@@ -503,6 +503,387 @@ def astar(
     return float("inf"), []
 
 
+# ============================================================================
+# SECTION 2: TREE DATA STRUCTURE & TREE DP
+# ============================================================================
+
+class TreeNode:
+    """Binary tree node for tree algorithms."""
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+def lca(root: TreeNode, p: TreeNode, q: TreeNode) -> TreeNode:
+    """
+    Lowest Common Ancestor of two nodes (assuming both exist in tree).
+
+    Time: O(n) single traversal, O(log n) balanced BST property
+    Space: O(h) where h = height (recursion stack)
+
+    Use when: Tree path queries, distance calculation, common ancestor problems
+    Interview tip: Show recursive solution vs iterative with parent pointers
+    """
+    if not root or root == p or root == q:
+        return root
+
+    left = lca(root.left, p, q)
+    right = lca(root.right, p, q)
+
+    if left and right:
+        return root  # Both found on different sides
+    return left if left else right  # Both on same side
+
+
+def path_sum(root: TreeNode, target_sum: int) -> bool:
+    """
+    Check if any root-to-leaf path sums to target.
+
+    Time: O(n) worst-case, O(log n) early termination possible
+    Space: O(h) recursion depth
+
+    Use when: Path validation, constraint checking
+    Interview tip: Explain both recursive and iterative approaches
+    """
+    def dfs(node, remaining):
+        if not node:
+            return False
+
+        remaining -= node.val
+
+        if not node.left and not node.right:
+            return remaining == 0
+
+        return dfs(node.left, remaining) or dfs(node.right, remaining)
+
+    return dfs(root, target_sum)
+
+
+def all_paths_sum(root: TreeNode) -> list[list[int]]:
+    """
+    Find all root-to-leaf paths (returning list of paths).
+
+    Time: O(n * h) where h is height (copy path per leaf)
+    Space: O(h) recursion + output space
+
+    Use when: All paths needed, backtracking on tree, path reconstruction
+    Interview tip: Distinguish from single path - need to track all branches
+    """
+    result = []
+
+    def dfs(node, path):
+        if not node:
+            return
+
+        path.append(node.val)
+
+        if not node.left and not node.right:
+            result.append(path[:])
+        else:
+            dfs(node.left, path)
+            dfs(node.right, path)
+
+        path.pop()
+
+    dfs(root, [])
+    return result
+
+
+def tree_diameter(root: TreeNode) -> int:
+    """
+    Longest path in tree (diameter = longest path between any two nodes).
+
+    Time: O(n) single DFS
+    Space: O(h) recursion depth
+
+    Use when: Tree analysis, path properties, constraint satisfaction
+    Interview tip: Explain why we need to return height and track global max
+    """
+    max_diameter = [0]
+
+    def dfs(node):
+        if not node:
+            return 0
+
+        left_height = dfs(node.left)
+        right_height = dfs(node.right)
+
+        # Diameter through this node
+        max_diameter[0] = max(max_diameter[0], left_height + right_height)
+
+        return max(left_height, right_height) + 1
+
+    dfs(root)
+    return max_diameter[0]
+
+
+def rob_tree(root: TreeNode) -> int:
+    """
+    House Robber III: max sum non-adjacent nodes (tree version).
+
+    Can't rob node if robbing any of its children.
+
+    Time: O(n) single DFS
+    Space: O(h) recursion
+
+    Use when: Constraint optimization on trees, state-dependent DP
+    Interview tip: Return tuple (rob_this, dont_rob_this) for clarity
+    """
+    def dfs(node):
+        if not node:
+            return (0, 0)  # (rob, dont_rob)
+
+        left_rob, left_no_rob = dfs(node.left)
+        right_rob, right_no_rob = dfs(node.right)
+
+        # Rob current: can't rob children
+        rob_current = node.val + left_no_rob + right_no_rob
+
+        # Don't rob current: can choose to rob or not rob each child
+        dont_rob = max(left_rob, left_no_rob) + max(right_rob, right_no_rob)
+
+        return (rob_current, dont_rob)
+
+    return max(dfs(root))
+
+
+def build_tree_preorder_inorder(preorder: list[int], inorder: list[int]) -> TreeNode:
+    """
+    Build tree from preorder and inorder traversals.
+
+    Preorder: root, left, right
+    Inorder: left, root, right
+
+    Time: O(n²) simple, O(n) with hashmap
+    Space: O(n) for result tree
+
+    Use when: Tree reconstruction, traversal combination problems
+    Interview tip: Explain role of each traversal (preorder gives root, inorder gives split)
+    """
+    if not preorder or not inorder:
+        return None
+
+    inorder_map = {val: i for i, val in enumerate(inorder)}
+
+    def build(pre_start, pre_end, in_start, in_end):
+        if pre_start > pre_end:
+            return None
+
+        root_val = preorder[pre_start]
+        root = TreeNode(root_val)
+
+        root_idx = inorder_map[root_val]
+        left_size = root_idx - in_start
+
+        root.left = build(pre_start + 1, pre_start + left_size, in_start, root_idx - 1)
+        root.right = build(pre_start + left_size + 1, pre_end, root_idx + 1, in_end)
+
+        return root
+
+    return build(0, len(preorder) - 1, 0, len(inorder) - 1)
+
+
+def serialize_tree(root: TreeNode) -> str:
+    """
+    Serialize tree to string (preorder with markers).
+
+    Use null marker to indicate missing children.
+
+    Time: O(n)
+    Space: O(n) for result string
+
+    Use when: Tree encoding, persistence, transmission
+    Interview tip: Explain why preorder works (root first, can reconstruct without inorder)
+    """
+    result = []
+
+    def preorder(node):
+        if not node:
+            result.append('null')
+            return
+
+        result.append(str(node.val))
+        preorder(node.left)
+        preorder(node.right)
+
+    preorder(root)
+    return ','.join(result)
+
+
+def deserialize_tree(data: str) -> TreeNode:
+    """
+    Deserialize string to tree (reverse of serialize_tree).
+
+    Time: O(n)
+    Space: O(n) for tree
+
+    Use when: Tree decoding, reconstruction from string
+    Interview tip: Use iterator to track position in preorder sequence
+    """
+    nodes = data.split(',')
+    iterator = iter(nodes)
+
+    def build():
+        val = next(iterator)
+        if val == 'null':
+            return None
+
+        root = TreeNode(int(val))
+        root.left = build()
+        root.right = build()
+        return root
+
+    return build()
+
+
+# ============================================================================
+# SECTION 3: ADVANCED GRAPH TRAVERSALS
+# ============================================================================
+# DFS/BFS patterns with variations for different problem types.
+
+def count_islands(grid: list[list[str]]) -> int:
+    """
+    Count distinct islands (connected 1s).
+
+    Time: O(m·n) visit each cell once
+    Space: O(m·n) for visited set
+
+    Use when: Connected component counting, region identification
+    Interview tip: Compare DFS (stack overflow risk), BFS (queue), Union-Find
+    """
+    if not grid:
+        return 0
+
+    visited = set()
+    count = 0
+
+    def dfs(i, j):
+        if i < 0 or i >= len(grid) or j < 0 or j >= len(grid[0]):
+            return
+        if (i, j) in visited or grid[i][j] == '0':
+            return
+
+        visited.add((i, j))
+        dfs(i+1, j)
+        dfs(i-1, j)
+        dfs(i, j+1)
+        dfs(i, j-1)
+
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == '1' and (i, j) not in visited:
+                dfs(i, j)
+                count += 1
+
+    return count
+
+
+def is_bipartite(graph: list[list[int]]) -> bool:
+    """
+    Check if graph is bipartite (2-colorable).
+
+    Time: O(v + e)
+    Space: O(v)
+
+    Use when: Bipartite matching preprocessing, 2-coloring problems
+    Interview tip: Explain DFS coloring vs BFS coloring trade-offs
+    """
+    color = {}
+
+    def dfs(node, c):
+        color[node] = c
+        for neighbor in graph[node]:
+            if neighbor in color:
+                if color[neighbor] == c:
+                    return False
+            else:
+                if not dfs(neighbor, 1 - c):
+                    return False
+        return True
+
+    for i in range(len(graph)):
+        if i not in color:
+            if not dfs(i, 0):
+                return False
+
+    return True
+
+
+def has_cycle_directed(graph: list[list[int]]) -> bool:
+    """
+    Detect cycle in directed graph using DFS coloring.
+
+    Colors: 0=white (unvisited), 1=gray (visiting), 2=black (done)
+    Cycle exists if we reach a gray node.
+
+    Time: O(v + e)
+    Space: O(v)
+
+    Use when: Topological sort verification, dependency analysis
+    Interview tip: Explain why we need 3 states (white/gray/black)
+    """
+    color = [0] * len(graph)  # 0: white, 1: gray, 2: black
+
+    def dfs(node):
+        if color[node] == 1:
+            return True  # Back edge found
+        if color[node] == 2:
+            return False  # Already processed
+
+        color[node] = 1  # Mark as visiting
+
+        for neighbor in graph[node]:
+            if dfs(neighbor):
+                return True
+
+        color[node] = 2  # Mark as done
+        return False
+
+    for i in range(len(graph)):
+        if color[i] == 0:
+            if dfs(i):
+                return True
+
+    return False
+
+
+def has_cycle_undirected(n: int, edges: list[list[int]]) -> bool:
+    """
+    Detect cycle in undirected graph using DFS.
+
+    Time: O(v + e)
+    Space: O(v)
+
+    Use when: Tree verification (acyclic graph), connectivity analysis
+    Interview tip: Contrast with directed version - need to track parent
+    """
+    graph = [[] for _ in range(n)]
+    for u, v in edges:
+        graph[u].append(v)
+        graph[v].append(u)
+
+    visited = set()
+
+    def dfs(node, parent):
+        visited.add(node)
+        for neighbor in graph[node]:
+            if neighbor == parent:
+                continue
+            if neighbor in visited:
+                return True
+            if dfs(neighbor, node):
+                return True
+        return False
+
+    for i in range(n):
+        if i not in visited:
+            if dfs(i, -1):
+                return True
+
+    return False
+
+
 # ---------------------------------------------------------------------------
 # __main__ demo
 # ---------------------------------------------------------------------------
