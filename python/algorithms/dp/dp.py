@@ -500,6 +500,567 @@ def longest_palindromic_substr(s: str) -> dict:
     }
 
 
+# ============================================================================
+# SECTION 2: BACKTRACKING ALGORITHMS
+# ============================================================================
+# Systematic exploration of decision space with constraint-based pruning.
+# Each algorithm generates all valid solutions by building incrementally
+# and backtracking when constraints are violated.
+
+def solve_nqueens(n: int) -> list[list[int]]:
+    """
+    Solve N-Queens problem: place n queens on an n×n board with no conflicts.
+
+    Each solution is represented as a list where index = row, value = column.
+    Example: [1, 3, 0, 2] means Queen at (0,1), (1,3), (2,0), (3,2).
+
+    Time: O(N!) - exploring N! permutations with pruning
+    Space: O(N) - recursion depth + result storage
+
+    Use when: Constraint satisfaction, board/placement problems, need all solutions
+    Interview tip: Explain pruning - why we reject invalid placements early
+    """
+    def is_safe(col_placement, row, col):
+        """Check if placing queen at (row, col) is safe."""
+        for prev_row in range(row):
+            prev_col = col_placement[prev_row]
+            # Check same column or diagonal
+            if prev_col == col or abs(prev_row - row) == abs(prev_col - col):
+                return False
+        return True
+
+    def backtrack(col_placement, row):
+        """Recursively place queens row by row."""
+        if row == n:
+            result.append(col_placement[:])
+            return
+
+        for col in range(n):
+            if is_safe(col_placement, row, col):
+                col_placement[row] = col
+                backtrack(col_placement, row + 1)
+                col_placement[row] = -1  # Reset for backtracking
+
+    result = []
+    backtrack([-1] * n, 0)
+    return result
+
+
+def solve_sudoku(board: list[list[int]]) -> None:
+    """
+    Solve Sudoku puzzle in-place using backtracking.
+
+    0 represents empty cells. Modifies board in-place.
+    Time: O(9^(n²)) worst-case, but typically much faster with constraint propagation
+    Space: O(1) excluding recursion stack (modifies board in-place)
+
+    Use when: Constraint satisfaction with multiple constraints, exact cover problems
+    Interview tip: Discuss how constraint propagation (tracking possibilities) speeds up naive backtracking
+    """
+    def is_valid(board, row, col, num):
+        """Check if placing num at (row, col) is valid."""
+        # Check row
+        if num in board[row]:
+            return False
+
+        # Check column
+        if num in [board[i][col] for i in range(9)]:
+            return False
+
+        # Check 3x3 box
+        box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+        for i in range(box_row, box_row + 3):
+            for j in range(box_col, box_col + 3):
+                if board[i][j] == num:
+                    return False
+
+        return True
+
+    def backtrack():
+        """Find next empty cell and try numbers 1-9."""
+        for row in range(9):
+            for col in range(9):
+                if board[row][col] == 0:
+                    for num in range(1, 10):
+                        if is_valid(board, row, col, num):
+                            board[row][col] = num
+                            if backtrack():
+                                return True
+                            board[row][col] = 0  # Backtrack
+                    return False
+        return True  # All cells filled
+
+    backtrack()
+
+
+def word_search(board: list[list[str]], word: str) -> bool:
+    """
+    Search for word in 2D grid (word must be contiguous, no cell reuse).
+
+    Time: O(N·M·4^L) where N,M are grid dims, L is word length, 4 neighbors per cell
+    Space: O(L) for recursion depth
+
+    Use when: Grid traversal with constraints, avoiding revisits, path finding
+    Interview tip: Explain visited set strategy and why we unmark during backtrack
+    """
+    if not board or not word:
+        return False
+
+    rows, cols = len(board), len(board[0])
+
+    def dfs(row, col, index, visited):
+        if index == len(word):
+            return True
+
+        if row < 0 or row >= rows or col < 0 or col >= cols:
+            return False
+        if (row, col) in visited or board[row][col] != word[index]:
+            return False
+
+        visited.add((row, col))
+        found = (dfs(row+1, col, index+1, visited) or
+                 dfs(row-1, col, index+1, visited) or
+                 dfs(row, col+1, index+1, visited) or
+                 dfs(row, col-1, index+1, visited))
+        visited.remove((row, col))
+
+        return found
+
+    for i in range(rows):
+        for j in range(cols):
+            if dfs(i, j, 0, set()):
+                return True
+    return False
+
+
+def permute(nums: list[int]) -> list[list[int]]:
+    """
+    Generate all permutations (arrangements) of a list.
+
+    Time: O(N! · N) - N! permutations, each takes O(N) to copy
+    Space: O(N!) for storing all permutations
+
+    Use when: All arrangements needed, order matters, each element used once
+    Interview tip: Show both swap-based and removed-element approaches
+    """
+    result = []
+
+    def backtrack(path):
+        if len(path) == len(nums):
+            result.append(path[:])
+            return
+
+        for i in range(len(nums)):
+            if nums[i] not in path:
+                path.append(nums[i])
+                backtrack(path)
+                path.pop()
+
+    backtrack([])
+    return result
+
+
+def combine(n: int, k: int) -> list[list[int]]:
+    """
+    Generate all combinations C(n, k) from [1, n].
+
+    Time: O(C(n,k) · k) - C(n,k) combinations, each takes O(k) to copy
+    Space: O(C(n,k)) for storing results
+
+    Use when: All selections needed, order doesn't matter, each element used once
+    Interview tip: Explain why we use start index to avoid duplicates
+    """
+    result = []
+
+    def backtrack(start, path):
+        if len(path) == k:
+            result.append(path[:])
+            return
+
+        for i in range(start, n + 1):
+            path.append(i)
+            backtrack(i + 1, path)
+            path.pop()
+
+    backtrack(1, [])
+    return result
+
+
+def letter_combinations(digits: str) -> list[str]:
+    """
+    Generate all letter combinations for phone keypad input.
+
+    Mapping: 2=abc, 3=def, 4=ghi, 5=jkl, 6=mno, 7=pqrs, 8=tuv, 9=wxyz
+
+    Time: O(4^N · N) where N is digit count, 4 is max letters per digit
+    Space: O(4^N) for results
+
+    Use when: Combinations from multiple choices with variable counts
+    Interview tip: Compare with backtracking - this is simpler iteration pattern
+    """
+    if not digits:
+        return []
+
+    mapping = {
+        '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',
+        '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'
+    }
+    result = []
+
+    def backtrack(index, path):
+        if index == len(digits):
+            result.append(''.join(path))
+            return
+
+        letters = mapping[digits[index]]
+        for letter in letters:
+            path.append(letter)
+            backtrack(index + 1, path)
+            path.pop()
+
+    backtrack(0, [])
+    return result
+
+
+def subsets(nums: list[int]) -> list[list[int]]:
+    """
+    Generate all subsets (power set) of a list.
+
+    Time: O(N · 2^N) - 2^N subsets, each takes O(N) to copy worst-case
+    Space: O(2^N) for results
+
+    Use when: All subsequences needed, subset sums, inclusion-exclusion
+    Interview tip: Show backtracking approach (easy to understand) vs bit-shift approach (efficient)
+    """
+    result = []
+
+    def backtrack(index, path):
+        result.append(path[:])
+
+        for i in range(index, len(nums)):
+            path.append(nums[i])
+            backtrack(i + 1, path)
+            path.pop()
+
+    backtrack(0, [])
+    return result
+
+
+def generate_parentheses(n: int) -> list[str]:
+    """
+    Generate all valid n-pair parentheses combinations.
+
+    Valid means: every '(' has matching ')', properly nested.
+
+    Time: O(4^N / √N) - Catalan number C_N ≈ 4^N / (N^1.5 · √π)
+    Space: O(4^N / √N) for results
+
+    Use when: Balanced bracket generation, valid sequences, constraint satisfaction
+    Interview tip: Show how tracking open count prunes invalid branches early
+    """
+    result = []
+
+    def backtrack(open_count, close_count, path):
+        if open_count == n and close_count == n:
+            result.append(''.join(path))
+            return
+
+        if open_count < n:
+            path.append('(')
+            backtrack(open_count + 1, close_count, path)
+            path.pop()
+
+        if close_count < open_count:
+            path.append(')')
+            backtrack(open_count, close_count + 1, path)
+            path.pop()
+
+    backtrack(0, 0, [])
+    return result
+
+
+# ============================================================================
+# SECTION 3: GRID & 2D DP ALGORITHMS
+# ============================================================================
+# Dynamic programming on 2D grids with multiple constraints and movements.
+# Key patterns: direction-aware DP, min/max path problems, obstacle handling.
+
+def unique_paths(m: int, n: int) -> int:
+    """
+    Count unique paths in m×n grid moving only right or down.
+
+    Time: O(m·n)
+    Space: O(m·n) or O(min(m,n)) with space optimization
+
+    Use when: Path counting, monotonic movement, small state space
+    Interview tip: Show both 2D DP and space-optimized 1D approach
+    """
+    dp = [[1] * n for _ in range(m)]
+
+    for i in range(1, m):
+        for j in range(1, n):
+            dp[i][j] = dp[i-1][j] + dp[i][j-1]
+
+    return dp[m-1][n-1]
+
+
+def bomb_enemy(grid: list[list[str]]) -> int:
+    """
+    Maximum enemies that can be killed by placing one bomb.
+
+    Bomb kills all enemies in same row/column until hitting wall 'W'.
+    '0'=empty, 'E'=enemy, 'W'=wall
+
+    Time: O(m·n) with preprocessing
+    Space: O(m·n) for DP tables
+
+    Use when: 2D range queries, directional constraints
+    Interview tip: Explain preprocessing matrices for each direction
+    """
+    if not grid:
+        return 0
+    m, n = len(grid), len(grid[0])
+
+    # Count enemies in rows (counting reset by walls)
+    rows = [[0]*n for _ in range(m)]
+    for i in range(m):
+        count = 0
+        for j in range(n):
+            if grid[i][j] == 'W':
+                count = 0
+            else:
+                if grid[i][j] == 'E':
+                    count += 1
+                rows[i][j] = count
+
+    # Count enemies in columns (counting reset by walls)
+    cols = [[0]*n for _ in range(m)]
+    for j in range(n):
+        count = 0
+        for i in range(m):
+            if grid[i][j] == 'W':
+                count = 0
+            else:
+                if grid[i][j] == 'E':
+                    count += 1
+                cols[i][j] = count
+
+    max_kill = 0
+    for i in range(m):
+        for j in range(n):
+            if grid[i][j] == '0':
+                max_kill = max(max_kill, rows[i][j] + cols[i][j])
+
+    return max_kill
+
+
+def max_island_area(grid: list[list[int]]) -> int:
+    """
+    Maximum area of island (connected 1s) in binary grid.
+
+    Time: O(m·n) - visit each cell once
+    Space: O(m·n) for visited set or recursion
+
+    Use when: Connected components, area/perimeter calculation
+    Interview tip: Compare DFS (clean code) vs BFS (less stack risk) vs Union-Find
+    """
+    if not grid:
+        return 0
+
+    visited = set()
+
+    def dfs(i, j):
+        if i < 0 or i >= len(grid) or j < 0 or j >= len(grid[0]):
+            return 0
+        if (i, j) in visited or grid[i][j] == 0:
+            return 0
+
+        visited.add((i, j))
+        area = 1
+        area += dfs(i+1, j) + dfs(i-1, j) + dfs(i, j+1) + dfs(i, j-1)
+        return area
+
+    max_area = 0
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == 1 and (i, j) not in visited:
+                max_area = max(max_area, dfs(i, j))
+
+    return max_area
+
+
+def dungeon_game(dungeon: list[list[int]]) -> int:
+    """
+    Minimum health required to traverse dungeon and reach exit.
+
+    Health must always be ≥ 1. Each cell changes health by its value.
+
+    Time: O(m·n)
+    Space: O(m·n) or O(n) with space optimization
+
+    Use when: Reverse DP, min constraint propagation, path requirements
+    Interview tip: Explain why reverse (bottom-right to top-left) is necessary
+    """
+    if not dungeon:
+        return 0
+
+    m, n = len(dungeon), len(dungeon[0])
+    dp = [[0] * n for _ in range(m)]
+
+    # Minimum health needed at exit is 1
+    dp[m-1][n-1] = max(1, 1 - dungeon[m-1][n-1])
+
+    # Fill last row (can only move right)
+    for j in range(n-2, -1, -1):
+        dp[m-1][j] = max(1, dp[m-1][j+1] - dungeon[m-1][j])
+
+    # Fill last column (can only move down)
+    for i in range(m-2, -1, -1):
+        dp[i][n-1] = max(1, dp[i+1][n-1] - dungeon[i][n-1])
+
+    # Fill rest of table
+    for i in range(m-2, -1, -1):
+        for j in range(n-2, -1, -1):
+            min_health_needed = min(dp[i+1][j], dp[i][j+1]) - dungeon[i][j]
+            dp[i][j] = max(1, min_health_needed)
+
+    return dp[0][0]
+
+
+def trapping_rain_water_2d(elevation_map: list[list[int]]) -> int:
+    """
+    Trap rainwater in 2D elevation map.
+
+    Water fills to minimum boundary height.
+
+    Time: O(m·n·log(m·n)) with priority queue
+    Space: O(m·n)
+
+    Use when: 2D range min queries, priority queue-based search
+    Interview tip: Explain why boundary cells are processed first (water flows out)
+    """
+    import heapq
+
+    if not elevation_map or not elevation_map[0]:
+        return 0
+
+    m, n = len(elevation_map), len(elevation_map[0])
+    visited = [[False] * n for _ in range(m)]
+    water = 0
+
+    # Start from boundary (water flows out at edges)
+    pq = []
+    for i in range(m):
+        for j in range(n):
+            if i == 0 or i == m-1 or j == 0 or j == n-1:
+                heapq.heappush(pq, (elevation_map[i][j], i, j))
+                visited[i][j] = True
+
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+    while pq:
+        height, i, j = heapq.heappop(pq)
+
+        for di, dj in directions:
+            ni, nj = i + di, j + dj
+            if 0 <= ni < m and 0 <= nj < n and not visited[ni][nj]:
+                visited[ni][nj] = True
+                water += max(0, height - elevation_map[ni][nj])
+                heapq.heappush(pq, (max(height, elevation_map[ni][nj]), ni, nj))
+
+    return water
+
+
+def word_ladder(begin_word: str, end_word: str, word_list: list[str]) -> int:
+    """
+    Shortest word ladder transformation (BFS on implicit graph).
+
+    Each step changes one letter. All intermediate words in word_list.
+
+    Time: O(n·L²) where n=list size, L=word length
+    Space: O(n·L)
+
+    Use when: Shortest path on implicit graph, pattern-based edges
+    Interview tip: Discuss word pattern generation (wildcard matching)
+    """
+    from collections import deque
+
+    if end_word not in word_list:
+        return 0
+
+    word_set = set(word_list)
+    queue = deque([(begin_word, 1)])
+    visited = {begin_word}
+
+    while queue:
+        word, level = queue.popleft()
+
+        if word == end_word:
+            return level
+
+        for i in range(len(word)):
+            for c in 'abcdefghijklmnopqrstuvwxyz':
+                new_word = word[:i] + c + word[i+1:]
+                if new_word in word_set and new_word not in visited:
+                    visited.add(new_word)
+                    queue.append((new_word, level + 1))
+
+    return 0
+
+
+def word_pattern_match(pattern: str, str_: str) -> bool:
+    """
+    Match pattern to string with bijective mapping.
+
+    Each char in pattern maps to unique substring in str_.
+
+    Time: O(n · 2^m) where n=str length, m=pattern length (exponential in pattern)
+    Space: O(m + n) for mapping and recursion
+
+    Use when: Pattern matching, bijective constraints, backtracking with state
+    Interview tip: Show memo optimization to avoid recomputation
+    """
+    memo = {}
+
+    def helper(pi, si, mapping, reverse_mapping):
+        if pi == len(pattern) and si == len(str_):
+            return True
+        if pi == len(pattern) or si == len(str_):
+            return False
+
+        key = (pi, si, tuple(sorted(mapping.items())))
+        if key in memo:
+            return memo[key]
+
+        p_char = pattern[pi]
+
+        for end in range(si + 1, len(str_) + 1):
+            sub_str = str_[si:end]
+
+            if p_char in mapping:
+                if mapping[p_char] != sub_str:
+                    continue
+                if helper(pi + 1, end, mapping, reverse_mapping):
+                    memo[key] = True
+                    return True
+            elif sub_str in reverse_mapping:
+                continue
+            else:
+                mapping[p_char] = sub_str
+                reverse_mapping[sub_str] = p_char
+
+                if helper(pi + 1, end, mapping, reverse_mapping):
+                    memo[key] = True
+                    return True
+
+                del mapping[p_char]
+                del reverse_mapping[sub_str]
+
+        memo[key] = False
+        return False
+
+    return helper(0, 0, {}, {})
+
+
 # ---------------------------------------------------------------------------
 # __main__ demo
 # ---------------------------------------------------------------------------
