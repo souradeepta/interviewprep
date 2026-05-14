@@ -793,6 +793,66 @@ Both length 3; return "bab" (first found).
 
 ---
 
+## Backtracking Pattern Guide
+
+> **See detailed guide:** [`backtracking_patterns.md`](backtracking_patterns.md)
+
+### When to Choose Backtracking
+
+Use backtracking when you need **all solutions** to a constraint satisfaction problem:
+- **N-Queens**: Place n queens with no conflicts
+- **Sudoku**: Fill grid with unique rows/cols/boxes
+- **Word Search**: Find word path in grid
+- **Permutations/Combinations**: All arrangements or selections
+- **Subsets**: All subsequences (power set)
+
+**Key insight:** Backtracking systematically explores all possibilities with early pruning of invalid branches.
+
+### Backtracking Complexity Summary
+
+| Algorithm | Time | Space | Type |
+|-----------|------|-------|------|
+| N-Queens | O(N!) | O(N²) | Constraint satisfaction |
+| Sudoku | O(9^(n²)) | O(1) | Constraint satisfaction |
+| Word Search | O(N·M·4^L) | O(L) | Grid path finding |
+| Permutations | O(N!·N) | O(N!) | All arrangements |
+| Combinations | O(C(n,k)·k) | O(k) | All selections |
+| Subsets | O(N·2^N) | O(2^N) | Power set |
+| Letter Combos | O(4^N·N) | O(4^N) | Mapping output |
+| Parentheses | O(Catalan·N) | O(N) | Balanced strings |
+
+---
+
+## Grid & 2D DP Pattern Guide
+
+> **See detailed guide:** [`grid_dp_patterns.md`](grid_dp_patterns.md)
+
+### Grid Problem Categories
+
+| Category | Algorithm | Pattern | Example |
+|----------|-----------|---------|---------|
+| Path Counting | unique_paths | DP[i][j] = DP[i-1][j] + DP[i][j-1] | m×n grid, right/down only |
+| Constraint Optimization | bomb_enemy | Precompute per direction | Range queries per row/col |
+| Connected Components | max_island_area | DFS/BFS all connected cells | Island maximum area |
+| Reverse Constraint | dungeon_game | Process bottom-right to top-left | Minimum health requirement |
+| Elevation/Boundaries | trapping_rain_water_2d | Priority queue + visited | Water level between boundaries |
+| Path Finding | word_ladder | BFS on implicit graph | Shortest transformation path |
+| Pattern Matching | word_pattern_match | Bijective backtracking | String-to-pattern assignment |
+
+### Grid DP Complexity Summary
+
+| Algorithm | Time | Space | Pattern |
+|-----------|------|-------|---------|
+| Unique Paths | O(m·n) | O(m·n) | Path counting |
+| Bomb Enemy | O(m·n·(m+n)) | O(m·n) | Preprocessing |
+| Max Island | O(m·n) | O(m·n) | Connected components |
+| Dungeon Game | O(m·n) | O(m·n) | Reverse DP |
+| Trapping Rain 2D | O(m·n·log(m·n)) | O(m·n) | Priority queue |
+| Word Ladder | O(n·L²) | O(n·L) | Implicit graph BFS |
+| Word Pattern | O(n·2^m) | O(m+n) | Bijective backtrack |
+
+---
+
 ## Choosing the Right Algorithm
 
 | Problem shape                                             | DP pattern               |
