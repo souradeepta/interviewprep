@@ -1,12 +1,43 @@
 # Backtracking Algorithms: Decision Flowchart & Patterns
 
+A comprehensive guide to backtracking algorithms for SDE interview preparation. Backtracking is a systematic exploration technique that explores all possible solutions through trial-and-error, abandoning (backtracking) when constraints are violated. This guide covers when to use backtracking, how to structure the algorithm, common patterns, and interview tips.
+
+---
+
 ## When to Use Backtracking
 
-Backtracking is a systematic exploration technique where you:
-1. **Build** solutions incrementally
-2. **Check** constraints at each step
-3. **Backtrack** when constraints are violated
-4. **Find all** valid solutions
+Backtracking is the right approach when:
+
+1. **You need ALL solutions** (not just one) — Backtracking exhaustively explores the solution space
+2. **Solutions can be built incrementally** — You can construct partial solutions and extend them
+3. **You can prune branches early** — Invalid branches can be identified and skipped without exploring them fully
+4. **The problem has constraints** — Valid solutions must satisfy multiple constraints (no conflicts, balance, bijection, etc.)
+
+**Key insight:** Backtracking = DFS on solution tree with early pruning.
+
+### Backtracking Process
+
+The algorithm follows this sequence:
+1. **Build**: Add a choice to the current partial solution
+2. **Check**: Verify that constraints are still satisfied
+3. **Recurse**: Recursively solve the remaining subproblem
+4. **Backtrack**: Undo the choice and try the next alternative
+
+```
+Backtracking on N-Queens (n=4):
+
+Place queens row by row, checking for conflicts
+
+  [0] Queen at (0,0)
+    [1] Queen at (1,2) - check: no column/diagonal conflicts
+      [2] Queen at (2,0) - fails: column conflict with (0,0) - BACKTRACK
+      [2] Queen at (2,1) - fails: diagonal conflict with (1,2) - BACKTRACK
+      [2] Queen at (2,3) - check: valid
+        [3] Queen at (3,1) - check: valid → SOLUTION [0,2,1,3]... BACKTRACK
+        [3] Try next... all fail → BACKTRACK
+    [1] Try (1,3) → ... → SOLUTION [0,3,1,0]... found or exhausted → BACKTRACK
+  [0] Try (0,1) → ... continue exhaustively
+```
 
 ## Decision Flowchart
 

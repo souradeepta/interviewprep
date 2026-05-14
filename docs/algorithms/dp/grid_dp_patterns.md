@@ -1,5 +1,48 @@
 # Grid & 2D DP: Pattern Recognition & Decision Flowchart
 
+A comprehensive guide to solving problems on 2D grids using dynamic programming. Grid DP problems involve filling or analyzing a 2D array with specific patterns and constraints. This guide covers pattern recognition, solution templates, and detailed examples for each category.
+
+---
+
+## Understanding Grid DP
+
+Grid DP involves solving problems on m×n 2D arrays where:
+- **State**: `dp[i][j]` represents the optimal solution for the subgrid from `(0,0)` to `(i,j)` or a specific property at position `(i,j)`
+- **Transition**: Each cell's value depends on neighbors (typically top and left for forward DP, or bottom and right for reverse)
+- **Key constraint**: Grid dimensions and movement rules (4-directional, only right/down, etc.)
+
+### Example: Unique Paths
+
+```
+Problem: Count paths in m×n grid moving only right or down
+
+Grid (3×3):
+  [1] [2] [3]
+  [4] [5] [6]
+  [7] [8] [9]
+
+Movement: → or ↓ only
+
+DP approach:
+  dp[i][j] = number of ways to reach (i,j) from (0,0)
+  dp[i][j] = dp[i-1][j] + dp[i][j-1]  (from top or left)
+
+Example: 3×3 grid
+  dp[0][0]=1    (start)
+  dp[0][1]=1    (only right)
+  dp[0][2]=1    (only right)
+  dp[1][0]=1    (only down)
+  dp[1][1]=2    (top=1 + left=1)
+  dp[1][2]=3    (top=1 + left=2)
+  dp[2][0]=1    (only down)
+  dp[2][1]=3    (top=2 + left=1)
+  dp[2][2]=6    (top=3 + left=3)  ← Answer
+
+Paths: 6 unique paths from (0,0) to (2,2)
+```
+
+---
+
 ## Grid Problem Patterns
 
 ```mermaid

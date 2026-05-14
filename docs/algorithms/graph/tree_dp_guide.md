@@ -1,5 +1,70 @@
 # Tree DP: Pattern Recognition & Implementation Guide
 
+A comprehensive guide to solving problems on tree structures using dynamic programming. Tree DP exploits the recursive structure of trees to solve optimization problems efficiently. This guide covers common patterns, templates, and detailed examples.
+
+---
+
+## What is Tree DP?
+
+Tree DP combines two key ideas:
+1. **Recursive structure**: Trees naturally decompose into independent subtrees
+2. **Optimal substructure**: Optimal solution to parent problem can be built from optimal solutions to child problems
+
+### Core Insight
+
+For a given node, we compute a **value** that depends on values from **children**. This allows O(n) algorithms: visit each node once, compute in O(1) per node using postorder traversal (children first, then parent).
+
+### Example: Maximum Path Sum in Tree
+
+```
+Problem: Find longest path sum in tree (can go through any node)
+
+Tree:
+       1
+      / \
+    -3   2
+    /
+   4
+
+Paths:
+  [4, -3, 1, 2] = 4 sum = 4 (just 4) [no, path is 4+(-3)+1+2=4]
+  [4, -3, 1] = 2 
+  [4, -3] = 1
+  [4] = 4  ← Local maximum at 4
+  [1] = 1
+  [2] = 2
+  [1, -3, 4] = 2
+  [1, 2] = 3
+  [-3, 4] = 1
+  
+Max path sum = 4 (path [4] or [1,2] with sum 3... so 4)
+
+DP approach:
+  For each node, compute:
+    max_path_through[node] = longest path that TURNS at this node
+    max_path_ending[node] = longest path that ENDS at this node going down
+  
+  Postorder: left subtree → right subtree → current node
+  
+  Node 4: 
+    max_ending = 4 (just the node)
+    max_through = 4 (just the node)
+  
+  Node -3:
+    max_ending = max(-3 alone, -3→4) = max(-3, -3+4) = 1
+    max_through = 1 (left child only, right doesn't exist)
+    
+  Node 1:
+    left_max_ending = 1 (from subtree of -3)
+    right_max_ending = 2 (from subtree of 2, which is just node 2)
+    max_ending = max(1, -3+1, 2+1, -3+1+2) = max(1, -2, 3, 0) = 3
+    max_through = 3 (path [-3, 1, 2])
+  
+  Global answer = max(all max_through values) = 4
+```
+
+---
+
 ## Tree DP Pattern Flowchart
 
 ```mermaid
