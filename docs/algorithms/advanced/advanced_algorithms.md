@@ -34,16 +34,16 @@ flowchart TD
     
     DPType -->|Need Digit Constraints| DigitDP["✓ Digit DP<br/>O(d·S) where d=digits<br/>S=state space"]
     
-    DPType -->|Tree Structure| TreeDP["✓ Tree DP<br/>O(V) or O(V²)<br/>for tree decomposition"]
+    DPType -->|Tree Structure| TreeDP["✓ Tree DP<br/>O(V) or O(V^2)<br/>for tree decomposition"]
     
     DPType -->|Bitmask/Subset| SosDP{{"Is subset<br/>enumeration needed?"}}
     SosDP -->|Yes - Sum Over Subsets| SosDp["✓ SOS DP<br/>O(k·2^k) k≤20"]
     SosDP -->|No - Standard Bitmask| BitmaskDP["✓ Standard DP<br/>O(2^k·poly)<br/>k≤15-20"]
     
     DPType -->|Interval DP| IntervalOpt{{"Optimal<br/>substructure<br/>monotonic?"}}
-    IntervalOpt -->|Yes, Quadrangle| KnuthYao["✓ Knuth-Yao<br/>Optimization<br/>O(n²)"]
+    IntervalOpt -->|Yes, Quadrangle| KnuthYao["✓ Knuth-Yao<br/>Optimization<br/>O(n^2)"]
     IntervalOpt -->|Yes, Convex| DivideConq["✓ Divide & Conquer DP<br/>O(n log n)"]
-    IntervalOpt -->|No| StandardInt["✓ Standard Interval DP<br/>O(n³)"]
+    IntervalOpt -->|No| StandardInt["✓ Standard Interval DP<br/>O(n^3)"]
     
     %% Graph Branch
     IsGraph -->|Yes| GraphType{{"What graph<br/>problem?"}}
@@ -52,11 +52,11 @@ flowchart TD
     FlowType -->|Yes| MinCostFlow["✓ Min Cost Max Flow<br/>Successive Shortest<br/>O(flow·E·log V)"]
     FlowType -->|No| MaxFlowAlgo{{"Graph<br/>density<br/>and size?"}}
     MaxFlowAlgo -->|Dense or V small| Dinic["✓ Dinic's Algorithm<br/>O(V²E)"]
-    MaxFlowAlgo -->|Sparse| PushRelabel["✓ Push-Relabel<br/>O(V³) or O(V²√E)<br/>variants"]
+    MaxFlowAlgo -->|Sparse| PushRelabel["✓ Push-Relabel<br/>O(V^3) or O(V²·sqrt(E))<br/>variants"]
     
     GraphType -->|Bipartite Matching| MatchSize{{"Size of<br/>bipartite<br/>set?"}}
-    MatchSize -->|V ≤ 500| Hungarian["✓ Hungarian Algorithm<br/>O(V³)"]
-    MatchSize -->|V > 500, Dense| HopcroftKarp["✓ Hopcroft-Karp<br/>O(E√V)"]
+    MatchSize -->|V ≤ 500| Hungarian["✓ Hungarian Algorithm<br/>O(V^3)"]
+    MatchSize -->|V > 500, Dense| HopcroftKarp["✓ Hopcroft-Karp<br/>O(E·sqrt(V))"]
     MatchSize -->|V > 500, Sparse| AugmentPath["✓ Augmenting Paths<br/>O(V·E)"]
     
     GraphType -->|2-SAT Problem| TwoSAT["✓ 2-SAT with SCC<br/>Build implication graph<br/>Find SCCs<br/>O(V+E)"]
@@ -71,7 +71,7 @@ flowchart TD
     SingleSource -->|Single| Dijkstra["✓ Dijkstra<br/>O(E+V log V)<br/>with Fibonacci heap"]
     SingleSource -->|All-pairs| Johnson["✓ Johnson's Algorithm<br/>O(VE log V)<br/>reweight + Dijkstra×V"]
     PathType -->|Yes| NegWeight{{"All-pairs<br/>needed?"}}
-    NegWeight -->|Yes| FloydWar["✓ Floyd-Warshall<br/>O(V³) dense"]
+    NegWeight -->|Yes| FloydWar["✓ Floyd-Warshall<br/>O(V^3) dense"]
     NegWeight -->|No| BellmanF["✓ Bellman-Ford<br/>O(VE)<br/>detect neg cycles"]
     
     GraphType -->|Articulation<br/>Points| ArticPt["✓ Articulation Points<br/>& Bridges<br/>Tarjan/DFS O(V+E)"]
@@ -98,7 +98,7 @@ flowchart TD
     
     StringType -->|Palindromes| PalindType{{"All palindromes<br/>or just check?"}}
     PalindType -->|All subpalindromes| Manacher["✓ Manacher's Algorithm<br/>O(n) single pass<br/>find all palindromes"]
-    PalindType -->|Check/Longest| ManacherDP["✓ Manacher or DP<br/>O(n) vs O(n²)"]
+    PalindType -->|Check/Longest| ManacherDP["✓ Manacher or DP<br/>O(n) vs O(n^2)"]
     
     %% Geometry Branch
     IsString -->|No| IsGeom{{"Is this a<br/>Geometry Problem?"}}
@@ -122,13 +122,13 @@ flowchart TD
     
     IsMisc -->|Yes| MiscType{{"Which pattern?"}}
     
-    MiscType -->|Tree Path Queries| HeavyLight["✓ Heavy-Light Decomposition<br/>O(log² V) per query<br/>+ O(log n) segment tree"]
+    MiscType -->|Tree Path Queries| HeavyLight["✓ Heavy-Light Decomposition<br/>O(log^2 V) per query<br/>+ O(log n) segment tree"]
     
-    MiscType -->|Offline Range Queries| Mo["✓ Mo's Algorithm<br/>O((n+m)√n)<br/>m queries on ranges"]
+    MiscType -->|Offline Range Queries| Mo["✓ Mo's Algorithm<br/>O((n+m)·sqrt(n))<br/>m queries on ranges"]
     
-    MiscType -->|Large sqrt(n) range| SqrtDecomp["✓ Square Root<br/>Decomposition<br/>O(√n) per query"]
+    MiscType -->|Large sqrt(n) range| SqrtDecomp["✓ Square Root<br/>Decomposition<br/>O(sqrt(n)) per query"]
     
-    MiscType -->|Selection Problem| QSelect["✓ QuickSelect<br/>O(n) average<br/>O(n²) worst (rare)"]
+    MiscType -->|Selection Problem| QSelect["✓ QuickSelect<br/>O(n) average<br/>O(n^2) worst (rare)"]
     
     MiscType -->|Optimal Encoding| Huffman["✓ Huffman Coding<br/>O(n log n) build<br/>Greedy tree construction"]
     
@@ -161,7 +161,7 @@ flowchart TD
 
 **Description**
 
-Convex Hull Trick optimizes DP recurrences of the form `dp[i] = min(dp[j] + cost[i][j])` where the cost function is a linear combination. It maintains the lower envelope of a set of linear functions and queries the minimum value in O(1) or O(log n) time, avoiding the naive O(n²) DP.
+Convex Hull Trick optimizes DP recurrences of the form `dp[i] = min(dp[j] + cost[i][j])` where the cost function is a linear combination. It maintains the lower envelope of a set of linear functions and queries the minimum value in O(1) or O(log n) time, avoiding the naive O(n^2) DP.
 
 The idea: represent each possible previous state j as a linear function `f_j(x) = a_j * x + b_j`. For a state i with parameter x_i, we need `min_j(a_j * x_i + b_j)`. The optimal j lies on the lower envelope (convex hull) of these lines.
 
@@ -169,7 +169,7 @@ The idea: represent each possible previous state j as a linear function `f_j(x) 
 
 ```mermaid
 flowchart TD
-    A(["START: Analyzing DP<br/>Recurrence"]) --> B{"Is recurrence<br/>O(n²) DP with<br/>cost structure?"}}
+    A(["START: Analyzing DP<br/>Recurrence"]) --> B{"Is recurrence<br/>O(n^2) DP with<br/>cost structure?"}}
     B -->|No| C["❌ CHT not applicable<br/>Use standard approach"]
     B -->|Yes| D{"Can cost be split:<br/>a_j·i + b_j<br/>where j,i are separate?"}}
     D -->|No| E["❌ CHT not applicable<br/>Cost structure wrong"]
@@ -190,7 +190,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["START: DP recurrence<br/>dp[i] = min(dp[j] + cost[i][j])"] --> B{"Is cost[i][j]<br/>of form a_j·i + b_j?"}
-    B -->|No| C["Use standard DP<br/>⏱️ O(n²)"]
+    B -->|No| C["Use standard DP<br/>⏱️ O(n^2)"]
     B -->|Yes| D{"Are queries x_i<br/>monotonically increasing?"}
     D -->|No| E["Use online CHT<br/>with balanced BST<br/>⏱️ O(n log n)"]
     D -->|Yes| F["Use offline CHT<br/>with deque<br/>⏱️ O(n)"]
@@ -215,7 +215,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Start(["Need to optimize<br/>O(n²) DP?"]) --> Q1{{"Slopes<br/>monotonic?"}}
+    Start(["Need to optimize<br/>O(n^2) DP?"]) --> Q1{{"Slopes<br/>monotonic?"}}
     Q1 -->|Decreasing| Deque["✓ Use Deque CHT<br/>O(n) - FASTEST<br/>Remove from back"]
     Q1 -->|Increasing| Deque
     Q1 -->|Random| Tree["✓ Use Tree CHT<br/>O(n log n)<br/>Binary search"]
@@ -223,8 +223,8 @@ flowchart TD
     Deque --> Space["Memory: O(n)<br/>for line storage"]
     Tree --> Space
     Space --> Impl["Implementation<br/>complexity: Medium"]
-    Impl --> Worth{{"Worth<br/>implementation<br/>vs O(n²)?"}}
-    Worth -->|n ≤ 5000| No["❌ Skip optimization<br/>O(n²) fast enough"]
+    Impl --> Worth{{"Worth<br/>implementation<br/>vs O(n^2)?"}}
+    Worth -->|n ≤ 5000| No["❌ Skip optimization<br/>O(n^2) fast enough"]
     Worth -->|n > 5000| Yes["✓ Implement CHT<br/>n=10^6+ needed"]
     
     classDef fast fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
@@ -288,12 +288,12 @@ Since queries x_i = i are in order, use offline CHT with deque:
   - Slopes are monotonically decreasing: -2, -4, -6, ... ✓
   - Process in order, remove dominated lines from back, query from front
 
-dp values computed in O(n) instead of O(n²)
+dp values computed in O(n) instead of O(n^2)
 ```
 
 **Interview Q&A**
 
-1. **Q: When should I use CHT instead of standard DP?** A: When you have O(n²) DP with a specific recurrence structure where cost is separable into j-dependent and i-dependent parts. CHT reduces this to O(n) or O(n log n). Without this structure, CHT doesn't apply.
+1. **Q: When should I use CHT instead of standard DP?** A: When you have O(n^2) DP with a specific recurrence structure where cost is separable into j-dependent and i-dependent parts. CHT reduces this to O(n) or O(n log n). Without this structure, CHT doesn't apply.
 
 2. **Q: What's the difference between online and offline CHT?** A: Offline CHT (with deque) runs in O(n) and works only when query parameters are monotonically ordered. Online CHT (with balanced BST or Li-Chao tree) handles random queries in O(n log n) but has higher constant factors.
 
@@ -446,7 +446,7 @@ flowchart TD
     Q1 -->|Yes| Q2{"Can solution<br/>be expressed<br/>per subtree?"}}
     Q2 -->|No| NotDP["❌ May need<br/>different approach"]
     Q2 -->|Yes| Q3{"Do subproblems<br/>depend on<br/>children only?"}}
-    Q3 -->|Yes| Apply["✓ TREE DP APPLICABLE<br/>O(n·S) or O(n²)<br/>S = states"]
+    Q3 -->|Yes| Apply["✓ TREE DP APPLICABLE<br/>O(n·S) or O(n^2)<br/>S = states"]
     Q3 -->|No| Harder["⚠️ May need rerooting<br/>or DP on paths"]
     
     classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
@@ -516,7 +516,7 @@ flowchart TD
 
 **Complexity**
 
-- Time: O(n) to traverse all nodes once (or O(n²) if rerooting)
+- Time: O(n) to traverse all nodes once (or O(n^2) if rerooting)
 - Space: O(n * S) where S = state space per node
 
 **When to Use**
@@ -729,7 +729,7 @@ The algorithm had an error in my trace; the recurrence is f[S] = f[S without bit
 Knuth-Yao optimization applies to interval DP problems where the recurrence is:
 `dp[i][j] = min_k(dp[i][k] + dp[k+1][j] + cost[i][j])` with the quadrangle inequality.
 
-If the optimal split point is monotone (opt[i][j-1] <= opt[i][j] <= opt[i+1][j]), Knuth-Yao reduces time from O(n³) to O(n²).
+If the optimal split point is monotone (opt[i][j-1] <= opt[i][j] <= opt[i+1][j]), Knuth-Yao reduces time from O(n^3) to O(n^2).
 
 **Solution Approach Flowchart**
 
@@ -737,7 +737,7 @@ If the optimal split point is monotone (opt[i][j-1] <= opt[i][j] <= opt[i+1][j])
 flowchart TD
     A["START: Interval DP with<br/>quadrangle inequality"] --> B["Define dp[i][j] and cost[i][j]"]
     B --> C{"Does cost satisfy<br/>quadrangle inequality?"}
-    C -->|No| D["Use standard interval DP<br/>O(n³)"]
+    C -->|No| D["Use standard interval DP<br/>O(n^3)"]
     C -->|Yes| E{"Is optimal split<br/>monotone?"}
     E -->|No| F["Cannot use Knuth-Yao"]
     E -->|Yes| G["Track optimal[i][j]"]
@@ -747,15 +747,15 @@ flowchart TD
     J -->|No| K["Next interval length"]
     K --> H
     J -->|Yes| L["Answer: dp[0][n-1]"]
-    L --> M["END: DP computed in O(n²)"]
+    L --> M["END: DP computed in O(n^2)"]
     D --> M
     F --> M
 ```
 
 **Complexity**
 
-- Time: O(n²) with Knuth-Yao, O(n³) without
-- Space: O(n²)
+- Time: O(n^2) with Knuth-Yao, O(n^3) without
+- Space: O(n^2)
 
 **When to Use**
 
@@ -775,14 +775,14 @@ cost[i][j] = dims[i] * dims[j+1] * dims[k+1] for split at k
 Quadrangle inequality: cost[a][c] + cost[b][d] <= cost[a][d] + cost[b][c]
 for a <= b <= c <= d. For matrix cost, this holds.
 
-Standard: try all splits k for each [i,j] → O(n³)
+Standard: try all splits k for each [i,j] → O(n^3)
 
 With Knuth-Yao:
 If opt[0][1] = 0 (split at k=0), then opt[0][2] >= 0
 If opt[1][2] = 1 (split at k=1), then opt[0][2] may be 0 or 1
 
 Monotonicity reduces search space: only check splits near previous optimal
-Final complexity: O(n²) amortized
+Final complexity: O(n^2) amortized
 ```
 
 **Interview Q&A**
@@ -808,7 +808,7 @@ flowchart TD
     Q1 -->|Yes| Q2{"Graph size<br/>and density?"}}
     Q2 -->|V ≤ 100, sparse| FF["⚠️ Ford-Fulkerson<br/>Simple but slow<br/>O(E·flow)"]
     Q2 -->|V ≤ 1000, any| Dinics["✓ Dinic's Algorithm<br/>BEST practical<br/>O(V²E)"]
-    Q2 -->|V > 1000, dense| PushRel["✓ Push-Relabel<br/>Better for dense<br/>O(V³) or variant"]
+    Q2 -->|V > 1000, dense| PushRel["✓ Push-Relabel<br/>Better for dense<br/>O(V^3) or variant"]
     
     classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
     classDef warning fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
@@ -862,7 +862,7 @@ flowchart TD
     A(["Finding Augmenting<br/>Paths"]) --> M1["Method 1: DFS<br/>Ford-Fulkerson<br/>Simple, slow O(E·flow)"]
     A --> M2["Method 2: BFS<br/>Edmonds-Karp<br/>Polynomial O(VE²)"]
     A --> M3["Method 3: Level Graph<br/>Dinic's<br/>O(V²E) fast"]
-    A --> M4["Method 4: Blocking Flows<br/>Push-Relabel variant<br/>O(V³) or O(V²√E)"]
+    A --> M4["Method 4: Blocking Flows<br/>Push-Relabel variant<br/>O(V^3) or O(V²√E)"]
     
     M1 --> Ex1["Unbounded flow:<br/>DFS may loop forever<br/>if flow not integer"]
     M2 --> Ex2["Always polynomial<br/>BFS finds shortest<br/>augmenting path"]
@@ -877,7 +877,7 @@ flowchart TD
 
 - Ford-Fulkerson: O(E * max_flow) (depends on flow value, not ideal)
 - Dinic's: O(V² * E) with BFS for level graphs
-- Push-relabel: O(V³) or O(V² * sqrt(E))
+- Push-relabel: O(V^3) or O(V² * sqrt(E))
 
 **When to Use**
 
@@ -912,7 +912,7 @@ Max flow = 5
 
 1. **Q: Why do we add reverse edges in the residual graph?** A: Reverse edges allow the algorithm to "undo" flow that was pushed in the wrong direction. This is critical for finding the true maximum.
 
-2. **Q: What is the difference between Ford-Fulkerson and Dinic's?** A: Ford-Fulkerson uses DFS to find augmenting paths (slow if flow is large). Dinic's uses BFS to build level graphs, ensuring each augmenting path increases the shortest path distance, reducing iterations to O(V²).
+2. **Q: What is the difference between Ford-Fulkerson and Dinic's?** A: Ford-Fulkerson uses DFS to find augmenting paths (slow if flow is large). Dinic's uses BFS to build level graphs, ensuring each augmenting path increases the shortest path distance, reducing iterations to O(V^2).
 
 ---
 
@@ -974,7 +974,7 @@ Total: 3 units flow, cost 9
 
 **Description**
 
-Bipartite matching finds a maximum matching (set of edges with no shared vertices) in a bipartite graph. Hungarian algorithm is O(V³) and conceptually simpler; Hopcroft-Karp is O(E * sqrt(V)) and faster for dense graphs.
+Bipartite matching finds a maximum matching (set of edges with no shared vertices) in a bipartite graph. Hungarian algorithm is O(V^3) and conceptually simpler; Hopcroft-Karp is O(E * sqrt(V)) and faster for dense graphs.
 
 **Solution Approach Flowchart**
 
@@ -1186,7 +1186,7 @@ Bridges: 3-4 (low[4]=1 < disc[3]=2? no), ...
 
 **Description**
 
-Transitive closure computes the reachability matrix: TC[i][j] = true if there's a path from i to j. Used for answering reachability queries. Floyd-Warshall can compute it in O(n³), or use DFS/BFS from each node in O(n(n+m)).
+Transitive closure computes the reachability matrix: TC[i][j] = true if there's a path from i to j. Used for answering reachability queries. Floyd-Warshall can compute it in O(n^3), or use DFS/BFS from each node in O(n(n+m)).
 
 **Solution Approach Flowchart**
 
@@ -1208,8 +1208,8 @@ flowchart TD
 
 **Complexity**
 
-- Floyd-Warshall: O(n³) time, O(n²) space
-- DFS/BFS per vertex: O(n(n+m)) time, O(n²) space
+- Floyd-Warshall: O(n^3) time, O(n^2) space
+- DFS/BFS per vertex: O(n(n+m)) time, O(n^2) space
 
 **When to Use**
 
@@ -1245,7 +1245,7 @@ Final TC:
 
 **Interview Q&A**
 
-1. **Q: When is DFS/BFS per vertex better than Floyd-Warshall?** A: When the graph is sparse (m << n²) and you don't need transitive closure for many queries. DFS is O(n(n+m)), which is better when m is small. Floyd-Warshall is always O(n³) regardless of m.
+1. **Q: When is DFS/BFS per vertex better than Floyd-Warshall?** A: When the graph is sparse (m << n²) and you don't need transitive closure for many queries. DFS is O(n(n+m)), which is better when m is small. Floyd-Warshall is always O(n^3) regardless of m.
 
 ---
 
@@ -1450,7 +1450,7 @@ flowchart TD
     B --> C["Sort suffixes lexicographically<br/>O(n log² n) naive or<br/>O(n log n) with doubling"]
     C --> D["Build LCP array using<br/>Kasai algorithm O(n)"]
     D --> E["Use SA + LCP for:<br/>pattern matching, LRS, etc."]
-    E --> F["Pattern matching:<br/>binary search in SA O(log² n)"]
+    E --> F["Pattern matching:<br/>binary search in SA O(log^2 n)"]
     F --> G["Longest repeated substring:<br/>max value in LCP array"]
     G --> H["Return results"]
     H --> I["END"]
@@ -1517,7 +1517,7 @@ Longest repeated substring: max(LCP) = 3 = "ana" ✓
 
 **Description**
 
-Manacher's algorithm finds all palindromic substrings in O(n) time (vs. O(n²) naive). It transforms the string with separators and uses previously computed palindrome radii to avoid redundant comparisons.
+Manacher's algorithm finds all palindromic substrings in O(n) time (vs. O(n^2) naive). It transforms the string with separators and uses previously computed palindrome radii to avoid redundant comparisons.
 
 **Solution Approach Flowchart**
 
@@ -1762,7 +1762,7 @@ Convex hull: (0,0) → (2,0) → (1,2) → (0,1) → (0,0)
 
 **Description**
 
-Finds the two closest points in a set. Divide-and-conquer achieves O(n log n), better than naive O(n²).
+Finds the two closest points in a set. Divide-and-conquer achieves O(n log n), better than naive O(n^2).
 
 **Solution Approach Flowchart**
 
@@ -1855,7 +1855,7 @@ flowchart TD
 
 **Complexity**
 
-- Time: O(1) per pair, O(n²) for all pairs
+- Time: O(1) per pair, O(n^2) for all pairs
 - Space: O(1)
 
 **When to Use**
@@ -1993,8 +1993,8 @@ flowchart TD
 **Complexity**
 
 - Build: O(n)
-- Path query: O(log² n) with segment tree
-- Path update: O(log² n)
+- Path query: O(log^2 n) with segment tree
+- Path update: O(log^2 n)
 
 **When to Use**
 
@@ -2040,7 +2040,7 @@ Query path(5,3):
 
 **Interview Q&A**
 
-1. **Q: Why is the chain decomposition important?** A: It reduces tree path problems to a polylog number of chain segments. With a segment tree on each chain, you can query/update in O(log² n) instead of O(n).
+1. **Q: Why is the chain decomposition important?** A: It reduces tree path problems to a polylog number of chain segments. With a segment tree on each chain, you can query/update in O(log^2 n) instead of O(n).
 
 ---
 
@@ -2228,7 +2228,7 @@ flowchart TD
 **Complexity**
 
 - Average: O(n)
-- Worst-case: O(n²) (rare with random pivot)
+- Worst-case: O(n^2) (rare with random pivot)
 - Space: O(log n) recursion stack
 
 **When to Use**
@@ -2265,7 +2265,7 @@ Iteration 3: array=[2,5], k=2-0-1=1
 
 1. **Q: How is QuickSelect different from QuickSort?** A: QuickSort recursively sorts both partitions; QuickSelect only recurses on the partition containing the k-th element, reducing expected time from O(n log n) to O(n).
 
-2. **Q: What's the worst-case scenario for QuickSelect?** A: If the pivot is always the smallest or largest element, the algorithm degenerates to O(n²). This is mitigated by randomized pivot selection or median-of-medians.
+2. **Q: What's the worst-case scenario for QuickSelect?** A: If the pivot is always the smallest or largest element, the algorithm degenerates to O(n^2). This is mitigated by randomized pivot selection or median-of-medians.
 
 ---
 
@@ -2498,8 +2498,8 @@ flowchart TD
 
 | Technique        | Recurrence Pattern              | Reduction      | Constraints                          |
 |------------------|--------------------------------|-----------------|--------------------------------------|
-| CHT              | `dp[i] = min_j(a_j*i + b_j)`   | O(n²) → O(n)   | Monotonic queries or convex hull     |
-| Knuth-Yao        | `dp[i][j] = min_k(...)`        | O(n³) → O(n²)  | Quadrangle inequality + monotonicity |
+| CHT              | `dp[i] = min_j(a_j*i + b_j)`   | O(n^2) → O(n)   | Monotonic queries or convex hull     |
+| Knuth-Yao        | `dp[i][j] = min_k(...)`        | O(n^3) → O(n^2)  | Quadrangle inequality + monotonicity |
 | SOS DP           | Sum/max over subsets           | O(3^k) → O(k*2^k) | Bitmask DP, k ≤ 20                 |
 | Digit DP         | Count numbers with property    | O(10^18) → O(d*S) | d ≤ 18 digits, polynomial state space |
 
@@ -2509,7 +2509,7 @@ flowchart TD
 |---------------------------|-----------------------|--------------|------------------------------------------|
 | Single-source shortest    | Dijkstra (no neg)     | O((V+E)logV) | Non-negative edge weights               |
 |                          | Bellman-Ford (with neg) | O(VE)        | Negative weights, cycle detection       |
-| All-pairs shortest       | Floyd-Warshall        | O(V³)        | Dense graphs, small V                   |
+| All-pairs shortest       | Floyd-Warshall        | O(V^3)        | Dense graphs, small V                   |
 | Maximum flow             | Dinic's               | O(V²E)       | General flow networks                   |
 | Min cost flow            | Successive shortest   | O(flow*E*logV) | Costs on edges                          |
 | Bipartite matching       | Hopcroft-Karp         | O(E√V)       | Dense bipartite graphs                  |
@@ -2543,11 +2543,11 @@ flowchart TD
 | Problem Category        | Algorithms                    | Preferred       | Fallback              |
 |-------------------------|-------------------------------|-----------------|------------------------|
 | Tree DP                 | Tree DP, Heavy-Light Decomp   | Tree DP         | Brute force            |
-| Interval DP             | Matrix Chain, Knuth-Yao       | Knuth-Yao       | Standard O(n³)         |
+| Interval DP             | Matrix Chain, Knuth-Yao       | Knuth-Yao       | Standard O(n^3)         |
 | Matching                | Hopcroft-Karp, Hungarian      | Hopcroft-Karp   | Augmenting paths O(VE) |
 | Flow                    | Dinic's, Push-Relabel         | Dinic's         | Ford-Fulkerson         |
 | String matching         | Boyer-Moore, Aho-Corasick     | Boyer-Moore     | KMP or naive           |
-| Palindromes             | Manacher's, DP                | Manacher's      | DP O(n²)               |
+| Palindromes             | Manacher's, DP                | Manacher's      | DP O(n^2)               |
 | Convex hull             | Andrew's, Graham Scan         | Andrew's        | Gift wrap O(n*h)       |
 | Connectivity            | Tarjan's SCC, Union-Find      | Tarjan's        | DFS-based              |
 
@@ -2555,7 +2555,7 @@ flowchart TD
 
 | Time Limit     | n         | Algorithm Family        | Example                       |
 |----------------|-----------|-------------------------|-------------------------------|
-| < 100ms        | n ≤ 10³   | O(n³) or O(n² log n)    | Floyd-Warshall, DP O(n³)      |
+| < 100ms        | n ≤ 10³   | O(n^3) or O(n² log n)    | Floyd-Warshall, DP O(n^3)      |
 | 1-2s           | n ≤ 10⁵   | O(n log n) or O(n √n)   | Sorting, CHT, Segment tree     |
 |                | n ≤ 10⁶   | O(n) or O(n log log n)  | Z-algorithm, Manacher          |
 | 5-10s          | n ≤ 10⁶   | O(n log n)              | Huffman, Suffix array build    |
@@ -2568,7 +2568,7 @@ flowchart TD
 | O(log n)       | Pointers, recursion     | DFS traversal, Binary search     |
 | O(n)           | Linear structures       | DP arrays, Single pass algorithms|
 | O(n log n)     | Tree structures         | Segment tree, Suffix array       |
-| O(n²)          | Interval DP, Graphs     | Floyd-Warshall, LCS DP          |
+| O(n^2)          | Interval DP, Graphs     | Floyd-Warshall, LCS DP          |
 
 ---
 
