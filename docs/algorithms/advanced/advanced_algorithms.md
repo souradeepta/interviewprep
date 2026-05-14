@@ -29,54 +29,54 @@ flowchart TD
     
     %% DP Branch
     DPType -->|Linear Recurrence<br/>Can we optimize?| IsMonotonic{{"Are DP queries<br/>monotonic?"}}
-    IsMonotonic -->|Yes| CHT["✓ Convex Hull Trick<br/>O(n) offline"]
-    IsMonotonic -->|No| LiChao["✓ Li-Chao Tree<br/>O(n log n) online"]
+    IsMonotonic -->|Yes| CHT["Convex Hull Trick<br/>O(n) offline"]
+    IsMonotonic -->|No| LiChao["Li-Chao Tree<br/>O(n log n) online"]
     
-    DPType -->|Need Digit Constraints| DigitDP["✓ Digit DP<br/>O(d·S) where d=digits<br/>S=state space"]
+    DPType -->|Need Digit Constraints| DigitDP["Digit DP<br/>O(d·S) where d=digits<br/>S=state space"]
     
-    DPType -->|Tree Structure| TreeDP["✓ Tree DP<br/>O(V) or O(V^2)<br/>for tree decomposition"]
+    DPType -->|Tree Structure| TreeDP["Tree DP<br/>O(V) or O(V^2)<br/>for tree decomposition"]
     
     DPType -->|Bitmask/Subset| SosDP{{"Is subset<br/>enumeration needed?"}}
-    SosDP -->|Yes - Sum Over Subsets| SosDp["✓ SOS DP<br/>O(k·2^k) k≤20"]
-    SosDP -->|No - Standard Bitmask| BitmaskDP["✓ Standard DP<br/>O(2^k·poly)<br/>k≤15-20"]
+    SosDP -->|Yes - Sum Over Subsets| SosDp["SOS DP<br/>O(k·2^k) k≤20"]
+    SosDP -->|No - Standard Bitmask| BitmaskDP["Standard DP<br/>O(2^k·poly)<br/>k≤15-20"]
     
     DPType -->|Interval DP| IntervalOpt{{"Optimal<br/>substructure<br/>monotonic?"}}
-    IntervalOpt -->|Yes, Quadrangle| KnuthYao["✓ Knuth-Yao<br/>Optimization<br/>O(n^2)"]
-    IntervalOpt -->|Yes, Convex| DivideConq["✓ Divide & Conquer DP<br/>O(n log n)"]
-    IntervalOpt -->|No| StandardInt["✓ Standard Interval DP<br/>O(n^3)"]
+    IntervalOpt -->|Yes, Quadrangle| KnuthYao["Knuth-Yao<br/>Optimization<br/>O(n^2)"]
+    IntervalOpt -->|Yes, Convex| DivideConq["Divide & Conquer DP<br/>O(n log n)"]
+    IntervalOpt -->|No| StandardInt["Standard Interval DP<br/>O(n^3)"]
     
     %% Graph Branch
     IsGraph -->|Yes| GraphType{{"What graph<br/>problem?"}}
     
     GraphType -->|Flow Network| FlowType{{"Need<br/>minimum<br/>cost?"}}
-    FlowType -->|Yes| MinCostFlow["✓ Min Cost Max Flow<br/>Successive Shortest<br/>O(flow·E·log V)"]
+    FlowType -->|Yes| MinCostFlow["Min Cost Max Flow<br/>Successive Shortest<br/>O(flow·E·log V)"]
     FlowType -->|No| MaxFlowAlgo{{"Graph<br/>density<br/>and size?"}}
-    MaxFlowAlgo -->|Dense or V small| Dinic["✓ Dinic's Algorithm<br/>O(V²E)"]
-    MaxFlowAlgo -->|Sparse| PushRelabel["✓ Push-Relabel<br/>O(V^3) or O(V²·sqrt(E))<br/>variants"]
+    MaxFlowAlgo -->|Dense or V small| Dinic["Dinic's Algorithm<br/>O(V²E)"]
+    MaxFlowAlgo -->|Sparse| PushRelabel["Push-Relabel<br/>O(V^3) or O(V²·sqrt(E))<br/>variants"]
     
     GraphType -->|Bipartite Matching| MatchSize{{"Size of<br/>bipartite<br/>set?"}}
-    MatchSize -->|V ≤ 500| Hungarian["✓ Hungarian Algorithm<br/>O(V^3)"]
-    MatchSize -->|V > 500, Dense| HopcroftKarp["✓ Hopcroft-Karp<br/>O(E·sqrt(V))"]
-    MatchSize -->|V > 500, Sparse| AugmentPath["✓ Augmenting Paths<br/>O(V·E)"]
+    MatchSize -->|V ≤ 500| Hungarian["Hungarian Algorithm<br/>O(V^3)"]
+    MatchSize -->|V > 500, Dense| HopcroftKarp["Hopcroft-Karp<br/>O(E·sqrt(V))"]
+    MatchSize -->|V > 500, Sparse| AugmentPath["Augmenting Paths<br/>O(V·E)"]
     
-    GraphType -->|2-SAT Problem| TwoSAT["✓ 2-SAT with SCC<br/>Build implication graph<br/>Find SCCs<br/>O(V+E)"]
+    GraphType -->|2-SAT Problem| TwoSAT["2-SAT with SCC<br/>Build implication graph<br/>Find SCCs<br/>O(V+E)"]
     
     GraphType -->|Connectivity<br/>SCC/BCC| ConnType{{"Need<br/>components<br/>or bridges?"}}
-    ConnType -->|SCCs| Tarjan["✓ Tarjan's SCC<br/>O(V+E) one-pass"]
-    ConnType -->|Bridges/BCCs| Bridges["✓ Bridge/BCC Finding<br/>DFS-based O(V+E)"]
-    ConnType -->|General Connect| DSU["✓ Union-Find<br/>O(α(V))"]
+    ConnType -->|SCCs| Tarjan["Tarjan's SCC<br/>O(V+E) one-pass"]
+    ConnType -->|Bridges/BCCs| Bridges["Bridge/BCC Finding<br/>DFS-based O(V+E)"]
+    ConnType -->|General Connect| DSU["Union-Find<br/>O(α(V))"]
     
     GraphType -->|Shortest Path| PathType{{"Negative<br/>edges<br/>present?"}}
     PathType -->|No| SingleSource{{"Single or<br/>all-pairs<br/>shortest?"}}
-    SingleSource -->|Single| Dijkstra["✓ Dijkstra<br/>O(E+V log V)<br/>with Fibonacci heap"]
-    SingleSource -->|All-pairs| Johnson["✓ Johnson's Algorithm<br/>O(VE log V)<br/>reweight + Dijkstra×V"]
+    SingleSource -->|Single| Dijkstra["Dijkstra<br/>O(E+V log V)<br/>with Fibonacci heap"]
+    SingleSource -->|All-pairs| Johnson["Johnson's Algorithm<br/>O(VE log V)<br/>reweight + Dijkstra×V"]
     PathType -->|Yes| NegWeight{{"All-pairs<br/>needed?"}}
-    NegWeight -->|Yes| FloydWar["✓ Floyd-Warshall<br/>O(V^3) dense"]
-    NegWeight -->|No| BellmanF["✓ Bellman-Ford<br/>O(VE)<br/>detect neg cycles"]
+    NegWeight -->|Yes| FloydWar["Floyd-Warshall<br/>O(V^3) dense"]
+    NegWeight -->|No| BellmanF["Bellman-Ford<br/>O(VE)<br/>detect neg cycles"]
     
-    GraphType -->|Articulation<br/>Points| ArticPt["✓ Articulation Points<br/>& Bridges<br/>Tarjan/DFS O(V+E)"]
+    GraphType -->|Articulation<br/>Points| ArticPt["Articulation Points<br/>& Bridges<br/>Tarjan/DFS O(V+E)"]
     
-    GraphType -->|Transitive Closure| TransClose["✓ Transitive Closure<br/>Floyd-Warshall<br/>or bitwise O(V³/w)"]
+    GraphType -->|Transitive Closure| TransClose["Transitive Closure<br/>Floyd-Warshall<br/>or bitwise O(V³/w)"]
     
     %% String Branch
     IsGraph -->|No| IsString{{"Is this a<br/>String Problem?"}}
@@ -84,21 +84,21 @@ flowchart TD
     IsString -->|Yes| StringType{{"What string<br/>problem?"}}
     
     StringType -->|Single Pattern Match| PatternSize{{"Pattern<br/>length<br/>vs text?"}}
-    PatternSize -->|Short pattern| KMP["✓ KMP<br/>O(n+m)<br/>simple & robust"]
-    PatternSize -->|Long pattern| BoyerMoore["✓ Boyer-Moore<br/>O(n/m) avg case<br/>O(nm) worst"]
-    PatternSize -->|Any - Optimal| ZAlgo["✓ Z-Algorithm<br/>O(n+m)<br/>or KMP variant"]
+    PatternSize -->|Short pattern| KMP["KMP<br/>O(n+m)<br/>simple & robust"]
+    PatternSize -->|Long pattern| BoyerMoore["Boyer-Moore<br/>O(n/m) avg case<br/>O(nm) worst"]
+    PatternSize -->|Any - Optimal| ZAlgo["Z-Algorithm<br/>O(n+m)<br/>or KMP variant"]
     
     StringType -->|Multiple Patterns| MultiPat{{"Number of<br/>patterns?"}}
-    MultiPat -->|Few patterns| AhoC["✓ Aho-Corasick<br/>O(n+m+z)<br/>z=matches"]
+    MultiPat -->|Few patterns| AhoC["Aho-Corasick<br/>O(n+m+z)<br/>z=matches"]
     MultiPat -->|Many patterns| SuffixStruct{{"Index query<br/>type?"}}
     
     StringType -->|Indexing/Query| SuffixStruct
-    SuffixStruct -->|Fast queries, offline| SuffixArr["✓ Suffix Array<br/>O(n log n) build<br/>O(log n) query"]
-    SuffixStruct -->|LCP queries needed| SuffixTree["✓ Suffix Tree<br/>O(n) build<br/>O(k) for k-length queries"]
+    SuffixStruct -->|Fast queries, offline| SuffixArr["Suffix Array<br/>O(n log n) build<br/>O(log n) query"]
+    SuffixStruct -->|LCP queries needed| SuffixTree["Suffix Tree<br/>O(n) build<br/>O(k) for k-length queries"]
     
     StringType -->|Palindromes| PalindType{{"All palindromes<br/>or just check?"}}
-    PalindType -->|All subpalindromes| Manacher["✓ Manacher's Algorithm<br/>O(n) single pass<br/>find all palindromes"]
-    PalindType -->|Check/Longest| ManacherDP["✓ Manacher or DP<br/>O(n) vs O(n^2)"]
+    PalindType -->|All subpalindromes| Manacher["Manacher's Algorithm<br/>O(n) single pass<br/>find all palindromes"]
+    PalindType -->|Check/Longest| ManacherDP["Manacher or DP<br/>O(n) vs O(n^2)"]
     
     %% Geometry Branch
     IsString -->|No| IsGeom{{"Is this a<br/>Geometry Problem?"}}
@@ -106,33 +106,33 @@ flowchart TD
     IsGeom -->|Yes| GeomType{{"What geometry<br/>problem?"}}
     
     GeomType -->|Convex Hull| HullPoints{{"Number of<br/>points?"}}
-    HullPoints -->|n ≤ 1000| GrahamScan["✓ Graham Scan<br/>O(n log n)<br/>intuitive"]
-    HullPoints -->|Any| Andrews["✓ Andrew's Algorithm<br/>O(n log n)<br/>robust, most stable"]
+    HullPoints -->|n ≤ 1000| GrahamScan["Graham Scan<br/>O(n log n)<br/>intuitive"]
+    HullPoints -->|Any| Andrews["Andrew's Algorithm<br/>O(n log n)<br/>robust, most stable"]
     
     GeomType -->|Closest Pair| ClosestSize{{"Point set<br/>size?"}}
-    ClosestSize -->|n ≤ 10K| DivideConqPts["✓ Divide & Conquer<br/>O(n log n)<br/>optimal worst-case"]
-    ClosestSize -->|n > 10K, 2D| KDTree["✓ KD-Tree<br/>O(n) build<br/>O(log n) avg query"]
+    ClosestSize -->|n ≤ 10K| DivideConqPts["Divide & Conquer<br/>O(n log n)<br/>optimal worst-case"]
+    ClosestSize -->|n > 10K, 2D| KDTree["KD-Tree<br/>O(n) build<br/>O(log n) avg query"]
     
-    GeomType -->|Line Intersections| LineIntersect["✓ Orientation Check<br/>O(1) per pair<br/>Robust algorithm"]
+    GeomType -->|Line Intersections| LineIntersect["Orientation Check<br/>O(1) per pair<br/>Robust algorithm"]
     
-    GeomType -->|Point in Polygon| PtInPoly["✓ Ray Casting<br/>O(n) per point<br/>Winding number"]
+    GeomType -->|Point in Polygon| PtInPoly["Ray Casting<br/>O(n) per point<br/>Winding number"]
     
     %% Misc/Advanced DS
     IsGeom -->|No| IsMisc{{"Is this a<br/>Heavy/Advanced<br/>Data Structure?"}}
     
     IsMisc -->|Yes| MiscType{{"Which pattern?"}}
     
-    MiscType -->|Tree Path Queries| HeavyLight["✓ Heavy-Light Decomposition<br/>O(log^2 V) per query<br/>+ O(log n) segment tree"]
+    MiscType -->|Tree Path Queries| HeavyLight["Heavy-Light Decomposition<br/>O(log^2 V) per query<br/>+ O(log n) segment tree"]
     
-    MiscType -->|Offline Range Queries| Mo["✓ Mo's Algorithm<br/>O((n+m)·sqrt(n))<br/>m queries on ranges"]
+    MiscType -->|Offline Range Queries| Mo["Mo's Algorithm<br/>O((n+m)·sqrt(n))<br/>m queries on ranges"]
     
-    MiscType -->|Large sqrt(n) range| SqrtDecomp["✓ Square Root<br/>Decomposition<br/>O(sqrt(n)) per query"]
+    MiscType -->|Large sqrt(n) range| SqrtDecomp["Square Root<br/>Decomposition<br/>O(sqrt(n)) per query"]
     
-    MiscType -->|Selection Problem| QSelect["✓ QuickSelect<br/>O(n) average<br/>O(n^2) worst (rare)"]
+    MiscType -->|Selection Problem| QSelect["QuickSelect<br/>O(n) average<br/>O(n^2) worst (rare)"]
     
-    MiscType -->|Optimal Encoding| Huffman["✓ Huffman Coding<br/>O(n log n) build<br/>Greedy tree construction"]
+    MiscType -->|Optimal Encoding| Huffman["Huffman Coding<br/>O(n log n) build<br/>Greedy tree construction"]
     
-    MiscType -->|Interval/Activity<br/>Scheduling| Activity["✓ Activity Selection<br/>Greedy<br/>O(n log n) sort"]
+    MiscType -->|Interval/Activity<br/>Scheduling| Activity["Activity Selection<br/>Greedy<br/>O(n log n) sort"]
     
     IsMisc -->|No| Generic["Check if problem<br/>is solvable with<br/>standard algorithms<br/>or optimization"]
     
@@ -175,7 +175,7 @@ flowchart TD
     D -->|No| E["❌ CHT not applicable<br/>Cost structure wrong"]
     D -->|Yes| F{"Are a_j values<br/>monotonic (increasing<br/>or decreasing)?"}}
     F -->|No| G["⚠️ CHT still possible<br/>but harder to use"]
-    F -->|Yes| H["✓ CHT APPLICABLE<br/>Proceed with optimization"]
+    F -->|Yes| H["CHT APPLICABLE<br/>Proceed with optimization"]
     
     classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
     classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
@@ -216,16 +216,16 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start(["Need to optimize<br/>O(n^2) DP?"]) --> Q1{{"Slopes<br/>monotonic?"}}
-    Q1 -->|Decreasing| Deque["✓ Use Deque CHT<br/>O(n) - FASTEST<br/>Remove from back"]
+    Q1 -->|Decreasing| Deque["Use Deque CHT<br/>O(n) - FASTEST<br/>Remove from back"]
     Q1 -->|Increasing| Deque
-    Q1 -->|Random| Tree["✓ Use Tree CHT<br/>O(n log n)<br/>Binary search"]
+    Q1 -->|Random| Tree["Use Tree CHT<br/>O(n log n)<br/>Binary search"]
     
     Deque --> Space["Memory: O(n)<br/>for line storage"]
     Tree --> Space
     Space --> Impl["Implementation<br/>complexity: Medium"]
     Impl --> Worth{{"Worth<br/>implementation<br/>vs O(n^2)?"}}
     Worth -->|n ≤ 5000| No["❌ Skip optimization<br/>O(n^2) fast enough"]
-    Worth -->|n > 5000| Yes["✓ Implement CHT<br/>n=10^6+ needed"]
+    Worth -->|n > 5000| Yes["Implement CHT<br/>n=10^6+ needed"]
     
     classDef fast fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
     classDef medium fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
@@ -246,12 +246,12 @@ flowchart TD
     A --> P3["❌ Integer overflow<br/>in multiplication<br/>a·i + b"]
     A --> P4["❌ Assuming slope<br/>monotonicity<br/>without verification"]
     
-    P1 --> S1["✓ Use exact arithmetic<br/>or long double<br/>Avoid epsilon"]
-    P2 --> S2["✓ Merge duplicate<br/>slopes, keep better<br/>intercept only"]
-    P3 --> S3["✓ Use __int128<br/>or careful casting<br/>to long long"]
-    P4 --> S4["✓ Verify slopes<br/>before assuming<br/>monotonicity"]
+    P1 --> S1["Use exact arithmetic<br/>or long double<br/>Avoid epsilon"]
+    P2 --> S2["Merge duplicate<br/>slopes, keep better<br/>intercept only"]
+    P3 --> S3["Use __int128<br/>or careful casting<br/>to long long"]
+    P4 --> S4["Verify slopes<br/>before assuming<br/>monotonicity"]
     
-    S1 --> End(["✓ Debug-free<br/>CHT implementation"])
+    S1 --> End(["Debug-free<br/>CHT implementation"])
     S2 --> End
     S3 --> End
     S4 --> End
@@ -319,7 +319,7 @@ flowchart TD
     Q1 -->|Yes| Q2{"Is property<br/>defined by<br/>digit sequence?"}}
     Q2 -->|No| NotDig2["❌ Use different DP"]
     Q2 -->|Yes| Q3{"Can state be<br/>expressed as:<br/>pos, property, tight?"}}
-    Q3 -->|Yes| Apply["✓ DIGIT DP APPLICABLE<br/>O(d·S) complexity<br/>d=digits, S=states"]
+    Q3 -->|Yes| Apply["DIGIT DP APPLICABLE<br/>O(d·S) complexity<br/>d=digits, S=states"]
     Q3 -->|No| Modify["⚠️ May need custom<br/>state design"]
     
     classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
@@ -366,14 +366,14 @@ flowchart TD
     A --> O2["Reduce property state<br/>e.g., modulo instead of exact"]
     A --> O3["Iterative DP if states<br/>can be topologically<br/>ordered"]
     
-    O1 --> R1["✓ Better cache locality<br/>Lower memory"]
-    O2 --> R2["✓ Smaller state space<br/>O(d·k) instead of O(d·N)"]
-    O3 --> R3["✓ Avoid recursion<br/>overhead"]
+    O1 --> R1["Better cache locality<br/>Lower memory"]
+    O2 --> R2["Smaller state space<br/>O(d·k) instead of O(d·N)"]
+    O3 --> R3["Avoid recursion<br/>overhead"]
     
     R1 --> Impl["Pick based on<br/>problem constraints"]
     R2 --> Impl
     R3 --> Impl
-    Impl --> End(["✓ Optimized DP<br/>ready"])
+    Impl --> End(["Optimized DP<br/>ready"])
 ```
     E -->|Yes, tight=true| F["Digit ∈ [0, N[pos]]"]
     E -->|No, tight=false| G["Digit ∈ [0, 9]"]
@@ -446,7 +446,7 @@ flowchart TD
     Q1 -->|Yes| Q2{"Can solution<br/>be expressed<br/>per subtree?"}}
     Q2 -->|No| NotDP["❌ May need<br/>different approach"]
     Q2 -->|Yes| Q3{"Do subproblems<br/>depend on<br/>children only?"}}
-    Q3 -->|Yes| Apply["✓ TREE DP APPLICABLE<br/>O(n·S) or O(n^2)<br/>S = states"]
+    Q3 -->|Yes| Apply["TREE DP APPLICABLE<br/>O(n·S) or O(n^2)<br/>S = states"]
     Q3 -->|No| Harder["⚠️ May need rerooting<br/>or DP on paths"]
     
     classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
@@ -469,7 +469,7 @@ flowchart TD
     I --> J{"All nodes<br/>processed?"}}
     J -->|No| K["⬆️ Go to next node<br/>in post-order"]
     K --> C
-    J -->|Yes| L["✓ Answer: dp[root][state]"]
+    J -->|Yes| L["Answer: dp[root][state]"]
     L --> M["END: Optimal value computed"]
     F --> I
     
@@ -583,7 +583,7 @@ flowchart TD
     Q1 -->|No| NotSOS["❌ Not SOS DP"]
     Q1 -->|Yes| Q2{"Is k = number of<br/>bits small?"}}
     Q2 -->|k > 20| TooLarge["❌ SOS DP impractical<br/>Use different approach<br/>2^k too large"]
-    Q2 -->|k ≤ 20| Apply["✓ SOS DP APPLICABLE<br/>O(k·2^k) time<br/>O(2^k) space"]
+    Q2 -->|k ≤ 20| Apply["SOS DP APPLICABLE<br/>O(k·2^k) time<br/>O(2^k) space"]
     
     classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
     classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
@@ -606,7 +606,7 @@ flowchart TD
     H --> I
     I -->|Yes| J["Move to next bit"]
     J --> D
-    I -->|No| K["✓ Done: All queries answered"]
+    I -->|No| K["Done: All queries answered"]
     K --> L["END: f array contains<br/>all subset sums"]
     
     classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
@@ -646,11 +646,11 @@ flowchart TD
     A --> P2["❌ Overwriting while<br/>processing same bit<br/>Use temp array"]
     A --> P3["❌ Forgetting to process<br/>bit position 0<br/>Check loop bounds"]
     
-    P1 --> S1["✓ For each bit b:<br/>  For each S:<br/>    update using S^(1<<b)"]
-    P2 --> S2["✓ Use two arrays OR<br/>iterate S in specific order<br/>to avoid overwrite"]
-    P3 --> S3["✓ Ensure loop i=0<br/>to k-1 covers all bits"]
+    P1 --> S1["For each bit b:<br/>  For each S:<br/>    update using S^(1<<b)"]
+    P2 --> S2["Use two arrays OR<br/>iterate S in specific order<br/>to avoid overwrite"]
+    P3 --> S3["Ensure loop i=0<br/>to k-1 covers all bits"]
     
-    S1 --> End(["✓ Correct SOS DP"])
+    S1 --> End(["Correct SOS DP"])
     S2 --> End
     S3 --> End
     
@@ -807,8 +807,8 @@ flowchart TD
     Q1 -->|No| NotFlow["❌ Not a flow problem"]
     Q1 -->|Yes| Q2{"Graph size<br/>and density?"}}
     Q2 -->|V ≤ 100, sparse| FF["⚠️ Ford-Fulkerson<br/>Simple but slow<br/>O(E·flow)"]
-    Q2 -->|V ≤ 1000, any| Dinics["✓ Dinic's Algorithm<br/>BEST practical<br/>O(V²E)"]
-    Q2 -->|V > 1000, dense| PushRel["✓ Push-Relabel<br/>Better for dense<br/>O(V^3) or variant"]
+    Q2 -->|V ≤ 1000, any| Dinics["Dinic's Algorithm<br/>BEST practical<br/>O(V²E)"]
+    Q2 -->|V > 1000, dense| PushRel["Push-Relabel<br/>Better for dense<br/>O(V^3) or variant"]
     
     classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
     classDef warning fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
@@ -825,7 +825,7 @@ flowchart TD
     C --> D["🔄 While augmenting path exists:"]
     D --> E["🔍 Find path s→t in<br/>residual graph<br/>with capacity > 0"]
     E --> F{"Path<br/>exists?"}}
-    F -->|No| I["✓ Done: max flow found"]
+    F -->|No| I["Done: max flow found"]
     F -->|Yes| G["⛓️ Find bottleneck capacity<br/>min capacity on path"]
     G --> H["📤 Push flow along path<br/>forward edges -=flow<br/>reverse edges +=flow"]
     H --> J["➕ flow_total += flow"]
@@ -849,7 +849,7 @@ flowchart TD
     Step1 --> Step2["Phase 2: DFS from source<br/>Find blocking flows<br/>using current edge pointer"]
     Step2 --> Step3["⏱️ Time: O(V²E)<br/>Much faster than O(E·flow)"]
     Step3 --> Repeat["🔄 Repeat phases<br/>until no augmenting path<br/>in level graph"]
-    Repeat --> End["✓ Max flow computed<br/>Optimal for most cases"]
+    Repeat --> End["Max flow computed<br/>Optimal for most cases"]
     
     classDef algo fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
     class Step1,Step2,Step3,Repeat,End algo
@@ -1579,7 +1579,7 @@ i=5 (b): mirror of 5 in [0,4] is 2*3-5=1. p[1]=1, but p[5] can expand more
   Actually: #b#a#b#a# at indices 0-8, so 5 is 'b'
   neighbors: i=4(#) and i=6(#), they match
   p[5]=2? index 5±2 gives 3(a) and 7(a), they match
-  p[5]=3 (#b#a#b#) ✓ (palindrome "bab")
+  p[5]=3 (#b#a#b#) (palindrome "bab")
   
 ...
 
@@ -1891,7 +1891,7 @@ Orientation of (0,2), (2,0), (2,2):
 o3 = cw, o4 = ccw (different) ✓
 
 General condition: o1 ≠ o3 and o2 ≠ o4 are satisfied
-Segments intersect ✓ (at point (1,1))
+Segments intersect (at point (1,1))
 ```
 
 **Interview Q&A**
