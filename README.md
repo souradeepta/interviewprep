@@ -69,6 +69,89 @@ datastructures/
 | Sparse Table | `python/new_ds/sparse_table.py` | `java/new_ds/SparseTable.java` | `docs/new_ds/sparse_table.md` |
 | Treap | `python/new_ds/treap.py` | `java/new_ds/Treap.java` | `docs/new_ds/treap.md` |
 
+## Advanced / Specialized Data Structures
+
+| Data Structure | Python | Java | Docs | Use Cases |
+|---|---|---|---|---|
+| Suffix Tree | `python/new_ds/suffix_tree.py` | `java/new_ds/SuffixTree.java` | `docs/new_ds/suffix_tree.md` | Pattern matching, string compression, DNA sequencing |
+| Suffix Array | `python/new_ds/suffix_array.py` | `java/new_ds/SuffixArray.java` | `docs/new_ds/suffix_array.md` | Pattern matching, substring search, longest repeated substring |
+| Heavy-Light Decomposition | `python/new_ds/heavy_light_decomposition.py` | `java/new_ds/HeavyLightDecomposition.java` | `docs/new_ds/heavy_light_decomposition.md` | Tree path queries, tree updates, competitive programming |
+| Link-Cut Tree | `python/new_ds/link_cut_tree.py` | `java/new_ds/LinkCutTree.java` | `docs/new_ds/link_cut_tree.md` | Dynamic tree queries, connectivity, dynamic MST |
+| Persistent Segment Tree | `python/new_ds/persistent_segment_tree.py` | `java/new_ds/PersistentSegmentTree.java` | `docs/new_ds/persistent_segment_tree.md` | Historical queries, version control, path queries |
+| Cartesian Tree | `python/new_ds/cartesian_tree.py` | `java/new_ds/CartesianTree.java` | `docs/new_ds/cartesian_tree.md` | Range minimum queries, stack simulation, offline queries |
+| Splay Tree | `python/new_ds/splay_tree.py` | `java/new_ds/SplayTree.java` | `docs/new_ds/splay_tree.md` | Amortized O(log n) operations, cache-oblivious |
+| AC Automaton | `python/new_ds/ac_automaton.py` | `java/new_ds/ACAutomaton.java` | `docs/new_ds/ac_automaton.md` | Multiple pattern matching, dictionary search |
+| KD-Tree | `python/new_ds/kd_tree.py` | `java/new_ds/KDTree.java` | `docs/new_ds/kd_tree.md` | Nearest neighbor search, range queries, spatial data |
+| Dancing Links | `python/new_ds/dancing_links.py` | `java/new_ds/DancingLinks.java` | `docs/new_ds/dancing_links.md` | Exact cover problem, Sudoku solving, constraint satisfaction |
+| Van Emde Boas Tree | `python/new_ds/van_emde_boas.py` | `java/new_ds/VanEmdeBoas.java` | `docs/new_ds/van_emde_boas.md` | Integer range operations, O(log log U) operations |
+| Leftist Heap | `python/new_ds/leftist_heap.py` | `java/new_ds/LeftistHeap.java` | `docs/new_ds/leftist_heap.md` | Efficient merge, priority queue merging |
+| Fibonacci Heap | `python/new_ds/fibonacci_heap.py` | `java/new_ds/FibonacciHeap.java` | `docs/new_ds/fibonacci_heap.md` | Amortized optimal decreaseKey, Dijkstra optimization |
+| B+ Tree | `python/new_ds/bplus_tree.py` | `java/new_ds/BPlusTree.java` | `docs/new_ds/bplus_tree.md` | Database indices, range queries, sorted access |
+| Segment Tree Lazy Propagation | `python/new_ds/segment_tree_lazy.py` | `java/new_ds/SegmentTreeLazy.java` | `docs/new_ds/segment_tree_lazy.md` | Range updates, range queries, lazy evaluation |
+
+## Advanced Algorithms
+
+### Dynamic Programming Advanced
+
+| Algorithm | Python | Java | Docs | Time Complexity |
+|---|---|---|---|---|
+| Convex Hull Trick (CHT) | `python/algorithms/dp_advanced/dp_advanced.py` | `java/algorithms/dp_advanced/DPAdvanced.java` | `docs/algorithms/dp_advanced/dp_advanced.md` | O(n log n) |
+| Digit Dynamic Programming | `python/algorithms/dp_advanced/dp_advanced.py` | `java/algorithms/dp_advanced/DPAdvanced.java` | `docs/algorithms/dp_advanced/dp_advanced.md` | O(d² · 10^d) |
+| Tree Dynamic Programming | `python/algorithms/dp_advanced/dp_advanced.py` | `java/algorithms/dp_advanced/DPAdvanced.java` | `docs/algorithms/dp_advanced/dp_advanced.md` | O(n²) |
+| Sum Over Subsets (SOS DP) | `python/algorithms/dp_advanced/dp_advanced.py` | `java/algorithms/dp_advanced/DPAdvanced.java` | `docs/algorithms/dp_advanced/dp_advanced.md` | O(n · 2^n) |
+| Knuth-Yao Speedup | `python/algorithms/dp_advanced/dp_advanced.py` | `java/algorithms/dp_advanced/DPAdvanced.java` | `docs/algorithms/dp_advanced/dp_advanced.md` | O(n²) |
+
+### Graph Algorithms Advanced
+
+| Algorithm | Python | Java | Docs | Time Complexity |
+|---|---|---|---|---|
+| Max Flow (Ford-Fulkerson) | `python/algorithms/graph_advanced/graph_advanced.py` | `java/algorithms/graph_advanced/GraphAdvanced.java` | `docs/algorithms/graph_advanced/graph_advanced.md` | O(E · max_flow) |
+| Max Flow (Edmonds-Karp) | `python/algorithms/graph_advanced/graph_advanced.py` | `java/algorithms/graph_advanced/GraphAdvanced.java` | `docs/algorithms/graph_advanced/graph_advanced.md` | O(V · E²) |
+| Min Cost Max Flow | `python/algorithms/graph_advanced/graph_advanced.py` | `java/algorithms/graph_advanced/GraphAdvanced.java` | `docs/algorithms/graph_advanced/graph_advanced.md` | O(V² · E · log V) |
+| Bipartite Matching (Hungarian) | `python/algorithms/graph_advanced/graph_advanced.py` | `java/algorithms/graph_advanced/GraphAdvanced.java` | `docs/algorithms/graph_advanced/graph_advanced.md` | O(V³) |
+| 2-SAT Solver | `python/algorithms/graph_advanced/graph_advanced.py` | `java/algorithms/graph_advanced/GraphAdvanced.java` | `docs/algorithms/graph_advanced/graph_advanced.md` | O(V + E) |
+| Minimum Vertex Cover | `python/algorithms/graph_advanced/graph_advanced.py` | `java/algorithms/graph_advanced/GraphAdvanced.java` | `docs/algorithms/graph_advanced/graph_advanced.md` | O(2^n) |
+
+### String Algorithms Advanced
+
+| Algorithm | Python | Java | Docs | Time Complexity |
+|---|---|---|---|---|
+| Boyer-Moore | `python/algorithms/string_advanced/string_advanced.py` | `java/algorithms/string_advanced/StringAdvanced.java` | `docs/algorithms/string_advanced/string_advanced.md` | O(n/m) best |
+| Aho-Corasick Automaton | `python/algorithms/string_advanced/string_advanced.py` | `java/algorithms/string_advanced/StringAdvanced.java` | `docs/algorithms/string_advanced/string_advanced.md` | O((n+m) log Σ) |
+| Suffix Array Construction | `python/algorithms/string_advanced/string_advanced.py` | `java/algorithms/string_advanced/StringAdvanced.java` | `docs/algorithms/string_advanced/string_advanced.md` | O(n log n) |
+| Suffix Tree Construction (Ukkonen) | `python/algorithms/string_advanced/string_advanced.py` | `java/algorithms/string_advanced/StringAdvanced.java` | `docs/algorithms/string_advanced/string_advanced.md` | O(n) |
+| Lyndon Factorization | `python/algorithms/string_advanced/string_advanced.py` | `java/algorithms/string_advanced/StringAdvanced.java` | `docs/algorithms/string_advanced/string_advanced.md` | O(n) |
+
+### Geometry Algorithms
+
+| Algorithm | Python | Java | Docs | Time Complexity |
+|---|---|---|---|---|
+| Convex Hull (Graham Scan) | `python/algorithms/geometry/geometry.py` | `java/algorithms/geometry/Geometry.java` | `docs/algorithms/geometry/geometry.md` | O(n log n) |
+| Convex Hull (Andrew's Monotone Chain) | `python/algorithms/geometry/geometry.py` | `java/algorithms/geometry/Geometry.java` | `docs/algorithms/geometry/geometry.md` | O(n log n) |
+| Closest Pair of Points | `python/algorithms/geometry/geometry.py` | `java/algorithms/geometry/Geometry.java` | `docs/algorithms/geometry/geometry.md` | O(n log n) |
+| Line Intersection | `python/algorithms/geometry/geometry.py` | `java/algorithms/geometry/Geometry.java` | `docs/algorithms/geometry/geometry.md` | O(1) |
+| Point in Polygon | `python/algorithms/geometry/geometry.py` | `java/algorithms/geometry/Geometry.java` | `docs/algorithms/geometry/geometry.md` | O(n) |
+
+### Tree Algorithms Advanced
+
+| Algorithm | Python | Java | Docs | Time Complexity |
+|---|---|---|---|---|
+| Heavy-Light Decomposition | `python/algorithms/tree_advanced/tree_advanced.py` | `java/algorithms/tree_advanced/TreeAdvanced.java` | `docs/algorithms/tree_advanced/tree_advanced.md` | O(log² n) per query |
+| Link-Cut Tree Operations | `python/algorithms/tree_advanced/tree_advanced.py` | `java/algorithms/tree_advanced/TreeAdvanced.java` | `docs/algorithms/tree_advanced/tree_advanced.md` | O(log n) amortized |
+| Centroid Decomposition | `python/algorithms/tree_advanced/tree_advanced.py` | `java/algorithms/tree_advanced/TreeAdvanced.java` | `docs/algorithms/tree_advanced/tree_advanced.md` | O(n log n) |
+| Square Root Decomposition | `python/algorithms/tree_advanced/tree_advanced.py` | `java/algorithms/tree_advanced/TreeAdvanced.java` | `docs/algorithms/tree_advanced/tree_advanced.md` | O(√n) per query |
+| Mo's Algorithm | `python/algorithms/tree_advanced/tree_advanced.py` | `java/algorithms/tree_advanced/TreeAdvanced.java` | `docs/algorithms/tree_advanced/tree_advanced.md` | O((n+q)√n) |
+
+## Problem-Solving Guides
+
+This repository includes structured decision guides to help you select the right data structure or algorithm for any problem.
+
+| Guide | Location | Purpose | How to Use |
+|---|---|---|---|
+| **Data Structure Selection Guide** | `docs/guides/data_structure_selection.md` | Flowchart for choosing the optimal DS based on operation needs | Start here when you need to pick a DS — answer questions about required operations |
+| **Algorithm Selection Guide** | `docs/guides/algorithm_selection.md` | Decision tree for algorithm selection across problem categories | Use when you recognize a problem type but aren't sure which algorithm applies |
+| **Problem-Solving Flowchart** | `docs/guides/problem_solving_flowchart.md` | Step-by-step approach for analyzing interview problems | Follow when you encounter a new problem in an interview |
+
 ## Algorithms Covered
 
 ### Sorting
@@ -178,6 +261,26 @@ datastructures/
 *with reference to node
 †build time; queries are O(1)
 
+#### Advanced / Specialized Data Structures Complexity
+
+| Data Structure | Access | Search | Insert | Delete | Space | Notes |
+|---|---|---|---|---|---|---|
+| Suffix Tree | — | O(m) | O(n) build | — | O(n) | Preprocessing; linear space variant |
+| Suffix Array | — | O(m log n) | O(n log n) build | — | O(n) | Memory efficient, often preferred |
+| Heavy-Light Decomp. | — | O(log² n) | O(log² n) | O(log² n) | O(n) | Tree path queries |
+| Link-Cut Tree | — | O(log n) | O(log n) | O(log n) | O(n) | Dynamic connectivity |
+| Persistent Seg. Tree | — | O(log n) | O(log n) | — | O(n log n) | Immutable versions |
+| Cartesian Tree | — | O(log n) avg | O(log n) avg | O(log n) avg | O(n) | RMQ, stack simulation |
+| Splay Tree | — | O(log n) amort. | O(log n) amort. | O(log n) amort. | O(n) | Cache-oblivious |
+| AC Automaton | — | O(n+m) | O(m log Σ) build | — | O(n·m) | Multi-pattern matching |
+| KD-Tree | — | O(√n) avg | O(log n) avg | — | O(n) | Spatial data, range queries |
+| Dancing Links | — | O(k) | O(k) | O(1) | O(n·m) | Exact cover, constraint satisfaction |
+| Van Emde Boas | O(1) | O(log log U) | O(log log U) | O(log log U) | O(U) | Integer universe U |
+| Leftist Heap | O(1) peek | O(log n) | O(log n) | O(log n) | O(n) | Mergeable, merge O(log n) |
+| Fibonacci Heap | O(1) peek | O(log n) | O(1) amort. | O(log n) amort. | O(n) | Optimal decreaseKey |
+| B+ Tree | O(log n) | O(log n) | O(log n) | O(log n) | O(n) | Database indices |
+| Seg. Tree Lazy | — | O(log n) | O(log n) | O(log n) | O(n) | Range updates |
+
 ## How to Use the Agents
 
 This repo includes two Claude Code agents for mock interview practice.
@@ -218,6 +321,19 @@ python3 python/advanced/avl_tree.py
 javac java/basic/Stack.java && java -cp java/basic Stack
 ```
 
+## Features
+
+This repository provides a comprehensive, interview-ready resource:
+
+- **Dual Language Coverage**: Python for clarity, Java for production readiness — each data structure and algorithm in both languages
+- **Visual Documentation**: ASCII art diagrams, tree structures, and state transitions for every concept
+- **Complexity Analysis**: Complete time and space complexity for all operations
+- **Implementation Demonstrations**: Runnable demos in both languages showing practical usage
+- **Mermaid Flowcharts**: Visual decision trees and algorithm flow diagrams
+- **Problem-Solving Guides**: Structured decision guides for DS and algorithm selection
+- **Mock Interview Agents**: Two Claude agents for realistic practice interviews
+- **Progressive Difficulty**: From basic (arrays, linked lists) to advanced (suffix trees, flow algorithms)
+
 ## Interview Prep Roadmap
 
 ### Week 1 — Basic Data Structures
@@ -249,3 +365,29 @@ javac java/basic/Stack.java && java -cp java/basic Stack
 - Day 5: Dynamic Programming (Knapsack, LCS, LIS, Edit Distance, Coin Change)
 - Day 6: Graph algorithms (Dijkstra, Bellman-Ford, Floyd-Warshall, Kruskal/Prim MST, Tarjan SCC, A*)
 - Day 7: String algorithms (KMP, Rabin-Karp, Z-algorithm, Manacher's) + Math algorithms (Sieve, fast exponentiation, matrix exponentiation) + Mock interviews with the agents
+
+### Week 5 — Advanced Data Structures
+- Day 1-2: Suffix Tree + Suffix Array (advanced string indexing)
+- Day 3-4: Heavy-Light Decomposition + Link-Cut Tree (advanced tree queries)
+- Day 5: Persistent Segment Tree + Cartesian Tree
+- Day 6: Splay Tree + Dancing Links
+- Day 7: Specialized structures (KD-Tree, Van Emde Boas, Fibonacci Heap) + Use cases review
+
+### Week 6 — Advanced Algorithms
+- Day 1-2: Advanced DP (CHT, Digit DP, Tree DP, SOS DP, Knuth-Yao)
+- Day 3-4: Graph algorithms (Max Flow, Min Cost Max Flow, Bipartite Matching, 2-SAT)
+- Day 5: String algorithms (Boyer-Moore, AC Automaton, Lyndon Factorization)
+- Day 6: Geometry (Convex Hull, Closest Pair, Point in Polygon, Line Intersection)
+- Day 7: Tree algorithms (Centroid Decomposition, Square Root Decomposition, Mo's Algorithm) + Mock interviews
+
+### Week 7 — Integration & Practice
+- Day 1-2: Use data structure and algorithm selection guides on mixed problems
+- Day 3-4: Solve problems requiring multiple DS/algorithm combinations
+- Day 5-6: Practice explaining trade-offs and optimization decisions
+- Day 7: Full mock interview with complex, multi-concept problems
+
+### Week 8 — Mock Interviews
+- Conduct 3-4 full 45-60 minute mock interviews
+- Use `/agent sde2-interviewer` to practice as candidate
+- Use `/agent sde-candidate` to practice problem formulation and evaluation
+- Focus on communication, problem breakdown, and optimization
