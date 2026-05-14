@@ -16,6 +16,140 @@ Advanced algorithms build on foundational patterns and are critical for senior-l
 
 ---
 
+## Master Algorithm Selection Flowchart
+
+This comprehensive decision tree guides you to the right algorithm based on problem characteristics, constraints, and optimization needs.
+
+```mermaid
+flowchart TD
+    Start(["🎯 START: Algorithm Selection<br/>Identify Problem Type"]) --> IsDP{{"Is this a<br/>DP Problem?"}}
+    
+    IsDP -->|Yes| DPType{{"What type of<br/>DP State?"}}
+    IsDP -->|No| IsGraph{{"Is this a<br/>Graph Problem?"}}
+    
+    %% DP Branch
+    DPType -->|Linear Recurrence<br/>Can we optimize?| IsMonotonic{{"Are DP queries<br/>monotonic?"}}
+    IsMonotonic -->|Yes| CHT["✓ Convex Hull Trick<br/>O(n) offline"]
+    IsMonotonic -->|No| LiChao["✓ Li-Chao Tree<br/>O(n log n) online"]
+    
+    DPType -->|Need Digit Constraints| DigitDP["✓ Digit DP<br/>O(d·S) where d=digits<br/>S=state space"]
+    
+    DPType -->|Tree Structure| TreeDP["✓ Tree DP<br/>O(V) or O(V²)<br/>for tree decomposition"]
+    
+    DPType -->|Bitmask/Subset| SosDP{{"Is subset<br/>enumeration needed?"}}
+    SosDP -->|Yes - Sum Over Subsets| SosDp["✓ SOS DP<br/>O(k·2^k) k≤20"]
+    SosDP -->|No - Standard Bitmask| BitmaskDP["✓ Standard DP<br/>O(2^k·poly)<br/>k≤15-20"]
+    
+    DPType -->|Interval DP| IntervalOpt{{"Optimal<br/>substructure<br/>monotonic?"}}
+    IntervalOpt -->|Yes, Quadrangle| KnuthYao["✓ Knuth-Yao<br/>Optimization<br/>O(n²)"]
+    IntervalOpt -->|Yes, Convex| DivideConq["✓ Divide & Conquer DP<br/>O(n log n)"]
+    IntervalOpt -->|No| StandardInt["✓ Standard Interval DP<br/>O(n³)"]
+    
+    %% Graph Branch
+    IsGraph -->|Yes| GraphType{{"What graph<br/>problem?"}}
+    
+    GraphType -->|Flow Network| FlowType{{"Need<br/>minimum<br/>cost?"}}
+    FlowType -->|Yes| MinCostFlow["✓ Min Cost Max Flow<br/>Successive Shortest<br/>O(flow·E·log V)"]
+    FlowType -->|No| MaxFlowAlgo{{"Graph<br/>density<br/>and size?"}}
+    MaxFlowAlgo -->|Dense or V small| Dinic["✓ Dinic's Algorithm<br/>O(V²E)"]
+    MaxFlowAlgo -->|Sparse| PushRelabel["✓ Push-Relabel<br/>O(V³) or O(V²√E)<br/>variants"]
+    
+    GraphType -->|Bipartite Matching| MatchSize{{"Size of<br/>bipartite<br/>set?"}}
+    MatchSize -->|V ≤ 500| Hungarian["✓ Hungarian Algorithm<br/>O(V³)"]
+    MatchSize -->|V > 500, Dense| HopcroftKarp["✓ Hopcroft-Karp<br/>O(E√V)"]
+    MatchSize -->|V > 500, Sparse| AugmentPath["✓ Augmenting Paths<br/>O(V·E)"]
+    
+    GraphType -->|2-SAT Problem| TwoSAT["✓ 2-SAT with SCC<br/>Build implication graph<br/>Find SCCs<br/>O(V+E)"]
+    
+    GraphType -->|Connectivity<br/>SCC/BCC| ConnType{{"Need<br/>components<br/>or bridges?"}}
+    ConnType -->|SCCs| Tarjan["✓ Tarjan's SCC<br/>O(V+E) one-pass"]
+    ConnType -->|Bridges/BCCs| Bridges["✓ Bridge/BCC Finding<br/>DFS-based O(V+E)"]
+    ConnType -->|General Connect| DSU["✓ Union-Find<br/>O(α(V))"]
+    
+    GraphType -->|Shortest Path| PathType{{"Negative<br/>edges<br/>present?"}}
+    PathType -->|No| SingleSource{{"Single or<br/>all-pairs<br/>shortest?"}}
+    SingleSource -->|Single| Dijkstra["✓ Dijkstra<br/>O(E+V log V)<br/>with Fibonacci heap"]
+    SingleSource -->|All-pairs| Johnson["✓ Johnson's Algorithm<br/>O(VE log V)<br/>reweight + Dijkstra×V"]
+    PathType -->|Yes| NegWeight{{"All-pairs<br/>needed?"}}
+    NegWeight -->|Yes| FloydWar["✓ Floyd-Warshall<br/>O(V³) dense"]
+    NegWeight -->|No| BellmanF["✓ Bellman-Ford<br/>O(VE)<br/>detect neg cycles"]
+    
+    GraphType -->|Articulation<br/>Points| ArticPt["✓ Articulation Points<br/>& Bridges<br/>Tarjan/DFS O(V+E)"]
+    
+    GraphType -->|Transitive Closure| TransClose["✓ Transitive Closure<br/>Floyd-Warshall<br/>or bitwise O(V³/w)"]
+    
+    %% String Branch
+    IsGraph -->|No| IsString{{"Is this a<br/>String Problem?"}}
+    
+    IsString -->|Yes| StringType{{"What string<br/>problem?"}}
+    
+    StringType -->|Single Pattern Match| PatternSize{{"Pattern<br/>length<br/>vs text?"}}
+    PatternSize -->|Short pattern| KMP["✓ KMP<br/>O(n+m)<br/>simple & robust"]
+    PatternSize -->|Long pattern| BoyerMoore["✓ Boyer-Moore<br/>O(n/m) avg case<br/>O(nm) worst"]
+    PatternSize -->|Any - Optimal| ZAlgo["✓ Z-Algorithm<br/>O(n+m)<br/>or KMP variant"]
+    
+    StringType -->|Multiple Patterns| MultiPat{{"Number of<br/>patterns?"}}
+    MultiPat -->|Few patterns| AhoC["✓ Aho-Corasick<br/>O(n+m+z)<br/>z=matches"]
+    MultiPat -->|Many patterns| SuffixStruct{{"Index query<br/>type?"}}
+    
+    StringType -->|Indexing/Query| SuffixStruct
+    SuffixStruct -->|Fast queries, offline| SuffixArr["✓ Suffix Array<br/>O(n log n) build<br/>O(log n) query"]
+    SuffixStruct -->|LCP queries needed| SuffixTree["✓ Suffix Tree<br/>O(n) build<br/>O(k) for k-length queries"]
+    
+    StringType -->|Palindromes| PalindType{{"All palindromes<br/>or just check?"}}
+    PalindType -->|All subpalindromes| Manacher["✓ Manacher's Algorithm<br/>O(n) single pass<br/>find all palindromes"]
+    PalindType -->|Check/Longest| ManacherDP["✓ Manacher or DP<br/>O(n) vs O(n²)"]
+    
+    %% Geometry Branch
+    IsString -->|No| IsGeom{{"Is this a<br/>Geometry Problem?"}}
+    
+    IsGeom -->|Yes| GeomType{{"What geometry<br/>problem?"}}
+    
+    GeomType -->|Convex Hull| HullPoints{{"Number of<br/>points?"}}
+    HullPoints -->|n ≤ 1000| GrahamScan["✓ Graham Scan<br/>O(n log n)<br/>intuitive"]
+    HullPoints -->|Any| Andrews["✓ Andrew's Algorithm<br/>O(n log n)<br/>robust, most stable"]
+    
+    GeomType -->|Closest Pair| ClosestSize{{"Point set<br/>size?"}}
+    ClosestSize -->|n ≤ 10K| DivideConqPts["✓ Divide & Conquer<br/>O(n log n)<br/>optimal worst-case"]
+    ClosestSize -->|n > 10K, 2D| KDTree["✓ KD-Tree<br/>O(n) build<br/>O(log n) avg query"]
+    
+    GeomType -->|Line Intersections| LineIntersect["✓ Orientation Check<br/>O(1) per pair<br/>Robust algorithm"]
+    
+    GeomType -->|Point in Polygon| PtInPoly["✓ Ray Casting<br/>O(n) per point<br/>Winding number"]
+    
+    %% Misc/Advanced DS
+    IsGeom -->|No| IsMisc{{"Is this a<br/>Heavy/Advanced<br/>Data Structure?"}}
+    
+    IsMisc -->|Yes| MiscType{{"Which pattern?"}}
+    
+    MiscType -->|Tree Path Queries| HeavyLight["✓ Heavy-Light Decomposition<br/>O(log² V) per query<br/>+ O(log n) segment tree"]
+    
+    MiscType -->|Offline Range Queries| Mo["✓ Mo's Algorithm<br/>O((n+m)√n)<br/>m queries on ranges"]
+    
+    MiscType -->|Large sqrt(n) range| SqrtDecomp["✓ Square Root<br/>Decomposition<br/>O(√n) per query"]
+    
+    MiscType -->|Selection Problem| QSelect["✓ QuickSelect<br/>O(n) average<br/>O(n²) worst (rare)"]
+    
+    MiscType -->|Optimal Encoding| Huffman["✓ Huffman Coding<br/>O(n log n) build<br/>Greedy tree construction"]
+    
+    MiscType -->|Interval/Activity<br/>Scheduling| Activity["✓ Activity Selection<br/>Greedy<br/>O(n log n) sort"]
+    
+    IsMisc -->|No| Generic["Check if problem<br/>is solvable with<br/>standard algorithms<br/>or optimization"]
+    
+    %% Styling
+    classDef startEnd fill:#90EE90,stroke:#228B22,stroke-width:3px,color:#000
+    classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
+    classDef algorithm fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
+    classDef complexity fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef warning fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    
+    class Start,End startEnd
+    class IsDP,DPType,IsMonotonic,GraphType,FlowType,MaxFlowAlgo,MatchSize,ConnType,PathType,SingleSource,NegWeight,StringType,PatternSize,MultiPat,SuffixStruct,PalindType,GeomType,HullPoints,ClosestSize,MiscType,IsGraph,IsString,IsGeom,IsMisc decision
+    class CHT,LiChao,DigitDP,TreeDP,SosDp,BitmaskDP,KnuthYao,DivideConq,StandardInt,Dinic,PushRelabel,MinCostFlow,Hungarian,HopcroftKarp,AugmentPath,TwoSAT,Tarjan,Bridges,DSU,Dijkstra,Johnson,FloydWar,BellmanF,ArticPt,TransClose,KMP,BoyerMoore,ZAlgo,AhoC,SuffixArr,SuffixTree,Manacher,ManacherDP,GrahamScan,Andrews,DivideConqPts,KDTree,LineIntersect,PtInPoly,HeavyLight,Mo,SqrtDecomp,QSelect,Huffman,Activity,Generic algorithm
+```
+
+---
+
 # 1. DP Optimization Techniques
 
 ## Convex Hull Trick (CHT)
@@ -26,21 +160,102 @@ Convex Hull Trick optimizes DP recurrences of the form `dp[i] = min(dp[j] + cost
 
 The idea: represent each possible previous state j as a linear function `f_j(x) = a_j * x + b_j`. For a state i with parameter x_i, we need `min_j(a_j * x_i + b_j)`. The optimal j lies on the lower envelope (convex hull) of these lines.
 
-**Solution Approach Flowchart**
+**Problem Recognition Flowchart**
 
 ```mermaid
 flowchart TD
-    A["START: DP recurrence<br/>dp[i] = min(dp[j] + cost[i][j])"] --> B{"Is cost[i][j]<br/>of form a_j*i + b_j?"}
-    B -->|No| C["Use standard DP O(n²)"]
+    A(["START: Analyzing DP<br/>Recurrence"]) --> B{"Is recurrence<br/>O(n²) DP with<br/>cost structure?"}}
+    B -->|No| C["❌ CHT not applicable<br/>Use standard approach"]
+    B -->|Yes| D{"Can cost be split:<br/>a_j·i + b_j<br/>where j,i are separate?"}}
+    D -->|No| E["❌ CHT not applicable<br/>Cost structure wrong"]
+    D -->|Yes| F{"Are a_j values<br/>monotonic (increasing<br/>or decreasing)?"}}
+    F -->|No| G["⚠️ CHT still possible<br/>but harder to use"]
+    F -->|Yes| H["✓ CHT APPLICABLE<br/>Proceed with optimization"]
+    
+    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    classDef warning fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    class H applicable
+    class C,E notappl
+    class G warning
+```
+
+**Solution Approach Flowchart (Execution)**
+
+```mermaid
+flowchart TD
+    A["START: DP recurrence<br/>dp[i] = min(dp[j] + cost[i][j])"] --> B{"Is cost[i][j]<br/>of form a_j·i + b_j?"}
+    B -->|No| C["Use standard DP<br/>⏱️ O(n²)"]
     B -->|Yes| D{"Are queries x_i<br/>monotonically increasing?"}
-    D -->|No| E["Use online CHT with<br/>balanced BST O(n log n)"]
-    D -->|Yes| F["Use offline CHT<br/>with deque O(n)"]
-    F --> G["Maintain lower envelope<br/>of lines"]
-    G --> H["For each query, find<br/>tangent line in O(1)"]
-    H --> I["Return minimum value"]
-    E --> I
-    C --> I
-    I --> J["END: DP[n] computed"]
+    D -->|No| E["Use online CHT<br/>with balanced BST<br/>⏱️ O(n log n)"]
+    D -->|Yes| F["Use offline CHT<br/>with deque<br/>⏱️ O(n)"]
+    F --> G["👁️ Maintain lower envelope<br/>of linear functions"]
+    G --> H["🔍 For each query,<br/>find tangent point<br/>on convex hull"]
+    H --> I["📊 Return minimum value<br/>from optimal line"]
+    E --> J["END: DP[n] computed<br/>in reduced time"]
+    C --> J
+    
+    classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
+    classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
+    classDef optimal fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef subopt fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    
+    class B,D decision
+    class G,H action
+    class F optimal
+    class C,E subopt
+```
+
+**Optimization Decision Tree**
+
+```mermaid
+flowchart TD
+    Start(["Need to optimize<br/>O(n²) DP?"]) --> Q1{{"Slopes<br/>monotonic?"}}
+    Q1 -->|Decreasing| Deque["✓ Use Deque CHT<br/>O(n) - FASTEST<br/>Remove from back"]
+    Q1 -->|Increasing| Deque
+    Q1 -->|Random| Tree["✓ Use Tree CHT<br/>O(n log n)<br/>Binary search"]
+    
+    Deque --> Space["Memory: O(n)<br/>for line storage"]
+    Tree --> Space
+    Space --> Impl["Implementation<br/>complexity: Medium"]
+    Impl --> Worth{{"Worth<br/>implementation<br/>vs O(n²)?"}}
+    Worth -->|n ≤ 5000| No["❌ Skip optimization<br/>O(n²) fast enough"]
+    Worth -->|n > 5000| Yes["✓ Implement CHT<br/>n=10^6+ needed"]
+    
+    classDef fast fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef medium fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef skip fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    
+    class Deque fast
+    class Tree medium
+    class No skip
+    class Yes fast
+```
+
+**Implementation Challenges**
+
+```mermaid
+flowchart TD
+    A(["Common CHT<br/>Pitfalls"]) --> P1["❌ Floating Point<br/>Error in slope<br/>comparison"]
+    A --> P2["❌ Not handling<br/>degenerate lines<br/>with same slope"]
+    A --> P3["❌ Integer overflow<br/>in multiplication<br/>a·i + b"]
+    A --> P4["❌ Assuming slope<br/>monotonicity<br/>without verification"]
+    
+    P1 --> S1["✓ Use exact arithmetic<br/>or long double<br/>Avoid epsilon"]
+    P2 --> S2["✓ Merge duplicate<br/>slopes, keep better<br/>intercept only"]
+    P3 --> S3["✓ Use __int128<br/>or careful casting<br/>to long long"]
+    P4 --> S4["✓ Verify slopes<br/>before assuming<br/>monotonicity"]
+    
+    S1 --> End(["✓ Debug-free<br/>CHT implementation"])
+    S2 --> End
+    S3 --> End
+    S4 --> End
+    
+    classDef problem fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    classDef solution fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    
+    class P1,P2,P3,P4 problem
+    class S1,S2,S3,S4 solution
 ```
 
 **Complexity**
@@ -90,14 +305,71 @@ State: `dp[pos][sum_state][tight]` where:
 - `sum_state`: aggregate of properties so far (sum, count, etc.)
 - `tight`: whether we're still bounded by the original number N
 
-**Solution Approach Flowchart**
+**Problem Recognition Flowchart**
 
 ```mermaid
 flowchart TD
-    A["START: Count numbers ≤ N<br/>with property P"] --> B["Transform to digit-by-digit<br/>DP: define states"]
-    B --> C["State = pos, property_state, tight"]
-    C --> D["Base case: pos = number of digits"]
-    D --> E{"Are we still<br/>bounded by N?"}
+    A(["START: Problem Analysis"]) --> Q1{"Need to count/sum<br/>numbers in range<br/>[0, N]?"}}
+    Q1 -->|No| NotDig["❌ Digit DP not suitable"]
+    Q1 -->|Yes| Q2{"Is property<br/>defined by<br/>digit sequence?"}}
+    Q2 -->|No| NotDig2["❌ Use different DP"]
+    Q2 -->|Yes| Q3{"Can state be<br/>expressed as:<br/>pos, property, tight?"}}
+    Q3 -->|Yes| Apply["✓ DIGIT DP APPLICABLE<br/>O(d·S) complexity<br/>d=digits, S=states"]
+    Q3 -->|No| Modify["⚠️ May need custom<br/>state design"]
+    
+    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    class Apply applicable
+    class NotDig,NotDig2 notappl
+```
+
+**Solution Approach Flowchart (Step-by-Step)**
+
+```mermaid
+flowchart TD
+    A["START: Count numbers ≤ N<br/>with property P"] --> B["🔢 Transform to digit-by-digit<br/>DP: define states"]
+    B --> C["📋 State = pos, property_state, tight<br/>pos = digit position from left<br/>property = aggregate value<br/>tight = still bounded by N?"]
+    C --> D["🏁 Base case: pos = num_digits"]
+    D --> E{"Are we still<br/>bounded by N<br/>tight=true?"}}
+    E -->|Yes| F["✋ Max digit at pos<br/>= N[pos]"]
+    E -->|No| G["🆓 Can use any digit<br/>0-9"]
+    F --> H["🔄 Recur with<br/>new tight flag"]
+    G --> H
+    H --> I["➕ Sum results<br/>from all branches"]
+    I --> J["END: Total count<br/>computed"]
+```
+
+**State Space and Complexity**
+
+```mermaid
+flowchart TD
+    Start(["Analyze Problem<br/>for Digit DP"]) --> NumDig["Number of digits d<br/>d = log10(N)<br/>typically d ≤ 18"]
+    NumDig --> PropState["Property state space<br/>Examples:<br/>- Sum of digits: [0, 9d]<br/>- Count of digit k: [0, d]<br/>- Bitmask: [0, 2^10]"]
+    PropState --> TightState["Tight state: 2 values<br/>true or false"]
+    TightState --> Complexity["Total states:<br/>d × |property_space| × 2<br/>Typical: 18 × 180 × 2 = 6480"]
+    Complexity --> Result["Time: O(d·S·10)<br/>10 = digits tried<br/>Space: O(d·S)"]
+    
+    classDef analysis fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
+    class NumDig,PropState,TightState,Complexity,Result analysis
+```
+
+**Optimization Techniques**
+
+```mermaid
+flowchart TD
+    A(["Optimize Digit DP"]) --> O1["Use memoization map<br/>instead of 3D array<br/>if state sparse"]
+    A --> O2["Reduce property state<br/>e.g., modulo instead of exact"]
+    A --> O3["Iterative DP if states<br/>can be topologically<br/>ordered"]
+    
+    O1 --> R1["✓ Better cache locality<br/>Lower memory"]
+    O2 --> R2["✓ Smaller state space<br/>O(d·k) instead of O(d·N)"]
+    O3 --> R3["✓ Avoid recursion<br/>overhead"]
+    
+    R1 --> Impl["Pick based on<br/>problem constraints"]
+    R2 --> Impl
+    R3 --> Impl
+    Impl --> End(["✓ Optimized DP<br/>ready"])
+```
     E -->|Yes, tight=true| F["Digit ∈ [0, N[pos]]"]
     E -->|No, tight=false| G["Digit ∈ [0, 9]"]
     F --> H["Recurse with new state<br/>and memoize"]
@@ -160,23 +432,81 @@ Answer: dp[0][0][1] (start at pos 0, sum is 0=even, tight to N)
 
 Tree DP combines DP with tree traversal. Each node's optimal solution depends on the optimal solutions of its children. This is essential for tree-shaped problems: count subtree patterns, find maximum weight independent sets, tree coloring, rerooting.
 
-**Solution Approach Flowchart**
+**Problem Recognition Flowchart**
 
 ```mermaid
 flowchart TD
-    A["START: DP on tree"] --> B["Define dp[node][state]<br/>= optimal value for subtree"]
-    B --> C["Choose root"]
-    C --> D["DFS from root"]
-    D --> E{"Is this a leaf?"}
-    E -->|Yes| F["dp[node][state] =<br/>base case"]
-    E -->|No| G["Compute dp[children] first"]
-    G --> H["Combine children DPs<br/>using recurrence"]
-    H --> I["Store dp[node][state]"]
-    I --> J{"All nodes processed?"}
-    J -->|No| K["Move to next node"]
-    K --> D
-    J -->|Yes| L["Answer: dp[root][state]"]
+    A(["START: Problem Analysis"]) --> Q1{"Is problem<br/>defined on a<br/>tree structure?"}}
+    Q1 -->|No| NotTree["❌ Use graph DP<br/>or standard DP"]
+    Q1 -->|Yes| Q2{"Can solution<br/>be expressed<br/>per subtree?"}}
+    Q2 -->|No| NotDP["❌ May need<br/>different approach"]
+    Q2 -->|Yes| Q3{"Do subproblems<br/>depend on<br/>children only?"}}
+    Q3 -->|Yes| Apply["✓ TREE DP APPLICABLE<br/>O(n·S) or O(n²)<br/>S = states"]
+    Q3 -->|No| Harder["⚠️ May need rerooting<br/>or DP on paths"]
+    
+    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    class Apply applicable
+    class NotTree,NotDP notappl
+```
+
+**Main Algorithm Flowchart**
+
+```mermaid
+flowchart TD
+    A["START: DP on tree<br/>Define dp[node][state]"] --> B["🌳 Choose root<br/>(any node works)"]
+    B --> C["📍 DFS post-order<br/>process children before parent"]
+    C --> D{"Is this a<br/>leaf node?"}}
+    D -->|Yes| F["🏁 Base case:<br/>dp[node][state]"]
+    D -->|No| G["🔄 Recurse on children<br/>Compute all dp[child][·]"]
+    G --> H["🔗 Combine children results<br/>using problem recurrence"]
+    H --> I["💾 Store dp[node][state]"]
+    I --> J{"All nodes<br/>processed?"}}
+    J -->|No| K["⬆️ Go to next node<br/>in post-order"]
+    K --> C
+    J -->|Yes| L["✓ Answer: dp[root][state]"]
     L --> M["END: Optimal value computed"]
+    F --> I
+    
+    classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
+    classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
+    classDef output fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    
+    class D,J decision
+    class G,H action
+    class L output
+```
+
+**Rerooting Pattern (All Nodes as Root)**
+
+```mermaid
+flowchart TD
+    Start(["Need answer<br/>for every node<br/>as root?"]) --> First["Phase 1: Bottom-up DP<br/>Fix arbitrary root<br/>Compute subtree DPs"]
+    First --> Second["Phase 2: Top-down DP<br/>DFS from root again<br/>Compute root's DP<br/>then propagate down"]
+    Second --> Combine["Phase 3: For each node<br/>Merge subtree info<br/>with parent info"]
+    Combine --> Result["Result: dp[node]<br/>valid for all roots"]
+    Result --> Time["⏱️ Time: O(n·S)<br/>Two DFS passes"]
+    
+    classDef phase fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
+    class First,Second,Combine,Result,Time phase
+```
+
+**State Combination Methods**
+
+```mermaid
+flowchart TD
+    A(["Combining children<br/>DP values"]) --> M1["Method 1: MAX<br/>Take max of children states<br/>Good for: optimization"]
+    A --> M2["Method 2: SUM<br/>Sum children values<br/>Good for: counting"]
+    A --> M3["Method 3: PRODUCT<br/>Multiply children counts<br/>Good for: path counting"]
+    A --> M4["Method 4: MERGE<br/>Combine pairs carefully<br/>Good for: matching, paths"]
+    
+    M1 --> Ex1["Example: Max Independent<br/>Set: dp[v][include] =<br/>weight[v] + sum(dp[child][exclude])"]
+    M2 --> Ex2["Example: Subtree Sum<br/>dp[v] = sum(dp[child])"]
+    M3 --> Ex3["Example: Colorings<br/>dp[v][color] =<br/>∏(dp[child][color'])"]
+    M4 --> Ex4["Example: Max Path<br/>dp[v] = max of<br/>combining 2 paths"]
+    
+    classDef method fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    class M1,M2,M3,M4 method
 ```
 
 **Complexity**
@@ -240,20 +570,90 @@ Answer: max(7, 3) = 7 (don't take root, take subtree rooted at 2)
 
 Sum Over Subsets DP efficiently computes `f(S) = sum of g(T)` for all subsets T of a bitmask S, or solves problems involving subset relationships. The key observation: process bits independently using inclusion-exclusion.
 
-**Solution Approach Flowchart**
+**Problem Recognition Flowchart**
 
 ```mermaid
 flowchart TD
-    A["START: Compute sum over<br/>all subsets for each set"] --> B["Define f[S] = sum of values<br/>for all subsets of S"]
-    B --> C["Initialize f[i] = g[i]<br/>for all bitmasks i"]
-    C --> D["For each bit position b<br/>(0 to k-1):"]
-    D --> E["For each bitmask S with<br/>bit b not yet processed:"]
-    E --> F["f[S] += f[S with bit b off]"]
-    F --> G{"All bits<br/>processed?"}
-    G -->|No| H["Move to next bit"]
-    H --> D
-    G -->|Yes| I["Return f array"]
-    I --> J["END: SOS DP complete"]
+    A(["START: Problem Type?"]) --> Q1{"Need to query<br/>for each set S:<br/>sum of all subsets?"}}
+    Q1 -->|No| NotSOS["❌ Not SOS DP"]
+    Q1 -->|Yes| Q2{"Is k = number of<br/>bits small?"}}
+    Q2 -->|k > 20| TooLarge["❌ SOS DP impractical<br/>Use different approach<br/>2^k too large"]
+    Q2 -->|k ≤ 20| Apply["✓ SOS DP APPLICABLE<br/>O(k·2^k) time<br/>O(2^k) space"]
+    
+    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    class Apply applicable
+    class NotSOS,TooLarge notappl
+```
+
+**Main Algorithm Flowchart**
+
+```mermaid
+flowchart TD
+    A["START: SOS DP<br/>Compute sum for all subsets"] --> B["📋 Define f[S] = aggregate<br/>of all values g[T]<br/>where T ⊆ S"]
+    B --> C["🔤 Initialize f[i] = g[i]<br/>for all bitmasks i ∈ [0, 2^k)"]
+    C --> D["🔢 For each bit position b<br/>from 0 to k-1:"]
+    D --> E["🔄 For each bitmask S<br/>from 0 to 2^k - 1:"]
+    E --> F{"Does S have<br/>bit b set?"}}
+    F -->|Yes| G["📊 f[S] = op(f[S], f[S^(1<<b)])"]
+    F -->|No| H["⏭️ Skip (bit not set)"]
+    G --> I{"Next bit<br/>to process?"}}
+    H --> I
+    I -->|Yes| J["Move to next bit"]
+    J --> D
+    I -->|No| K["✓ Done: All queries answered"]
+    K --> L["END: f array contains<br/>all subset sums"]
+    
+    classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
+    classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
+    classDef output fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    
+    class F,I decision
+    class G,H,J action
+    class K output
+```
+
+**Optimization Variants**
+
+```mermaid
+flowchart TD
+    A(["SOS DP Variants"]) --> Op1["Variant 1: SUM<br/>f[S] = sum g[T]<br/>for T ⊆ S<br/>Use: += operation"]
+    A --> Op2["Variant 2: MIN<br/>f[S] = min g[T]<br/>for T ⊆ S<br/>Use: min operation"]
+    A --> Op3["Variant 3: MAX<br/>f[S] = max g[T]<br/>for T ⊆ S<br/>Use: max operation"]
+    A --> Op4["Variant 4: SUPERSET<br/>f[S] = sum g[T]<br/>for S ⊆ T<br/>Iterate backwards"]
+    
+    Op1 --> Time["Time: O(k·2^k)<br/>k ≤ 20 practical"]
+    Op2 --> Time
+    Op3 --> Time
+    Op4 --> Back["Reverse iteration<br/>process bit by bit<br/>S ⊇ T becomes T ⊆ S"]
+    Back --> Time
+    Time --> Space["Space: O(2^k)<br/>Single array"]
+    
+    classDef var fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    class Op1,Op2,Op3,Op4,Back var
+```
+
+**Common Pitfalls & Fixes**
+
+```mermaid
+flowchart TD
+    A(["SOS DP<br/>Pitfalls"]) --> P1["❌ Wrong bit iteration<br/>Must go bit by bit<br/>not submask iteration"]
+    A --> P2["❌ Overwriting while<br/>processing same bit<br/>Use temp array"]
+    A --> P3["❌ Forgetting to process<br/>bit position 0<br/>Check loop bounds"]
+    
+    P1 --> S1["✓ For each bit b:<br/>  For each S:<br/>    update using S^(1<<b)"]
+    P2 --> S2["✓ Use two arrays OR<br/>iterate S in specific order<br/>to avoid overwrite"]
+    P3 --> S3["✓ Ensure loop i=0<br/>to k-1 covers all bits"]
+    
+    S1 --> End(["✓ Correct SOS DP"])
+    S2 --> End
+    S3 --> End
+    
+    classDef problem fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
+    classDef solution fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    
+    class P1,P2,P3 problem
+    class S1,S2,S3 solution
 ```
 
 **Complexity**
@@ -394,20 +794,78 @@ Final complexity: O(n²) amortized
 
 Max flow finds the maximum amount of "flow" that can be pushed from a source to a sink in a flow network (directed graph with capacities on edges). Ford-Fulkerson is the general algorithm; Dinic's is a practical O(V²E) implementation.
 
-**Solution Approach Flowchart**
+**Problem Recognition Flowchart**
 
 ```mermaid
 flowchart TD
-    A["START: Find max flow<br/>from source s to sink t"] --> B["Build residual graph<br/>with forward and reverse edges"]
-    B --> C["While there exists<br/>an augmenting path:"]
-    C --> D["Find path s → t with<br/>available capacity"]
-    D --> E["Find bottleneck capacity<br/>on the path"]
-    E --> F["Push flow along path"]
-    F --> G["Update residual graph:<br/>forward edge -=flow,<br/>reverse edge +=flow"]
-    G --> H{"More augmenting<br/>paths?"}
-    H -->|Yes| C
-    H -->|No| I["Return total flow"]
-    I --> J["END: Max flow computed"]
+    A(["START: Network Problem"]) --> Q1{"Need to find<br/>maximum flow<br/>s→t?"}}
+    Q1 -->|No| NotFlow["❌ Not a flow problem"]
+    Q1 -->|Yes| Q2{"Graph size<br/>and density?"}}
+    Q2 -->|V ≤ 100, sparse| FF["⚠️ Ford-Fulkerson<br/>Simple but slow<br/>O(E·flow)"]
+    Q2 -->|V ≤ 1000, any| Dinics["✓ Dinic's Algorithm<br/>BEST practical<br/>O(V²E)"]
+    Q2 -->|V > 1000, dense| PushRel["✓ Push-Relabel<br/>Better for dense<br/>O(V³) or variant"]
+    
+    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef warning fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    class Dinics applicable
+    class FF warning
+```
+
+**Core Ford-Fulkerson Flowchart**
+
+```mermaid
+flowchart TD
+    A["START: Find max flow<br/>source s, sink t"] --> B["🔧 Build residual graph<br/>forward & reverse edges<br/>capacity = original"]
+    B --> C["📊 flow_total = 0"]
+    C --> D["🔄 While augmenting path exists:"]
+    D --> E["🔍 Find path s→t in<br/>residual graph<br/>with capacity > 0"]
+    E --> F{"Path<br/>exists?"}}
+    F -->|No| I["✓ Done: max flow found"]
+    F -->|Yes| G["⛓️ Find bottleneck capacity<br/>min capacity on path"]
+    G --> H["📤 Push flow along path<br/>forward edges -=flow<br/>reverse edges +=flow"]
+    H --> J["➕ flow_total += flow"]
+    J --> D
+    I --> K["END: Return flow_total"]
+    
+    classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
+    classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
+    classDef output fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    
+    class F decision
+    class E,G,H action
+    class I,K output
+```
+
+**Dinic's Algorithm (Optimized)**
+
+```mermaid
+flowchart TD
+    Start(["Dinic's Algorithm<br/>Ford-Fulkerson + Levels"]) --> Step1["Phase 1: BFS from source<br/>Build level graph<br/>level[v] = distance from s"]
+    Step1 --> Step2["Phase 2: DFS from source<br/>Find blocking flows<br/>using current edge pointer"]
+    Step2 --> Step3["⏱️ Time: O(V²E)<br/>Much faster than O(E·flow)"]
+    Step3 --> Repeat["🔄 Repeat phases<br/>until no augmenting path<br/>in level graph"]
+    Repeat --> End["✓ Max flow computed<br/>Optimal for most cases"]
+    
+    classDef algo fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
+    class Step1,Step2,Step3,Repeat,End algo
+```
+
+**Augmenting Path Finding Methods**
+
+```mermaid
+flowchart TD
+    A(["Finding Augmenting<br/>Paths"]) --> M1["Method 1: DFS<br/>Ford-Fulkerson<br/>Simple, slow O(E·flow)"]
+    A --> M2["Method 2: BFS<br/>Edmonds-Karp<br/>Polynomial O(VE²)"]
+    A --> M3["Method 3: Level Graph<br/>Dinic's<br/>O(V²E) fast"]
+    A --> M4["Method 4: Blocking Flows<br/>Push-Relabel variant<br/>O(V³) or O(V²√E)"]
+    
+    M1 --> Ex1["Unbounded flow:<br/>DFS may loop forever<br/>if flow not integer"]
+    M2 --> Ex2["Always polynomial<br/>BFS finds shortest<br/>augmenting path"]
+    M3 --> Ex3["Level graph pruning<br/>Dinic's is practical<br/>RECOMMENDED"]
+    M4 --> Ex4["Global approach<br/>Different philosophy<br/>Also efficient"]
+    
+    classDef method fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    class M1,M2,M3,M4 method
 ```
 
 **Complexity**

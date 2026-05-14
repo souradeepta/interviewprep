@@ -95,23 +95,126 @@ Result: positions 3 and 1 in original string both have "ana"
 
 ```mermaid
 flowchart TD
-    A["Problem: Pattern/substring analysis"] -->|Space available?| B{Memory tight?}
-    B -->|Yes| C["Use suffix array + LCP<br/>O(n) space"]
-    B -->|No, more queries| D["Suffix tree<br/>O(m) queries"]
-    C --> E["Choose construction method"]
-    E -->|Quick implementation| F["Prefix doubling O(n log² n)<br/>or divsufsort library"]
-    E -->|Optimal theory| G["SA-IS O(n) linear"]
-    F --> H["Identify query type"]
+    A["🎯 Problem: Pattern/substring analysis"] -->|Space available?| B{Memory tight?}
+    B -->|Yes| C["✓ Use suffix array + LCP<br/>O(n) space"]
+    B -->|No, many queries| D["✓ Suffix tree<br/>O(m) query"]
+    C --> E["📋 Choose construction method"]
+    E -->|Quick implementation| F["✓ Prefix doubling<br/>O(n log² n)"]
+    E -->|Optimal theory| G["✓ SA-IS<br/>O(n) linear"]
+    F --> H["📊 Identify query type"]
     G --> H
-    H -->|Single pattern search| I["Binary search SA<br/>for pattern range<br/>O(m log n)"]
-    H -->|Longest repeated| J["Build LCP array<br/>Find max LCP value<br/>O(n)"]
-    H -->|Longest common substring| K["Build SA for S1#S2<br/>Find max LCP where<br/>SA spans both strings"]
-    I --> L["Verify range contains<br/>all matches"]
-    J --> M["Position of max LCP<br/>gives start of repeat"]
-    K --> N["Verify matches constraint"]
-    L --> O["Complexity check"]
+    H -->|Single pattern search| I["🔍 Binary search SA<br/>for pattern range<br/>O(m log n)"]
+    H -->|Longest repeated| J["🔄 Build LCP array<br/>Find max LCP value"]
+    H -->|Longest common| K["🌲 Build SA for S1#S2<br/>Find max LCP<br/>spanning both"]
+    I --> L["✓ Range [left, right]<br/>contains all matches<br/>O(m log n)"]
+    J --> M["📈 Position of max LCP<br/>= start of repeat<br/>O(n)"]
+    K --> N["✓ Check span constraint<br/>O(n)"]
+    L --> O["✓ Result verified"]
     M --> O
     N --> O
+    
+    style A fill:#fff4e6
+    style C fill:#e3f2fd
+    style D fill:#e3f2fd
+    style E fill:#f3e5f5
+    style H fill:#f3e5f5
+    style L fill:#e8f5e9
+    style M fill:#e8f5e9
+    style N fill:#e8f5e9
+    style O fill:#e8f5e9
+```
+
+## Suffix Array Construction Methods Flowchart
+
+```mermaid
+flowchart TD
+    A["🏗 Build Suffix Array"] --> B{Implementation priority?}
+    B -->|Easy & practical| C["Prefix Doubling<br/>O(n log² n)"]
+    B -->|Optimal complexity| D["SA-IS<br/>O(n) linear"]
+    B -->|Use library| E["divsufsort or qsufsort<br/>Highly optimized"]
+    C --> F["Initialize: rank each char<br/>rank[i] = char value"]
+    F --> G["For step=1,2,4,8,...:<br/>Sort by (rank[i], rank[i+step])"]
+    G --> H["Use stable sort or counting sort<br/>O(n log n) per iteration<br/>log n iterations"]
+    H --> I{"Sorted<br/>completely?"}
+    I -->|No| G
+    I -->|Yes| J["✓ Suffix Array complete"]
+    D --> K["Complex algorithm<br/>Induce sorting concept<br/>Divide into S/L types"]
+    K --> L["Recursively sort subset<br/>Then induce sort full array"]
+    L --> M["✓ O(n) time<br/>but intricate logic"]
+    E --> N["Use standard library<br/>optimized C/C++"]
+    J --> O["Next: Build LCP array"]
+    M --> O
+    N --> O
+    O --> P["Use Kasai algorithm<br/>O(n) linear construction"]
+    
+    style A fill:#f3e5f5
+    style C fill:#e3f2fd
+    style D fill:#e3f2fd
+    style E fill:#e3f2fd
+    style J fill:#e8f5e9
+    style M fill:#e8f5e9
+    style N fill:#e8f5e9
+    style P fill:#f3e5f5
+```
+
+## Suffix Array Query Patterns Flowchart
+
+```mermaid
+flowchart TD
+    A["🔍 Suffix Array Query Operations"] --> B{Query type?}
+    B -->|Pattern matching<br/>find positions| C["Binary search<br/>or exponential jump"]
+    B -->|Longest repeat<br/>substring| D["Build LCP array<br/>find max value"]
+    B -->|Longest common<br/>substring| E["Concatenate strings<br/>with separator"]
+    B -->|Substring<br/>uniqueness| F["Check if pattern<br/>appears exactly once"]
+    C --> G["Binary search pattern P<br/>Compare P with SA[mid]"]
+    G --> H{"P vs<br/>SA[mid]<br/>suffix?"}
+    H -->|P < suffix| I["Search left half"]
+    H -->|P > suffix| J["Search right half"]
+    H -->|P prefix| K["Narrow range:<br/>find [left, right]<br/>boundaries"]
+    I --> G
+    J --> G
+    K --> L["✓ Return all match<br/>positions SA[left..right]<br/>O(m log n + k)"]
+    D --> M["Build LCP[i] =<br/>LCP(SA[i-1], SA[i])"]
+    M --> N["Scan LCP array<br/>O(n)"]
+    N --> O["Max LCP = longest<br/>repeated substring"]
+    O --> P["✓ Position from SA"]
+    E --> Q["Build SA for S1 + '#' + S2<br/>both suffixes appear"]
+    Q --> R["Find max LCP where<br/>one from S1, one from S2"]
+    R --> S["✓ Longest common found"]
+    F --> T["Binary search for P<br/>Check range size = 1<br/>or pattern not found"]
+    T --> U["✓ Unique or absent"]
+    
+    style A fill:#fff4e6
+    style L fill:#e8f5e9
+    style P fill:#e8f5e9
+    style S fill:#e8f5e9
+    style U fill:#e8f5e9
+```
+
+## Suffix Array vs Suffix Tree Comparison Flowchart
+
+```mermaid
+flowchart TD
+    A["🤔 Suffix Array vs Suffix Tree"] --> B{Your constraints?}
+    B -->|Memory very tight| C["✓ Suffix Array<br/>O(n) space<br/>4-8 bytes/elem"]
+    B -->|Memory plenty<br/>many queries| D["✓ Suffix Tree<br/>O(n) theoretical<br/>10-30x in practice"]
+    B -->|Speed critical| E{Query pattern?}
+    E -->|One-time search| F["Both ok<br/>SA: O(m log n)<br/>Tree: O(m+k)"]
+    E -->|Multiple same text| G["Suffix Tree better<br/>O(m+k) each query<br/>vs O(m log n)"]
+    B -->|Complex operations| H{Operation type?}
+    H -->|Longest repeat<br/>common substr| I["✓ Suffix Array + LCP<br/>O(n) with LCP array<br/>Easy to implement"]
+    H -->|Pattern with<br/>wildcards| J["❌ Not SA<br/>Suffix Tree better<br/>or NFA"]
+    C --> K["Suffix Array approach"]
+    D --> L["Suffix Tree approach"]
+    G --> L
+    I --> K
+    K --> M["Practical choice:<br/>SA+LCP most common<br/>Competitive programming"]
+    L --> M
+    
+    style A fill:#fff4e6
+    style K fill:#e8f5e9
+    style L fill:#e8f5e9
+    style M fill:#f3e5f5
 ```
 
 ## Common Patterns

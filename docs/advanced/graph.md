@@ -14,6 +14,105 @@ A **Graph** G = (V, E) consists of a set of vertices (nodes) V and edges E conne
 
 ---
 
+## Flowcharts
+
+### Graph Algorithm Selection Decision Tree
+
+```mermaid
+graph TD
+    A["Graph Problem"] --> B{"What to find?"}
+    
+    B -->|Shortest path<br/>between two nodes| C{"Weighted edges?"}
+    B -->|All shortest paths<br/>from one source| D{"Type of weights?"}
+    B -->|Connectivity<br/>Components| E{"Static or<br/>dynamic?"}
+    B -->|Cycle detection| F{"Directed or<br/>undirected?"}
+    B -->|Topological order| G["DAG only"]
+    
+    C -->|No weights<br/>Unweighted| H["Use BFS<br/>O(V+E)<br/>Level-by-level"]
+    C -->|Yes, all >= 0| I["Use Dijkstra<br/>O((V+E)log V)<br/>Min-heap"]
+    
+    D -->|Positive weights| I
+    D -->|Negative weights| J["Use Bellman-Ford<br/>O(V*E)<br/>Slower"]
+    
+    E -->|Static| K["DFS/Union-Find<br/>O(V+E)"]
+    E -->|Dynamic| L["Union-Find<br/>O(α(n)) per op"]
+    
+    F -->|Undirected| M["DFS with visited set<br/>Back edge = cycle"]
+    F -->|Directed| N["DFS with 3 states<br/>Back edge = cycle"]
+    
+    G --> O["Kahn's BFS or<br/>DFS postorder<br/>O(V+E)"]
+    
+    H --> P["✓ BFS: 0-1 weights"]
+    I --> Q["✓ Dijkstra"]
+    J --> R["✓ Bellman-Ford"]
+    K --> S["✓ DFS/UF"]
+    L --> T["✓ Union-Find"]
+    M --> U["✓ Undirected cycle"]
+    N --> V["✓ Directed cycle"]
+    O --> W["✓ Topological sort"]
+    
+    style P fill:#90EE90
+    style Q fill:#90EE90
+    style R fill:#90EE90
+    style S fill:#90EE90
+    style T fill:#90EE90
+```
+
+### Representation: Adjacency List vs Matrix
+
+```mermaid
+graph TD
+    A["Choose graph representation"] --> B{"Graph density?"}
+    
+    B -->|Sparse<br/>E << V²| C["Adjacency List<br/>O(V+E) space<br/>O(degree) per lookup"]
+    B -->|Dense<br/>E ≈ V²| D["Adjacency Matrix<br/>O(V²) space<br/>O(1) edge lookup"]
+    B -->|Not sure| E["Default: Adjacency List<br/>Works for most"]
+    
+    C --> F["Use Dict/HashMap<br/>neighbors"]
+    D --> G["Use 2D array<br/>matrix[i][j]"]
+    E --> H["Adjacency List<br/>more versatile"]
+    
+    F --> I["Get neighbors: O(1)"]
+    F --> J["Check edge: O(degree)"]
+    G --> K["Get neighbors: O(V)"]
+    G --> L["Check edge: O(1)"]
+    
+    style C fill:#90EE90
+    style D fill:#FFB6C1
+```
+
+### DFS vs BFS Application
+
+```mermaid
+graph TD
+    A["Graph traversal problem"] --> B{"What's the goal?"}
+    
+    B -->|Shortest path<br/>unweighted| C["Use BFS<br/>Level-order"]
+    B -->|All reachable nodes| D{"Memory constraint?"}
+    B -->|Connectivity test| E{"Need parent path?"}
+    B -->|Topological/Cycle| F["Use DFS<br/>Post-order"]
+    
+    D -->|Limited stack| G["Use BFS<br/>Queue is safer"]
+    D -->|Limited queue| H["Use DFS<br/>Recursion/stack"]
+    
+    E -->|Yes, track path| I["Use BFS/DFS<br/>with parent array"]
+    E -->|No, just check| J["Use DFS<br/>Faster"]
+    
+    C --> K["BFS: O(V+E)<br/>Shortest level"]
+    G --> L["BFS: queue"]
+    H --> M["DFS: stack"]
+    I --> N["Track parent on visit"]
+    J --> O["DFS simple check"]
+    F --> P["DFS: finish times"]
+    
+    style K fill:#90EE90
+    style L fill:#87CEEB
+    style M fill:#87CEEB
+    style P fill:#87CEEB
+```
+
+---
+
 ## Visualization
 
 ### Undirected Graph

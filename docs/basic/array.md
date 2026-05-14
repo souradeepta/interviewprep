@@ -13,6 +13,35 @@ A **Dynamic Array** (also called a resizable array or ArrayList) is a random-acc
 
 ---
 
+## When to Use: Decision Tree
+
+```mermaid
+graph TD
+    A["Do you need to access<br/>elements by index?"] -->|YES| B["O(1) random access<br/>is critical?"]
+    A -->|NO| C["Use LinkedList,<br/>Set, or Queue"]
+    
+    B -->|YES| D["Fixed size<br/>known at start?"]
+    B -->|NO| E["Consider alternatives:<br/>LinkedList, Deque"]
+    
+    D -->|YES| F["Static Array:<br/>int arr[n]"]
+    D -->|NO| G["Dynamic Array:<br/>ArrayList, list"]
+    
+    F --> F1["Best for:<br/>Memory efficiency<br/>when size fixed"]
+    G --> G1["Best for:<br/>Frequent append<br/>dynamic growth"]
+    
+    E --> E1["Use if:<br/>Frequent insertions<br/>at front/middle"]
+    
+    style A fill:#FFA500,color:#000
+    style B fill:#FFA500,color:#000
+    style D fill:#FFA500,color:#000
+    style C fill:#90EE90
+    style F fill:#87CEEB
+    style G fill:#87CEEB
+    style E1 fill:#90EE90
+```
+
+---
+
 ## Visualization
 
 ### Basic Structure
@@ -103,6 +132,80 @@ RAM Address:   1000  1004  1008  1012  1016
                │  5 │  3 │  8 │  1 │  9 │
                └────┴────┴────┴────┴────┘
                  ↑ 4 bytes per int, sequential addresses
+```
+
+### Operation Flowchart: Insert, Delete, Append
+
+```mermaid
+graph TD
+    START["Array Operation<br/>Insert/Delete/Append?"] 
+    
+    START -->|Append| A["Check if<br/>size == capacity?"]
+    START -->|Insert at idx| B["Shift elements<br/>right from idx"]
+    START -->|Delete at idx| C["Shift elements<br/>left after idx"]
+    
+    A -->|YES| A1["Trigger Resize<br/>(double capacity)"]
+    A -->|NO| A2["Place at index<br/>size++"]
+    
+    A1 --> A1a["Allocate new<br/>memory (2x)"]
+    A1a --> A1b["Copy all<br/>elements"]
+    A1b --> A1c["Free old<br/>memory"]
+    A1c --> A2
+    A2 --> DONE["✓ Complete<br/>O(1) amortized"]
+    
+    B --> B1["Check<br/>index valid?"]
+    B1 -->|YES| B2["Create space<br/>by shifting"]
+    B1 -->|NO| ERR1["Error:<br/>Out of bounds"]
+    B2 --> B3["Insert value<br/>at index"]
+    B3 --> B4["size++"]
+    B4 --> DONE2["✓ Complete<br/>O(n) shift cost"]
+    
+    C --> C1["Check index<br/>valid?"]
+    C1 -->|YES| C2["Shift elements<br/>to fill gap"]
+    C1 -->|NO| ERR2["Error:<br/>Out of bounds"]
+    C2 --> C3["size--"]
+    C3 --> DONE3["✓ Complete<br/>O(n) shift cost"]
+    
+    style A fill:#FFA500
+    style B fill:#FFA500
+    style C fill:#FFA500
+    style DONE fill:#90EE90
+    style DONE2 fill:#90EE90
+    style DONE3 fill:#90EE90
+    style ERR1 fill:#FFB6C6
+    style ERR2 fill:#FFB6C6
+```
+
+---
+
+### Static vs Dynamic Array Decision
+
+```mermaid
+graph TD
+    Q["Need to choose<br/>array type?"]
+    
+    Q --> Q1["Will size change<br/>at runtime?"]
+    
+    Q1 -->|NO| StaticArray["Static Array<br/>(fixed-size)"]
+    Q1 -->|YES| Q2["Can size grow<br/>very large?"]
+    
+    StaticArray --> SA["✓ Pros:<br/>- Exact memory<br/>- No overhead<br/>- Stack allocation"]
+    StaticArray --> SA2["✗ Cons:<br/>- Can't resize<br/>- May waste space<br/>- Rigid"]
+    
+    Q2 -->|NO, bounded| DynArray1["Dynamic Array<br/>(ArrayList)"]
+    Q2 -->|YES, unbounded| DynArray2["LinkedList or<br/>Dynamic Array<br/>with growth"]
+    
+    DynArray1 --> DA1["✓ Pros:<br/>- Fast access O(1)<br/>- Cache friendly<br/>- O(1) append"]
+    DynArray1 --> DA1x["✗ Cons:<br/>- O(n) insert/delete<br/>- Waste on shrink<br/>- Resize cost"]
+    
+    DynArray2 --> DA2["Consider if:<br/>- Massive growth<br/>- Many mid-list ops<br/>- Memory efficiency"]
+    
+    style Q fill:#FFA500
+    style Q1 fill:#FFA500
+    style Q2 fill:#FFA500
+    style StaticArray fill:#87CEEB
+    style DynArray1 fill:#87CEEB
+    style DynArray2 fill:#FFB6C6
 ```
 
 ---
@@ -199,6 +302,53 @@ Rearrange elements without extra space by swapping.
 [ 2 ][ 0 ][ 2 ][ 1 ][ 1 ][ 0 ]
  swap 0s to left, 2s to right
 → [ 0 ][ 0 ][ 1 ][ 1 ][ 2 ][ 2 ]
+```
+
+---
+
+## Common Mistakes Flowchart
+
+```mermaid
+graph TD
+    START["Implementing<br/>array algorithm"]
+    
+    START --> M1["Checked bounds<br/>before access?"]
+    M1 -->|NO| ERR1["❌ IndexOutOfBounds<br/>Off-by-one error<br/>a[n] is invalid!"]
+    M1 -->|YES| M2
+    
+    M2["Modifying array<br/>during iteration?"]
+    M2 -->|YES| ERR2["❌ ConcurrentModification<br/>Skip/duplicate elements<br/>Use index loop, not for-each"]
+    M2 -->|NO| M3
+    
+    M3["Need O(n) space<br/>when O(1) works?"]
+    M3 -->|YES| ERR3["❌ Extra Space<br/>Interview wants<br/>in-place solution"]
+    M3 -->|NO| M4
+    
+    M4["Two pointers or<br/>sliding window<br/>needed?"]
+    M4 -->|NO| ERR4["⚠️ Suboptimal<br/>O(n²) instead of O(n)<br/>Consider 2-pointer"]
+    M4 -->|YES| M5
+    
+    M5["Handling negatives<br/>in sum/product?"]
+    M5 -->|NO| ERR5["❌ Wrong Answer<br/>Negatives affect logic<br/>-2 + 1 = -1!"]
+    M5 -->|YES| M6
+    
+    M6["Using mid = (l+r)/2<br/>for integer?"]
+    M6 -->|YES| ERR6["⚠️ Integer Overflow<br/>Use: mid = l+(r-l)/2"]
+    M6 -->|NO| PASS["✓ Code looks good!"]
+    
+    style M1 fill:#FFA500
+    style M2 fill:#FFA500
+    style M3 fill:#FFA500
+    style M4 fill:#FFA500
+    style M5 fill:#FFA500
+    style M6 fill:#FFA500
+    style ERR1 fill:#FFB6C6
+    style ERR2 fill:#FFB6C6
+    style ERR3 fill:#FFB6C6
+    style ERR4 fill:#FFE4B5
+    style ERR5 fill:#FFB6C6
+    style ERR6 fill:#FFE4B5
+    style PASS fill:#90EE90
 ```
 
 ---

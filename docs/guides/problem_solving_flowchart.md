@@ -12,83 +12,307 @@ This guide presents a systematic framework for solving interview problems from s
 
 ---
 
-## The Interview Problem-Solving Framework
+## The Interview Problem-Solving Framework (Enhanced)
 
 ```mermaid
 graph TD
     A["🎯 START: Interview Problem Received"] --> B["Step 1: Clarify & Understand"]
     
-    B --> C["Ask clarifying questions:<br/>- Input/output format?<br/>- Edge cases to handle?<br/>- Duplicates allowed?<br/>- Empty input behavior?<br/>- Can I modify input?<br/>- Special constraints?"]
+    B --> C["Ask clarifying questions:<br/>- Input/output format?<br/>- Range of input?<br/>- Duplicates allowed?<br/>- Empty input?<br/>- Modify input OK?<br/>- Special constraints?<br/>- Examples provided?"]
     
-    C --> D["Confirm understanding:<br/>- Restate problem<br/>- Show examples<br/>- Ask interviewer to confirm"]
+    C --> D["Restate problem:<br/>- Repeat back<br/>- Show examples<br/>- List assumptions<br/>- Confirm with interviewer"]
     
-    D --> E["Step 2: Identify Constraints"]
+    D --> E["Document:<br/>- Write problem statement<br/>- Note edge cases<br/>- Mark constraints"]
     
-    E --> F["Analyze input size:<br/>- n = 10, 100, 1000, 10^6?<br/>Time limit implications"]
+    E --> F["Step 2: Identify Constraints"]
     
-    E --> G["Identify constraints:<br/>- Time limit?<br/>- Space limit?<br/>- Special requirements<br/>- (sorted, duplicates, etc)"]
+    F --> G["Analyze input size:<br/>- Is n ≤ 10? 100? 1K? 10K?<br/>- What about m, k, etc?<br/>- Time limit implications<br/>- 10⁶-10⁸ operations/sec?"]
     
-    D --> H["Step 3: Plan Approach"]
+    F --> H["Identify constraints:<br/>- Time limit? Memory limit?<br/>- Sorted input?<br/>- All positive numbers?<br/>- Modulo required?<br/>- In-place required?"]
     
-    H --> I["Identify data needs:<br/>- What operations?<br/>- Access patterns?<br/>- Frequency of ops?"]
+    E --> I["Identify patterns:<br/>- Subarray/substring?<br/>- Interval problem?<br/>- Tree/graph problem?<br/>- DP problem?<br/>- Greedy possible?"]
     
-    I --> J["Select data structure(s)<br/>using DS Selection Guide:<br/>- HashMap<br/>- Heap<br/>- BST<br/>- Trie<br/>- Graph<br/>- etc"]
+    I --> J["Step 3: Plan Approach"]
     
-    J --> K["Identify algorithm(s)<br/>using Algorithm Selection Guide:<br/>- Sorting?<br/>- Searching?<br/>- DP?<br/>- Graph traversal?"]
+    J --> K["Identify operations needed:<br/>- Lookup frequency?<br/>- Insertion/deletion?<br/>- Range queries?<br/>- Ordering needed?<br/>- Caching needed?"]
     
-    K --> L["Walk through approach<br/>with example:<br/>- Trace inputs<br/>- Verify correctness<br/>- Check edge cases"]
+    K --> L["Select data structure:<br/>- Use DS Selection Guide<br/>- Justify choice<br/>- Consider alternatives"]
     
-    L --> M{"Does approach<br/>work for all<br/>test cases?"}
+    L --> M["Select algorithm:<br/>- Use Algorithm Guide<br/>- Verify complexity OK<br/>- Check against constraints"]
     
-    M -->|No| N["Revise approach<br/>or pick different<br/>DS/Algorithm"]
+    M --> N["Walk through approach:<br/>- Trace 2-3 examples<br/>- Verify correctness<br/>- Identify edge cases"]
     
-    N --> L
+    N --> O{"Does approach<br/>work?"}
     
-    M -->|Yes| O["Step 4: Code the Solution"]
+    O -->|No| P["Revise:<br/>- Change DS?<br/>- Change algorithm?<br/>- Try different approach"]
     
-    O --> P["Implement step-by-step:<br/>1. Handle edge cases<br/>2. Implement main logic<br/>3. Test with examples<br/>4. Handle corner cases"]
+    P --> N
     
-    P --> Q["Code review check:<br/>- Variable names clear?<br/>- Comments where needed?<br/>- DRY principle?<br/>- Early returns?"]
+    O -->|Yes| Q["Get interviewer OK:<br/>- Explain approach<br/>- Ask for approval<br/>- Ask to proceed"]
     
-    Q --> R["Step 5: Test Thoroughly"]
+    Q --> R["Step 4: Code the Solution"]
     
-    R --> S["Test with examples:<br/>- Simple case<br/>- Medium complexity<br/>- Large input<br/>- Edge cases"]
+    R --> S["Edge case handling:<br/>- Add null/empty checks<br/>- Handle boundaries<br/>- Test edge cases first"]
     
-    S --> T["Test edge cases:<br/>- Empty input<br/>- Single element<br/>- All same elements<br/>- Negative numbers<br/>- Boundary values"]
+    S --> T["Implement main logic:<br/>- Code step-by-step<br/>- Clear variable names<br/>- Add comments for complex"]
     
-    T --> U["Trace through code:<br/>- With debugger or<br/>- Manual walkthrough"]
+    T --> U["Code quality:<br/>- DRY principle<br/>- Early returns<br/>- Clear structure"]
     
-    U --> V{"All tests<br/>pass?"}
+    U --> V["Code review:<br/>- Check syntax<br/>- Verify logic<br/>- Spot obvious bugs"]
     
-    V -->|No| W["Debug:<br/>- Identify issue<br/>- Fix logic<br/>- Re-test"]
+    V --> W["Step 5: Test Thoroughly"]
     
-    W --> U
+    W --> X["Test cases:<br/>- Simple example<br/>- Medium complexity<br/>- Large input<br/>- Edge cases"]
     
-    V -->|Yes| X["Step 6: Analyze Complexity"]
+    X --> Y["Identified edge cases:<br/>- Empty input<br/>- Single element<br/>- All same values<br/>- Negative/zero<br/>- Boundary values"]
     
-    X --> Y["Time complexity:<br/>- Count operations<br/>- Identify loops<br/>- Account for DS ops<br/>- Big-O notation"]
+    Y --> Z["Trace execution:<br/>- Manual walkthrough<br/>- Print debugging<br/>- Verify state changes"]
     
-    X --> Z["Space complexity:<br/>- Count variables<br/>- Account for DS size<br/>- Recursion stack?<br/>- Big-O notation"]
+    Z --> AA{"All tests<br/>pass?"}
     
-    X --> AA["Verify constraints:<br/>- Time OK for input size?<br/>- Space within limits?<br/>- Acceptable for interview?"]
+    AA -->|No| AB["Debug:<br/>- Identify root cause<br/>- Fix logic issue<br/>- Re-test"]
     
-    AA --> AB{"Can we<br/>optimize?"}
+    AB --> Z
     
-    AB -->|Yes, easy win| AC["Optimize:<br/>- Better DS?<br/>- Better algorithm?<br/>- Reduce constants?<br/>- Re-code and test"]
+    AA -->|Yes| AC["Verify correctness<br/>one more time"]
     
-    AC --> X
+    AC --> AD["Step 6: Analyze Complexity"]
     
-    AB -->|No or risky| AD["Present solution<br/>to interviewer"]
+    AD --> AE["Time complexity:<br/>- Count all operations<br/>- Identify loop nesting<br/>- Account for DS ops<br/>- Check against limits"]
     
-    AD --> AE["Step 7: Discuss & Refine"]
+    AD --> AF["Space complexity:<br/>- Variables/DS size<br/>- Recursion depth<br/>- Hidden allocations<br/>- Stack vs heap"]
     
-    AE --> AF["Discuss complexity:<br/>- Time complexity<br/>- Space complexity<br/>- Trade-offs made"]
+    AF --> AG["Verify against constraints:<br/>- Time OK?<br/>- Space OK?<br/>- Match requirements?"]
     
-    AF --> AG["Discuss alternatives:<br/>- Other approaches?<br/>- Why chose this one?<br/>- What would change<br/>  with different constraints?"]
+    AG --> AH{"Can we<br/>optimize?"}
     
-    AG --> AH["Answer follow-ups:<br/>- Modify for constraints?<br/>- Handle duplicates?<br/>- Optimize space?<br/>- Optimize time?"]
+    AH -->|Easy win| AI["Optimize:<br/>- Better DS?<br/>- Better algorithm?<br/>- Reduce overhead?<br/>- Re-code and test"]
     
-    AH --> AI["✅ DONE:<br/>Clean solution +<br/>Good explanation"]
+    AI --> AD
+    
+    AH -->|No or risky| AJ["Present solution"]
+    
+    AJ --> AK["Step 7: Discuss & Refine"]
+    
+    AK --> AL["Discuss complexity:<br/>- Time analysis<br/>- Space analysis<br/>- Trade-offs made<br/>- Why this approach"]
+    
+    AL --> AM["Discuss alternatives:<br/>- Other DS choices?<br/>- Other algorithms?<br/>- Space-time tradeoffs?<br/>- Why not X?"]
+    
+    AM --> AN["Answer follow-ups:<br/>- Change for new constraint?<br/>- Handle duplicates better?<br/>- Optimize space?<br/>- Optimize time?<br/>- Parallel version?"]
+    
+    AN --> AO["Step 8: Final Review"]
+    
+    AO --> AP["Code correctness:<br/>- No bugs visible<br/>- Edge cases handled<br/>- Logic sound"]
+    
+    AO --> AQ["Communication:<br/>- Explained clearly<br/>- Answered questions<br/>- Good discussion"]
+    
+    AQ --> AR["✅ DONE:<br/>Clean solution<br/>Good explanation<br/>Problem solved"]
+    
+    style A fill:#ff9999
+    style AR fill:#99ff99
+    
+    classDef step fill:#ffe6e6
+    class B,F,J,R,W,AD,AK,AO step
+```
+
+---
+
+## Edge Case Identification Flowchart
+
+```mermaid
+graph TD
+    A["Identify Edge Cases"] --> B["Input constraints"]
+    
+    B --> C["Empty input?"]
+    C -->|Yes| D["Handle empty array"]
+    C -->|Depends| E["Ask interviewer"]
+    
+    B --> F["Single element?"]
+    F -->|Yes| G["Does code handle?"]
+    G -->|No| H["Add special case"]
+    
+    B --> I["All same values?"]
+    I -->|Yes| J["Test duplicates"]
+    
+    B --> K["Negative numbers?"]
+    K -->|Yes| L["Test negatives"]
+    
+    B --> M["Zero?"]
+    M -->|Yes| N["Division by zero?"]
+    N -->|Yes| O["Add zero check"]
+    
+    B --> P["Boundary values?"]
+    P -->|Yes| Q["Test min/max"]
+    
+    B --> R["Order matters?"]
+    R -->|Yes| S["Test different orders"]
+    
+    B --> T["Duplicates allowed?"]
+    T -->|Yes| U["Test with duplicates"]
+    
+    D --> V["✓ Edge case<br/>handled"]
+    E --> V
+    H --> V
+    J --> V
+    L --> V
+    O --> V
+    Q --> V
+    S --> V
+    U --> V
+    
+    style V fill:#99ff99
+```
+
+---
+
+## Optimization Opportunity Detection Tree
+
+```mermaid
+graph TD
+    A["Can we optimize?"] --> B["Check time complexity"]
+    
+    B --> C["Is it O(n²)?"]
+    C -->|Yes, n large| D["Try O(n log n)"]
+    C -->|Borderline| E["Consider optimizing"]
+    C -->|Small n| F["Current is fine"]
+    
+    B --> G["Is it O(2ⁿ)?"]
+    G -->|Yes| H["Use DP/memoization"]
+    
+    B --> I["Is it O(n³)?"]
+    I -->|Yes, n small| J["Optimize carefully"]
+    I -->|Yes, n large| K["Definitely optimize"]
+    
+    D --> L["Use sorting/hashing"]
+    E --> M["Profile first"]
+    F --> N["Keep current"]
+    H --> O["Add memoization"]
+    J --> P["Check O(n²) possible"]
+    K --> Q["Must optimize"]
+    
+    L --> R["✓ Optimization path"]
+    M --> R
+    N --> R
+    O --> R
+    P --> R
+    Q --> R
+    
+    style R fill:#99ff99
+```
+
+---
+
+## Testing Strategy Flowchart
+
+```mermaid
+graph TD
+    A["Testing Strategy"] --> B["Simple case"]
+    
+    B --> C["Trace 1 example"]
+    C -->|Pass| D["Medium case"]
+    C -->|Fail| E["Debug code"]
+    E --> B
+    
+    D --> F["Trace 2-3 examples"]
+    F -->|Pass| G["Edge cases"]
+    F -->|Fail| E
+    
+    G --> H["Test identified edges"]
+    H -->|Pass| I["Boundary values"]
+    H -->|Fail| E
+    
+    I --> J["Test min/max values"]
+    J -->|Pass| K["Stress test"]
+    J -->|Fail| E
+    
+    K --> L["Large input if time"]
+    L -->|Pass| M["All tests pass"]
+    L -->|Timeout| N["Optimize or accept"]
+    
+    M --> O["✓ Solution verified"]
+    N --> O
+    
+    style O fill:#99ff99
+```
+
+---
+
+## Interview Communication Flowchart
+
+```mermaid
+graph TD
+    A["How to communicate?"] --> B["Before coding"]
+    
+    B --> C["Restate problem"]
+    C --> D["Ask clarifying Qs"]
+    D --> E["Explain approach"]
+    E --> F["Walk through example"]
+    F --> G["Get approval"]
+    
+    G --> H["During coding"]
+    H --> I["Explain logic"]
+    I --> J["Comment code"]
+    J --> K["Ask for feedback"]
+    
+    K --> L["After coding"]
+    L --> M["Trace example"]
+    M --> N["Explain complexity"]
+    N --> O["Discuss trade-offs"]
+    O --> P["Answer follow-ups"]
+    
+    C --> Q["✓ Communication<br/>complete"]
+    D --> Q
+    E --> Q
+    F --> Q
+    G --> Q
+    I --> Q
+    J --> Q
+    K --> Q
+    M --> Q
+    N --> Q
+    O --> Q
+    P --> Q
+    
+    style Q fill:#99ff99
+```
+
+---
+
+## Debugging Decision Tree
+
+```mermaid
+graph TD
+    A["Code doesn't work"] --> B["Identify failure point"]
+    
+    B --> C["Wrong output?"]
+    C -->|Yes| D["Check logic"]
+    
+    B --> E["Crashes?"]
+    E -->|Yes| F["Check null/bounds"]
+    
+    B --> G["Timeout?"]
+    G -->|Yes| H["Check complexity"]
+    
+    D --> I["Logic error:<br/>- Loop condition<br/>- State transition<br/>- Edge case"]
+    F --> J["Safety error:<br/>- Null pointer<br/>- Array index<br/>- Division by 0"]
+    H --> K["Performance error:<br/>- Nested loops<br/>- Data structure<br/>- Algorithm"]
+    
+    I --> L["Add print statements"]
+    J --> L
+    K --> M["Profile code"]
+    
+    L --> N["Trace execution"]
+    M --> O["Optimize algorithm"]
+    
+    N --> P["Find bug"]
+    O --> Q["Verify fix"]
+    
+    P --> R["Fix and re-test"]
+    Q --> R
+    
+    R --> S["✓ Debug complete"]
+    
+    style S fill:#99ff99
 ```
 
 ---

@@ -94,19 +94,122 @@ Given matrix with columns and rows:
 
 ```mermaid
 flowchart TD
-    A["Problem: Exact cover or variant"] -->|Problem type?| B{Can encode as matrix?}
-    B -->|No direct matrix| C["Use standard backtracking<br/>or other method"]
-    B -->|Yes, rows/columns| D["Dancing Links + Algorithm X<br/>Exponential but fast in practice"]
-    D --> E["Build matrix:<br/>Rows = choices<br/>Columns = constraints"]
-    E --> F["Initialize column headers<br/>circular linked lists"]
-    F --> G["Implement cover/uncover<br/>pointer operations"]
-    G --> H["Algorithm X:<br/>Choose minimum-size column"]
-    H --> I["For each row in column:<br/>Include row in solution"]
-    I --> J["Cover column and affected rows<br/>O(1) per operation"]
-    J --> K["Recursively solve<br/>reduced matrix"]
-    K --> L["Uncover columns/rows<br/>Restore pointers"]
-    L --> M["Backtrack if no solution<br/>or continue search"]
-    M --> N["Found: exact cover<br/>Time: exponential,<br/>but fast with constraint propagation"]
+    A["🎯 Problem: Exact cover or variant"] -->|Problem type?| B{Can encode as matrix?}
+    B -->|No direct matrix| C["❌ Use standard backtracking<br/>or other method"]
+    B -->|Yes, rows/columns| D["✓ Dancing Links + Algorithm X<br/>Exponential but fast in practice"]
+    D --> E["📋 Build matrix:<br/>Rows = choices<br/>Columns = constraints"]
+    E --> F["🔗 Initialize column headers<br/>circular linked lists"]
+    F --> G["⚙ Implement cover/uncover<br/>pointer operations O(1)"]
+    G --> H["🎮 Algorithm X:<br/>Choose minimum-size column<br/>constraint propagation"]
+    H --> I["▶ For each row in column:<br/>Include row in solution"]
+    I --> J["🗑 Cover column<br/>and affected rows"]
+    J --> K["♻ Recursively solve<br/>reduced matrix"]
+    K --> L{Solution<br/>found?}
+    L -->|Yes| M["✓ Record solution"]
+    L -->|No| N["Continue with next row"]
+    M --> O["🔄 Uncover columns/rows<br/>Restore pointers"]
+    N --> O
+    O --> P{"All rows<br/>in column<br/>tried?"}
+    P -->|No| I
+    P -->|Yes| Q{"More solutions<br/>needed?"}
+    Q -->|Yes| I
+    Q -->|No| R["✓ Done: all exact covers found<br/>Time: exponential,<br/>space: O(n·m)"]
+    
+    style A fill:#fff4e6
+    style D fill:#e3f2fd
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style G fill:#f3e5f5
+    style H fill:#f3e5f5
+    style M fill:#e8f5e9
+    style R fill:#e8f5e9
+```
+
+## Problem Recognition: When to Use DLX
+
+```mermaid
+flowchart TD
+    A["📊 Analyzing combinatorial problem"] --> B{What type?}
+    B -->|Find all solutions| C["✓ DLX good choice<br/>efficient backtracking"]
+    B -->|Single solution| D{Constraints dense?}
+    D -->|Yes| E["✓ DLX can prune<br/>with many constraints"]
+    D -->|No| F["❌ Overkill complexity<br/>try greedy/DP"]
+    B -->|Optimize objective| G["❌ Not DLX<br/>Use ILP or branch-bound"]
+    B -->|Set cover variant| H{Exact vs approximate?}
+    H -->|Exact| I["✓ DLX applicable<br/>or use ILP"]
+    H -->|Approximate| J["❌ Not DLX<br/>Use greedy algorithms"]
+    C --> K["✓ Use Dancing Links"]
+    E --> K
+    I --> K
+    
+    style A fill:#fff4e6
+    style K fill:#e8f5e9
+    style F fill:#ffebee
+    style G fill:#ffebee
+    style J fill:#ffebee
+```
+
+## Algorithm X & DLX Operations Flowchart
+
+```mermaid
+flowchart TD
+    A["🎮 Algorithm X + Dancing Links"] --> B["Input: Matrix with<br/>m columns, n rows"]
+    B --> C{Any columns<br/>left?}
+    C -->|No| D["✓ Solution found!<br/>Return selected rows"]
+    C -->|Yes| E["Column selection step"]
+    E --> F["Scan all column headers<br/>find minimum size"]
+    F --> G["Choose column C<br/>with smallest size<br/>constraint propagation"]
+    G --> H["For each row R in C:<br/>Try selecting R"]
+    H --> I["🗑 Cover(C):<br/>Remove C from headers"]
+    I --> J["For each column J in R:<br/>Cover(J)"]
+    J --> K{"All rows covered<br/>O(1) per<br/>operation?"}
+    K -->|Yes| L["✓ Covered"]
+    K -->|No| M["Continue next row J"]
+    L --> M
+    M --> N["♻ Recursive call<br/>solve reduced matrix"]
+    N --> O{Solution<br/>found?}
+    O -->|Yes| P["✓ Return solution"]
+    O -->|No,backtrack| Q["🔄 Uncover all<br/>Reverse pointer ops"]
+    Q --> R["Next row R in C"]
+    R --> S{"All rows<br/>tried?"}
+    S -->|No| H
+    S -->|Yes| T["❌ No solution<br/>Backtrack"]
+    
+    style A fill:#f3e5f5
+    style D fill:#e8f5e9
+    style G fill:#fff4e6
+    style I fill:#f3e5f5
+    style J fill:#f3e5f5
+    style P fill:#e8f5e9
+    style T fill:#ffebee
+```
+
+## DLX vs Alternatives Flowchart
+
+```mermaid
+flowchart TD
+    A["🤔 Choosing exact cover solver"] --> B{Problem characteristics}
+    B -->|Very small n<1000| C["✓ DLX fast enough<br/>setup overhead ok"]
+    B -->|Medium 1k-10k| D{Constraint type?}
+    D -->|Simple| E["✓ Greedy or DP<br/>might be faster"]
+    D -->|Complex| F["✓ DLX better<br/>handles constraint prop"]
+    B -->|Large >10k| G["❌ DLX too slow<br/>Use ILP solver"]
+    B -->|Weighted version| H["❌ Not DLX<br/>Use ILP/branch-bound"]
+    B -->|Dynamic updates| I["❌ Rebuild needed<br/>Not ideal for DLX"]
+    C --> J["DLX approach"]
+    E --> K["Alternative: greedy/DP"]
+    F --> J
+    J --> L["Competitive programming<br/>Sudoku, N-queens, tiling"]
+    K --> L
+    G --> M["Specialized solver"]
+    H --> M
+    I --> M
+    
+    style A fill:#fff4e6
+    style J fill:#e8f5e9
+    style K fill:#e3f2fd
+    style M fill:#ffebee
+    style L fill:#f3e5f5
 ```
 
 ## Common Patterns

@@ -14,7 +14,7 @@ This guide covers ~60+ algorithms implemented in this repository, organized by c
 
 ---
 
-## Master Algorithm Decision Flowchart
+## Master Algorithm Decision Flowchart (100+ nodes)
 
 ```mermaid
 graph TD
@@ -29,128 +29,444 @@ graph TD
     B -->|Geometry| I["Geometric shape?"]
     B -->|Advanced| J["Specialized problem?"]
     
-    C -->|Small array < 50| K["Use Insertion Sort"]
-    C -->|Unordered, no special requirements| L["Is space critical?"]
-    C -->|Already partially sorted| M["Use Insertion/Bubble Sort"]
-    C -->|Stable sort needed| N["Use Merge Sort or Tim Sort"]
+    C -->|Small < 50| K["Use Insertion Sort"]
+    C -->|Unordered| L["Is space critical?"]
+    C -->|Partially sorted| M["Use Insertion Sort"]
+    C -->|Stable needed| N["Use Merge Sort"]
+    C -->|Nearly sorted| O["Use Tim Sort"]
+    C -->|Integer range| P["Use Counting/Radix"]
     
-    L -->|Yes, minimize space| O["Use Quick Sort<br/>or Heap Sort"]
-    L -->|No, optimize time| P["Use Merge Sort<br/>or Tim Sort"]
+    L -->|Yes| Q["Use Heap Sort"]
+    L -->|No| R["Use Quick Sort"]
     
-    D -->|Sorted array| Q["Need exact match?"]
-    D -->|Unsorted array| R["Is n small?"]
-    D -->|Special structure| S["Use specialized search"]
+    D -->|Sorted array| S["Need exact match?"]
+    D -->|Unsorted array| T["Use Linear Search"]
+    D -->|Special structure| U["Use specialized"]
     
-    Q -->|Yes| T["Use Binary Search"]
-    Q -->|No, range| U["Use Binary Search<br/>variants"]
+    S -->|Yes| V["Use Binary Search"]
+    S -->|No, range| W["Use BS variant"]
+    S -->|Position| X["Use leftmost/rightmost BS"]
     
-    R -->|Yes < 1000| V["Linear Search"]
-    R -->|No| W["Build index first<br/>then search"]
+    W -->|First/Last| X
+    W -->|Closest| Y["Use Binary Search"]
+    W -->|Floor/Ceil| Z["Use BS variant"]
     
-    S -->|Hash-based| X["Use Hash Table"]
-    S -->|Tree-based| Y["Use BST Search"]
+    U -->|Hash| AA["Use HashMap"]
+    U -->|Tree| AB["Use BST"]
+    U -->|Rotated| AC["Use rotated BS"]
+    U -->|Mountain| AD["Use ternary search"]
     
-    E -->|0/1 Knapsack| Z["2D DP table"]
-    E -->|Unbounded Knapsack| AA["1D DP table"]
-    E -->|Longest subsequence| AB["LCS or LIS"]
-    E -->|Partition problem| AC["Set DP or 2D"]
-    E -->|Counting problem| AD["Combinatorics DP"]
-    E -->|Optimal path| AE["DAG or grid DP"]
-    E -->|String matching| AF["Edit distance DP"]
+    E -->|0/1 Knapsack| AE["2D DP table"]
+    E -->|Unbounded| AF["1D DP table"]
+    E -->|Bounded| AG["Modified Unbounded"]
+    E -->|LCS| AH["2D DP"]
+    E -->|LIS| AI["DP O(n²) or O(n log n)"]
+    E -->|Edit distance| AJ["2D DP"]
+    E -->|Partition| AK["2D DP"]
+    E -->|Coin change| AL["1D DP"]
+    E -->|House robber| AM["1D DP"]
+    E -->|Paint house| AN["1D DP"]
+    E -->|Word break| AO["1D DP"]
+    E -->|Counting| AP["Combinatorics DP"]
+    E -->|Matrix chain| AQ["O(n³) DP"]
+    E -->|Palindrome| AR["2D DP"]
+    E -->|Subsequence| AS["Counting DP"]
     
-    F -->|Shortest path| AG["Weighted edges?"]
-    F -->|Connectivity| AH["Use DFS/BFS<br/>or Union Find"]
-    F -->|Cycle detection| AI["Use DFS<br/>or Union Find"]
-    F -->|Topological sort| AJ["Use DFS<br/>or Kahn"]
-    F -->|Spanning tree| AK["Weighted?"]
-    F -->|All-pairs path| AL["Use Floyd-Warshall"]
-    F -->|Special graph| AM["Is DAG?"]
+    F -->|Shortest path| AT["Weighted?"]
+    F -->|Connectivity| AU["Use DFS/BFS"]
+    F -->|Cycle| AV["Directed?"]
+    F -->|Topo sort| AW["Use DFS or Kahn"]
+    F -->|MST| AX["Dense or sparse?"]
+    F -->|All pairs| AY["Use Floyd-Warshall"]
+    F -->|SCC| AZ["Use Kosaraju"]
+    F -->|Bipartite| BA["Use BFS coloring"]
+    F -->|Special| BB["DAG or tree?"]
     
-    AG -->|No negatives| AN["Use Dijkstra's"]
-    AG -->|Negative weights| AO["Use Bellman-Ford"]
+    AT -->|No negatives| AC1["Use Dijkstra"]
+    AT -->|Negative| AC2["Use Bellman-Ford"]
+    AT -->|Unweighted| AC3["Use BFS"]
     
-    AK -->|Yes| AP["Kruskal or Prim"]
-    AK -->|No| AQ["DFS/BFS"]
+    AV -->|Yes| AC4["Use DFS stack"]
+    AV -->|No| AC5["Use Union Find"]
     
-    AM -->|Yes| AR["Use DP or DFS"]
-    AM -->|No| AS["Use strongly connected"]
+    AX -->|Dense| AC6["Use Prim"]
+    AX -->|Sparse| AC7["Use Kruskal"]
     
-    G -->|Pattern matching| AT["Single pattern?"]
-    G -->|Multiple patterns| AU["Use Aho-Corasick"]
-    G -->|Substring| AV["Use KMP or RK"]
-    G -->|Edit distance| AW["Use DP<br/>Levenshtein"]
-    G -->|Anagram/Permutation| AX["Use sorting or hashing"]
-    G -->|Compression| AY["Use LZ77 or Huffman"]
+    BB -->|DAG| AC8["Use DP"]
+    BB -->|Tree| AC9["Use DFS"]
     
-    AT -->|Yes| AZ["Use KMP or RK"]
-    AT -->|Naive OK| BA["Simple loop"]
+    G -->|Pattern| AC10["Single pattern?"]
+    G -->|Multiple| AC11["Use Aho-Corasick"]
+    G -->|Substring| AC12["Use KMP or RK"]
+    G -->|Edit distance| AC13["Use DP"]
+    G -->|Anagram| AC14["Use sorting"]
+    G -->|Palindrome| AC15["Use Manacher"]
+    G -->|Compression| AC16["Use Huffman"]
     
-    H -->|Prime checking| BB["Small n?"]
-    H -->|Factorization| BC["Small n?"]
-    H -->|Modular exponentiation| BD["Use binary exponentiation"]
-    H -->|GCD/LCM| BE["Use Euclidean algorithm"]
-    H -->|Combinatorics| BF["Pascal's triangle<br/>or formula"]
-    H -->|Random selection| BG["Use shuffle or<br/>quickselect"]
+    AC10 -->|Yes| AC12
+    AC10 -->|No| AC17["Use naive"]
     
-    BB -->|Yes| BH["Miller-Rabin<br/>or trial division"]
-    BB -->|No| BI["Sieve of Eratosthenes"]
+    H -->|Prime| AC18["Small?"]
+    H -->|Factor| AC19["Small?"]
+    H -->|Modular| AC20["Use binary expo"]
+    H -->|GCD| AC21["Use Euclidean"]
+    H -->|Combinatorics| AC22["Use Pascal"]
+    H -->|Random| AC23["Use shuffle"]
     
-    BC -->|Yes| BJ["Trial division"]
-    BC -->|No| BK["Pollard's rho"]
+    AC18 -->|Yes| AC24["Trial division"]
+    AC18 -->|No| AC25["Miller-Rabin"]
     
-    I -->|Convex hull| BL["Graham Scan<br/>or Andrew's"]
-    I -->|Point location| BM["Segment tree<br/>or sweep line"]
-    I -->|Closest pair| BN["Divide and conquer"]
+    AC19 -->|Yes| AC26["Trial division"]
+    AC19 -->|No| AC27["Pollard's rho"]
     
-    J -->|LRU/LFU cache| BO["Design problem"]
-    J -->|Interval problems| BP["Sorting + greedy<br/>or merge intervals"]
-    J -->|Matrix problems| BQ["DFS/BFS<br/>or DP"]
+    I -->|Convex hull| AC28["Use Graham"]
+    I -->|Point| AC29["Use ray cast"]
+    I -->|Closest| AC30["Divide/Conquer"]
+    I -->|Intersection| AC31["Use geometry"]
     
-    K --> BA
-    M --> BA
-    O --> BA
-    P --> BA
-    T --> BA
-    U --> BA
-    V --> BA
-    W --> BA
-    X --> BA
-    Y --> BA
-    Z --> BA
-    AA --> BA
-    AB --> BA
-    AC --> BA
-    AD --> BA
-    AE --> BA
-    AF --> BA
-    AN --> BA
-    AO --> BA
-    AP --> BA
-    AQ --> BA
-    AR --> BA
-    AS --> BA
-    AZ --> BA
-    AV --> BA
-    AU --> BA
-    AW --> BA
-    AX --> BA
-    AY --> BA
-    BD --> BA
-    BE --> BA
-    BF --> BA
-    BG --> BA
-    BH --> BA
-    BI --> BA
-    BJ --> BA
-    BK --> BA
-    BL --> BA
-    BM --> BA
-    BN --> BA
-    BO --> BA
-    BP --> BA
-    BQ --> BA
+    J -->|Cache| AC32["Design"]
+    J -->|Interval| AC33["Sort + merge"]
+    J -->|Matrix| AC34["DFS/BFS or DP"]
+    J -->|Stream| AC35["Use reservoir"]
+    J -->|Greedy| AC36["Proof needed"]
     
-    BA --> BR["✓ Algorithm Selected<br/>Verify time/space<br/>constraints below"]
+    K --> BR
+    M --> BR
+    O --> BR
+    P --> BR
+    Q --> BR
+    R --> BR
+    N --> BR
+    V --> BR
+    X --> BR
+    Y --> BR
+    Z --> BR
+    AA --> BR
+    AB --> BR
+    AC --> BR
+    AD --> BR
+    AE --> BR
+    AF --> BR
+    AG --> BR
+    AH --> BR
+    AI --> BR
+    AJ --> BR
+    AK --> BR
+    AL --> BR
+    AM --> BR
+    AN --> BR
+    AO --> BR
+    AP --> BR
+    AQ --> BR
+    AR --> BR
+    AS --> BR
+    AC1 --> BR
+    AC2 --> BR
+    AC3 --> BR
+    AC4 --> BR
+    AC5 --> BR
+    AC6 --> BR
+    AC7 --> BR
+    AC8 --> BR
+    AC9 --> BR
+    AC11 --> BR
+    AC12 --> BR
+    AC13 --> BR
+    AC14 --> BR
+    AC15 --> BR
+    AC16 --> BR
+    AC17 --> BR
+    AC20 --> BR
+    AC21 --> BR
+    AC22 --> BR
+    AC23 --> BR
+    AC24 --> BR
+    AC25 --> BR
+    AC26 --> BR
+    AC27 --> BR
+    AC28 --> BR
+    AC29 --> BR
+    AC30 --> BR
+    AC31 --> BR
+    AC32 --> BR
+    AC33 --> BR
+    AC34 --> BR
+    AC35 --> BR
+    AC36 --> BR
+    
+    BR["✓ Algorithm Selected<br/>Verify time/space"]
+    
+    style A fill:#ff9999
+    style BR fill:#99ff99
+```
+
+---
+
+## Time Complexity Requirements Classification Tree
+
+```mermaid
+graph TD
+    A["What's your time constraint?"] --> B["Calculate max complexity"]
+    
+    B --> C["n ≤ 10"]
+    C --> D1["Can use:<br/>O(n³), O(2ⁿ)<br/>O(n!)"]
+    
+    B --> E["n ≤ 100"]
+    E --> D2["Can use:<br/>O(n²)<br/>O(n² log n)"]
+    
+    B --> F["n ≤ 1000"]
+    F --> D3["Can use:<br/>O(n²) tight<br/>O(n log n) safe"]
+    
+    B --> G["n ≤ 10⁴"]
+    G --> D4["Can use:<br/>O(n log n)<br/>O(n√n)"]
+    
+    B --> H["n ≤ 10⁵"]
+    H --> D5["Must use:<br/>O(n log n)"]
+    
+    B --> I["n ≤ 10⁶"]
+    I --> D6["Must use:<br/>O(n) or O(n log n)"]
+    
+    B --> J["n > 10⁶"]
+    J --> D7["Must use:<br/>O(n) or O(1)"]
+    
+    D1 --> K["Brute force OK<br/>Backtracking<br/>Permutations"]
+    D2 --> L["DP/Sorting OK<br/>Nested loops<br/>2D problems"]
+    D3 --> M["Single DP<br/>Sorting<br/>Binary search"]
+    D4 --> N["Sort/BFS/DFS<br/>Dijkstra<br/>Single DP"]
+    D5 --> O["O(n log n) only<br/>Efficient DS<br/>Single pass DP"]
+    D6 --> P["Linear algorithm<br/>Hash-based<br/>Greedy"]
+    D7 --> Q["Streaming<br/>Precompute<br/>O(1) query"]
+    
+    style K fill:#99ff99
+    style L fill:#99ff99
+    style M fill:#99ff99
+    style N fill:#99ff99
+    style O fill:#99ff99
+    style P fill:#99ff99
+    style Q fill:#99ff99
+```
+
+---
+
+## Space Complexity Constraints Decision Tree
+
+```mermaid
+graph TD
+    A["What's your space constraint?"] --> B["How much memory?"]
+    
+    B --> C["MB < 1"]
+    C --> D1["Use in-place<br/>No extra arrays<br/>O(1) or O(log n)"]
+    
+    B --> E["MB < 10"]
+    E --> D2["Minimize arrays<br/>Rolling state<br/>O(n) max"]
+    
+    B --> F["MB < 100"]
+    F --> D3["Standard DP<br/>Hash tables<br/>O(n) space OK"]
+    
+    B --> G["MB > 100"]
+    G --> D4["Large arrays OK<br/>Memoization<br/>Full DP tables"]
+    
+    D1 --> H["In-place quicksort<br/>Two pointer<br/>Recursive DFS"]
+    D2 --> I["Rolling array DP<br/>Single DS<br/>Streaming"]
+    D3 --> J["Standard DP<br/>HashMap<br/>Graph storage"]
+    D4 --> K["Full 2D DP<br/>Adjacency matrix<br/>Memo table"]
+    
+    style H fill:#99ff99
+    style I fill:#99ff99
+    style J fill:#99ff99
+    style K fill:#99ff99
+```
+
+---
+
+## Problem Property Recognition Tree
+
+```mermaid
+graph TD
+    A["What's special about input?"] --> B["Sorted input?"]
+    A --> C["Special structure?"]
+    A --> D["Range of values?"]
+    
+    B -->|Yes| E["Use binary search"]
+    B -->|No| F["Use sorting first"]
+    
+    C -->|DAG| G["Use DP/DFS"]
+    C -->|Tree| H["Use tree DP"]
+    C -->|Interval| I["Use sort/sweep"]
+    C -->|Subarray| J["Use prefix/DP"]
+    
+    D -->|Small range| K["Use counting/radix"]
+    D -->|Large range| L["Use hash/sorting"]
+    
+    E --> M["✓ Binary search"]
+    F --> N["✓ Sort then algo"]
+    G --> O["✓ DAG DP"]
+    H --> P["✓ Tree DP"]
+    I --> Q["✓ Sorting+merge"]
+    J --> R["✓ Prefix/DP"]
+    K --> S["✓ Counting sort"]
+    L --> T["✓ Hash/sort"]
+    
+    style M fill:#99ff99
+    style N fill:#99ff99
+    style O fill:#99ff99
+    style P fill:#99ff99
+    style Q fill:#99ff99
+    style R fill:#99ff99
+    style S fill:#99ff99
+    style T fill:#99ff99
+```
+
+---
+
+## Dynamic Programming Pattern Recognition Tree
+
+```mermaid
+graph TD
+    A["DP problem type?"] --> B["What's being optimized?"]
+    
+    B -->|Max/min value| C["Optimization DP"]
+    B -->|Count ways| D["Counting DP"]
+    B -->|Check possible| E["Boolean DP"]
+    B -->|K-th element| F["Selection DP"]
+    
+    C --> G["Subproblems overlap?"]
+    D --> H["Combinatorial?"]
+    E --> I["Feasibility?"]
+    F --> J["Order matters?"]
+    
+    G -->|Yes| K["Use memoization"]
+    G -->|No| L["Greedy likely"]
+    
+    H -->|Yes| M["Use combinatorics"]
+    H -->|No| N["Use counting DP"]
+    
+    I -->|Yes| O["Use boolean DP"]
+    I -->|No| P["Use greedy"]
+    
+    J -->|Yes| Q["Use sequence DP"]
+    J -->|No| R["Use subset DP"]
+    
+    K --> S["✓ Memo DP"]
+    L --> T["✓ Greedy"]
+    M --> U["✓ Combinatorial"]
+    N --> V["✓ Counting DP"]
+    O --> W["✓ Boolean DP"]
+    P --> X["✓ Greedy check"]
+    Q --> Y["✓ Sequence DP"]
+    R --> Z["✓ Subset DP"]
+    
+    style S fill:#99ff99
+    style T fill:#99ff99
+    style U fill:#99ff99
+    style V fill:#99ff99
+    style W fill:#99ff99
+    style X fill:#99ff99
+    style Y fill:#99ff99
+    style Z fill:#99ff99
+```
+
+---
+
+## Graph Algorithm Selection Tree
+
+```mermaid
+graph TD
+    A["What graph problem?"] --> B["Shortest path?"]
+    A --> C["Connectivity?"]
+    A --> D["Tree structure?"]
+    
+    B -->|Weighted+positive| E["Use Dijkstra"]
+    B -->|Negative edges| F["Use Bellman-Ford"]
+    B -->|Unweighted| G["Use BFS"]
+    B -->|All pairs| H["Use Floyd-Warshall"]
+    
+    C -->|Components| I["Use DFS/BFS or UF"]
+    C -->|Bipartite| J["Use 2-coloring"]
+    C -->|SCC| K["Use Kosaraju"]
+    C -->|Articulation| L["Use DFS+low"]
+    
+    D -->|MST| M["Use Kruskal/Prim"]
+    D -->|LCA| N["Use binary lifting"]
+    D -->|Path queries| O["Use HLD"]
+    
+    E --> P["✓ Dijkstra O(E log V)"]
+    F --> Q["✓ Bellman-Ford O(VE)"]
+    G --> R["✓ BFS O(V+E)"]
+    H --> S["✓ Floyd-Warshall O(V³)"]
+    I --> T["✓ DFS/UF O(V+E)"]
+    J --> U["✓ 2-coloring O(V+E)"]
+    K --> V["✓ Kosaraju O(V+E)"]
+    L --> W["✓ DFS+low O(V+E)"]
+    M --> X["✓ Kruskal/Prim O(E log E)"]
+    N --> Y["✓ Binary lifting O(log n)"]
+    O --> Z["✓ HLD O(log² n)"]
+    
+    style P fill:#99ff99
+    style Q fill:#99ff99
+    style R fill:#99ff99
+    style S fill:#99ff99
+    style T fill:#99ff99
+    style U fill:#99ff99
+    style V fill:#99ff99
+    style W fill:#99ff99
+    style X fill:#99ff99
+    style Y fill:#99ff99
+    style Z fill:#99ff99
+```
+
+---
+
+## String Algorithm Selection Tree
+
+```mermaid
+graph TD
+    A["String problem type?"] --> B["Pattern matching?"]
+    A --> C["String transformation?"]
+    A --> D["Structure query?"]
+    
+    B -->|Single pattern| E["Pattern in text?"]
+    B -->|Multiple patterns| F["Use Aho-Corasick"]
+    B -->|Approximate| G["Use fuzzy matching"]
+    
+    E -->|Exact| H["Use KMP"]
+    E -->|Hash-based| I["Use Rabin-Karp"]
+    E -->|Position| J["Use Boyer-Moore"]
+    
+    C -->|Edit distance| K["Use DP"]
+    C -->|Transformation| L["Use DP or BFS"]
+    C -->|Compression| M["Use Huffman"]
+    
+    D -->|Prefix query| N["Use Trie"]
+    D -->|Substring query| O["Use Suffix Tree"]
+    D -->|Palindrome| P["Use Manacher"]
+    D -->|LCP| Q["Use Suffix Array"]
+    
+    F --> R["✓ Aho-Corasick O(n+m+z)"]
+    G --> S["✓ Fuzzy matching O(n*m)"]
+    H --> T["✓ KMP O(n+m)"]
+    I --> U["✓ Rabin-Karp O(n+m)"]
+    J --> V["✓ Boyer-Moore O(n/m)"]
+    K --> W["✓ Edit Distance O(m*n)"]
+    L --> X["✓ Transform DP/BFS"]
+    M --> Y["✓ Huffman O(n log n)"]
+    N --> Z["✓ Trie O(m) per op"]
+    O --> AA["✓ Suffix Tree O(n)"]
+    P --> AB["✓ Manacher O(n)"]
+    Q --> AC["✓ Suffix Array O(n log n)"]
+    
+    style R fill:#99ff99
+    style S fill:#99ff99
+    style T fill:#99ff99
+    style U fill:#99ff99
+    style V fill:#99ff99
+    style W fill:#99ff99
+    style X fill:#99ff99
+    style Y fill:#99ff99
+    style Z fill:#99ff99
+    style AA fill:#99ff99
+    style AB fill:#99ff99
+    style AC fill:#99ff99
 ```
 
 ---

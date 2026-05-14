@@ -15,6 +15,50 @@ A **HashMap** (Hash Table) is a data structure that maps **keys** to **values** 
 
 ---
 
+## When to Use: HashMap Decision Tree
+
+```mermaid
+graph TD
+    Q["Problem characteristic?"]
+    
+    Q --> Q1["Need O(1) lookup<br/>by KEY?"]
+    Q --> Q2["Counting frequencies?"]
+    Q --> Q3["Detect duplicates?"]
+    Q --> Q4["Group by property?"]
+    
+    Q1 -->|YES| USE1["→ HashMap!<br/>Key-value store<br/>O(1) average"]
+    
+    Q2 -->|YES| USE2["→ HashMap or<br/>Counter!<br/>Key=element<br/>Value=count"]
+    
+    Q3 -->|YES| USE3["→ HashSet or<br/>HashMap!<br/>Store seen"]
+    
+    Q4 -->|YES| USE4["→ HashMap!<br/>Key=group criterion<br/>Value=list"]
+    
+    Q --> Q5["Need complement?"]
+    Q5 -->|Two sum style| USE5["→ HashMap!<br/>target - curr = ?<br/>O(1) lookup"]
+    
+    Q --> Q6["Need ordering?"]
+    Q6 -->|Sorted keys| ALT1["→ TreeMap or<br/>sorted dict<br/>O(log n)"]
+    Q6 -->|No order| USE6["→ HashMap<br/>unordered, fastest"]
+    
+    style Q fill:#FFA500
+    style Q1 fill:#FFA500
+    style Q2 fill:#FFA500
+    style Q3 fill:#FFA500
+    style Q4 fill:#FFA500
+    style Q5 fill:#FFA500
+    style Q6 fill:#FFA500
+    style USE1 fill:#87CEEB
+    style USE2 fill:#87CEEB
+    style USE3 fill:#87CEEB
+    style USE4 fill:#87CEEB
+    style USE5 fill:#87CEEB
+    style USE6 fill:#87CEEB
+    style ALT1 fill:#FFE4B5
+```
+
+---
+
 ## Visualization
 
 ### Hash Function and Bucketing

@@ -20,6 +20,53 @@ A **Circular Queue** (ring buffer) connects the tail back to the head, allowing 
 
 ---
 
+## When to Use: Queue Problem Recognition
+
+```mermaid
+graph TD
+    PROB["Analyzing<br/>problem"]
+    
+    PROB --> Q1["Involves:<br/>shortest path?<br/>unweighted graph?"]
+    PROB --> Q2["Level-by-level<br/>processing?<br/>tree/graph?"]
+    PROB --> Q3["Order matters:<br/>first come<br/>first serve?"]
+    PROB --> Q4["Multi-source<br/>BFS?<br/>spreading?"]
+    
+    Q1 -->|YES| USE1["→ Queue!<br/>BFS finds shortest"]
+    Q2 -->|YES| USE2["→ Queue!<br/>Level-order traversal<br/>FIFO for levels"]
+    Q3 -->|YES| USE3["→ Queue!<br/>Process in arrival<br/>order"]
+    Q4 -->|YES| USE4["→ Queue!<br/>Start from multiple<br/>sources"]
+    
+    PROB --> Q5["Resource contention?<br/>Task scheduling?<br/>buffering?"]
+    Q5 -->|YES| USE5["→ Queue!<br/>FIFO scheduling<br/>fairness"]
+    
+    Q1 -->|NO| NEXT1["Continue..."]
+    Q2 -->|NO| NEXT2["Continue..."]
+    Q3 -->|NO| NEXT3["Continue..."]
+    Q4 -->|NO| NEXT4["Continue..."]
+    Q5 -->|NO| NEXT5["Continue..."]
+    
+    NEXT1 --> NONE["Not a queue<br/>problem"]
+    NEXT2 --> NONE
+    NEXT3 --> NONE
+    NEXT4 --> NONE
+    NEXT5 --> NONE
+    
+    style PROB fill:#FFA500
+    style Q1 fill:#FFA500
+    style Q2 fill:#FFA500
+    style Q3 fill:#FFA500
+    style Q4 fill:#FFA500
+    style Q5 fill:#FFA500
+    style USE1 fill:#87CEEB
+    style USE2 fill:#87CEEB
+    style USE3 fill:#87CEEB
+    style USE4 fill:#87CEEB
+    style USE5 fill:#87CEEB
+    style NONE fill:#FFB6C6
+```
+
+---
+
 ## Visualization
 
 ### Standard Queue
@@ -113,6 +160,70 @@ The key formula:  rear = (rear + 1) % capacity
                   │                             │
                   └─────────────────────────────┘
                   (logical order: C→D→E→F→G)
+```
+
+### BFS Algorithmic Flowchart
+
+```mermaid
+graph TD
+    BFS["BFS Algorithm"]
+    
+    BFS --> INIT["Initialize:<br/>queue = [start]<br/>visited = {start}"]
+    
+    INIT --> LOOP["While queue<br/>NOT empty?"]
+    
+    LOOP -->|YES| DEQUEUE["Dequeue node"]
+    LOOP -->|NO| END["Return result"]
+    
+    DEQUEUE --> PROCESS["Process node<br/>Add to result"]
+    
+    PROCESS --> EXPLORE["For each neighbor"]
+    
+    EXPLORE --> CHECK["Visited?"]
+    CHECK -->|YES| SKIP["Skip"]
+    CHECK -->|NO| MARK["Mark visited"]
+    
+    MARK --> ENQ["Enqueue neighbor"]
+    
+    ENQ --> LOOP
+    SKIP --> LOOP
+    
+    style BFS fill:#FFA500
+    style INIT fill:#87CEEB
+    style LOOP fill:#FFA500
+    style DEQUEUE fill:#87CEEB
+    style PROCESS fill:#87CEEB
+    style EXPLORE fill:#FFA500
+    style CHECK fill:#FFA500
+    style MARK fill:#87CEEB
+    style ENQ fill:#87CEEB
+    style END fill:#90EE90
+```
+
+### Circular Queue Implementation Choice
+
+```mermaid
+graph TD
+    Q["Need fixed-size<br/>queue?"]
+    
+    Q -->|NO| STD["Standard Queue<br/>uses deque/list"]
+    Q -->|YES| CQ["Circular Queue"]
+    
+    STD --> STD_A["✓ Simple<br/>✓ Unbounded<br/>✗ Linear probing"]
+    
+    CQ --> CQ_Q["Track size or<br/>leave gap?"]
+    
+    CQ_Q -->|Size counter| CQ1["Approach 1:<br/>Keep size variable<br/>✓ Simpler logic<br/>✗ Extra variable"]
+    CQ_Q -->|One slot empty| CQ2["Approach 2:<br/>Never fill completely<br/>✓ Distinguish<br/>full vs empty<br/>✗ Wasted slot"]
+    
+    CQ1 --> CQ1_A["isFull = size==cap<br/>isEmpty = size==0"]
+    CQ2 --> CQ2_A["isFull: (r+1)%cap==f<br/>isEmpty: f==r"]
+    
+    style Q fill:#FFA500
+    style CQ_Q fill:#FFA500
+    style STD fill:#87CEEB
+    style CQ1 fill:#87CEEB
+    style CQ2 fill:#87CEEB
 ```
 
 ### BFS Level-Order Traversal (Queue in Action)
@@ -233,6 +344,53 @@ pop_stack:  []           (dequeue from here)
 dequeue(): if pop_stack empty, pour push_stack into pop_stack
            push_stack: []   pop_stack: [8, 3, 5]
            dequeue returns 5 (bottom of push → FIFO order restored)
+```
+
+---
+
+## Common Queue Mistakes
+
+```mermaid
+graph TD
+    START["Implementing<br/>queue solution"]
+    
+    START --> M1["Checking empty<br/>before dequeue()?"]
+    M1 -->|NO| E1["❌ Queue Underflow<br/>Crash on empty dequeue<br/>Always check!"]
+    M1 -->|YES| M2
+    
+    M2["Marking visited<br/>BEFORE enqueue?"]
+    M2 -->|NO| E2["❌ Duplicates in queue<br/>Same node queued twice<br/>Mark BEFORE enqueue"]
+    M2 -->|YES| M3
+    
+    M3["Snapshotting queue size<br/>for level-order?"]
+    M3 -->|NO| E3["⚠️ Wrong logic<br/>len(queue) inside loop<br/>changes during loop"]
+    M3 -->|YES| M4
+    
+    M4["Using list.pop(0) in Python?"]
+    M4 -->|YES| E4["⚠️ O(n) per dequeue!<br/>Use collections.deque<br/>with popleft()"]
+    M4 -->|NO| M5
+    
+    M5["Graph disconnected?<br/>Handle all components?"]
+    M5 -->|NO| E5["❌ Incomplete result<br/>Start BFS from<br/>all unvisited"]
+    M5 -->|YES| M6
+    
+    M6["Topological sort:<br/>handle in-degree?"]
+    M6 -->|Wrong| E6["❌ Wrong order<br/>Must track in-degree<br/>enqueue 0-degree first"]
+    M6 -->|Right| PASS["✓ Solution complete"]
+    
+    style M1 fill:#FFA500
+    style M2 fill:#FFA500
+    style M3 fill:#FFA500
+    style M4 fill:#FFA500
+    style M5 fill:#FFA500
+    style M6 fill:#FFA500
+    style E1 fill:#FFB6C6
+    style E2 fill:#FFB6C6
+    style E3 fill:#FFE4B5
+    style E4 fill:#FFE4B5
+    style E5 fill:#FFB6C6
+    style E6 fill:#FFB6C6
+    style PASS fill:#90EE90
 ```
 
 ---

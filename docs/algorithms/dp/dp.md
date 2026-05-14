@@ -4,6 +4,50 @@ A collection of eight foundational DP algorithms covering the core patterns — 
 
 ---
 
+## Master Algorithm Decision Tree
+
+```mermaid
+graph TD
+    A["Is the problem optimal substructure?<br/>Can you break it into smaller states?"] -->|No| Z["Not DP<br/>Try greedy, math,<br/>or brute-force"]
+    A -->|Yes| B["How many independent<br/>decision dimensions?"]
+    
+    B -->|One| C["1-D DP"]
+    B -->|Two| D["2-D DP"]
+    B -->|Two+ with<br/>interval splits| E["Interval DP"]
+    
+    C -->|Single sequence,<br/>maximize/minimize| F["Sequence DP<br/>LIS, Coin Change,<br/>Fibonacci"]
+    C -->|Two sequences,<br/>alignment| G["Never 1-D<br/>Go to 2-D"]
+    
+    D -->|Two sequences<br/>match/diff| H["String Alignment DP<br/>LCS, Edit Distance,<br/>LPS"]
+    D -->|Subset of items<br/>with capacity| I["Knapsack DP<br/>0/1 or Unbounded"]
+    
+    E -->|Chain of elements<br/>optimal split| J["Interval DP<br/>Matrix Chain,<br/>Burst Balloons"]
+    
+    F -->|Can reuse?| F1["Unbounded:<br/>Coin Change"]
+    F -->|Each once?| F2["1-D bounded:<br/>Fibonacci"]
+    F -->|Binary search<br/>optimization?| F3["O(n log n):<br/>LIS with bisect"]
+    
+    H -->|Characters match?| H1["LCS, LPS substring<br/>Similarity"]
+    H -->|Edit operations?| H2["Edit Distance<br/>Levenshtein"]
+    
+    I -->|Maximize value?| I1["0/1 or Unbounded<br/>Knapsack"]
+    
+    J -->|Recurrence on<br/>dp[i][k] + dp[k+1][j]| J1["Interval DP:<br/>try all splits"]
+    
+    F1 --> K["Implementation choice"]
+    F2 --> K
+    F3 --> K
+    H1 --> K
+    H2 --> K
+    I1 --> K
+    J1 --> K
+    
+    K -->|State fits<br/>in memory?| K1["Memoization<br/>Top-down,<br/>avoids unused states"]
+    K -->|Predict all<br/>states needed?| K2["Tabulation<br/>Bottom-up,<br/>space optimizable"]
+```
+
+---
+
 ## Algorithms Covered
 
 | Algorithm                     | Time           | Space         | DP Dimension |
@@ -24,6 +68,60 @@ A collection of eight foundational DP algorithms covering the core patterns — 
 ## Fibonacci
 
 Compute the nth Fibonacci number using three strategies: top-down memoization (recursive with cache), bottom-up tabulation (fill a table iteratively), and the space-optimized two-variable sliding window. All three produce the same result; they differ only in space usage and whether the call stack is involved.
+
+### Implementation Strategy Flowchart
+```mermaid
+graph TD
+    A["Start: Compute F(n)"] --> B{"Can all states<br/>up to n fit<br/>in memory?"}
+    B -->|Yes, likely| C["Use Tabulation<br/>O(n) time, O(n) space"]
+    B -->|No or<br/>sparse calls| D["Use Memoization<br/>Only compute needed states"]
+    
+    C --> C1["Initialize table[0..n]"]
+    C1 --> C2["Set base cases:<br/>table[0]=0, table[1]=1"]
+    C2 --> C3["Loop i from 2 to n"]
+    C3 --> C4["table[i] = table[i-1] + table[i-2]"]
+    C4 --> C5["Return table[n]"]
+    
+    D --> D1["Create cache dict"]
+    D1 --> D2["Define fib_memo(n, cache)"]
+    D2 --> D3{"n in cache?"}
+    D3 -->|Yes| D4["Return cached value"]
+    D3 -->|No| D5["Recurse:<br/>fib(n-1) + fib(n-2)"]
+    D5 --> D6["Store in cache"]
+    D6 --> D7["Return"]
+    
+    C5 --> E{"Need to<br/>optimize space<br/>further?"}
+    D4 --> E
+    D7 --> E
+    
+    E -->|Yes, only<br/>last 2 values| F["Use O(1) Space:<br/>prev, curr sliding"]
+    E -->|No, current<br/>solution works| G["Done"]
+    
+    F --> F1["a, b = 0, 1"]
+    F1 --> F2["Loop i from 2 to n"]
+    F2 --> F3["a, b = b, a+b"]
+    F3 --> F4["Return b"]
+    F4 --> G
+    
+    style C fill:#4287f5,color:#fff
+    style D fill:#4287f5,color:#fff
+    style F fill:#42c742,color:#fff
+    style G fill:#42c742,color:#fff
+```
+
+### State Definition & Transitions
+```mermaid
+graph LR
+    A["State: F(n)<br/>= Fib number at n"] --> B["Recurrence:<br/>F(n) = F(n-1) + F(n-2)"]
+    B --> C["Base:<br/>F(0)=0, F(1)=1"]
+    C --> D["Compute order:<br/>bottom-up (0→n)<br/>or top-down (n→0)"]
+    D --> E["Answer: F(n)"]
+    
+    style A fill:#ff9800,color:#000
+    style B fill:#ff9800,color:#000
+    style C fill:#42c742,color:#fff
+    style E fill:#42c742,color:#fff
+```
 
 ```
 n = 7   (F(7) = 13)
@@ -64,6 +162,51 @@ step 7: a,b = 13, 8+13=21 (but n=7 loops end here; a=13 = F(7)) ✓
 
 Given n items each with a weight and value, and a knapsack of capacity W, determine the maximum total value achievable without exceeding W, where each item can be taken at most once. State: `dp[i][w]` = maximum value using the first i items with capacity w.
 
+### Algorithm Flowchart
+```mermaid
+graph TD
+    A["Input: items with weights<br/>and values, capacity W"] --> B["Initialize dp[n+1][W+1]<br/>All zeros"]
+    B --> C["Loop i from 1 to n"]
+    C --> D["Loop w from W down to 1"]
+    D --> E{"weight[i-1] > w?<br/>Item too heavy?"}
+    E -->|Yes| F["dp[i][w] = dp[i-1][w]<br/>Cannot take item"]
+    E -->|No| G["Decide: take or skip?"]
+    G --> H["dp[i][w] = max(<br/>  dp[i-1][w],        ← skip<br/>  dp[i-1][w-wt]+val  ← take<br/>)"]
+    H --> I["Next capacity w"]
+    F --> I
+    I --> J{"w == 0?"}
+    J -->|No| D
+    J -->|Yes| K["Next item i"]
+    K --> L{"i == n?"}
+    L -->|No| C
+    L -->|Yes| M["Answer: dp[n][W]"]
+    M --> N["Backtrack to<br/>find items chosen"]
+    
+    style E fill:#ff9800,color:#000
+    style G fill:#ff9800,color:#000
+    style H fill:#4287f5,color:#fff
+    style M fill:#42c742,color:#fff
+    style N fill:#42c742,color:#fff
+```
+
+### Knapsack Type Decision Tree
+```mermaid
+graph TD
+    A["Problem: Resource<br/>allocation with<br/>capacity constraint"] --> B{"Can each item<br/>be used<br/>multiple times?"}
+    B -->|No, once each| C["0/1 Knapsack<br/>Iterate items outer,<br/>capacities inner reverse"]
+    B -->|Yes, unlimited| D["Unbounded Knapsack<br/>Iterate capacities outer,<br/>try each item"]
+    
+    C --> C1["Space opt:<br/>Reverse w loop<br/>to avoid reuse"]
+    D --> D1["Space opt:<br/>Forward w loop<br/>allows reuse"]
+    
+    C1 --> E["dp[i][w] = max(<br/>  dp[i-1][w],<br/>  dp[i-1][w-wt]+val<br/>)"]
+    D1 --> F["dp[w] = max(<br/>  dp[w],<br/>  dp[w-wt]+val<br/>)"]
+    
+    style B fill:#ff9800,color:#000
+    style C fill:#4287f5,color:#fff
+    style D fill:#4287f5,color:#fff
+```
+
 ```
 weights = [2, 3, 4, 5]
 values  = [3, 4, 5, 6]
@@ -103,6 +246,52 @@ Backtrack from dp[4][8]:
 
 Find the longest sequence of characters that appears (in order, but not necessarily contiguously) in both strings s1 and s2. State: `dp[i][j]` = LCS length of `s1[:i]` and `s2[:j]`.
 
+### LCS Algorithm Flowchart
+```mermaid
+graph TD
+    A["Input: two strings s1, s2<br/>m = len(s1), n = len(s2)"] --> B["Initialize dp[m+1][n+1]<br/>First row/col = 0"]
+    B --> C["Loop i from 1 to m"]
+    C --> D["Loop j from 1 to n"]
+    D --> E{"s1[i-1] ==<br/>s2[j-1]?"}
+    E -->|Yes| F["dp[i][j] = dp[i-1][j-1] + 1<br/>Characters match:<br/>extend LCS"]
+    E -->|No| G["dp[i][j] = max(<br/>  dp[i-1][j],   ← skip s1[i-1]<br/>  dp[i][j-1]    ← skip s2[j-1]<br/>)"]
+    F --> H["Next j"]
+    G --> H
+    H --> I{"j == n?"}
+    I -->|No| D
+    I -->|Yes| J["Next i"]
+    J --> K{"i == m?"}
+    K -->|No| C
+    K -->|Yes| L["LCS length = dp[m][n]"]
+    L --> M["Backtrack from dp[m][n]<br/>to reconstruct string"]
+    
+    style E fill:#ff9800,color:#000
+    style F fill:#4287f5,color:#fff
+    style G fill:#4287f5,color:#fff
+    style L fill:#42c742,color:#fff
+```
+
+### String Comparison Pattern Recognition
+```mermaid
+graph TD
+    A["Given: Two sequences<br/>s1, s2"] --> B{"What do we<br/>need to find?"}
+    B -->|Longest common<br/>sequence in order| C["LCS<br/>non-contiguous"]
+    B -->|Longest common<br/>contiguous block| D["LCS Substring<br/>dp[i-1][j-1]+1<br/>on match, 0 on mismatch"]
+    B -->|How many edits<br/>to transform?| E["Edit Distance<br/>insert/delete/replace"]
+    B -->|Longest palindromic<br/>substring?| F["LPS<br/>Manacher or DP"]
+    
+    C --> C1["dp[i][j] = LCS of<br/>s1[:i] and s2[:j]"]
+    D --> D1["dp[i][j] = length ending<br/>at s1[i-1], s2[j-1]"]
+    E --> E1["dp[i][j] = min edits<br/>to transform s1[:i]<br/>to s2[:j]"]
+    F --> F1["dp[i][j] = True if<br/>s[i..j] is palindrome"]
+    
+    style B fill:#ff9800,color:#000
+    style C fill:#4287f5,color:#fff
+    style D fill:#4287f5,color:#fff
+    style E fill:#4287f5,color:#fff
+    style F fill:#4287f5,color:#fff
+```
+
 ```
 s1 = "ABCB"   s2 = "BDCAB"
 
@@ -141,6 +330,52 @@ LCS = "ACB" (reversed during backtrack: A, C, B)
 
 Find the length of the longest strictly increasing subsequence of an array. The patience sorting approach maintains a `tails` array where `tails[i]` holds the smallest possible tail value of all increasing subsequences of length `i+1` found so far. Binary search (bisect_left) positions each element.
 
+### LIS Algorithm Flowchart (Optimized O(n log n))
+```mermaid
+graph TD
+    A["Input: array arr of length n"] --> B["Initialize tails = []<br/>tails[i] = smallest tail of<br/>all increasing subseqs of length i+1"]
+    B --> C["Loop through each element x in arr"]
+    C --> D["Find position: pos = bisect_left(tails, x)<br/>Binary search O(log n)"]
+    D --> E{"pos == len(tails)?<br/>x extends longest?"}
+    E -->|Yes| F["Append x<br/>New longest found"]
+    E -->|No| G["Replace tails[pos] = x<br/>Keep tails optimal"]
+    F --> H["Continue next x"]
+    G --> H
+    H --> I{"More elements?"}
+    I -->|Yes| C
+    I -->|No| J["Answer: len(tails)<br/>is the LIS length"]
+    J --> K["Reconstruct LIS<br/>via predecessor tracking<br/>during forward pass"]
+    
+    style D fill:#ff9800,color:#000
+    style E fill:#ff9800,color:#000
+    style F fill:#4287f5,color:#fff
+    style G fill:#4287f5,color:#fff
+    style J fill:#42c742,color:#fff
+```
+
+### Optimization Decision: O(n²) vs O(n log n)
+```mermaid
+graph TD
+    A["Find LIS length"] --> B{"Input size<br/>and constraints?"}
+    B -->|n ≤ 1000<br/>or simple case| C["O(n²) DP<br/>Simpler, easier to<br/>implement, fewer bugs"]
+    B -->|n > 1000<br/>or TLE risk| D["O(n log n)<br/>Patience sorting<br/>+ binary search"]
+    
+    C --> C1["dp[i] = length of LIS<br/>ending at i"]
+    C1 --> C2["For each i, check<br/>all j < i where<br/>arr[j] < arr[i]"]
+    C2 --> C3["dp[i] = max(dp[j]) + 1"]
+    
+    D --> D1["Maintain tails array<br/>invariant: tails is sorted"]
+    D1 --> D2["For each x, binary search<br/>position in tails"]
+    D2 --> D3["Update or append<br/>to tails"]
+    
+    C3 --> E["Choose based on<br/>constraints"]
+    D3 --> E
+    
+    style B fill:#ff9800,color:#000
+    style C fill:#4287f5,color:#fff
+    style D fill:#42c742,color:#fff
+```
+
 ```
 arr = [10, 9, 2, 5, 3, 7, 101, 18]
 
@@ -173,6 +408,51 @@ Reconstruct: track predecessor indices
 ## Edit Distance (Levenshtein)
 
 Find the minimum number of single-character operations (insert, delete, substitute) needed to transform string s1 into string s2. State: `dp[i][j]` = minimum edits to transform `s1[:i]` into `s2[:j]`.
+
+### Edit Distance Algorithm Flowchart
+```mermaid
+graph TD
+    A["Input: s1, s2<br/>m = len(s1), n = len(s2)"] --> B["Initialize dp[m+1][n+1]"]
+    B --> B1["Base: dp[0][j] = j<br/>Need j inserts"]
+    B1 --> B2["Base: dp[i][0] = i<br/>Need i deletes"]
+    B2 --> C["Loop i from 1 to m"]
+    C --> D["Loop j from 1 to n"]
+    D --> E{"s1[i-1] ==<br/>s2[j-1]?"}
+    E -->|Yes| F["dp[i][j] = dp[i-1][j-1]<br/>Characters match:<br/>no operation needed"]
+    E -->|No| G["dp[i][j] = 1 + min(<br/>  dp[i-1][j],      ← delete s1[i-1]<br/>  dp[i][j-1],      ← insert s2[j-1]<br/>  dp[i-1][j-1]     ← replace<br/>)"]
+    F --> H["Next j"]
+    G --> H
+    H --> I{"j == n?"}
+    I -->|No| D
+    I -->|Yes| J["Next i"]
+    J --> K{"i == m?"}
+    K -->|No| C
+    K -->|Yes| L["Answer: dp[m][n]"]
+    L --> M["Backtrack to find<br/>actual operations"]
+    
+    style E fill:#ff9800,color:#000
+    style F fill:#4287f5,color:#fff
+    style G fill:#4287f5,color:#fff
+    style L fill:#42c742,color:#fff
+```
+
+### Operation Decision Tree: 3-Way Choice
+```mermaid
+graph TD
+    A["At mismatch between<br/>s1[i-1] and s2[j-1]"] --> B["Three operations<br/>to consider:"]
+    B --> B1["DELETE: remove s1[i-1]<br/>Move to dp[i-1][j]<br/>Cost: 1 + dp[i-1][j]"]
+    B --> B2["INSERT: add s2[j-1]<br/>into s1 (or skip in s1)<br/>Move to dp[i][j-1]<br/>Cost: 1 + dp[i][j-1]"]
+    B --> B3["REPLACE: swap s1[i-1]<br/>with s2[j-1]<br/>Move to dp[i-1][j-1]<br/>Cost: 1 + dp[i-1][j-1]"]
+    
+    B1 --> C["Take minimum<br/>of three costs"]
+    B2 --> C
+    B3 --> C
+    
+    style B fill:#ff9800,color:#000
+    style B1 fill:#4287f5,color:#fff
+    style B2 fill:#4287f5,color:#fff
+    style B3 fill:#4287f5,color:#fff
+```
 
 ```
 s1 = "kitten"   s2 = "sitting"
@@ -218,6 +498,53 @@ Operations (backtracked):
 
 Find the minimum number of coins from a given set of denominations that sum to a target amount. State: `dp[a]` = minimum coins to make exactly amount a. This is an unbounded knapsack (coins can be reused).
 
+### Coin Change Algorithm Flowchart
+```mermaid
+graph TD
+    A["Input: coin denominations,<br/>target amount"] --> B["Initialize dp[amount+1]<br/>All INF except dp[0]=0"]
+    B --> C["Loop amount a from 1 to target"]
+    C --> D["For each coin c in coins"]
+    D --> E{"c <= a?<br/>Coin fits?"}
+    E -->|No| F["Skip coin"]
+    E -->|Yes| G["Can we use this coin?"]
+    G --> H["dp[a] = min(<br/>  dp[a],<br/>  dp[a-c] + 1  ← add coin c<br/>)"]
+    H --> I["Next coin"]
+    F --> I
+    I --> J{"More coins?"}
+    J -->|Yes| D
+    J -->|No| K["Next amount a"]
+    K --> L{"a == target?"}
+    L -->|No| C
+    L -->|Yes| M{"dp[target]<br/>== INF?"}
+    M -->|Yes| N["No solution<br/>Cannot make amount"]
+    M -->|No| O["Answer: dp[target]<br/>is min coins"]
+    O --> P["Backtrack via<br/>last_coin array"]
+    
+    style E fill:#ff9800,color:#000
+    style G fill:#ff9800,color:#000
+    style H fill:#4287f5,color:#fff
+    style M fill:#ff9800,color:#000
+    style O fill:#42c742,color:#fff
+```
+
+### Unbounded vs 0/1 Knapsack Loop Order
+```mermaid
+graph TD
+    A["Resource problem:<br/>Coins or Items?"] --> B{"Is each item<br/>reusable?"}
+    B -->|No<br/>Each once| C["0/1 Knapsack<br/>items outer,<br/>capacities inner REVERSE"]
+    B -->|Yes<br/>Unlimited reuse| D["Unbounded Knapsack<br/>Coin Change<br/>capacities outer,<br/>items inner forward"]
+    
+    C --> C1["for item in items:<br/>  for w in range(W, weight-1, -1)<br/>    dp[w] = max(dp[w],<br/>             dp[w-weight]+value)"]
+    D --> D1["for amount in range(1, target+1):<br/>  for coin in coins:<br/>    if coin <= amount<br/>      dp[amount] = min(dp[amount],<br/>                  dp[amount-coin]+1)"]
+    
+    C1 --> E["Reverse prevents<br/>same item twice"]
+    D1 --> E
+    
+    style B fill:#ff9800,color:#000
+    style C fill:#4287f5,color:#fff
+    style D fill:#42c742,color:#fff
+```
+
 ```
 coins = [1, 5, 6, 9]   amount = 11
 
@@ -257,6 +584,56 @@ Backtrack via last_coin array:
 ## Matrix Chain Multiplication
 
 Given a chain of n matrices where matrix i has dimensions `dims[i] × dims[i+1]`, find the parenthesization that minimizes the total number of scalar multiplications. State: `dp[i][j]` = minimum multiplications to compute the product of matrices i through j.
+
+### Matrix Chain Algorithm Flowchart
+```mermaid
+graph TD
+    A["Input: dims array<br/>dims[i] = rows of mat i<br/>dims[i+1] = cols of mat i"] --> B["Initialize dp[n][n]<br/>All zero"]
+    B --> C["Base case: dp[i][i] = 0<br/>Single matrix: no mult"]
+    C --> D["Loop by chain length len"]
+    D --> D1["len from 2 to n"]
+    D1 --> E["Loop start i from 0 to n-len"]
+    E --> E1["j = i + len - 1<br/>end index"]
+    E1 --> F["Try all split points k"]
+    F --> F1["k from i to j-1"]
+    F1 --> G["Compute cost of split:<br/>cost = dp[i][k]<br/>  + dp[k+1][j]<br/>  + dims[i]*dims[k+1]*dims[j+1]"]
+    G --> H["Update dp[i][j] = min<br/>of all split costs"]
+    H --> I["Next split k"]
+    I --> J{"k == j-1?"}
+    J -->|No| F1
+    J -->|Yes| K["Next start i"]
+    K --> L{"i == n-len?"}
+    L -->|No| E
+    L -->|Yes| M["Next length len"]
+    M --> N{"len == n?"}
+    N -->|No| D1
+    N -->|Yes| O["Answer: dp[0][n-1]"]
+    O --> P["Reconstruct parenthesization<br/>via split[i][j] tracking"]
+    
+    style G fill:#ff9800,color:#000
+    style H fill:#4287f5,color:#fff
+    style O fill:#42c742,color:#fff
+```
+
+### Interval DP Pattern Recognition
+```mermaid
+graph TD
+    A["Problem on interval [i,j]:<br/>Optimal way to split it?"] --> B["Characteristics:"]
+    B --> B1["Solution = combine two<br/>sub-interval solutions"]
+    B1 --> B2["Cost = cost(left) + cost(right)<br/>+ cost of combining"]
+    B2 --> B3["Try all split points k"]
+    
+    A --> C{"Problem type?"}
+    C -->|Matrix chain<br/>Burst balloons<br/>Polygon triangulation| D["Interval DP<br/>fill by length"]
+    C -->|Optimal substructure<br/>on subsets| E["Another DP variant"]
+    
+    D --> D1["for len in 2..n:<br/>  for i in 0..n-len:<br/>    j = i + len - 1<br/>    for k in i..j-1:<br/>      try split at k"]
+    
+    style B fill:#ff9800,color:#000
+    style B1 fill:#ff9800,color:#000
+    style B2 fill:#ff9800,color:#000
+    style D fill:#4287f5,color:#fff
+```
 
 ```
 dims = [40, 20, 30, 10, 30]
@@ -305,6 +682,65 @@ Parenthesization: ((A0 x A1) x (A2 x A3))
 ## Longest Palindromic Substring
 
 Find the longest substring of s that reads the same forwards and backwards. Two approaches: O(n²) DP table and O(n) Manacher's algorithm.
+
+### Algorithm Choice: DP vs Manacher
+```mermaid
+graph TD
+    A["Find longest<br/>palindromic substring"] --> B{"What is your<br/>priority?"}
+    B -->|Simpler code,<br/>2D table OK| C["O(n²) DP<br/>Time: O(n²)<br/>Space: O(n²)"]
+    B -->|Must have O(n)<br/>Linear time| D["Manacher's Algorithm<br/>Time: O(n)<br/>Space: O(n)"]
+    
+    C --> C1["dp[i][j] = True if<br/>s[i..j] is palindrome"]
+    C1 --> C2["Base: dp[i][i] = True"]
+    C2 --> C3["Fill by substring length"]
+    C3 --> C4["If s[i]==s[j] and<br/>dp[i+1][j-1], then<br/>dp[i][j] = True"]
+    
+    D --> D1["Transform s with '#':<br/>s = '#a#b#a#'"]
+    D1 --> D2["Compute p[i] =<br/>palindrome radius at i"]
+    D2 --> D3["Use mirror trick:<br/>p[i] >= min(R-i, p[mirror])"]
+    D3 --> D4["Expand from initial guess"]
+    
+    C4 --> E["Return longest found"]
+    D4 --> E
+    
+    style B fill:#ff9800,color:#000
+    style C fill:#4287f5,color:#fff
+    style D fill:#42c742,color:#fff
+```
+
+### DP Approach: Substring Length Iteration
+```mermaid
+graph TD
+    A["Initialize dp[n][n]<br/>All False"] --> B["Base case:<br/>dp[i][i] = True"]
+    B --> C["Loop by length len"]
+    C --> C1["len from 2 to n"]
+    C1 --> D["Loop start i from 0 to n-len"]
+    D --> D1["j = i + len - 1"]
+    D1 --> E{"s[i] == s[j]?"}
+    E -->|No| F["dp[i][j] = False<br/>Ends differ"]
+    E -->|Yes| G{"len == 2?<br/>Two chars?"}
+    G -->|Yes| H["dp[i][j] = True<br/>Both end match"]
+    G -->|No| I{"dp[i+1][j-1]<br/>== True?<br/>Inside is<br/>palindrome?"}
+    I -->|Yes| J["dp[i][j] = True<br/>Whole thing is"]
+    I -->|No| K["dp[i][j] = False<br/>Inside breaks it"]
+    H --> L["Track max length<br/>and start position"]
+    J --> L
+    F --> L
+    K --> L
+    L --> M["Next start i"]
+    M --> N{"i exhausted?"}
+    N -->|No| D
+    N -->|Yes| O["Next length"]
+    O --> P{"len == n?"}
+    P -->|No| C1
+    P -->|Yes| Q["Return longest<br/>palindrome found"]
+    
+    style E fill:#ff9800,color:#000
+    style G fill:#ff9800,color:#000
+    style I fill:#ff9800,color:#000
+    style J fill:#4287f5,color:#fff
+    style Q fill:#42c742,color:#fff
+```
 
 ```
 s = "babad"

@@ -86,19 +86,130 @@ Find "ana" in "banana$":
 
 ```mermaid
 flowchart TD
-    A["Problem: String matching / substring analysis"] -->|Multiple queries?| B{Can preprocess?}
-    B -->|Yes, many queries| C["Build suffix tree<br/>Ukkonen's O(n)"]
-    B -->|No, single query| D["Use KMP or Aho-Corasick<br/>O(n+m)"]
-    C --> E["Identify pattern requirements"]
-    E -->|Find all matches| F["Traverse tree from root<br/>following pattern path<br/>O(m + k)"]
-    E -->|Longest repeat| G["DFS tree, track max depth<br/>O(n)"]
-    E -->|Longest common| H["Build tree for concatenated<br/>strings, find deepest<br/>internal node"]
-    F --> I["Collect all leaf positions<br/>from subtree"]
-    G --> J["Track deepest internal node<br/>in each DFS"]
-    H --> K["Position must be in both<br/>original strings"]
-    I --> L["Verify complexity: O(m+k)"]
+    A["🎯 Problem: String matching / substring analysis"] -->|Multiple queries?| B{Can preprocess?}
+    B -->|Yes, many queries| C["✓ Build suffix tree<br/>Ukkonen's O(n)"]
+    B -->|No, single query| D["✓ Use KMP or Aho-Corasick<br/>O(n+m)"]
+    C --> E["📋 Identify pattern requirements"]
+    E -->|Find all matches| F["🔍 Traverse tree from root<br/>following pattern path"]
+    E -->|Longest repeat| G["🔄 DFS tree<br/>track max depth"]
+    E -->|Longest common| H["🌲 Build tree for concatenated<br/>strings"]
+    F --> I["📊 Collect all leaf positions<br/>from subtree<br/>O(m + k)"]
+    G --> J["📈 Track deepest internal node<br/>in each DFS<br/>O(n)"]
+    H --> K["✓ Find deepest internal node<br/>position in both strings<br/>O(n+m)"]
+    I --> L["✓ Verify complexity: O(m+k)"]
     J --> L
     K --> L
+    L --> M["Return result"]
+    
+    style A fill:#fff4e6
+    style C fill:#e3f2fd
+    style D fill:#e3f2fd
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style G fill:#f3e5f5
+    style H fill:#f3e5f5
+    style I fill:#e8f5e9
+    style J fill:#e8f5e9
+    style K fill:#e8f5e9
+    style M fill:#e8f5e9
+    K --> L
+```
+
+## String Problem Classification Flowchart
+
+```mermaid
+flowchart TD
+    A["📊 Analyzing string problem"] --> B{What task?}
+    B -->|Pattern search| C{How many queries?}
+    C -->|Single| D["❌ Not suffix tree<br/>Use KMP O(n+m)"]
+    C -->|Multiple same text| E["✓ Suffix tree<br/>preprocess once"]
+    B -->|Longest substring| F{Type of substring?}
+    F -->|Longest repeat<br/>in one string| G["✓ Suffix tree<br/>O(n)"]
+    F -->|Common substring<br/>two strings| H["✓ Suffix tree<br/>concatenated O(n+m)"]
+    F -->|Longest palindrome| I["✓ Suffix tree + suffix array<br/>with reverse"]
+    B -->|String matching| J{Pattern characteristics?}
+    J -->|Exact match| K["✓ Suffix tree<br/>O(n) preprocess<br/>O(m+k) query"]
+    J -->|All occurrences| K
+    J -->|Approximate| L["❌ Not suffix tree<br/>Use edit distance"]
+    B -->|Counting problems| M{Count what?}
+    M -->|Distinct substrings| N["✓ Suffix tree<br/>O(n) using internal nodes"]
+    M -->|Substring frequencies| N
+    
+    E --> O["✓ Suffix tree approach"]
+    G --> O
+    H --> O
+    I --> O
+    K --> O
+    N --> O
+    D --> P["Alternative approach"]
+    L --> P
+    
+    style A fill:#fff4e6
+    style O fill:#e8f5e9
+    style P fill:#ffebee
+    style E fill:#e3f2fd
+    style K fill:#e3f2fd
+    style N fill:#e3f2fd
+```
+
+## Suffix Tree Construction & Query Flowchart
+
+```mermaid
+flowchart TD
+    A["🏗 Suffix Tree Operations"] --> B["Input: string S<br/>length n"]
+    B --> C["Option 1: Build tree<br/>Ukkonen's algorithm"]
+    C --> D["Initialize: root, active pt"]
+    D --> E["For each char i=0 to n-1:<br/>extend tree with char"]
+    E --> F["Update active point<br/>create new internal nodes<br/>O(1) per char"]
+    F --> G{"All chars<br/>processed?"}
+    G -->|No| E
+    G -->|Yes| H["✓ Tree complete<br/>O(n) time, O(n) space"]
+    H --> I["Option 2: Query tree<br/>pattern matching"]
+    I --> J["Start at root"]
+    J --> K["For each char in pattern:<br/>find matching edge"]
+    K --> L{Edge starts<br/>with char?}
+    L -->|Yes| M["Move to child node"]
+    M --> N{"Pattern<br/>complete?"}
+    N -->|No| K
+    N -->|Yes| O["🎯 Found subtree<br/>all leaves = matches"]
+    L -->|No| P["❌ Pattern not in tree<br/>0 matches"]
+    O --> Q["Collect leaf positions<br/>O(m + k)"]
+    P --> Q
+    Q --> R["Return match positions"]
+    
+    style A fill:#f3e5f5
+    style C fill:#f3e5f5
+    style I fill:#f3e5f5
+    style H fill:#e8f5e9
+    style O fill:#e8f5e9
+    style P fill:#ffebee
+    style R fill:#e8f5e9
+```
+
+## Suffix Tree vs Suffix Array vs Trie Flowchart
+
+```mermaid
+flowchart TD
+    A["🤔 Choosing suffix structure"] --> B{Data characteristics}
+    B -->|Single pattern search| C["✓ Suffix array<br/>O(n log n) build<br/>O(m log n) query<br/>less memory"]
+    B -->|Multiple queries<br/>on same text| D["✓ Suffix tree<br/>O(n) build<br/>O(m+k) query<br/>more memory"]
+    B -->|LCP computation| E["✓ Suffix array<br/>+ LCP array<br/>more flexible"]
+    B -->|Complex queries| F["✓ Suffix tree<br/>direct subtree access"]
+    B -->|Memory critical| G["✓ Suffix array<br/>O(n) vs O(n) tree"]
+    B -->|Space unlimited| H["✓ Suffix tree<br/>10-30x input size ok"]
+    B -->|Very short strings| I["❌ All overkill<br/>simple search faster"]
+    C --> J["Suffix array approach"]
+    D --> K["Suffix tree approach"]
+    E --> J
+    F --> K
+    G --> J
+    H --> K
+    I --> L["Direct string search"]
+    
+    style A fill:#fff4e6
+    style J fill:#e8f5e9
+    style K fill:#e8f5e9
+    style L fill:#ffebee
 ```
 
 ## Common Patterns

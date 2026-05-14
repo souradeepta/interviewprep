@@ -14,6 +14,113 @@
 
 ---
 
+## Flowcharts
+
+### When to Use Union-Find
+
+```mermaid
+graph TD
+    A["Problem requiring<br/>connectivity"] --> B{"What's the question?"}
+    
+    B -->|Are A and B<br/>connected?| C["Union-Find<br/>O(α(n))"]
+    B -->|Number of<br/>components| D["Union-Find<br/>Count roots"]
+    B -->|Cycle in<br/>undirected graph| E["Union-Find<br/>Fast detection"]
+    B -->|Minimum spanning<br/>tree| F["Kruskal's<br/>+ Union-Find"]
+    B -->|Group similar<br/>elements| G["Union-Find<br/>Merge sets"]
+    
+    C --> H["find(A) == find(B)"]
+    D --> I["Count of distinct<br/>root parents"]
+    E --> J["On edge: if find(u)<br/>== find(v) → cycle"]
+    F --> K["Sort edges, union<br/>if not connected"]
+    G --> L["Union all in group<br/>Group by root"]
+    
+    style C fill:#90EE90
+    style D fill:#90EE90
+    style E fill:#90EE90
+    style F fill:#90EE90
+    style G fill:#90EE90
+```
+
+### Union-Find: find() Operation
+
+```mermaid
+graph TD
+    A["find(x)"] --> B["Start at x"]
+    B --> C{"parent[x] == x?"}
+    C -->|Yes, is root| D["Return x<br/>x is the root"]
+    C -->|No| E["Move to parent[x]"]
+    E --> F["Repeat until root"]
+    F --> G["Path found<br/>x → ... → root"]
+    G --> H["Path Compression:<br/>Make all point<br/>directly to root"]
+    H --> I["Return root<br/>✓ Optimized"]
+    
+    style D fill:#90EE90
+    style I fill:#90EE90
+    style H fill:#87CEEB
+```
+
+### Union-Find: union() Operation
+
+```mermaid
+graph TD
+    A["union(x, y)"] --> B["Find roots"]
+    B --> C["rootX = find(x)<br/>rootY = find(y)"]
+    C --> D{"rootX == rootY?"}
+    D -->|Yes| E["Already connected<br/>Return false"]
+    D -->|No| F{"Union by Rank<br/>or Size?"}
+    
+    F -->|By Rank| G{"rank[rootX]<br/>rank[rootY]?"}
+    F -->|By Size| H{"size[rootX]<br/>size[rootY]?"}
+    
+    G -->|Yes| I["parent[rootX]=rootY<br/>Attach smaller"]
+    G -->|No| J{"Ranks equal?"}
+    J -->|Yes| K["parent[rootY]=rootX<br/>Increment rank"]
+    J -->|No| L["parent[rootY]=rootX"]
+    
+    H -->|Yes| M["parent[rootX]=rootY<br/>size[rootY]+=size[rootX]"]
+    H -->|No| N["parent[rootY]=rootX<br/>size[rootX]+=size[rootY]"]
+    
+    I --> O["Return true<br/>✓ Merged"]
+    K --> O
+    L --> O
+    M --> O
+    N --> O
+    
+    style E fill:#FFB6C1
+    style O fill:#90EE90
+```
+
+### Union-Find Application Patterns
+
+```mermaid
+graph TD
+    A["Union-Find problem"] --> B{"Pattern?"}
+    
+    B -->|Detect cycle<br/>in edges| C["For each edge<br/>if find(u)==find(v)<br/>→ cycle<br/>else union(u,v)"]
+    
+    B -->|Connected components| D["Initialize all<br/>Union each edge<br/>Count roots"]
+    
+    B -->|Kruskal MST| E["Sort edges by weight<br/>Union if different sets<br/>Stop at n-1 edges"]
+    
+    B -->|Accounts/Group merge| F["Union all in group<br/>Group by root"]
+    
+    B -->|Dynamic connectivity| G["online queries<br/>union/find<br/>as needed"]
+    
+    C --> C1["Time: O(E·α(n))"]
+    D --> D1["Time: O(E·α(n))"]
+    E --> E1["Time: O(E log E<br/>+ E·α(n))"]
+    F --> F1["Time: O(n·α(n))"]
+    G --> G1["Time: O(q·α(n))"]
+    
+    style C fill:#90EE90
+    style D fill:#90EE90
+    style E fill:#FFD700
+    style F fill:#FFB6C1
+    style G fill:#87CEEB
+```
+
+---
+
 ## Visualization
 
 ### Initial State (6 elements, each in its own set)

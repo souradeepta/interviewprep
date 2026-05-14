@@ -101,17 +101,101 @@ Three cases for splay(x) where p = parent of x, g = grandparent:
 
 ```mermaid
 flowchart TD
-    A["Problem: Ordered set / tree operations"] -->|Requirement?| B{Need worst-case<br/>guarantee?}
-    B -->|Yes, O(log n) guaranteed| C["Use AVL or Red-Black<br/>Strict balance"]
-    B -->|No, amortized OK| D["Splay tree viable<br/>Simpler implementation"]
-    D --> E["Identify operation"]
-    E -->|Find x| F["Search for x<br/>Then splay x to root"]
-    E -->|Insert x| G["Insert x as leaf<br/>Then splay x to root"]
-    E -->|Delete x| H["Find x by splay<br/>Delete root<br/>Merge left and right<br/>by splay on right subtree"]
-    F --> I["x now at root<br/>Future accesses to x<br/>and neighbors faster"]
+    A["🎯 Problem: Ordered set / tree operations"] -->|Requirement?| B{Need worst-case<br/>guarantee?}
+    B -->|Yes, O(log n) hard| C["✓ Use AVL/Red-Black<br/>Strict balance<br/>metadata required"]
+    B -->|No, amortized ok| D["✓ Splay tree viable<br/>Simpler code"]
+    D --> E["📋 Identify operation"]
+    E -->|Find x| F["🔍 Search for x<br/>Then splay x to root"]
+    E -->|Insert x| G["➕ Insert x as leaf<br/>Then splay x to root"]
+    E -->|Delete x| H["➖ Find x by splay<br/>Delete root<br/>Merge left/right subtrees"]
+    F --> I["✓ x now at root<br/>Future accesses to x<br/>O(1) best case"]
     G --> I
-    H --> J["Left and right subtrees<br/>now connected at new root<br/>O(log n) amortized"]
-    I --> K["Amortized O(log n)<br/>per operation"]
+    H --> J["✓ Subtrees merged<br/>at new root<br/>O(log n) amortized"]
+    I --> K["⏱ Amortized O(log n)<br/>per operation<br/>temporal locality gain"]
+    J --> K
+    
+    style A fill:#fff4e6
+    style C fill:#e3f2fd
+    style D fill:#e3f2fd
+    style E fill:#f3e5f5
+    style I fill:#e8f5e9
+    style J fill:#e8f5e9
+    style K fill:#e8f5e9
+```
+
+## Splay Tree Rotation Cases Flowchart
+
+```mermaid
+flowchart TD
+    A["🌳 Splay Operation - Rotation Cases"] --> B["Input: node x to splay to root"]
+    B --> C{Is x at<br/>root?}
+    C -->|Yes| D["✓ Done<br/>x already at root"]
+    C -->|No| E{"Is parent<br/>of x root?"}
+    E -->|Yes| F["ZIG case:<br/>single rotation<br/>right or left"]
+    E -->|No| G{"x, parent p,<br/>grandparent g<br/>all left or<br/>all right?"}
+    G -->|Yes| H["ZIG-ZIG case:<br/>two rotations<br/>same direction"]
+    G -->|No| I["ZIG-ZAG case:<br/>two rotations<br/>opposite directions"]
+    F --> J["Perform single rotation<br/>x becomes new root<br/>of subtree"]
+    H --> K["Rotate at g, then at p<br/>x becomes new root<br/>maintains BST"]
+    I --> L["Rotate at p, then at g<br/>x becomes new root<br/>maintains BST"]
+    J --> M["After rotation:<br/>is x at root?"]
+    K --> M
+    L --> M
+    M -->|No| E
+    M -->|Yes| N["✓ Splay complete<br/>x is new root<br/>O(log n) amortized<br/>depth reduction"]
+    
+    style A fill:#f3e5f5
+    style F fill:#fff4e6
+    style H fill:#fff4e6
+    style I fill:#fff4e6
+    style N fill:#e8f5e9
+```
+
+## BST vs Splay vs AVL vs Red-Black Flowchart
+
+```mermaid
+flowchart TD
+    A["🤔 Choosing balanced BST variant"] --> B{Requirements?}
+    B -->|Worst-case O(log n)<br/>guaranteed| C["✓ Red-Black Tree<br/>most flexible<br/>1-2 metadata per node"]
+    B -->|Educational<br/>strict balance| D["✓ AVL Tree<br/>2-3 balancing<br/>height metadata"]
+    B -->|Temporal locality<br/>cache-friendly| E["✓ Splay Tree<br/>O(log n) amortized<br/>no metadata"]
+    B -->|Simple structure<br/>not balanced| F["❌ BST<br/>O(n) worst case<br/>use if no structure"]
+    B -->|Custom operations<br/>like link-cut| G["✓ Splay Tree<br/>foundation for LCT<br/>flexible structure"]
+    C --> H["Trade-offs"]
+    D --> H
+    E --> H
+    G --> H
+    H --> I["Red-Black: production systems<br/>AVL: teaching/reference<br/>Splay: competitive programming<br/>BST: baseline understanding"]
+    
+    style A fill:#fff4e6
+    style C fill:#e8f5e9
+    style D fill:#e3f2fd
+    style E fill:#e8f5e9
+    style G fill:#e8f5e9
+    style I fill:#f3e5f5
+```
+
+## Splay Tree Application Patterns Flowchart
+
+```mermaid
+flowchart TD
+    A["📊 Splay Tree Applications"] --> B{Use case?}
+    B -->|LRU Cache| C["✓ Splay most recently<br/>used item to root<br/>evict least recently used<br/>O(log n) per access"]
+    B -->|Temporal locality<br/>hot data| D["✓ Splay accessed data<br/>to root<br/>nearby elements cached<br/>improves future accesses"]
+    B -->|Range queries<br/>interval tree| E["✓ Splay boundary<br/>intervals to root<br/>query efficiently<br/>O(log n) per range"]
+    B -->|Merge/Split ops| F["✓ Splay split point<br/>detach subtree<br/>merge by attaching<br/>O(log n) per op"]
+    B -->|Dynamic tree<br/>link/cut| G["✓ Foundation for<br/>link-cut trees<br/>enable O(log n) LCT ops"]
+    B -->|Competitive programming| H["✓ Template structure<br/>multiple problem types<br/>amortized O(log n)<br/>good average"]
+    C --> I["When to use splay:"]
+    D --> I
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J["Access patterns matter<br/>unbalanced load ok<br/>amortized analysis ok<br/>temporal locality present"]
+    
+    style A fill:#fff4e6
+    style J fill:#f3e5f5
 ```
 
 ## Common Patterns

@@ -13,6 +13,84 @@ A **Binary Search Tree** is a binary tree where each node satisfies the BST prop
 
 ---
 
+## Flowcharts
+
+### When to Use BST
+
+```mermaid
+graph TD
+    A["Need ordered data structure?"] -->|No| B["Use Hash Map<br/>O(1) lookup"]
+    A -->|Yes| C{"Data fits in memory?"}
+    C -->|No| D["Use B-Tree<br/>Database indexes"]
+    C -->|Yes| E{"Need guarantees<br/>against worst-case?"}
+    E -->|No, random data| F["Use BST<br/>Average O(log n)"]
+    E -->|Yes, need guarantee| G{"Write or Read heavy?"}
+    G -->|Read heavy| H["Use AVL Tree<br/>O(log n) guaranteed"]
+    G -->|Write heavy| I["Use Red-Black Tree<br/>Fewer rotations"]
+    
+    B --> J["Pattern: Direct key lookup"]
+    F --> K["Pattern: Sorted traversal,<br/>range queries"]
+    H --> L["Pattern: Strict balance,<br/>fast search"]
+    I --> M["Pattern: Balanced,<br/>efficient updates"]
+    
+    style F fill:#90EE90
+    style K fill:#87CEEB
+```
+
+### BST Deletion Strategy Decision Tree
+
+```mermaid
+graph TD
+    A["Delete key from BST"] --> B["Search for node"]
+    B --> C{"Node found?"}
+    C -->|No| D["✓ Key not in tree"]
+    C -->|Yes| E{"How many children?"}
+    
+    E -->|0 children<br/>Leaf| F["Simply remove node<br/>Update parent"]
+    E -->|1 child| G["Replace node with<br/>its child"]
+    E -->|2 children| H{"Successor or<br/>Predecessor?"}
+    
+    H -->|Inorder Successor<br/>rightmost of left| I["Find min in right subtree"]
+    H -->|Inorder Predecessor<br/>leftmost of right| J["Find max in left subtree"]
+    
+    I --> K["Replace node value<br/>with successor"]
+    J --> L["Replace node value<br/>with predecessor"]
+    K --> M["Recursively delete<br/>successor node"]
+    L --> N["Recursively delete<br/>predecessor node"]
+    
+    F --> O["✓ Deletion complete<br/>BST property maintained"]
+    G --> O
+    M --> O
+    N --> O
+    
+    style O fill:#90EE90
+    style I fill:#87CEEB
+    style J fill:#FFB6C1
+```
+
+### BST Search Optimization Decision Tree
+
+```mermaid
+graph TD
+    A["Problem: Search in BST"] --> B{"What type of query?"}
+    B -->|Find exact value| C["Binary search<br/>left/right comparison<br/>O(log n) avg"]
+    B -->|Find k-th smallest| D["Augment with<br/>subtree sizes<br/>O(log n)"]
+    B -->|Range query [L, R]| E["Inorder traversal<br/>with early termination<br/>O(k) where k = result"]
+    B -->|Successor/Predecessor| F["Navigate smartly<br/>left/right<br/>O(log n)"]
+    
+    C --> G["Validate BST first<br/>using min/max bounds"]
+    D --> H["Each node stores<br/>count of left subtree"]
+    E --> I["Return all values<br/>in [L, R]"]
+    F --> J["Successor: go right then left<br/>Predecessor: go left then right"]
+    
+    style C fill:#90EE90
+    style D fill:#90EE90
+    style E fill:#90EE90
+    style F fill:#90EE90
+```
+
+---
+
 ## Visualization
 
 ### Structure

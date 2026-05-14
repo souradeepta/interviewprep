@@ -13,6 +13,87 @@ An **LRU Cache** evicts the least recently used entry when the cache reaches its
 
 ---
 
+## Flowcharts
+
+### LRU vs LFU: When to Use Each
+
+```mermaid
+graph TD
+    A["Cache eviction problem"] --> B{"Eviction policy?"}
+    
+    B -->|Evict least<br/>recently used| C["Use LRU Cache<br/>HashMap + DLL<br/>O(1) get/put"]
+    B -->|Evict least<br/>frequently used| D["Use LFU Cache<br/>Freq tracking<br/>O(1) get/put"]
+    B -->|Time-based<br/>expiry| E["Use TTL cache<br/>Add timestamp<br/>Check on access"]
+    
+    C --> F["Pattern: Browser history<br/>Recently viewed items<br/>Page replacement"]
+    D --> G["Pattern: Cache hot items<br/>Content by popularity<br/>DB query results"]
+    E --> H["Pattern: Session expiry<br/>API rate limit<br/>Temporary storage"]
+    
+    F --> I["When accessed,<br/>move to front"]
+    G --> J["Track frequency<br/>Break ties by recency"]
+    H --> K["Delete if<br/>now - timestamp > TTL"]
+    
+    style C fill:#90EE90
+    style D fill:#FFB6C1
+    style E fill:#FFD700
+```
+
+### LRU get() and put() Decision Tree
+
+```mermaid
+graph TD
+    A["LRU operation"] --> B{"get() or put()?"}
+    
+    B -->|get(key)| C{"Key in cache?"}
+    C -->|No| D["Return -1"]
+    C -->|Yes| E["Get value from node"]
+    E --> F["Move node to MRU<br/>right after HEAD"]
+    F --> G["Return value"]
+    
+    B -->|put(key,val)| H{"Key exists?"}
+    H -->|Yes| I["Update value"]
+    I --> J["Move node to MRU"]
+    J --> K["Return"]
+    
+    H -->|No| L{"Cache full?<br/>size == capacity"}
+    L -->|No| M["Create new node"]
+    L -->|Yes| N["Evict LRU<br/>node before TAIL"]
+    N --> O["Delete from HashMap"]
+    O --> M
+    M --> P["Insert at MRU<br/>right after HEAD"]
+    P --> Q["Add to HashMap"]
+    Q --> R["Return"]
+    
+    style D fill:#FFB6C1
+    style G fill:#90EE90
+    style K fill:#90EE90
+    style R fill:#90EE90
+```
+
+### LRU Variant Patterns
+
+```mermaid
+graph TD
+    A["Cache variant needed?"] --> B{"Constraint?"}
+    
+    B -->|Need expiry time| C["LRU + TTL<br/>Check timestamp on access"]
+    B -->|Multiple layers| D["L1/L2 Cache<br/>L1 in memory<br/>L2 on disk"]
+    B -->|By frequency| E["LFU Cache<br/>Freq + recency"]
+    B -->|Thread-safe| F["Concurrent LRU<br/>Lock on operations"]
+    
+    C --> G["Pattern: Session cache<br/>Add timestamp field"]
+    D --> H["Pattern: Database cache<br/>Hierarchy"]
+    E --> I["Pattern: Hot data cache<br/>Popular items first"]
+    F --> J["Pattern: Multi-threaded<br/>Use mutex/lock"]
+    
+    style C fill:#FFD700
+    style D fill:#FFD700
+    style E fill:#FFB6C1
+    style F fill:#FFD700
+```
+
+---
+
 ## Visualization
 
 ### Structure: HashMap + Doubly Linked List

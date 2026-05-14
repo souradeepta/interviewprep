@@ -4,6 +4,40 @@ Nine algorithms for locating elements in sorted arrays, rotated arrays, and unso
 
 ---
 
+## Master Algorithm Selection Flowchart
+
+```mermaid
+flowchart TD
+    Start([Choose Search Algorithm]) --> Q1{Array<br/>properties?}
+    
+    Q1 -->|Sorted, standard| Q2{Duplicates<br/>present?}
+    Q1 -->|Rotated sorted| RotatedSearch["Search Rotated Array<br/>O(log n)<br/>LeetCode 33"]
+    Q1 -->|Unsorted,<br/>find peak| PeakSearch["Find Peak Element<br/>O(log n)<br/>LeetCode 162"]
+    Q1 -->|Unknown size<br/>infinite stream| ExpSearch["Exponential Search<br/>O(log i)"]
+    
+    Q2 -->|No| Q3{Target type?}
+    Q2 -->|Yes, find<br/>range| FirstLast["Binary Search<br/>First/Last<br/>count = last-first+1"]
+    
+    Q3 -->|Point lookup| Q4{Size?}
+    Q3 -->|Unknown size| ExpSearch
+    
+    Q4 -->|Small to medium| Iterative["Binary Search<br/>Iterative<br/>O(log n)"]
+    Q4 -->|Large, uniform<br/>distribution| Interp["Interpolation Search<br/>O(log log n) avg<br/>O(n) worst"]
+    
+    Q1 -->|Special: unimodal<br/>function maximum| TernarySearch["Ternary Search<br/>O(log₃ n)<br/>Math optimization"]
+    
+    style Start fill:#e1f5ff
+    style Iterative fill:#a5d6a7
+    style FirstLast fill:#a5d6a7
+    style RotatedSearch fill:#64b5f6
+    style PeakSearch fill:#64b5f6
+    style ExpSearch fill:#ffb74d
+    style Interp fill:#ffb74d
+    style TernarySearch fill:#ffd54f
+```
+
+---
+
 ## Algorithms Covered
 
 | Algorithm                | Best   | Average      | Worst    | Space      |
@@ -44,6 +78,55 @@ lo=0, hi=7 → mid=3, arr[3]=7  > 6  → hi = 2
 lo=0, hi=2 → mid=1, arr[1]=3  < 6  → lo = 2
 lo=2, hi=2 → mid=2, arr[2]=5  < 6  → lo = 3
 lo=3 > hi=2 → return -1
+```
+
+### Algorithm Flowchart
+
+```mermaid
+flowchart TD
+    Start([Input: sorted arr, target]) --> Precond{Array sorted?}
+    Precond -->|No| Error["✗ Error<br/>Binary search requires<br/>sorted input"]
+    Precond -->|Yes| Init["lo = 0<br/>hi = len(arr)-1"]
+    Init --> Loop{lo <= hi?}
+    Loop -->|No| NotFound["return -1<br/>Not found"]
+    Loop -->|Yes| CalcMid["mid = lo + (hi-lo)//2<br/>Avoid overflow"]
+    CalcMid --> Cmp{arr[mid]<br/>vs target?}
+    Cmp -->|==| Found["return mid<br/>Found!"]
+    Cmp -->|<| GoRight["lo = mid + 1<br/>Search right"]
+    Cmp -->|>| GoLeft["hi = mid - 1<br/>Search left"]
+    GoRight --> Loop
+    GoLeft --> Loop
+    
+    NotFound --> End([Output: index or -1])
+    Found --> End
+    Error --> End
+    
+    style Start fill:#e1f5ff
+    style End fill:#a5d6a7
+    style Loop fill:#ffb74d
+    style Cmp fill:#ffb74d
+    style Found fill:#a5d6a7
+    style NotFound fill:#ef5350
+    style Error fill:#ef5350
+```
+
+### Precondition Check & When to Use
+
+```mermaid
+flowchart TD
+    Q{Use Binary<br/>Search?} --> Q1{Preconditions<br/>met?}
+    Q1 -->|Array sorted?<br/>Yes| Q2{Size?}
+    Q1 -->|Not sorted| No1["✗ Use Linear Search<br/>or sort first"]
+    Q2 -->|Any size| Q3{Space<br/>budget?}
+    Q3 -->|O(1) needed| Yes1["✓ Perfect<br/>Iterative O(1)"]
+    Q3 -->|O(log n) OK| Maybe1["△ Recursive OK<br/>More readable"]
+    
+    Yes1 --> Perfect["Default choice:<br/>Fastest, safest<br/>no recursion risk"]
+    
+    style Yes1 fill:#a5d6a7
+    style Maybe1 fill:#ffb74d
+    style No1 fill:#ef5350
+    style Perfect fill:#c8e6c9
 ```
 
 **Key insight:** Use `mid = lo + (hi - lo) // 2` rather than `(lo + hi) // 2` to avoid integer overflow in languages with fixed-width integers (Java, C++). The loop invariant is: if target exists, it is in `arr[lo..hi]`.

@@ -14,6 +14,122 @@ A **Trie** (retrieval tree, also called a prefix tree or digital tree) is an n-a
 
 ---
 
+## Flowcharts
+
+### When to Use Trie
+
+```mermaid
+graph TD
+    A["String problem"] --> B{"What operation?"}
+    
+    B -->|Exact word lookup| C["Hash set faster<br/>O(m) either way"]
+    B -->|Prefix queries<br/>Autocomplete| D["Use Trie<br/>Only option"]
+    B -->|Longest common| E["Use Trie<br/>Walk until fork"]
+    B -->|Word in grid| F["Trie + DFS<br/>Boggle/Scrabble"]
+    B -->|IP routing| G["Trie on bits<br/>Longest match"]
+    B -->|Max XOR| H["Binary Trie<br/>Greedy opposite bits"]
+    
+    C --> I["Set/HashMap<br/>O(m) lookup"]
+    D --> J["Trie: Only way<br/>to get all prefixes"]
+    E --> K["Trie walking<br/>Stop at branches"]
+    F --> L["Trie + DFS<br/>Prune invalid paths"]
+    G --> M["Bit Trie<br/>Navigate greedily"]
+    H --> N["Bit Trie<br/>Choose opposite"]
+    
+    style D fill:#90EE90
+    style J fill:#90EE90
+    style K fill:#90EE90
+    style L fill:#90EE90
+```
+
+### Trie Insert/Search/Prefix Operations
+
+```mermaid
+graph TD
+    A["Trie operation"] --> B{"Operation?"}
+    
+    B -->|Insert word| C["Start at root"]
+    C --> D{"For each char:"}
+    D --> E{"Child exists?"}
+    E -->|No| F["Create new node"]
+    E -->|Yes| G["Traverse to child"]
+    F --> G
+    G --> H{"Last char?"}
+    H -->|No| D
+    H -->|Yes| I["Mark node as end<br/>is_end = True"]
+    I --> J["✓ Word inserted"]
+    
+    B -->|Search word| K["_find_node(word)"]
+    K --> L{"Found?"}
+    L -->|No| M["Return -1"]
+    L -->|Yes| N{"is_end = True?"}
+    N -->|No| O["It's a prefix, not word"]
+    N -->|Yes| P["✓ Word found"]
+    
+    B -->|startsWith| Q["_find_node(prefix)"]
+    Q --> R{"Node exists?"}
+    R -->|No| S["Return false"]
+    R -->|Yes| T["✓ Prefix exists"]
+    
+    style J fill:#90EE90
+    style P fill:#90EE90
+    style T fill:#90EE90
+    style M fill:#FFB6C1
+    style O fill:#FFB6C1
+```
+
+### Trie Autocomplete Pattern
+
+```mermaid
+graph TD
+    A["Autocomplete(prefix)"] --> B["_find_node(prefix)"]
+    B --> C{"Node found?"}
+    C -->|No| D["Return []"]
+    C -->|Yes| E["DFS from node<br/>collect all words"]
+    
+    E --> F{"At current node:"}
+    F --> G{"is_end = True?"}
+    G -->|Yes| H["Add to results<br/>prefix + path"]
+    G -->|No| I["Continue"]
+    
+    H --> J{"More children?"}
+    I --> J
+    J -->|Yes| K["DFS each child<br/>append char"]
+    J -->|No| L["Backtrack"]
+    
+    K --> F
+    L --> M{"More siblings?"}
+    M -->|Yes| K
+    M -->|No| N["Done<br/>✓ Return results"]
+    
+    style N fill:#90EE90
+    style D fill:#FFB6C1
+```
+
+### Trie Memory vs Speed Trade-off
+
+```mermaid
+graph TD
+    A["Choose Trie implementation"] --> B{"Priority?"}
+    
+    B -->|Speed<br/>Frequent lookups| C["Array of 26<br/>children[26]<br/>O(1) per char"]
+    B -->|Memory<br/>Many small words| D["HashMap<br/>children = {}<br/>O(1) dict lookup"]
+    B -->|Unicode support<br/>Not just A-Z| E["HashMap required<br/>Flexible keys"]
+    
+    C --> F["Fast: O(1) access<br/>Space: 26 * nodes"]
+    D --> G["Moderate: Dict lookup<br/>Space: Only used"]
+    E --> H["Flexible: Any char<br/>Space: Minimal"]
+    
+    F --> I["Use when<br/>few distinct chars"]
+    D --> J["Use when<br/>sparse alphabet"]
+    
+    style C fill:#90EE90
+    style D fill:#FFB6C1
+    style E fill:#FFD700
+```
+
+---
+
 ## Visualization
 
 ### Structure After Inserting: "apple", "app", "apt", "bat", "ball"

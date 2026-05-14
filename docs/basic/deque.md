@@ -21,6 +21,53 @@ Deque  =   full two-ended access
 
 ---
 
+## When to Use: Deque Problem Recognition
+
+```mermaid
+graph TD
+    PROB["Analyzing problem"]
+    
+    PROB --> P1["Sliding window<br/>maximum/minimum?"]
+    PROB --> P2["Shortest path with<br/>0-1 weights?"]
+    PROB --> P3["Palindrome check?"]
+    PROB --> P4["Need both stack<br/>AND queue behavior?"]
+    
+    P1 -->|YES| USE1["→ Deque!<br/>Monotonic deque<br/>O(n) solution"]
+    P2 -->|YES| USE2["→ Deque!<br/>0-1 BFS<br/>0 to front, 1 to rear"]
+    P3 -->|YES| USE3["→ Deque!<br/>Compare both ends<br/>O(n) check"]
+    P4 -->|YES| USE4["→ Deque!<br/>Flexible both ends<br/>superset of both"]
+    
+    PROB --> P5["Jump Game or<br/>DP optimization?"]
+    P5 -->|YES| USE5["→ Deque!<br/>Monotonic for<br/>max/min in range"]
+    
+    P1 -->|NO| NEXT1["Continue..."]
+    P2 -->|NO| NEXT2["Continue..."]
+    P3 -->|NO| NEXT3["Continue..."]
+    P4 -->|NO| NEXT4["Continue..."]
+    P5 -->|NO| NEXT5["Continue..."]
+    
+    NEXT1 --> NONE["Not a deque<br/>problem"]
+    NEXT2 --> NONE
+    NEXT3 --> NONE
+    NEXT4 --> NONE
+    NEXT5 --> NONE
+    
+    style PROB fill:#FFA500
+    style P1 fill:#FFA500
+    style P2 fill:#FFA500
+    style P3 fill:#FFA500
+    style P4 fill:#FFA500
+    style P5 fill:#FFA500
+    style USE1 fill:#87CEEB
+    style USE2 fill:#87CEEB
+    style USE3 fill:#87CEEB
+    style USE4 fill:#87CEEB
+    style USE5 fill:#87CEEB
+    style NONE fill:#FFB6C6
+```
+
+---
+
 ## Visualization
 
 ### Basic Deque Structure
@@ -112,6 +159,93 @@ Result: [3, 3, 5, 5, 6, 7]
 Invariant: deque front always holds the index of the window's maximum.
            Deque values are DECREASING from front to rear.
            Front index is expired if: index <= i - k  → removeFront
+```
+
+### Monotonic Deque Operation Flowchart
+
+```mermaid
+graph TD
+    MONO["Sliding window max<br/>using deque"]
+    
+    MONO --> STEP1["For each element<br/>at index i"]
+    
+    STEP1 --> STEP2["Remove expired<br/>from FRONT"]
+    STEP2 -->|Check| EXPIRED["deque[0] <= i-k?"]
+    EXPIRED -->|YES| REMOVE_F["Remove front<br/>outdated"]
+    EXPIRED -->|NO| STEP3
+    REMOVE_F --> STEP3
+    
+    STEP3["Remove smaller<br/>from REAR"]
+    STEP3 -->|Check| SMALLER["arr[deque[-1]]<br/>< arr[i]?"]
+    SMALLER -->|YES| REMOVE_R["Remove rear<br/>never be max"]
+    SMALLER -->|NO| STEP4
+    REMOVE_R --> STEP3
+    
+    STEP4["Add current<br/>to REAR"]
+    STEP4 --> APPEND["deque.append(i)"]
+    
+    APPEND --> STEP5["Window full?"]
+    STEP5 -->|YES| RECORD["Record<br/>deque[0] is max"]
+    STEP5 -->|NO| NEXT_I["Next element"]
+    
+    RECORD --> NEXT_I
+    NEXT_I --> STEP1
+    
+    STEP1 --> DONE["All elements<br/>processed"]
+    DONE --> END["Result: array<br/>of maximums"]
+    
+    style MONO fill:#FFA500
+    style STEP1 fill:#FFA500
+    style STEP2 fill:#FFA500
+    style STEP3 fill:#FFA500
+    style STEP4 fill:#87CEEB
+    style STEP5 fill:#FFA500
+    style REMOVE_F fill:#87CEEB
+    style REMOVE_R fill:#87CEEB
+    style APPEND fill:#87CEEB
+    style RECORD fill:#87CEEB
+    style END fill:#90EE90
+```
+
+### 0-1 BFS with Deque
+
+```mermaid
+graph TD
+    BFS01["0-1 BFS Algorithm"]
+    
+    BFS01 --> INIT["Initialize:<br/>deque = [start, 0]<br/>visited = {start}"]
+    
+    INIT --> LOOP["While deque<br/>NOT empty?"]
+    
+    LOOP -->|YES| POP["Pop from FRONT<br/>node, cost"]
+    LOOP -->|NO| END["Return result"]
+    
+    POP --> FOR_EACH["For each edge<br/>to neighbor"]
+    
+    FOR_EACH --> EDGE_CHK["Edge weight?"]
+    EDGE_CHK -->|0| ADD_F["Add to FRONT<br/>same cost level"]
+    EDGE_CHK -->|1| ADD_R["Add to REAR<br/>next cost level"]
+    
+    ADD_F --> CHK_VIS["Already visited?"]
+    ADD_R --> CHK_VIS
+    
+    CHK_VIS -->|YES| SKIP["Skip"]
+    CHK_VIS -->|NO| MARK["Mark visited<br/>enqueue"]
+    
+    MARK --> LOOP
+    SKIP --> LOOP
+    
+    style BFS01 fill:#FFA500
+    style INIT fill:#87CEEB
+    style LOOP fill:#FFA500
+    style POP fill:#87CEEB
+    style FOR_EACH fill:#FFA500
+    style EDGE_CHK fill:#FFA500
+    style ADD_F fill:#87CEEB
+    style ADD_R fill:#87CEEB
+    style CHK_VIS fill:#FFA500
+    style MARK fill:#87CEEB
+    style END fill:#90EE90
 ```
 
 ### Deque as Stack vs Queue
@@ -236,6 +370,53 @@ Use a monotonic deque to optimize DP transitions where you need the max/min over
 ```
 dp[i] = nums[i] + max(dp[j]) for j in [i-k, i-1]
 Use monotonic deque to get max(dp[j]) in O(1) instead of O(k)
+```
+
+---
+
+## Common Deque Mistakes
+
+```mermaid
+graph TD
+    START["Implementing<br/>deque solution"]
+    
+    START --> M1["Using Python list.pop(0)?"]
+    M1 -->|YES| E1["⚠️ O(n) operation!<br/>Always use deque<br/>with popleft()"]
+    M1 -->|NO| M2
+    
+    M2["Monotonic deque:<br/>removing wrong end?"]
+    M2 -->|YES| E2["❌ Logic broken<br/>Remove stale FRONT<br/>Remove smaller REAR"]
+    M2 -->|NO| M3
+    
+    M3["Window boundary<br/>check correct?"]
+    M3 -->|Off-by-one| E3["❌ Wrong answer<br/>deque[0] <= i-k (not <)<br/>or (i >= k-1)"]
+    M3 -->|Correct| M4
+    
+    M4["0-1 BFS:<br/>correct edge logic?"]
+    M4 -->|Swapped| E4["❌ Wrong order<br/>Cost 0 to FRONT<br/>Cost 1 to REAR"]
+    M4 -->|Correct| M5
+    
+    M5["Checking empty<br/>before pop?"]
+    M5 -->|NO| E5["❌ Underflow<br/>Always check<br/>!deque.empty()"]
+    M5 -->|YES| M6
+    
+    M6["Modular arithmetic<br/>in circular deque?"]
+    M6 -->|front - 1| E6["⚠️ Negative index<br/>Use (front-1+cap)%cap<br/>Add capacity first!"]
+    M6 -->|Correct| PASS["✓ Solution complete"]
+    
+    style M1 fill:#FFA500
+    style M2 fill:#FFA500
+    style M3 fill:#FFA500
+    style M4 fill:#FFA500
+    style M5 fill:#FFA500
+    style M6 fill:#FFA500
+    style E1 fill:#FFE4B5
+    style E2 fill:#FFB6C6
+    style E3 fill:#FFB6C6
+    style E4 fill:#FFB6C6
+    style E5 fill:#FFB6C6
+    style E6 fill:#FFE4B5
+    style PASS fill:#90EE90
 ```
 
 ---

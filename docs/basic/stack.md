@@ -14,6 +14,53 @@ A **Stack** is a linear data structure that follows the **LIFO** (Last In, First
 
 ---
 
+## When to Use: Stack Problem Recognition
+
+```mermaid
+graph TD
+    PROB["Analyzing<br/>problem statement"]
+    
+    PROB --> K1["Mentions:<br/>undo/redo?<br/>history?<br/>previous state?"]
+    PROB --> K2["Involves:<br/>nested structures?<br/>brackets?<br/>tags?"]
+    PROB --> K3["Asks to:<br/>reverse?<br/>process LIFO?"]
+    PROB --> K4["Tree/graph:<br/>DFS traversal?<br/>Iteratively?"]
+    
+    K1 -->|YES| USE1["→ Stack!<br/>Track state<br/>with LIFO"]
+    K2 -->|YES| USE2["→ Stack!<br/>Matching/validation<br/>Bracket matching"]
+    K3 -->|YES| USE3["→ Stack!<br/>Last-in-first-out<br/>natural fit"]
+    K4 -->|YES| USE4["→ Stack!<br/>Iterative DFS<br/>simulate recursion"]
+    
+    PROB --> K5["No stack hint?"]
+    K5 -->|Check for| K5a["Monotonic stack:<br/>next greater/smaller<br/>largest rectangle"]
+    K5a -->|YES| USE5["→ Stack!<br/>Maintain mono order<br/>O(n) solution"]
+    
+    K1 -->|NO| NEXT1["Continue..."]
+    K2 -->|NO| NEXT2["Continue..."]
+    K3 -->|NO| NEXT3["Continue..."]
+    K4 -->|NO| NEXT4["Continue..."]
+    
+    NEXT1 --> NONE["Not a stack<br/>problem"]
+    NEXT2 --> NONE
+    NEXT3 --> NONE
+    NEXT4 --> NONE
+    
+    style PROB fill:#FFA500
+    style K1 fill:#FFA500
+    style K2 fill:#FFA500
+    style K3 fill:#FFA500
+    style K4 fill:#FFA500
+    style K5 fill:#FFA500
+    style K5a fill:#FFA500
+    style USE1 fill:#87CEEB
+    style USE2 fill:#87CEEB
+    style USE3 fill:#87CEEB
+    style USE4 fill:#87CEEB
+    style USE5 fill:#87CEEB
+    style NONE fill:#FFB6C6
+```
+
+---
+
 ## Visualization
 
 ### Basic Stack Structure
@@ -125,6 +172,81 @@ Char  Action            Stack
  )    ) does NOT match {  → INVALID ✗
 ```
 
+### Stack Operation Flowchart
+
+```mermaid
+graph TD
+    OP["Stack operation?"]
+    
+    OP -->|Push| PUSH["Add to TOP"]
+    OP -->|Pop| POP["Remove from TOP"]
+    OP -->|Peek| PEEK["View TOP<br/>no removal"]
+    
+    PUSH --> PUSH1["Check capacity<br/>if array-based"]
+    PUSH1 -->|Full| PUSH_FULL["Error:<br/>Stack overflow"]
+    PUSH1 -->|Space| PUSH_OK["Append element<br/>size++<br/>O(1)"]
+    
+    POP --> POP1["Check if empty"]
+    POP1 -->|Empty| POP_EMPTY["Error:<br/>Stack underflow"]
+    POP1 -->|Has elements| POP_OK["Remove top<br/>size--<br/>O(1)"]
+    
+    PEEK --> PEEK1["Check if empty"]
+    PEEK1 -->|Empty| PEEK_EMPTY["Error:<br/>Empty stack"]
+    PEEK1 -->|Has elements| PEEK_OK["Return top<br/>No change<br/>O(1)"]
+    
+    POP_OK --> DONE["✓ Complete"]
+    PUSH_OK --> DONE
+    PEEK_OK --> DONE
+    
+    style OP fill:#FFA500
+    style PUSH fill:#FFA500
+    style POP fill:#FFA500
+    style PEEK fill:#FFA500
+    style PUSH1 fill:#FFA500
+    style POP1 fill:#FFA500
+    style PEEK1 fill:#FFA500
+    style PUSH_OK fill:#87CEEB
+    style POP_OK fill:#87CEEB
+    style PEEK_OK fill:#87CEEB
+    style PUSH_FULL fill:#FFB6C6
+    style POP_EMPTY fill:#FFB6C6
+    style PEEK_EMPTY fill:#FFB6C6
+```
+
+### Monotonic Stack Logic
+
+```mermaid
+graph TD
+    MONO["Building monotonic<br/>stack"]
+    
+    MONO --> M1["Maintain invariant:<br/>Elements in stack<br/>DECREASING (for NGE)"]
+    
+    M1 --> M2["For each element:"]
+    
+    M2 --> M3["While curr > top<br/>of stack?"]
+    M3 -->|YES| M4["Pop element<br/>Record: curr is<br/>next greater"]
+    M3 -->|NO| M5["Push curr"]
+    
+    M4 --> M4A["Still have stack<br/>& curr > new top?"]
+    M4A -->|YES| M4B["Pop again<br/>Repeat"]
+    M4A -->|NO| M5
+    
+    M5 --> M6["Move to<br/>next element"]
+    
+    M6 --> M7["After loop:<br/>Remaining elements<br/>have no NGE"]
+    
+    M7 --> DONE["✓ O(n) total<br/>Each element<br/>pushed/popped once"]
+    
+    style MONO fill:#FFA500
+    style M1 fill:#FFA500
+    style M2 fill:#FFA500
+    style M3 fill:#FFA500
+    style M4 fill:#87CEEB
+    style M5 fill:#87CEEB
+    style M4A fill:#FFA500
+    style DONE fill:#90EE90
+```
+
 ---
 
 ## Operations & Complexity
@@ -215,6 +337,53 @@ Main stack:  [3][5][2][1][4]
 Min stack:   [3][3][2][1][1]
               ↑ tracks running minimum at each push
 getMin() = min_stack.top() → O(1)
+```
+
+---
+
+## Common Stack Pitfalls
+
+```mermaid
+graph TD
+    START["Implementing<br/>stack solution"]
+    
+    START --> C1["Checking empty<br/>before pop()?"]
+    C1 -->|NO| E1["❌ Stack Underflow<br/>Crash on empty pop<br/>Always check!"]
+    C1 -->|YES| C2
+    
+    C2["Using correct<br/>data structure?"]
+    C2 -->|list.pop(0)| E2["⚠️ O(n) operation!<br/>Wrong end removed<br/>Use deque.popleft()"]
+    C2 -->|OK| C3
+    
+    C3["Bracket matching:<br/>checking TYPE?"]
+    C3 -->|Wrong| E3["❌ } doesn't<br/>match (<br/>Must match types"]
+    C3 -->|Correct| C4
+    
+    C4["Monotonic problem?"]
+    C4 -->|No handling| E4["⚠️ Suboptimal<br/>O(n²) nested loop<br/>Use monotonic O(n)"]
+    C4 -->|Handled| C5
+    
+    C5["Edge case:<br/>empty input?"]
+    C5 -->|Unchecked| E5["❌ Wrong answer<br/>Empty string is<br/>valid parentheses"]
+    C5 -->|Checked| C6
+    
+    C6["Remaining elements<br/>after loop?"]
+    C6 -->|Ignored| E6["❌ Wrong answer<br/>Remaining = no pair<br/>Handle separately"]
+    C6 -->|Handled| PASS["✓ Solution complete"]
+    
+    style C1 fill:#FFA500
+    style C2 fill:#FFA500
+    style C3 fill:#FFA500
+    style C4 fill:#FFA500
+    style C5 fill:#FFA500
+    style C6 fill:#FFA500
+    style E1 fill:#FFB6C6
+    style E2 fill:#FFE4B5
+    style E3 fill:#FFB6C6
+    style E4 fill:#FFE4B5
+    style E5 fill:#FFB6C6
+    style E6 fill:#FFB6C6
+    style PASS fill:#90EE90
 ```
 
 ---

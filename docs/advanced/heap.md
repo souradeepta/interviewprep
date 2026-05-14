@@ -14,6 +14,83 @@ A **Heap** is a complete binary tree stored as an array satisfying the heap prop
 
 ---
 
+## Flowcharts
+
+### When to Use Min Heap vs Max Heap
+
+```mermaid
+graph TD
+    A["Heap problem"] --> B{"What to extract?"}
+    
+    B -->|Smallest elements| C["Use Min Heap<br/>Root = minimum<br/>Default in most langs"]
+    B -->|Largest elements| D["Use Max Heap<br/>Root = maximum<br/>Negate in Python"]
+    
+    C --> E{"K largest or K smallest?"}
+    D --> F{"K largest or K smallest?"}
+    
+    E -->|K largest| G["Min heap size K<br/>Pop anything < min<br/>Answer = heap"]
+    E -->|K smallest| H["Push all<br/>Pop K times"]
+    
+    F -->|K largest| I["Max heap size K<br/>Pop anything > max<br/>Answer = heap"]
+    F -->|K smallest| J["Push all<br/>Pop K times"]
+    
+    G --> K["Keep heap size K<br/>Drop small elements"]
+    H --> L["Extract K smallest<br/>from full heap"]
+    I --> M["Keep heap size K<br/>Drop large elements"]
+    J --> N["Extract K largest<br/>from full heap"]
+    
+    style G fill:#90EE90
+    style H fill:#90EE90
+    style I fill:#FFB6C1
+    style J fill:#FFB6C1
+```
+
+### Heap Build vs Insert Decision
+
+```mermaid
+graph TD
+    A["Create heap from data"] --> B{"How much data<br/>available upfront?"}
+    
+    B -->|All at once| C["Build heap in O(n)<br/>heapify()"]
+    B -->|Streaming/unknown| D["Insert one by one<br/>O(n log n) total"]
+    
+    C --> E["More efficient<br/>Heapify from<br/>last non-leaf"]
+    D --> F["More flexible<br/>Add as data arrives"]
+    
+    C --> G["Use heapify()<br/>Bottom-up approach"]
+    D --> H["Use heappush()<br/>Each step O(log n)"]
+    
+    style E fill:#90EE90
+    style F fill:#FFB6C1
+```
+
+### Problem Pattern: Heap Application
+
+```mermaid
+graph TD
+    A["Heap problem"] --> B{"Problem type?"}
+    
+    B -->|K-th largest/smallest| C["Maintain heap size K"]
+    B -->|Merge K lists| D["Heap of list heads<br/>Pop min, push next"]
+    B -->|Median in stream| E["Two heaps<br/>Lower + Upper"]
+    B -->|Task scheduling| F["Max heap by priority<br/>Process by freq"]
+    B -->|Dijkstra/Prim| G["Min heap<br/>Greedy shortest"]
+    
+    C --> H["Time: O(n log k)<br/>Space: O(k)"]
+    D --> I["Time: O(n log k)<br/>k = # of lists"]
+    E --> J["Time: O(log n) per add<br/>Median: O(1)"]
+    F --> K["Time: O(n²)"]
+    G --> L["Time: O((V+E) log V)"]
+    
+    style C fill:#90EE90
+    style D fill:#90EE90
+    style E fill:#FFD700
+    style F fill:#FFB6C1
+    style G fill:#FFB6C1
+```
+
+---
+
 ## Visualization
 
 ### Array ↔ Tree Mapping

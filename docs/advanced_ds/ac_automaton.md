@@ -85,17 +85,125 @@ ushers  → detects "she" and "hers" (both present)
 
 ```mermaid
 flowchart TD
-    A["Problem: Multi-pattern matching in text"] -->|How many patterns?| B{Patterns count}
-    B -->|Single pattern| C["Use KMP<br/>O(n + m)"]
-    B -->|Multiple patterns| D["Aho-Corasick<br/>O(m + n + k)"]
-    D --> E["Step 1: Build trie<br/>from all patterns<br/>O(m)"]
-    E --> F["Step 2: Compute failure links<br/>BFS from root<br/>O(m)"]
-    F --> G["Step 3: Process text<br/>character by character"]
-    G --> H["For each character:<br/>follow transitions<br/>or failure links"]
-    H --> I["At each node check:<br/>is it a pattern end?<br/>or failure link reaches one?"]
-    I --> J["Record match if found"]
-    J --> K["Continue to next char"]
-    K --> L["Time: O(n)<br/>Total: O(m + n + k)"]
+    A["🎯 Problem: Multi-pattern matching in text"] -->|How many patterns?| B{Patterns count}
+    B -->|Single pattern| C["✓ Use KMP<br/>O(n + m)"]
+    B -->|Multiple patterns| D["✓ Aho-Corasick<br/>O(m + n + k)"]
+    D --> E["📋 Step 1: Build trie<br/>from all patterns<br/>O(m)"]
+    E --> F["🔗 Step 2: Compute failure links<br/>BFS from root<br/>O(m)"]
+    F --> G["▶ Step 3: Process text<br/>character by character"]
+    G --> H["🔍 For each character:<br/>follow transitions<br/>or failure links"]
+    H --> I{"Current node<br/>pattern end?"}
+    I -->|Yes| J["✓ Record match"]
+    I -->|No| K["Check failure link<br/>for pattern ends"]
+    K --> L{"Failure link<br/>reaches match?"}
+    L -->|Yes| M["✓ Record overlapping match"]
+    L -->|No| N["Continue"]
+    J --> O["Next character"]
+    M --> O
+    N --> O
+    O --> P["⏱ Time: O(n)<br/>Total: O(m + n + k)"]
+    
+    style A fill:#fff4e6
+    style C fill:#e3f2fd
+    style D fill:#e3f2fd
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style G fill:#f3e5f5
+    style J fill:#e8f5e9
+    style M fill:#e8f5e9
+    style P fill:#fff3e0
+```
+
+## Pattern Recognition Flowchart
+
+```mermaid
+flowchart TD
+    A["📊 Analyzing the string problem"] -->|What task?| B{Identify operation}
+    B -->|Find patterns in text| C{Multiple or overlapping?}
+    C -->|Single pattern| D["❌ Not Aho-Corasick<br/>Use KMP"]
+    C -->|Multiple patterns| E["✓ Potential AC match"]
+    B -->|Count occurrences| F["✓ AC can count<br/>per-pattern counters"]
+    B -->|Real-time scanning| G{Can preprocess?}
+    G -->|Yes| H["✓ AC ideal<br/>Precompile automaton<br/>Stream processing"]
+    G -->|No streaming| I["❌ Reconsider approach"]
+    B -->|Pattern with wildcards| J["⚠ AC needs modification<br/>Consider NFA or regex"]
+    B -->|Approximate match| K["❌ Not AC<br/>Use edit distance/Levenshtein"]
+    E --> L["✓ Continue with AC"]
+    F --> L
+    H --> L
+    
+    style A fill:#fff4e6
+    style E fill:#e8f5e9
+    style F fill:#e8f5e9
+    style H fill:#e8f5e9
+    style D fill:#ffebee
+    style I fill:#ffebee
+    style J fill:#fff3e0
+    style K fill:#ffebee
+    style L fill:#e3f2fd
+```
+
+## AC Automaton Building Flowchart
+
+```mermaid
+flowchart TD
+    A["🏗 Build AC Automaton"] --> B["Receive pattern set<br/>P = {p1, p2, ...}"]
+    B --> C["Step 1: Insert all patterns<br/>into trie"]
+    C --> D["Trie[i] = map of chars<br/>to child nodes<br/>O(Σmi)"]
+    D --> E["Step 2: Mark pattern ends<br/>is_end[node] = true<br/>for last char of each pattern"]
+    E --> F["Step 3: Compute failure links<br/>using BFS"]
+    F --> G{"At depth d=1:<br/>First char patterns"}
+    G -->|Direct children| H["failure[node] = root<br/>for all first-char nodes"]
+    H --> I["At depth d>1:<br/>Process in BFS order"]
+    I --> J["For node u with parent p"]
+    J --> K["parent_fail = failure[p]"]
+    K --> L["Follow parent_fail<br/>until found matching char<br/>or reach root"]
+    L --> M{"Found transition<br/>for u's char?"}
+    M -->|Yes| N["failure[u] = that node"]
+    M -->|No| O["failure[u] = root"]
+    N --> P["Continue BFS"]
+    O --> P
+    P --> Q{"All nodes<br/>processed?"}
+    Q -->|No| I
+    Q -->|Yes| R["✓ Automaton ready<br/>O(m·σ) space"]
+    
+    style A fill:#f3e5f5
+    style C fill:#f3e5f5
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style R fill:#e8f5e9
+```
+
+## Alternatives & Optimization Flowchart
+
+```mermaid
+flowchart TD
+    A["🤔 Choosing pattern matching approach"] --> B{Data characteristics?}
+    B -->|Single pattern| C{Pattern length?}
+    C -->|Short| D["✓ KMP<br/>O(n+m)"]
+    C -->|Very short| E["✓ Naive<br/>Overhead not justified"]
+    B -->|Multiple patterns| F{Pattern count?}
+    F -->|Few 2-5| G{Text size vs pattern?}
+    G -->|Small text| H["✓ Use KMP<br/>p times O(n+m)"]
+    G -->|Large text| I["✓ AC Automaton<br/>O(n+m+k)"]
+    F -->|Many 10+| J{All patterns<br/>in one text?}
+    J -->|Yes| K["✓ AC Automaton<br/>One pass"]
+    J -->|No streaming| L["✓ AC ideal<br/>Precompile, reuse"]
+    B -->|Overlapping analysis| M["✓ AC best<br/>Finds all overlaps"]
+    B -->|Edit/fuzzy match| N["❌ Not AC<br/>Use edit distance"]
+    
+    H --> O["Decision: AC better?"]
+    I --> O
+    K --> O
+    L --> O
+    O -->|Yes AC| P["AC Automaton"]
+    O -->|No| Q["Alternative method"]
+    
+    style A fill:#fff4e6
+    style P fill:#e8f5e9
+    style Q fill:#ffebee
+    style K fill:#e3f2fd
+    style I fill:#e3f2fd
 ```
 
 ## Common Patterns

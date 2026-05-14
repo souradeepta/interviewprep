@@ -13,6 +13,103 @@ A **Segment Tree** is a binary tree where each node stores information about a c
 
 ---
 
+## Flowcharts
+
+### When to Use Segment Tree vs Fenwick vs Sparse Table
+
+```mermaid
+graph TD
+    A["Range query + update problem"] --> B{"Operation type?"}
+    
+    B -->|Prefix sum<br/>Point update| C["Use Fenwick Tree<br/>Simpler, faster"]
+    B -->|Min/Max/GCD<br/>Point update| D["Use Segment Tree"]
+    B -->|Range add<br/>Range sum| E["Segment Tree<br/>Lazy propagation"]
+    B -->|Static queries<br/>No updates| F["Sparse Table<br/>Precompute<br/>O(1) query"]
+    
+    C --> G["Fenwick: O(log n)<br/>Less code"]
+    D --> H["Seg Tree: Flexible<br/>Any associative op"]
+    E --> I["Lazy: Update range<br/>in O(log n)"]
+    F --> J["Sparse: Build O(n log n)<br/>Query O(1)"]
+    
+    style C fill:#90EE90
+    style D fill:#FFB6C1
+    style E fill:#FFD700
+    style F fill:#87CEEB
+```
+
+### Segment Tree Query Decision
+
+```mermaid
+graph TD
+    A["Segment Tree query"] --> B["Query range [L,R]"]
+    B --> C["Query node [start,end]"]
+    C --> D{"Overlap with [L,R]?"}
+    
+    D -->|No overlap| E["Return identity<br/>0 for sum<br/>INF for min"]
+    D -->|Full overlap<br/>start,end in [L,R]| F["Return node value<br/>No recursion"]
+    D -->|Partial overlap| G["Recurse left child"]
+    
+    G --> H["Recurse right child"]
+    H --> I["Merge results"]
+    I --> J["Return merged"]
+    
+    E --> K["Optimization: Early exit<br/>if no overlap"]
+    F --> L["Optimization: Don't<br/>recurse if contained"]
+    
+    style K fill:#90EE90
+    style L fill:#90EE90
+```
+
+### Segment Tree Update with Lazy Propagation
+
+```mermaid
+graph TD
+    A["Segment Tree range update"] --> B["Update range [L,R]<br/>with value V"]
+    B --> C["At node [start,end]"]
+    C --> D{"Overlap?"}
+    
+    D -->|No overlap| E["Return"]
+    D -->|Full overlap| F["tree[node] += V<br/>* range_size"]
+    F --> G["lazy[node] += V<br/>Mark pending"]
+    G --> H["Return"]
+    
+    D -->|Partial overlap| I["Push lazy to children<br/>_push_down()"]
+    I --> J["Update left child"]
+    J --> K["Update right child"]
+    K --> L["Recalculate node"]
+    L --> M["Return"]
+    
+    I --> N["If lazy[node] > 0:<br/>Propagate to children"]
+    
+    style F fill:#87CEEB
+    style G fill:#87CEEB
+    style N fill:#FFB6C1
+```
+
+### Segment Tree Problem Pattern
+
+```mermaid
+graph TD
+    A["Segment Tree problem"] --> B{"What's needed?"}
+    
+    B -->|Sum range, update point| C["Standard Seg Tree<br/>No lazy needed"]
+    B -->|Min range, update point| D["Segment Tree<br/>Change + to min"]
+    B -->|Sum range, update range| E["Lazy Propagation<br/>Range updates"]
+    B -->|Multiple queries<br/>offline| F["Coordinate compress<br/>Merge sort tree"]
+    
+    C --> G["O(log n) query/update<br/>Simple build"]
+    D --> H["O(log n) all ops<br/>Just change merge"]
+    E --> I["O(log n) range ops<br/>Need lazy array"]
+    F --> J["Offline only<br/>Persistent tree"]
+    
+    style C fill:#90EE90
+    style D fill:#90EE90
+    style E fill:#FFD700
+    style F fill:#87CEEB
+```
+
+---
+
 ## Visualization
 
 ### Array to Segment Tree (Range Sum)

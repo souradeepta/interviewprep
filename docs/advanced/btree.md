@@ -12,6 +12,84 @@ A **B-Tree** of order t (minimum degree) is a self-balancing search tree where e
 
 ---
 
+## Flowcharts
+
+### When to Use B-Tree vs AVL
+
+```mermaid
+graph TD
+    A["Need to store data?"] --> B{"Where does data live?"}
+    B -->|In RAM/Memory| C["Use BST/AVL/Red-Black<br/>Binary trees optimized<br/>for fast comparisons"]
+    B -->|On Disk/Database| D["Use B-Tree or B+ Tree<br/>Minimize disk I/O"]
+    
+    D --> E{"Single query or<br/>Range scan?"}
+    E -->|Single value lookup| F["B-Tree<br/>Data in all nodes"]
+    E -->|Range queries<br/>Sequential access| G["B+ Tree<br/>Data only in leaves<br/>Leaves linked"]
+    
+    C --> H["Height ~log(n)<br/>Each node = 1 comparison"]
+    F --> I["Height ~log_t(n)<br/>Each node = 1 disk read<br/>t-1 comparisons"]
+    G --> J["Height ~log_t(n)<br/>+linked leaf traversal"]
+    
+    H --> K["Example: n=1M, height~20"]
+    I --> L["Example: n=1M, t=1000, height~3"]
+    
+    style C fill:#90EE90
+    style G fill:#FFD700
+```
+
+### B-Tree Insertion & Node Split Decision
+
+```mermaid
+graph TD
+    A["Insert key into B-Tree"] --> B{"Is root full?<br/>Keys = 2t-1"}
+    B -->|Yes| C["Split root<br/>Create new root<br/>height++"]
+    B -->|No| D["Navigate to leaf"]
+    C --> D
+    D --> E["Leaf found, insert key<br/>in sorted order"]
+    E --> F{"Parent full?<br/>Keys = 2t-1"}
+    F -->|Yes| G["Split parent node<br/>Push median up"]
+    F -->|No| H["✓ Insertion complete"]
+    G --> I{"Grandparent full?"}
+    I -->|Yes| G
+    I -->|No| H
+    
+    style H fill:#90EE90
+    style G fill:#87CEEB
+```
+
+### B-Tree Deletion Decision Tree
+
+```mermaid
+graph TD
+    A["Delete key from B-Tree"] --> B["Search for key"]
+    B --> C{"Key location?"}
+    
+    C -->|In leaf node| D["Remove key<br/>Check if leaf valid"]
+    C -->|In internal node| E["Replace with predecessor<br/>or successor from child"]
+    
+    D --> F{"Leaf has >= t keys?"}
+    E --> G{"Child has >= t keys?"}
+    
+    F -->|Yes| H["✓ Simple removal"]
+    F -->|No, < t keys| I{"Sibling has > t-1?"}
+    
+    G -->|Yes| J["Borrow from sibling<br/>or merge if needed"]
+    G -->|No| K["Merge with sibling<br/>Recursively delete"]
+    
+    I -->|Yes, borrow| L["Rotate through parent<br/>Rebalance"]
+    I -->|No, merge| M["Merge with sibling<br/>Check parent validity"]
+    
+    H --> N["✓ Deletion complete"]
+    J --> N
+    K --> N
+    L --> N
+    M --> N
+    
+    style N fill:#90EE90
+```
+
+---
+
 ## Visualization
 
 ### B-Tree Structure (order t=2, max 3 keys per node)

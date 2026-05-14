@@ -13,6 +13,81 @@ A **Fenwick Tree** (also called a Binary Indexed Tree or BIT), invented by Peter
 
 ---
 
+## Flowcharts
+
+### When to Use Fenwick Tree vs Segment Tree
+
+```mermaid
+graph TD
+    A["Need range queries<br/>with updates?"] --> B{"What operation?"}
+    B -->|Prefix sum<br/>Point update| C["Use Fenwick Tree<br/>O(log n) both<br/>Simpler code"]
+    B -->|Range update<br/>Range query| D["Use Segment Tree<br/>Lazy propagation<br/>O(log n) both"]
+    B -->|Min/Max<br/>Any operation| E["Use Segment Tree<br/>Can't do min/max<br/>with Fenwick"]
+    
+    C --> F["Pattern: sum, XOR,<br/>invertible operations"]
+    D --> G["Pattern: add range,<br/>max range"]
+    E --> H["Pattern: range min/max"]
+    
+    F --> I["Fenwick: 1-indexed<br/>lowbit = i & -i"]
+    G --> J["Segment Tree: easier<br/>for complex ops"]
+    H --> K["Segment Tree required<br/>non-invertible agg"]
+    
+    style C fill:#90EE90
+    style D fill:#FFB6C1
+    style E fill:#FFD700
+```
+
+### Fenwick Tree Query vs Update Path
+
+```mermaid
+graph TD
+    A["Operation on Fenwick Tree"] --> B{"Read or Write?"}
+    
+    B -->|Query: prefix_sum| C["Start at index i"]
+    B -->|Update: add to index| D["Start at index i"]
+    
+    C --> E["Add BIT[i]"]
+    E --> F["i = i - lowbit(i)"]
+    F --> G{"i > 0?"}
+    G -->|Yes| E
+    G -->|No| H["Return sum<br/>✓ Complete"]
+    
+    D --> I["BIT[i] += delta"]
+    I --> J["i = i + lowbit(i)"]
+    J --> K{"i <= n?"}
+    K -->|Yes| I
+    K -->|No| L["✓ Update complete<br/>All ancestors updated"]
+    
+    H --> M["Query path: subtract lowbit<br/>go left/up"]
+    L --> N["Update path: add lowbit<br/>go right/up to parents"]
+    
+    style H fill:#90EE90
+    style L fill:#90EE90
+    style M fill:#87CEEB
+    style N fill:#87CEEB
+```
+
+### Fenwick Tree Problem Pattern Recognition
+
+```mermaid
+graph TD
+    A["Array problem with<br/>queries + updates"] --> B{"Problem type?"}
+    
+    B -->|Count inversions| C["Process right to left<br/>Query < current<br/>Update current"]
+    B -->|Smaller after<br/>LC 315 style| D["Process right to left<br/>Query = how many<br/>of this value seen"]
+    B -->|2D prefix sum| E["Use 2D Fenwick<br/>Nested loops"]
+    B -->|Range add<br/>Point query| F["Use difference array<br/>Two Fenwick Trees"]
+    
+    C --> G["Fenwick efficient<br/>for inversion counting"]
+    D --> H["Coordinate compress<br/>values first"]
+    E --> I["BIT[i][j] for<br/>2D rectangles"]
+    F --> J["Difference technique<br/>avoids lazy update"]
+    
+    style A fill:#FFE4B5
+```
+
+---
+
 ## Visualization
 
 ### Structure and Responsibility Ranges

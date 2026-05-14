@@ -12,6 +12,91 @@ An **AVL Tree** (Adelson-Velsky and Landis, 1962) is a self-balancing BST where 
 
 ---
 
+## Flowcharts
+
+### When to Use AVL Tree
+
+```mermaid
+graph TD
+    A["Need self-balancing tree?"] -->|No, data fits in memory| B["Use regular BST"]
+    A -->|Yes, needs guaranteed balance| C{"Read-heavy or Write-heavy?"}
+    C -->|Read-heavy lookups dominate| D["Use AVL Tree<br/>(Stricter balance,<br/>faster reads)"]
+    C -->|Write-heavy, balanced ok| E["Use Red-Black Tree<br/>(Fewer rotations)"]
+    D --> F["Goal: O(log n) worst-case<br/>all operations"]
+    E --> G["Goal: Fewer rebalances<br/>better insert/delete"]
+    
+    style D fill:#90EE90
+    style E fill:#FFB6C1
+    style F fill:#87CEEB
+    style G fill:#87CEEB
+```
+
+### AVL Insertion & Rotation Decision Tree
+
+```mermaid
+graph TD
+    A["Insert node<br/>into AVL Tree"] --> B["Perform standard<br/>BST insertion"]
+    B --> C["Update height<br/>of parent nodes"]
+    C --> D["Calculate balance factor<br/>at each ancestor"]
+    D --> E{"Balance Factor<br/>in {-1, 0, 1}?"}
+    E -->|Yes| F["✓ Tree balanced<br/>No rotation needed"]
+    E -->|No| G{"BF = +2 or -2?"}
+    G -->|BF = +2<br/>Left-heavy| H{"Left child<br/>BF = +1?"}
+    G -->|BF = -2<br/>Right-heavy| I{"Right child<br/>BF = -1?"}
+    
+    H -->|Yes, LL case| J["Single Right Rotation"]
+    H -->|No, LR case| K["Left Rotate child<br/>then Right Rotate parent"]
+    
+    I -->|Yes, RR case| L["Single Left Rotation"]
+    I -->|No, RL case| M["Right Rotate child<br/>then Left Rotate parent"]
+    
+    J --> N["✓ Rebalanced"]
+    K --> N
+    L --> N
+    M --> N
+    N --> O["Continue up<br/>tree if needed"]
+    
+    style F fill:#90EE90
+    style J fill:#87CEEB
+    style K fill:#87CEEB
+    style L fill:#87CEEB
+    style M fill:#87CEEB
+    style N fill:#90EE90
+```
+
+### AVL Deletion Decision Tree
+
+```mermaid
+graph TD
+    A["Delete node<br/>from AVL Tree"] --> B["Find target node"]
+    B --> C{"Node found?"}
+    C -->|No| D["✓ Node not in tree"]
+    C -->|Yes| E{"How many children?"}
+    
+    E -->|0 children<br/>Leaf node| F["Remove node<br/>Update parent height"]
+    E -->|1 child| G["Replace with child<br/>Update parent height"]
+    E -->|2 children| H["Find inorder successor<br/>in right subtree"]
+    H --> I["Replace node value<br/>with successor value"]
+    I --> J["Recursively delete<br/>successor node"]
+    
+    F --> K["Check balance from<br/>parent upward"]
+    G --> K
+    J --> K
+    
+    K --> L{"Any ancestor<br/>unbalanced?"}
+    L -->|No| M["✓ Tree balanced"]
+    L -->|Yes| N["Apply rotation<br/>at that ancestor"]
+    N --> O["Continue checking<br/>ancestors upward"]
+    O --> P{"More unbalanced<br/>ancestors?"}
+    P -->|Yes| N
+    P -->|No| M
+    
+    style M fill:#90EE90
+    style N fill:#87CEEB
+```
+
+---
+
 ## Visualization
 
 ### Balance Factor

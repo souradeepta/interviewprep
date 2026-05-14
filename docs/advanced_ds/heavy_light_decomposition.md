@@ -89,20 +89,112 @@ Query path(u, v):
 
 ```mermaid
 flowchart TD
-    A["Problem: Tree path query/update"] -->|Query type?| B{What's on tree?}
-    B -->|Node values only| C["DFS preorder + segment tree<br/>No HLD needed"]
-    B -->|Edge weights<br/>Path updates| D["Heavy-Light Decomposition needed"]
-    D --> E["Preprocessing:<br/>1. DFS subtree sizes"]
-    E --> F["2. Assign chain IDs<br/>& positions in chain"]
-    F --> G["3. Build segment tree<br/>for each chain"]
-    G --> H["Choose query operation"]
-    H -->|Single path query| I["Find LCA<br/>split path by chains"]
-    H -->|Path range update| J["Update all chains<br/>on path from u to LCA<br/>to v to LCA"]
-    I --> K["For each chain:<br/>query segment tree<br/>for chain interval"]
-    J --> L["For each chain:<br/>update segment tree<br/>range"]
-    K --> M["Merge results<br/>from all chains"]
-    L --> M
-    M --> N["Time: O(log² n)<br/>Per operation"]
+    A["🎯 Problem: Tree path query/update"] -->|Query type?| B{What's on tree?}
+    B -->|Node values only<br/>subtree queries| C["❌ No HLD needed<br/>DFS preorder + segment tree"]
+    B -->|Edge weights<br/>path operations| D["✓ Heavy-Light Decomposition"]
+    D --> E["🏗 Preprocessing:<br/>1. DFS subtree sizes"]
+    E --> F["🔗 2. Assign chain IDs<br/>& positions in chain"]
+    F --> G["📋 3. Build segment tree<br/>for each chain"]
+    G --> H["📊 Identify query type"]
+    H -->|Single path query| I["🎯 Find LCA<br/>split path by chains"]
+    H -->|Path range update| J["🔄 Update all chains<br/>from u→LCA and v→LCA"]
+    H -->|Point update| K["Update single node<br/>on appropriate chain"]
+    I --> L["For each chain:<br/>query segment tree<br/>O(log n) per chain"]
+    J --> M["For each chain:<br/>range update segment tree<br/>with lazy propagation"]
+    K --> N["Update segment tree entry<br/>for single position"]
+    L --> O["Merge results<br/>from all chains<br/>O(log n) chains total"]
+    M --> O
+    N --> O
+    O --> P["✓ Time: O(log² n)<br/>Per operation"]
+    
+    style A fill:#fff4e6
+    style D fill:#e3f2fd
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style G fill:#f3e5f5
+    style P fill:#e8f5e9
+```
+
+## Tree Decomposition Decision Flowchart
+
+```mermaid
+flowchart TD
+    A["📊 Analyzing tree problem"] --> B{Problem structure?}
+    B -->|Subtree aggregation only| C["✓ DFS preorder<br/>+ segment tree<br/>O(log n)"]
+    B -->|Path queries/updates| D{Edge weights?}
+    D -->|No weights<br/>node values| E["✓ LCA with<br/>binary lifting<br/>O(log n)"]
+    D -->|Weighted edges<br/>complex queries| F{Path type?}
+    F -->|Simple path sums| G["✓ Heavy-Light HLD<br/>O(log² n)"]
+    F -->|Arbitrary trees<br/>reroot needed| H["✓ Link-Cut Trees<br/>O(log n)"]
+    B -->|All operations<br/>dynamic| I["✓ Link-Cut Trees<br/>or Centroid"]
+    B -->|Heavy/light<br/>analysis| J["✓ Heavy-Light HLD<br/>for decomposition<br/>structure analysis"]
+    C --> K["Choice depends on operation type"]
+    E --> K
+    G --> K
+    H --> K
+    I --> K
+    J --> K
+    
+    style A fill:#fff4e6
+    style C fill:#e8f5e9
+    style E fill:#e8f5e9
+    style G fill:#e8f5e9
+    style H fill:#e8f5e9
+    style I fill:#e8f5e9
+```
+
+## HLD Preprocessing & Chain Building Flowchart
+
+```mermaid
+flowchart TD
+    A["🏗 Heavy-Light Decomposition Preprocessing"] --> B["Input: Tree with n nodes"]
+    B --> C["Step 1: DFS calculate subtree sizes"]
+    C --> D["For each node u:<br/>subtree_size[u] =<br/>1 + sum children sizes"]
+    D --> E["Time: O(n)"]
+    E --> F["Step 2: Identify heavy children"]
+    F --> G["For each non-leaf node u:<br/>heavy_child[u] =<br/>child with max subtree_size"]
+    G --> H["Time: O(n)"]
+    H --> I["Step 3: DFS and assign chains"]
+    I --> J["DFS from root:<br/>when on heavy edge,<br/>continue same chain<br/>when on light edge,<br/>start new chain"]
+    J --> K["Assign chain_id[node]<br/>and position_in_chain[node]"]
+    K --> L["Time: O(n)"]
+    L --> M["Step 4: Build segment tree<br/>for each chain"]
+    M --> N["For each chain of length L:<br/>create segment tree<br/>indexed by position"]
+    N --> O["Total space: O(n)<br/>sum of all chains"]
+    O --> P["All preprocessing done<br/>Ready for queries"]
+    
+    style A fill:#f3e5f5
+    style C fill:#f3e5f5
+    style F fill:#f3e5f5
+    style I fill:#f3e5f5
+    style M fill:#f3e5f5
+    style P fill:#e8f5e9
+```
+
+## HLD Path Query vs Alternatives Flowchart
+
+```mermaid
+flowchart TD
+    A["🤔 Tree path operation analysis"] --> B{Operation frequency?}
+    B -->|Few queries<br/>naive ok| C["✓ Simple DFS/BFS<br/>O(n) per query<br/>total O(queries·n)"]
+    B -->|Many queries<br/>need fast| D{Query types?}
+    D -->|Point lookups<br/>or single vertex| E["✓ LCA + preprocessing<br/>O(log n)"]
+    D -->|Path aggregation| F{Can fit in memory?}
+    F -->|Memory abundant| G["✓ HLD<br/>O(log² n) per query<br/>O(n) space"]
+    F -->|Memory tight| H["✓ Link-Cut Trees<br/>O(log n) per query<br/>complex code"]
+    B -->|Dynamic changes<br/>reroot needed| I["✓ Link-Cut Trees<br/>O(log n) per operation<br/>handles rerooting"]
+    B -->|Offline queries| J["✓ Batch processing<br/>offline dynamic<br/>tree queries"]
+    C --> K["Decision"]
+    E --> K
+    G --> K
+    H --> K
+    I --> K
+    J --> K
+    K --> L["HLD is sweet spot:<br/>easier than Link-Cut Trees<br/>faster than naive<br/>good for CP"]
+    
+    style A fill:#fff4e6
+    style G fill:#e8f5e9
+    style L fill:#f3e5f5
 ```
 
 ## Common Patterns

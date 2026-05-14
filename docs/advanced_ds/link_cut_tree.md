@@ -92,20 +92,113 @@ Splay trees are restructured by access() to expose the path efficiently.
 
 ```mermaid
 flowchart TD
-    A["Problem: Dynamic tree with path queries"] -->|Operation type?| B{Add/remove edges?}
-    B -->|No, static tree| C["Use simple DFS/segment tree<br/>O(log n) per query"]
-    B -->|Yes, dynamic| D["Link-Cut Tree needed<br/>Amortized O(log n)"]
-    D --> E["Implement or use library<br/>Splay tree foundation"]
-    E --> F["Choose operation"]
-    F -->|Add edge u-v| G["call link u, v<br/>Make v parent of u"]
-    F -->|Remove edge u-v| H["call cut u, v<br/>Ensure u is parent"]
-    F -->|Query path u-v| I["access u<br/>access v<br/>query splay tree"]
-    G --> J["Verify u, v in different<br/>trees before link"]
-    H --> K["Verify u, v are<br/>adjacent before cut"]
-    I --> L["LCA automatically<br/>found during access"]
-    J --> M["Merge two trees<br/>O(log n) amortized"]
-    K --> N["Split tree at edge<br/>O(log n) amortized"]
-    L --> O["Path query result<br/>O(log n) amortized"]
+    A["🎯 Problem: Dynamic tree with path queries"] -->|Operation type?| B{Add/remove edges?}
+    B -->|No, static tree| C["❌ Not needed<br/>Use simple DFS/segment tree<br/>O(log n) per query"]
+    B -->|Yes, dynamic edges| D["✓ Link-Cut Tree<br/>Amortized O(log n)"]
+    D --> E["⚙ Implement or use library<br/>Splay tree foundation"]
+    E --> F["📋 Choose operation"]
+    F -->|Add edge u-v| G["🔗 call link(u, v)<br/>Make v parent of u"]
+    F -->|Remove edge u-v| H["✂ call cut(u, v)<br/>Ensure u is parent"]
+    F -->|Query path u-v| I["🔍 access(u)<br/>access(v)<br/>query splay tree"]
+    G --> J{"u, v in<br/>different<br/>trees?"}
+    J -->|Yes| M["✓ Merge two trees<br/>O(log n) amortized"]
+    J -->|No| K["❌ Can't link<br/>already connected"]
+    H --> L{"u, v<br/>adjacent?"}
+    L -->|Yes| N["✓ Split tree at edge<br/>O(log n) amortized"]
+    L -->|No| O["❌ Can't cut<br/>non-adjacent"]
+    I --> P["✓ LCA found<br/>during access<br/>Path query result"]
+    
+    style A fill:#fff4e6
+    style D fill:#e3f2fd
+    style E fill:#f3e5f5
+    style F fill:#f3e5f5
+    style M fill:#e8f5e9
+    style N fill:#e8f5e9
+    style P fill:#e8f5e9
+    style K fill:#ffebee
+    style O fill:#ffebee
+```
+
+## Dynamic Tree Operation Selection Flowchart
+
+```mermaid
+flowchart TD
+    A["📊 Dynamic tree problem analysis"] --> B{Operation mix?}
+    B -->|Mostly static<br/>few changes| C["❌ LCT overkill<br/>use simpler struct"]
+    B -->|Many path queries<br/>few edge changes| D{Query type?}
+    D -->|Connectivity only| E["✓ Union-Find<br/>O(α(n))"]
+    D -->|Path aggregation| F["✓ HLD<br/>O(log² n)<br/>simpler"]
+    B -->|Many edge changes<br/>many path queries| G["✓ Link-Cut Tree<br/>O(log n)<br/>optimal"]
+    B -->|Reroot needed<br/>arbitrary tree ops| H["✓ LCT with<br/>rerooting support"]
+    B -->|Weighted edges<br/>dynamic MST| I["✓ LCT<br/>track max edge<br/>on path"]
+    C --> J["Decision"]
+    E --> J
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+    
+    style A fill:#fff4e6
+    style G fill:#e8f5e9
+    style H fill:#e8f5e9
+    style I fill:#e8f5e9
+    style E fill:#e3f2fd
+    style F fill:#e3f2fd
+```
+
+## Link-Cut Tree Core Operations Flowchart
+
+```mermaid
+flowchart TD
+    A["🏗 Link-Cut Tree Operations"] --> B["Foundation: splay trees<br/>with preferred path decomposition"]
+    B --> C["Key operation: access(v)"]
+    C --> D["Goal: expose path from v to root<br/>in a single splay tree"]
+    D --> E["Step 1: Splay(v)<br/>bring v to root of its splay tree"]
+    E --> F["Step 2: Cut preferred child edge<br/>if v has one"]
+    F --> G["Step 3: Follow parent pointer<br/>to parent splay tree"]
+    G --> H{"Reached<br/>root of<br/>forest?"}
+    H -->|No| I["Step 4: Splay in parent tree<br/>and continue recursion"]
+    I --> E
+    H -->|Yes| J["✓ Complete path exposed<br/>v is now root of splay tree<br/>containing full path"]
+    J --> K["Now can query/update<br/>on this splay tree"]
+    K --> L["After query: splayed structure<br/>updated by splay ops"]
+    L --> M["link(u,v): access(u)<br/>set v as parent<br/>O(log n)"]
+    L --> N["cut(u,v): access(u)<br/>remove right child<br/>disconnect v<br/>O(log n)"]
+    L --> O["path_query(u,v):<br/>access(u), access(v)<br/>query splay tree<br/>O(log n)"]
+    
+    style A fill:#f3e5f5
+    style C fill:#f3e5f5
+    style J fill:#e8f5e9
+    style M fill:#e8f5e9
+    style N fill:#e8f5e9
+    style O fill:#e8f5e9
+```
+
+## LCT vs HLD vs Union-Find Flowchart
+
+```mermaid
+flowchart TD
+    A["🤔 Choosing dynamic structure"] --> B{Problem type?}
+    B -->|Connectivity only<br/>no path queries| C["✓ Union-Find<br/>O(α(n))<br/>very simple"]
+    B -->|Static tree<br/>path queries| D["✓ LCA preprocessing<br/>O(log n)<br/>simple"]
+    B -->|Dynamic edges<br/>path queries| E{Time critical?}
+    E -->|Need O(log n)| F["✓ Link-Cut Tree<br/>complex code<br/>O(log n) amortized"]
+    E -->|O(log² n) ok| G["✓ Heavy-Light HLD<br/>easier to code<br/>O(log² n)"]
+    B -->|Reroot operations<br/>arbitrary modifications| H["✓ LCT<br/>or virtual tree<br/>more flexible"]
+    B -->|Subtree operations<br/>not path queries| I["❌ Not right family<br/>use Centroid decomposition<br/>or DFS ordering"]
+    C --> J["Trade-offs"]
+    D --> J
+    F --> J
+    G --> J
+    H --> J
+    J --> K["LCT pros: fastest<br/>LCT cons: hardest to code<br/>HLD: middle ground<br/>Union-Find: simplest"]
+    
+    style A fill:#fff4e6
+    style C fill:#e8f5e9
+    style F fill:#e8f5e9
+    style G fill:#e8f5e9
+    style H fill:#e8f5e9
+    style K fill:#f3e5f5
 ```
 
 ## Common Patterns

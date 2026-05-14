@@ -13,7 +13,7 @@ This guide covers fundamental, intermediate, and advanced data structures to hel
 
 ---
 
-## Main Decision Flowchart
+## Main Decision Flowchart (Comprehensive)
 
 ```mermaid
 graph TD
@@ -26,71 +26,361 @@ graph TD
     B -->|Network/Graph data| G["What graph operations?"]
     B -->|String data| H["Pattern matching needed?"]
     B -->|Range queries| I["Static or dynamic data?"]
-    B -->|Exact duplicates OK| J["Do you need probability?"]
+    B -->|Membership testing| J["False positives acceptable?"]
+    B -->|Caching/Eviction| K["Eviction policy?"]
     
-    C -->|Fast lookup| K{"Insertion/deletion needed?"}
-    C -->|Insertion/Deletion critical| L["Do you need sorted order?"]
+    C -->|Fast lookup| L["Insertion/deletion?"]
+    C -->|Update frequency high| M["Sorted needed?"]
+    C -->|Sparse data| N["Use Hash variant"]
     
-    K -->|Minimal updates| M["Use HashMap"]
-    K -->|Frequent updates| L
+    L -->|Minimal| O["Use HashMap"]
+    L -->|Frequent| M
     
-    L -->|Yes, sorted| N["Use TreeMap<br/>or BST"]
-    L -->|No, fast ops| M
+    M -->|Yes| P["Use TreeMap/BST"]
+    M -->|No| O
     
-    D -->|Yes, balanced| O["Insertion freq?"]
-    D -->|No, array OK| P["Use Sorted Array"]
+    D -->|Yes, balanced| Q["Insertion frequency?"]
+    D -->|No, static array| R["Use Sorted Array"]
     
-    O -->|Very frequent| Q["Use AVL Tree<br/>or Red-Black Tree"]
-    O -->|Moderate| R["Use BST<br/>or Skip List"]
+    Q -->|Very high| S["Use AVL Tree"]
+    Q -->|Moderate| T["Use Red-Black Tree"]
+    Q -->|Few ops| U["Use Skip List"]
     
-    E -->|Min priority| S["Use Min Heap"]
-    E -->|Max priority| T["Use Max Heap"]
+    E -->|Min priority| V["Size bounded?"]
+    E -->|Max priority| W["Size bounded?"]
     
-    F -->|Search in tree| U["Need all traversals?"]
-    F -->|Special structure| V["Use appropriate<br/>Tree variant"]
+    V -->|Yes, use k-heap| X["Use Min Heap<br/>size k"]
+    V -->|No, dynamic| Y["Use Min Heap"]
     
-    U -->|Yes| W["Use BST or AVL"]
-    U -->|Only sorted| X["Use Trie for<br/>autocomplete"]
+    W -->|Yes, use k-heap| Z["Use Max Heap<br/>size k"]
+    W -->|No, dynamic| AA["Use Max Heap"]
     
-    G -->|Shortest path| Y["Weighted edges?"]
-    G -->|Connected components| Z["Use Union Find"]
-    G -->|Cycle detection| AA["Use Graph +<br/>DFS/BFS"]
-    G -->|DAG traversal| AB["Use Topological<br/>Sort + DP"]
+    F -->|Binary search tree| AB["Self-balance?"]
+    F -->|N-ary tree| AC["Use N-ary Tree"]
+    F -->|Weighted tree| AD["Use Segment/BIT"]
     
-    Y -->|Yes| AC["Use Dijkstra's<br/>or Bellman-Ford"]
-    Y -->|No| AD["Use BFS"]
+    AB -->|Yes| AE["Use AVL or RB"]
+    AB -->|No| AF["Use BST"]
     
-    H -->|Prefix matching| AE["Use Trie"]
-    H -->|Full text search| AF["Use Trie or<br/>KMP/Rabin-Karp"]
-    H -->|Substring matching| AG["Use KMP or<br/>Rabin-Karp or<br/>Suffix Tree"]
+    G -->|Shortest path| AG["Weighted?"]
+    G -->|Connected components| AH["Use Union Find"]
+    G -->|Cycle detection| AI["Directed?"]
+    G -->|MST| AJ["Dense or sparse?"]
+    G -->|All-pairs distance| AK["Use Floyd-Warshall"]
+    G -->|Topological sort| AL["Use DAG+DFS"]
     
-    I -->|Static| AH["Use Sparse Table<br/>or Precompute"]
-    I -->|Dynamic| AI["Point updates?"]
+    AG -->|Yes, all non-negative| AM["Use Dijkstra"]
+    AG -->|Negative weights| AN["Use Bellman-Ford"]
+    AG -->|No weights| AO["Use BFS"]
     
-    AI -->|Yes| AJ["Use Segment Tree<br/>or Fenwick Tree"]
-    AI -->|Range updates| AK["Use Lazy Segment Tree"]
+    AI -->|Yes| AP["Use DFS recursion"]
+    AI -->|No| AQ["Use Union Find"]
     
-    J -->|Set membership| AL["Use Bloom Filter"]
-    J -->|Frequency counts| AM["Use HashMap"]
+    AJ -->|Dense| AR["Use Prim"]
+    AJ -->|Sparse| AS["Use Kruskal"]
     
-    M --> BA["✓ HashMap<br/>O(1) avg lookup<br/>O(n) worst case"]
-    N --> BA
-    P --> BB["✓ Sorted Array<br/>O(n log n) sort<br/>O(log n) search<br/>O(n) insert/delete"]
-    Q --> BC["✓ AVL/RB Tree<br/>O(log n) all ops<br/>Self-balancing"]
-    R --> BD["✓ BST/Skip List<br/>O(log n) expected<br/>Easier to implement"]
-    S --> BE["✓ Min Heap<br/>O(1) peek min<br/>O(log n) insert/remove"]
-    T --> BF["✓ Max Heap<br/>O(1) peek max<br/>O(log n) insert/remove"]
-    W --> BG["✓ BST/AVL Tree<br/>All tree ops<br/>In-order traversal"]
-    X --> BH["✓ Trie<br/>O(m) per operation<br/>m = string length"]
-    Z --> BI["✓ Union Find<br/>Nearly O(1) per op<br/>With path compression"]
-    AA --> BJ["✓ KMP/Rabin-Karp<br/>O(n+m) or O(n)<br/>No preprocessing"]
-    AC --> BK["✓ Dijkstra's<br/>O((V+E)logV)<br/>Non-negative weights"]
-    AD --> BL["✓ BFS<br/>O(V+E)<br/>Unweighted graphs"]
-    AE --> BM["✓ Trie<br/>O(m) insert/search<br/>Memory intensive"]
-    AH --> BN["✓ Sparse Table<br/>O(1) query<br/>No updates"]
-    AJ --> BO["✓ Segment Tree<br/>O(log n) per op<br/>Complex code"]
-    AK --> BP["✓ Lazy Segment Tree<br/>O(log n) per op<br/>Handles range updates"]
-    AL --> BQ["✓ Bloom Filter<br/>O(k) operations<br/>No false negatives"]
+    H -->|Prefix matching| AT["Use Trie"]
+    H -->|Single pattern| AU["Use KMP"]
+    H -->|Multiple patterns| AV["Use Aho-Corasick"]
+    H -->|Substring search| AW["Pattern in text?"]
+    H -->|Longest palindrome| AX["Use Manacher"]
+    
+    AW -->|Single| AU
+    AW -->|Many| AV
+    AW -->|Indexed| AY["Use Suffix Tree"]
+    
+    I -->|Static, range query| AZ["Use Sparse Table"]
+    I -->|Point updates| BA["Use Segment Tree"]
+    I -->|Range updates| BB["Use Lazy Segment Tree"]
+    I -->|Simple sums| BC["Use Fenwick Tree"]
+    
+    J -->|Yes, space critical| BD["Use Bloom Filter"]
+    J -->|No, exact needed| BE["Use HashMap"]
+    J -->|Ordered needed| BF["Use TreeSet"]
+    
+    K -->|LRU| BG["HashMap + DLL"]
+    K -->|LFU| BH["HashMap + Heap"]
+    K -->|TTL| BI["HashMap + Heap"]
+    K -->|FIFO| BJ["Use Queue"]
+    
+    O --> BK["✓ HashMap<br/>O(1) avg lookup<br/>O(n) worst"]
+    P --> BL["✓ TreeMap<br/>O(log n) all ops<br/>Sorted order"]
+    N --> BM["✓ Hash variant<br/>Perfect hashing<br/>Cuckoo hash"]
+    R --> BN["✓ Sorted Array<br/>O(log n) search<br/>O(n) insert/delete"]
+    S --> BO["✓ AVL Tree<br/>Strict balance<br/>More rotations"]
+    T --> BP["✓ RB Tree<br/>Flexible balance<br/>Fewer rotations"]
+    U --> BQ["✓ Skip List<br/>Probabilistic<br/>Easy implement"]
+    X --> BR["✓ Min K-Heap<br/>O(log k) insert<br/>O(k) space"]
+    Y --> BS["✓ Min Heap<br/>O(log n) ops<br/>O(n) space"]
+    Z --> BT["✓ Max K-Heap<br/>O(log k) insert<br/>O(k) space"]
+    AA --> BU["✓ Max Heap<br/>O(log n) ops<br/>O(n) space"]
+    AB --> BV["✓ BST<br/>O(log n) avg<br/>O(n) worst"]
+    AC --> BW["✓ N-ary Tree<br/>Multi-child<br/>DFS/BFS"]
+    AD --> BX["✓ Segment Tree<br/>Range operations<br/>O(log n) per"]
+    AE --> BY["✓ AVL/RB Tree<br/>Self-balancing<br/>Guaranteed O(log n)"]
+    AF --> BV
+    AM --> BZ["✓ Dijkstra<br/>Priority queue<br/>O(V+E)logV"]
+    AN --> CA["✓ Bellman-Ford<br/>Detects negatives<br/>O(VE)"]
+    AO --> CB["✓ BFS<br/>Level-order<br/>O(V+E)"]
+    AP --> CC["✓ DFS Stack<br/>Recursion<br/>O(V+E)"]
+    AQ --> CD["✓ Union Find<br/>Nearly O(1)<br/>Path compression"]
+    AR --> CE["✓ Prim Algo<br/>Priority queue<br/>O(E log V)"]
+    AS --> CF["✓ Kruskal Algo<br/>Sort edges<br/>O(E log E)"]
+    AT --> CG["✓ Trie<br/>O(m) per op<br/>m = length"]
+    AU --> CH["✓ KMP<br/>O(n+m) match<br/>No preprocess"]
+    AV --> CI["✓ Aho-Corasick<br/>O(n+m+z)<br/>z = matches"]
+    AY --> CJ["✓ Suffix Tree<br/>O(n) build<br/>Complex"]
+    AX --> CK["✓ Manacher<br/>O(n) palindrome<br/>Clever DP"]
+    AZ --> CL["✓ Sparse Table<br/>O(1) query<br/>O(n log n) space"]
+    BA --> CM["✓ Segment Tree<br/>O(log n) per op<br/>O(n) space"]
+    BB --> CN["✓ Lazy Segment<br/>Range updates<br/>O(log n) deferred"]
+    BC --> CO["✓ Fenwick Tree<br/>O(log n) per op<br/>Simpler code"]
+    BD --> CP["✓ Bloom Filter<br/>O(k) constant<br/>Space efficient"]
+    BE --> CQ["✓ HashMap<br/>Exact matching<br/>O(1) avg"]
+    BF --> CR["✓ TreeSet<br/>Sorted + fast<br/>O(log n) ops"]
+    BG --> CS["✓ HashMap+DLL<br/>O(1) all ops<br/>LRU order"]
+    BH --> CT["✓ HashMap+Heap<br/>O(1) access<br/>O(log n) evict"]
+    BI --> CU["✓ HashMap+Heap<br/>TTL tracking<br/>Time-based"]
+    BJ --> CV["✓ Queue<br/>FIFO order<br/>O(1) all"]
+
+    style A fill:#ff9999
+    style BK fill:#99ccff
+    style BL fill:#99ccff
+    style BN fill:#99ccff
+    style BO fill:#99ccff
+    style BP fill:#99ccff
+    style BQ fill:#99ccff
+    style BR fill:#99ccff
+    style BS fill:#99ccff
+    style BT fill:#99ccff
+    style BU fill:#99ccff
+    style BV fill:#99ccff
+    style BW fill:#99ccff
+    style BX fill:#99ccff
+    style BY fill:#99ccff
+    style BZ fill:#99ff99
+    style CA fill:#99ff99
+    style CB fill:#99ff99
+    style CC fill:#99ff99
+    style CD fill:#99ff99
+    style CE fill:#99ff99
+    style CF fill:#99ff99
+    style CG fill:#99ff99
+    style CH fill:#99ff99
+    style CI fill:#99ff99
+    style CJ fill:#99ff99
+    style CK fill:#99ff99
+    style CL fill:#99ff99
+    style CM fill:#99ff99
+    style CN fill:#99ff99
+    style CO fill:#99ff99
+    style CP fill:#99ff99
+    style CQ fill:#99ff99
+    style CR fill:#99ff99
+    style CS fill:#99ff99
+    style CT fill:#99ff99
+    style CU fill:#99ff99
+    style CV fill:#99ff99
+```
+
+---
+
+## Linear vs Hierarchical Data Structure Decision Tree
+
+```mermaid
+graph TD
+    A["Do you need sequential access?"] -->|Yes| B["Is ordering critical?"]
+    A -->|No| C["Need parent-child?"]
+    
+    B -->|FIFO order| D["Use Queue"]
+    B -->|LIFO order| E["Use Stack"]
+    B -->|Priority order| F["Use Heap"]
+    B -->|Sorted order| G["Use Sorted List"]
+    
+    C -->|Binary tree| H["Search tree?"]
+    C -->|General tree| I["Use N-ary Tree"]
+    C -->|Weighted tree| J["Use Segment Tree"]
+    C -->|No hierarchy| K["Use HashMap"]
+    
+    H -->|Yes, search| L["Self-balance?"]
+    H -->|No, just store| M["Use Binary Tree"]
+    
+    L -->|Strict| N["Use AVL Tree"]
+    L -->|Flexible| O["Use Red-Black"]
+    L -->|Random| P["Use Treap"]
+    
+    D --> Q["✓ Queue O(1) all ops"]
+    E --> R["✓ Stack O(1) all ops"]
+    F --> S["✓ Heap O(log n) ops"]
+    G --> T["✓ Sorted List O(n) insert"]
+    I --> U["✓ N-ary Tree flexible"]
+    J --> V["✓ Segment Tree range"]
+    K --> W["✓ HashMap O(1) lookup"]
+    M --> X["✓ Binary Tree flexible"]
+    N --> Y["✓ AVL strict balance"]
+    O --> Z["✓ RB-Tree flex balance"]
+    P --> AA["✓ Treap random"]
+    
+    style Q fill:#99ff99
+    style R fill:#99ff99
+    style S fill:#99ff99
+    style T fill:#99ff99
+    style U fill:#99ff99
+    style V fill:#99ff99
+    style W fill:#99ff99
+    style X fill:#99ff99
+    style Y fill:#99ff99
+    style Z fill:#99ff99
+    style AA fill:#99ff99
+```
+
+---
+
+## Sorted vs Unsorted Collections Decision Tree
+
+```mermaid
+graph TD
+    A["Do you need sorted order?"] -->|Yes| B["Insertion/deletion?"]
+    A -->|No| C["Need random access?"]
+    
+    B -->|Very frequent| D["Balance needed?"]
+    B -->|Moderate| E["Use BST"]
+    B -->|Rare| F["Use Sorted Array"]
+    
+    D -->|Yes| G["Use AVL/RB Tree"]
+    D -->|No| E
+    
+    C -->|Yes| H["Use Array"]
+    C -->|No| I["Use Linked List"]
+    
+    G --> J["✓ AVL/RB O(log n)"]
+    E --> K["✓ BST O(log n) avg"]
+    F --> L["✓ Sorted Array O(n) insert"]
+    H --> M["✓ Array O(1) random"]
+    I --> N["✓ Linked List O(n) search"]
+    
+    style J fill:#99ff99
+    style K fill:#99ff99
+    style L fill:#99ff99
+    style M fill:#99ff99
+    style N fill:#99ff99
+```
+
+---
+
+## Static vs Dynamic Structure Decision Tree
+
+```mermaid
+graph TD
+    A["Will data change?"] -->|No| B["Query type?"]
+    A -->|Yes| C["Update frequency?"]
+    
+    B -->|Range queries| D["Use Sparse Table"]
+    B -->|Single access| E["Use Array"]
+    B -->|Prefix match| F["Use Trie"]
+    
+    C -->|Point updates only| G["Use Segment Tree"]
+    C -->|Range updates| H["Use Lazy Segment"]
+    C -->|Frequency counts| I["Use Hash Map"]
+    C -->|Very frequent| J["Use dynamic array"]
+    
+    D --> K["✓ Sparse Table O(1)"]
+    E --> L["✓ Array O(1)"]
+    F --> M["✓ Trie O(m)"]
+    G --> N["✓ Segment Tree O(log n)"]
+    H --> O["✓ Lazy Segment O(log n)"]
+    I --> P["✓ HashMap O(1)"]
+    J --> Q["✓ Dynamic Array O(1) amort"]
+    
+    style K fill:#99ff99
+    style L fill:#99ff99
+    style M fill:#99ff99
+    style N fill:#99ff99
+    style O fill:#99ff99
+    style P fill:#99ff99
+    style Q fill:#99ff99
+```
+
+---
+
+## Memory Efficiency vs Speed Tradeoff Decision Tree
+
+```mermaid
+graph TD
+    A["What's your constraint?"] -->|Time critical| B["Use faster DS"]
+    A -->|Space critical| C["Use compact DS"]
+    A -->|Balanced| D["Use moderate DS"]
+    
+    B -->|Lookup| E["Use HashMap"]
+    B -->|Range query| F["Use Segment Tree"]
+    B -->|Sorted| G["Use BST"]
+    
+    C -->|Membership| H["Use Bloom Filter"]
+    C -->|Ordered| I["Use Compressed Trie"]
+    C -->|Unordered| J["Use Hash Set"]
+    
+    D -->|Lookup+Sort| K["Use TreeMap"]
+    D -->|Priority| L["Use Heap"]
+    D -->|Prefix| M["Use Trie"]
+    
+    E --> N["✓ HashMap fastest lookup"]
+    F --> O["✓ Segment Tree balanced"]
+    G --> P["✓ BST balanced"]
+    H --> Q["✓ Bloom Filter space efficient"]
+    I --> R["✓ Compressed Trie compact"]
+    J --> S["✓ Hash Set simple"]
+    K --> T["✓ TreeMap versatile"]
+    L --> U["✓ Heap simple"]
+    M --> V["✓ Trie structured"]
+    
+    style N fill:#99ff99
+    style O fill:#99ff99
+    style P fill:#99ff99
+    style Q fill:#99ff99
+    style R fill:#99ff99
+    style S fill:#99ff99
+    style T fill:#99ff99
+    style U fill:#99ff99
+    style V fill:#99ff99
+```
+
+---
+
+## Concurrency Requirements Decision Tree
+
+```mermaid
+graph TD
+    A["Multiple threads?"] -->|No| B["Use basic DS"]
+    A -->|Yes| C["Contention level?"]
+    
+    C -->|Low| D["Lock-based"]
+    C -->|High| E["Lock-free"]
+    C -->|Moderate| F["Hybrid"]
+    
+    D -->|Sorted| G["Synchronized TreeMap"]
+    D -->|Unordered| H["Synchronized HashMap"]
+    
+    E -->|Sorted| I["ConcurrentSkipListMap"]
+    E -->|Unordered| J["ConcurrentHashMap"]
+    
+    F -->|Segments| K["Segment locks"]
+    F -->|Striped| L["Striped locks"]
+    
+    B --> M["✓ Basic HashMap"]
+    G --> N["✓ Thread-safe sorted"]
+    H --> O["✓ Thread-safe unordered"]
+    I --> P["✓ Lock-free sorted"]
+    J --> Q["✓ Lock-free unordered"]
+    K --> R["✓ Segment locks"]
+    L --> S["✓ Striped locks"]
+    
+    style M fill:#99ff99
+    style N fill:#99ff99
+    style O fill:#99ff99
+    style P fill:#99ff99
+    style Q fill:#99ff99
+    style R fill:#99ff99
+    style S fill:#99ff99
 ```
 
 ---
@@ -134,31 +424,59 @@ graph TD
 ### Scenario 1: "I need fast lookup and insertion"
 **Example:** Design a cache with O(1) access and insertion.
 
-**Decision Tree:**
-- Need sorted order? No → Use **HashMap**
-  - Time: O(1) average case
-  - Space: O(n)
-  - Catch: No ordering, worst case O(n)
-- Need sorted order? Yes → Use **TreeMap / BST**
-  - Time: O(log n) per operation
-  - Space: O(n)
-  - Better: RedBlack Tree (fewer rotations)
+```mermaid
+graph TD
+    A["Need fast lookup<br/>and insertion?"] --> B["Need sorted order?"]
+    B -->|No| C{"Need<br/>LRU/LFU?"}
+    B -->|Yes| D["Use TreeMap"]
+    
+    C -->|LRU| E["HashMap +<br/>Doubly Linked List"]
+    C -->|LFU| F["HashMap +<br/>Frequency Map"]
+    C -->|No| G["Use HashMap"]
+    
+    D --> H["✓ TreeMap<br/>O(log n) all ops<br/>Sorted order"]
+    E --> I["✓ LRU Cache<br/>O(1) all ops<br/>Maintain recency"]
+    F --> J["✓ LFU Cache<br/>O(1) access<br/>O(log n) evict"]
+    G --> K["✓ HashMap<br/>O(1) avg lookup<br/>O(n) worst"]
+    
+    style H fill:#99ff99
+    style I fill:#99ff99
+    style J fill:#99ff99
+    style K fill:#99ff99
+```
 
 **Real Interview:** "Design an LRU Cache" → HashMap + Doubly Linked List
+- **When to use:** Need O(1) access, insertion, deletion with eviction
+- **Alternative:** LFU Cache uses frequency instead of recency
+- **Key insight:** Maintain both hash map (O(1) access) and linked list (O(1) reordering)
 
 ---
 
 ### Scenario 2: "I need to find the k-th largest element in a stream"
 **Example:** Real-time analytics receiving continuous data.
 
-**Decision Tree:**
-- Storing all elements? Too much memory. Use **Min Heap of size k**
-  - Maintain min-heap with k largest elements
-  - Insert: O(log k)
-  - Space: O(k) instead of O(n)
-  - Answer at heap top: O(1)
+```mermaid
+graph TD
+    A["Find k-th largest<br/>in stream?"] --> B["Store all elements?"]
+    B -->|No| C["Use Min Heap<br/>size k"]
+    B -->|Yes| D["Use Max Heap<br/>or sorted array"]
+    
+    C --> E["Add element:<br/>- If heap size < k: add<br/>- Else if elem > min: remove min, add"]
+    E --> F["Result: heap.top()"]
+    
+    D --> G["Store all: O(n) space<br/>Find kth: O(log n)"]
+    
+    F --> H["✓ Min K-Heap<br/>Insert: O(log k)<br/>Space: O(k)"]
+    G --> I["✓ Full Heap<br/>Insert: O(log n)<br/>Space: O(n)"]
+    
+    style H fill:#99ff99
+    style I fill:#99ff99
+```
 
 **Real Interview:** "Kth Largest Element in Stream" (LeetCode 703)
+- **When to use:** Continuous stream of data, want k-th largest
+- **Space optimization:** Use Min Heap of size k instead of storing all
+- **Time complexity:** O(log k) per insertion vs O(log n) if storing all
 
 ---
 

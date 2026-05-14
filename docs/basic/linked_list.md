@@ -17,6 +17,39 @@ A **Linked List** is a linear data structure where elements (nodes) are stored i
 
 ---
 
+## When to Use: Singly vs Doubly Decision
+
+```mermaid
+graph TD
+    Q["Do you need linked list?"]
+    
+    Q -->|No| A1["Use Array or<br/>HashMap instead"]
+    Q -->|Yes| Q2["Frequent deletions<br/>at known positions?"]
+    
+    A1 --> A1x["If you have<br/>index access"]
+    
+    Q2 -->|No, mostly insert/lookup| Singly["Singly Linked List"]
+    Q2 -->|Yes, bidirectional| Q3["Need backward<br/>traversal?"]
+    
+    Q3 -->|No| Singly2["Singly is OK"]
+    Q3 -->|Yes| Doubly["Doubly Linked List"]
+    
+    Singly --> S1["✓ Memory efficient<br/>1 pointer per node<br/>✗ Need prev for delete"]
+    Singly2 --> S2["✓ Simpler code<br/>✗ Can't go backward"]
+    
+    Doubly --> D1["✓ O(1) delete with ptr<br/>✓ Bidirectional<br/>✗ Extra pointer overhead"]
+    
+    style Q fill:#FFA500
+    style Q2 fill:#FFA500
+    style Q3 fill:#FFA500
+    style Singly fill:#87CEEB
+    style Singly2 fill:#87CEEB
+    style Doubly fill:#87CEEB
+    style A1 fill:#90EE90
+```
+
+---
+
 ## Visualization
 
 ### Singly Linked List
@@ -156,6 +189,56 @@ Step 5:  next=null, curr.next=[3], prev=[4], curr=null
 After:   head → [4|●] → [3|●] → [2|●] → [1|null]
 ```
 
+### Linked List Operation Decision Tree
+
+```mermaid
+graph TD
+    OP["What operation<br/>do you need?"]
+    
+    OP -->|Insert| INS["Where to insert?"]
+    OP -->|Delete| DEL["Where to delete?"]
+    OP -->|Search| SEARCH["Search by value<br/>or index?"]
+    OP -->|Traverse| TRAV["Need to visit<br/>all nodes?"]
+    
+    INS -->|At head| INS1["O(1):<br/>Update head ptr"]
+    INS -->|At tail| INS2{{"Have tail ptr?"}}
+    INS -->|At index| INS3["O(n):<br/>Traverse to idx-1"]
+    INS -->|After node| INS4["O(1):<br/>Rewire pointers"]
+    
+    INS2 -->|YES| INS2A["O(1):<br/>Append to tail"]
+    INS2 -->|NO| INS2B["O(n):<br/>Find tail first"]
+    
+    DEL -->|Head| DEL1["O(1):<br/>Update head"]
+    DEL -->|Tail| DEL2["O(n):<br/>Find new tail"]
+    DEL -->|By value| DEL3["O(n):<br/>Search + rewire"]
+    DEL -->|Given node ptr| DEL4{{"Singly or Doubly?"}}
+    
+    DEL4 -->|Singly| DEL4A["O(n):<br/>Need prev ptr"]
+    DEL4 -->|Doubly| DEL4B["O(1):<br/>Use prev/next"]
+    
+    SEARCH -->|By value| SEARCH1["O(n):<br/>Linear scan"]
+    SEARCH -->|By index| SEARCH2["O(n):<br/>Must traverse"]
+    
+    TRAV -->|Forward| TRAV1["O(n):<br/>Follow next ptrs"]
+    TRAV -->|Backward| TRAV2{{"Doubly linked?"}}
+    
+    TRAV2 -->|YES| TRAV2A["O(n):<br/>Follow prev ptrs"]
+    TRAV2 -->|NO| TRAV2B["Not possible<br/>Use recursion"]
+    
+    style OP fill:#FFA500
+    style INS fill:#FFA500
+    style DEL fill:#FFA500
+    style SEARCH fill:#FFA500
+    style TRAV fill:#FFA500
+    style INS2 fill:#FFA500
+    style DEL4 fill:#FFA500
+    style TRAV2 fill:#FFA500
+    style INS1 fill:#87CEEB
+    style INS4 fill:#87CEEB
+    style DEL4B fill:#87CEEB
+    style TRAV2A fill:#87CEEB
+```
+
 ---
 
 ## Operations & Complexity
@@ -279,6 +362,38 @@ With dummy head:
   dummy → [1] → [2] → [3] → null
   All deletions look the same: prev.next = curr.next
   Return dummy.next as the real head
+```
+
+---
+
+### Fast/Slow Pointers Pattern Recognition
+
+```mermaid
+graph TD
+    PROB["Problem hints<br/>at linked list ops"]
+    
+    PROB --> P1["Find middle<br/>of list?"]
+    PROB --> P2["Detect cycle?"]
+    PROB --> P3["Find kth from<br/>end?"]
+    PROB --> P4["Palindrome<br/>check?"]
+    
+    P1 --> P1A["Use fast/slow:<br/>slow moves 1x<br/>fast moves 2x<br/>When fast.next=null<br/>slow is middle"]
+    
+    P2 --> P2A["Use fast/slow:<br/>If they MEET<br/>→ cycle exists<br/>Floyd's algorithm"]
+    
+    P3 --> P3A["Use two pointers<br/>with k-step gap:<br/>Advance both until<br/>fast is at end<br/>slow is at k-from-end"]
+    
+    P4 --> P4A["Find middle +<br/>reverse second half +<br/>compare: palindrome!"]
+    
+    style PROB fill:#FFA500
+    style P1 fill:#FFA500
+    style P2 fill:#FFA500
+    style P3 fill:#FFA500
+    style P4 fill:#FFA500
+    style P1A fill:#87CEEB
+    style P2A fill:#87CEEB
+    style P3A fill:#87CEEB
+    style P4A fill:#87CEEB
 ```
 
 ---
