@@ -22,7 +22,7 @@ This comprehensive decision tree guides you to the right algorithm based on prob
 
 ```mermaid
 flowchart TD
-    Start(["🎯 START: Algorithm Selection<br/>Identify Problem Type"]) --> IsDP{{"Is this a<br/>DP Problem?"}}
+    Start(["START: Algorithm Selection<br/>Identify Problem Type"]) --> IsDP{{"Is this a<br/>DP Problem?"}}
     
     IsDP -->|Yes| DPType{{"What type of<br/>DP State?"}}
     IsDP -->|No| IsGraph{{"Is this a<br/>Graph Problem?"}}
@@ -51,8 +51,8 @@ flowchart TD
     GraphType -->|Flow Network| FlowType{{"Need<br/>minimum<br/>cost?"}}
     FlowType -->|Yes| MinCostFlow["Min Cost Max Flow<br/>Successive Shortest<br/>O(flow·E·log V)"]
     FlowType -->|No| MaxFlowAlgo{{"Graph<br/>density<br/>and size?"}}
-    MaxFlowAlgo -->|Dense or V small| Dinic["Dinic's Algorithm<br/>O(V²E)"]
-    MaxFlowAlgo -->|Sparse| PushRelabel["Push-Relabel<br/>O(V^3) or O(V²·sqrt(E))<br/>variants"]
+    MaxFlowAlgo -->|Dense or V small| Dinic["Dinic's Algorithm<br/>O(V^2E)"]
+    MaxFlowAlgo -->|Sparse| PushRelabel["Push-Relabel<br/>O(V^3) or O(V^2·sqrt(E))<br/>variants"]
     
     GraphType -->|Bipartite Matching| MatchSize{{"Size of<br/>bipartite<br/>set?"}}
     MatchSize -->|V ≤ 500| Hungarian["Hungarian Algorithm<br/>O(V^3)"]
@@ -76,7 +76,7 @@ flowchart TD
     
     GraphType -->|Articulation<br/>Points| ArticPt["Articulation Points<br/>& Bridges<br/>Tarjan/DFS O(V+E)"]
     
-    GraphType -->|Transitive Closure| TransClose["Transitive Closure<br/>Floyd-Warshall<br/>or bitwise O(V³/w)"]
+    GraphType -->|Transitive Closure| TransClose["Transitive Closure<br/>Floyd-Warshall<br/>or bitwise O(V^3/w)"]
     
     %% String Branch
     IsGraph -->|No| IsString{{"Is this a<br/>String Problem?"}}
@@ -97,8 +97,8 @@ flowchart TD
     SuffixStruct -->|LCP queries needed| SuffixTree["Suffix Tree<br/>O(n) build<br/>O(k) for k-length queries"]
     
     StringType -->|Palindromes| PalindType{{"All palindromes<br/>or just check?"}}
-    PalindType -->|All subpalindromes| Manacher["Manacher's Algorithm<br/>O(n) single pass<br/>find all palindromes"]
-    PalindType -->|Check/Longest| ManacherDP["Manacher or DP<br/>O(n) vs O(n^2)"]
+    PalindType -->|Check only| Manacher["Manacher's Algorithm<br/>O(n) single pass"]
+    PalindType -->|Find all/longest| ManacherDP["Manacher or DP<br/>O(n) vs O(n^2)"]
     
     %% Geometry Branch
     IsString -->|No| IsGeom{{"Is this a<br/>Geometry Problem?"}}
@@ -106,21 +106,22 @@ flowchart TD
     IsGeom -->|Yes| GeomType{{"What geometry<br/>problem?"}}
     
     GeomType -->|Convex Hull| HullPoints{{"Number of<br/>points?"}}
-    HullPoints -->|n ≤ 1000| GrahamScan["Graham Scan<br/>O(n log n)<br/>intuitive"]
-    HullPoints -->|Any| Andrews["Andrew's Algorithm<br/>O(n log n)<br/>robust, most stable"]
+    HullPoints -->|Small n ≤ 1000| GrahamScan["Graham Scan<br/>O(n log n) general"]
+    HullPoints -->|Any n| Andrews["Andrew's Monotone Chain<br/>O(n log n) robust"]
+    HullPoints -->|Already sorted| DivideConqPts["Divide & Conquer<br/>O(n log n) elegant"]
     
-    GeomType -->|Closest Pair| ClosestSize{{"Point set<br/>size?"}}
-    ClosestSize -->|n ≤ 10K| DivideConqPts["Divide & Conquer<br/>O(n log n)<br/>optimal worst-case"]
-    ClosestSize -->|n > 10K, 2D| KDTree["KD-Tree<br/>O(n) build<br/>O(log n) avg query"]
+    GeomType -->|Closest Pair| ClosestSize{{"Points<br/>distribution?"}}
+    ClosestSize -->|Random/Sorted| KDTree["KD-Tree<br/>O(n log n) build<br/>O(log n) query"]
+    ClosestSize -->|Incremental| LineIntersect["Line Sweep<br/>O(n log n) events"]
     
-    GeomType -->|Line Intersections| LineIntersect["Orientation Check<br/>O(1) per pair<br/>Robust algorithm"]
+    GeomType -->|Point Queries| PtInPoly{{"Point in<br/>polygon or<br/>intersection?"}}
+    PtInPoly -->|Containment| PtInPoly["Ray Casting<br/>O(n) per query"]
+    PtInPoly -->|Intersections| LineIntersect["Bentley-Ottmann<br/>O((n+k) log n)"]
     
-    GeomType -->|Point in Polygon| PtInPoly["Ray Casting<br/>O(n) per point<br/>Winding number"]
+    %% Misc Branch
+    IsGeom -->|No| IsMisc{{"Miscellaneous<br/>Optimization?"}}
     
-    %% Misc/Advanced DS
-    IsGeom -->|No| IsMisc{{"Is this a<br/>Heavy/Advanced<br/>Data Structure?"}}
-    
-    IsMisc -->|Yes| MiscType{{"Which pattern?"}}
+    IsMisc -->|Yes| MiscType{{"What type?"}}
     
     MiscType -->|Tree Path Queries| HeavyLight["Heavy-Light Decomposition<br/>O(log^2 V) per query<br/>+ O(log n) segment tree"]
     
