@@ -145,7 +145,12 @@ flowchart TD
     
     class Start,End startEnd
     class IsDP,DPType,IsMonotonic,GraphType,FlowType,MaxFlowAlgo,MatchSize,ConnType,PathType,SingleSource,NegWeight,StringType,PatternSize,MultiPat,SuffixStruct,PalindType,GeomType,HullPoints,ClosestSize,MiscType,IsGraph,IsString,IsGeom,IsMisc decision
-    class CHT,LiChao,DigitDP,TreeDP,SosDp,BitmaskDP,KnuthYao,DivideConq,StandardInt,Dinic,PushRelabel,MinCostFlow,Hungarian,HopcroftKarp,AugmentPath,TwoSAT,Tarjan,Bridges,DSU,Dijkstra,Johnson,FloydWar,BellmanF,ArticPt,TransClose,KMP,BoyerMoore,ZAlgo,AhoC,SuffixArr,SuffixTree,Manacher,ManacherDP,GrahamScan,Andrews,DivideConqPts,KDTree,LineIntersect,PtInPoly,HeavyLight,Mo,SqrtDecomp,QSelect,Huffman,Activity,Generic algorithm
+    class CHT,LiChao,DigitDP,TreeDP,SosDp,BitmaskDP,KnuthYao,DivideConq,StandardInt algorithm
+    class Dinic,PushRelabel,MinCostFlow,Hungarian,HopcroftKarp,AugmentPath,TwoSAT algorithm
+    class Tarjan,Bridges,DSU,Dijkstra,Johnson,FloydWar,BellmanF,ArticPt,TransClose algorithm
+    class KMP,BoyerMoore,ZAlgo,AhoC,SuffixArr,SuffixTree,Manacher,ManacherDP algorithm
+    class GrahamScan,Andrews,DivideConqPts,KDTree,LineIntersect,PtInPoly algorithm
+    class HeavyLight,Mo,SqrtDecomp,QSelect,Huffman,Activity,Generic algorithm
 ```
 
 ---
