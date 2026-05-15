@@ -143,7 +143,7 @@ graph TD
     BI --> CU["✓ HashMap+Heap<br/>TTL tracking<br/>Time-based"]
     BJ --> CV["✓ Queue<br/>FIFO order<br/>O(1) all"]
 
-    style A fill:#ff9999
+    style A fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
     style BK fill:#99ccff
     style BL fill:#99ccff
     style BN fill:#99ccff
@@ -158,29 +158,29 @@ graph TD
     style BW fill:#99ccff
     style BX fill:#99ccff
     style BY fill:#99ccff
-    style BZ fill:#99ff99
-    style CA fill:#99ff99
-    style CB fill:#99ff99
-    style CC fill:#99ff99
-    style CD fill:#99ff99
-    style CE fill:#99ff99
-    style CF fill:#99ff99
-    style CG fill:#99ff99
-    style CH fill:#99ff99
-    style CI fill:#99ff99
-    style CJ fill:#99ff99
-    style CK fill:#99ff99
-    style CL fill:#99ff99
-    style CM fill:#99ff99
-    style CN fill:#99ff99
-    style CO fill:#99ff99
-    style CP fill:#99ff99
-    style CQ fill:#99ff99
-    style CR fill:#99ff99
-    style CS fill:#99ff99
-    style CT fill:#99ff99
-    style CU fill:#99ff99
-    style CV fill:#99ff99
+    style BZ fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CA fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CB fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CC fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CD fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CE fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CF fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CG fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CH fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CI fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CJ fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CK fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CL fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CM fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CN fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CO fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CP fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CQ fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CR fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CS fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CT fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CU fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style CV fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -221,17 +221,17 @@ graph TD
     O --> Z["✓ RB-Tree flex balance"]
     P --> AA["✓ Treap random"]
     
-    style Q fill:#99ff99
-    style R fill:#99ff99
-    style S fill:#99ff99
-    style T fill:#99ff99
-    style U fill:#99ff99
-    style V fill:#99ff99
-    style W fill:#99ff99
-    style X fill:#99ff99
-    style Y fill:#99ff99
-    style Z fill:#99ff99
-    style AA fill:#99ff99
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style U fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style V fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style W fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style X fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Y fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Z fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style AA fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -259,11 +259,11 @@ graph TD
     H --> M["✓ Array O(1) random"]
     I --> N["✓ Linked List O(n) search"]
     
-    style J fill:#99ff99
-    style K fill:#99ff99
-    style L fill:#99ff99
-    style M fill:#99ff99
-    style N fill:#99ff99
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -292,13 +292,13 @@ graph TD
     I --> P["✓ HashMap O(1)"]
     J --> Q["✓ Dynamic Array O(1) amort"]
     
-    style K fill:#99ff99
-    style L fill:#99ff99
-    style M fill:#99ff99
-    style N fill:#99ff99
-    style O fill:#99ff99
-    style P fill:#99ff99
-    style Q fill:#99ff99
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -333,15 +333,15 @@ graph TD
     L --> U["✓ Heap simple"]
     M --> V["✓ Trie structured"]
     
-    style N fill:#99ff99
-    style O fill:#99ff99
-    style P fill:#99ff99
-    style Q fill:#99ff99
-    style R fill:#99ff99
-    style S fill:#99ff99
-    style T fill:#99ff99
-    style U fill:#99ff99
-    style V fill:#99ff99
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style U fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style V fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -374,13 +374,13 @@ graph TD
     K --> R["✓ Segment locks"]
     L --> S["✓ Striped locks"]
     
-    style M fill:#99ff99
-    style N fill:#99ff99
-    style O fill:#99ff99
-    style P fill:#99ff99
-    style Q fill:#99ff99
-    style R fill:#99ff99
-    style S fill:#99ff99
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -439,10 +439,10 @@ graph TD
     F --> J["✓ LFU Cache<br/>O(1) access<br/>O(log n) evict"]
     G --> K["✓ HashMap<br/>O(1) avg lookup<br/>O(n) worst"]
     
-    style H fill:#99ff99
-    style I fill:#99ff99
-    style J fill:#99ff99
-    style K fill:#99ff99
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 **Real Interview:** "Design an LRU Cache" → HashMap + Doubly Linked List
@@ -469,8 +469,8 @@ graph TD
     F --> H["✓ Min K-Heap<br/>Insert: O(log k)<br/>Space: O(k)"]
     G --> I["✓ Full Heap<br/>Insert: O(log n)<br/>Space: O(n)"]
     
-    style H fill:#99ff99
-    style I fill:#99ff99
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 **Real Interview:** "Kth Largest Element in Stream" (LeetCode 703)

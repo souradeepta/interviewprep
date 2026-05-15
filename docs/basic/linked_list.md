@@ -45,7 +45,7 @@ graph TD
     style Singly fill:#87CEEB
     style Singly2 fill:#87CEEB
     style Doubly fill:#87CEEB
-    style A1 fill:#90EE90
+    style A1 fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

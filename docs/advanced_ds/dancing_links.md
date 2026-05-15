@@ -115,14 +115,14 @@ flowchart TD
     Q -->|Yes| I
     Q -->|No| R["✓ Done: all exact covers found<br/>Time: exponential,<br/>space: O(n·m)"]
     
-    style A fill:#fff4e6
-    style D fill:#e3f2fd
-    style E fill:#f3e5f5
-    style F fill:#f3e5f5
-    style G fill:#f3e5f5
-    style H fill:#f3e5f5
-    style M fill:#e8f5e9
-    style R fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Problem Recognition: When to Use DLX
@@ -142,8 +142,8 @@ flowchart TD
     E --> K
     I --> K
     
-    style A fill:#fff4e6
-    style K fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style F fill:#ffebee
     style G fill:#ffebee
     style J fill:#ffebee
@@ -175,12 +175,12 @@ flowchart TD
     S -->|No| H
     S -->|Yes| T["❌ No solution<br/>Backtrack"]
     
-    style A fill:#f3e5f5
-    style D fill:#e8f5e9
-    style G fill:#fff4e6
-    style I fill:#f3e5f5
-    style J fill:#f3e5f5
-    style P fill:#e8f5e9
+    style A fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style T fill:#ffebee
 ```
 
@@ -205,11 +205,11 @@ flowchart TD
     H --> M
     I --> M
     
-    style A fill:#fff4e6
-    style J fill:#e8f5e9
-    style K fill:#e3f2fd
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
     style M fill:#ffebee
-    style L fill:#f3e5f5
+    style L fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Common Patterns

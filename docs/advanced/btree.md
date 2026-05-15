@@ -33,8 +33,8 @@ graph TD
     H --> K["Example: n=1M, height~20"]
     I --> L["Example: n=1M, t=1000, height~3"]
     
-    style C fill:#90EE90
-    style G fill:#FFD700
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### B-Tree Insertion & Node Split Decision
@@ -53,7 +53,7 @@ graph TD
     I -->|Yes| G
     I -->|No| H
     
-    style H fill:#90EE90
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style G fill:#87CEEB
 ```
 
@@ -85,7 +85,7 @@ graph TD
     L --> N
     M --> N
     
-    style N fill:#90EE90
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

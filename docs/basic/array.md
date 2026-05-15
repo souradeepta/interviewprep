@@ -34,10 +34,10 @@ graph TD
     style A fill:#FFA500,color:#000
     style B fill:#FFA500,color:#000
     style D fill:#FFA500,color:#000
-    style C fill:#90EE90
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style F fill:#87CEEB
     style G fill:#87CEEB
-    style E1 fill:#90EE90
+    style E1 fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -169,9 +169,9 @@ graph TD
     style A fill:#FFA500
     style B fill:#FFA500
     style C fill:#FFA500
-    style DONE fill:#90EE90
-    style DONE2 fill:#90EE90
-    style DONE3 fill:#90EE90
+    style DONE fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style DONE2 fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style DONE3 fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style ERR1 fill:#FFB6C6
     style ERR2 fill:#FFB6C6
 ```
@@ -348,7 +348,7 @@ graph TD
     style ERR4 fill:#FFE4B5
     style ERR5 fill:#FFB6C6
     style ERR6 fill:#FFE4B5
-    style PASS fill:#90EE90
+    style PASS fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

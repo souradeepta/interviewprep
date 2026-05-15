@@ -114,13 +114,13 @@ flowchart TD
     I --> K["⏱ Amortized O(log n)<br/>per operation<br/>temporal locality gain"]
     J --> K
     
-    style A fill:#fff4e6
-    style C fill:#e3f2fd
-    style D fill:#e3f2fd
-    style E fill:#f3e5f5
-    style I fill:#e8f5e9
-    style J fill:#e8f5e9
-    style K fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Splay Tree Rotation Cases Flowchart
@@ -144,11 +144,11 @@ flowchart TD
     M -->|No| E
     M -->|Yes| N["✓ Splay complete<br/>x is new root<br/>O(log n) amortized<br/>depth reduction"]
     
-    style A fill:#f3e5f5
-    style F fill:#fff4e6
-    style H fill:#fff4e6
-    style I fill:#fff4e6
-    style N fill:#e8f5e9
+    style A fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## BST vs Splay vs AVL vs Red-Black Flowchart
@@ -167,12 +167,12 @@ flowchart TD
     G --> H
     H --> I["Red-Black: production systems<br/>AVL: teaching/reference<br/>Splay: competitive programming<br/>BST: baseline understanding"]
     
-    style A fill:#fff4e6
-    style C fill:#e8f5e9
-    style D fill:#e3f2fd
-    style E fill:#e8f5e9
-    style G fill:#e8f5e9
-    style I fill:#f3e5f5
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Splay Tree Application Patterns Flowchart
@@ -194,8 +194,8 @@ flowchart TD
     H --> I
     I --> J["Access patterns matter<br/>unbalanced load ok<br/>amortized analysis ok<br/>temporal locality present"]
     
-    style A fill:#fff4e6
-    style J fill:#f3e5f5
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Common Patterns

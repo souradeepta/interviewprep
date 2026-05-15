@@ -33,7 +33,7 @@ graph TD
     H --> L["Pattern: Strict balance,<br/>fast search"]
     I --> M["Pattern: Balanced,<br/>efficient updates"]
     
-    style F fill:#90EE90
+    style F fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style K fill:#87CEEB
 ```
 
@@ -63,9 +63,9 @@ graph TD
     M --> O
     N --> O
     
-    style O fill:#90EE90
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style I fill:#87CEEB
-    style J fill:#FFB6C1
+    style J fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### BST Search Optimization Decision Tree
@@ -83,10 +83,10 @@ graph TD
     E --> I["Return all values<br/>in [L, R]"]
     F --> J["Successor: go right then left<br/>Predecessor: go left then right"]
     
-    style C fill:#90EE90
-    style D fill:#90EE90
-    style E fill:#90EE90
-    style F fill:#90EE90
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

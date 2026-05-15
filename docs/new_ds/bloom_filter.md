@@ -200,7 +200,7 @@ graph TD
     classDef warning fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef mistake fill:#FFB6C6,stroke:#333,stroke-width:2px,color:#000
     classDef impact fill:#FFCCCB,stroke:#333,stroke-width:1px,color:#000
-    classDef fix fill:#90EE90,stroke:#333,stroke-width:2px,color:#000
+    classDef fix fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:2px,color:#000
     classDef note fill:#FFFFCC,stroke:#333,stroke-width:1px,color:#000
 ```
 

@@ -94,7 +94,7 @@ graph TD
     classDef decision fill:#FFA500,stroke:#333,stroke-width:2px,color:#000
     classDef randomness fill:#FFE0B2,stroke:#333,stroke-width:2px,color:#000
     classDef limit fill:#FFFACD,stroke:#999,stroke-width:1px,color:#000
-    classDef result fill:#90EE90,stroke:#333,stroke-width:1px,color:#000
+    classDef result fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:1px,color:#000
     classDef info fill:#F0F8FF,stroke:#333,stroke-width:2px,color:#000
     classDef level fill:#E0F4FF,stroke:#333,stroke-width:1px,color:#000
     classDef guarantee fill:#FFFFFF,stroke:#999,stroke-width:1px,color:#000
@@ -178,7 +178,7 @@ graph TD
     classDef reasoning fill:#F5F5F5,stroke:#999,stroke-width:1px,color:#000
     classDef summary fill:#FFF8DC,stroke:#333,stroke-width:2px,color:#000
     classDef formula fill:#FFE0B2,stroke:#999,stroke-width:1px,color:#000
-    classDef result fill:#90EE90,stroke:#333,stroke-width:1px,color:#000
+    classDef result fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:1px,color:#000
     classDef worstcase fill:#FF6B6B,stroke:#333,stroke-width:1px,color:#fff
     classDef note fill:#FFFFFF,stroke:#999,stroke-width:1px,color:#000
     classDef compare fill:#E0F4FF,stroke:#999,stroke-width:1px,color:#000
@@ -218,7 +218,7 @@ graph TD
     classDef warning fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef mistake fill:#FFB6C6,stroke:#333,stroke-width:2px,color:#000
     classDef impact fill:#FFCCCB,stroke:#333,stroke-width:1px,color:#000
-    classDef fix fill:#90EE90,stroke:#333,stroke-width:2px,color:#000
+    classDef fix fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ---

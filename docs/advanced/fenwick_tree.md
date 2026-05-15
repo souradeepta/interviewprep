@@ -32,9 +32,9 @@ graph TD
     G --> J["Segment Tree: easier<br/>for complex ops"]
     H --> K["Segment Tree required<br/>non-invertible agg"]
     
-    style C fill:#90EE90
-    style D fill:#FFB6C1
-    style E fill:#FFD700
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Fenwick Tree Query vs Update Path
@@ -61,8 +61,8 @@ graph TD
     H --> M["Query path: subtract lowbit<br/>go left/up"]
     L --> N["Update path: add lowbit<br/>go right/up to parents"]
     
-    style H fill:#90EE90
-    style L fill:#90EE90
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style M fill:#87CEEB
     style N fill:#87CEEB
 ```

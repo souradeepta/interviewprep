@@ -31,9 +31,9 @@ graph TD
     E --> I["Lazy: Update range<br/>in O(log n)"]
     F --> J["Sparse: Build O(n log n)<br/>Query O(1)"]
     
-    style C fill:#90EE90
-    style D fill:#FFB6C1
-    style E fill:#FFD700
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
     style F fill:#87CEEB
 ```
 
@@ -56,8 +56,8 @@ graph TD
     E --> K["Optimization: Early exit<br/>if no overlap"]
     F --> L["Optimization: Don't<br/>recurse if contained"]
     
-    style K fill:#90EE90
-    style L fill:#90EE90
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Segment Tree Update with Lazy Propagation
@@ -83,7 +83,7 @@ graph TD
     
     style F fill:#87CEEB
     style G fill:#87CEEB
-    style N fill:#FFB6C1
+    style N fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Segment Tree Problem Pattern
@@ -102,9 +102,9 @@ graph TD
     E --> I["O(log n) range ops<br/>Need lazy array"]
     F --> J["Offline only<br/>Persistent tree"]
     
-    style C fill:#90EE90
-    style D fill:#90EE90
-    style E fill:#FFD700
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
     style F fill:#87CEEB
 ```
 

@@ -244,7 +244,7 @@ graph TD
     style M4 fill:#87CEEB
     style M5 fill:#87CEEB
     style M4A fill:#FFA500
-    style DONE fill:#90EE90
+    style DONE fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -383,7 +383,7 @@ graph TD
     style E4 fill:#FFE4B5
     style E5 fill:#FFB6C6
     style E6 fill:#FFB6C6
-    style PASS fill:#90EE90
+    style PASS fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

@@ -33,9 +33,9 @@ graph TD
     G --> J["Track frequency<br/>Break ties by recency"]
     H --> K["Delete if<br/>now - timestamp > TTL"]
     
-    style C fill:#90EE90
-    style D fill:#FFB6C1
-    style E fill:#FFD700
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### LRU get() and put() Decision Tree
@@ -64,10 +64,10 @@ graph TD
     P --> Q["Add to HashMap"]
     Q --> R["Return"]
     
-    style D fill:#FFB6C1
-    style G fill:#90EE90
-    style K fill:#90EE90
-    style R fill:#90EE90
+    style D fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### LRU Variant Patterns
@@ -86,10 +86,10 @@ graph TD
     E --> I["Pattern: Hot data cache<br/>Popular items first"]
     F --> J["Pattern: Multi-threaded<br/>Use mutex/lock"]
     
-    style C fill:#FFD700
-    style D fill:#FFD700
-    style E fill:#FFB6C1
-    style F fill:#FFD700
+    style C fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

@@ -36,10 +36,10 @@ graph TD
     G --> M["Bit Trie<br/>Navigate greedily"]
     H --> N["Bit Trie<br/>Choose opposite"]
     
-    style D fill:#90EE90
-    style J fill:#90EE90
-    style K fill:#90EE90
-    style L fill:#90EE90
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Trie Insert/Search/Prefix Operations
@@ -71,11 +71,11 @@ graph TD
     R -->|No| S["Return false"]
     R -->|Yes| T["✓ Prefix exists"]
     
-    style J fill:#90EE90
-    style P fill:#90EE90
-    style T fill:#90EE90
-    style M fill:#FFB6C1
-    style O fill:#FFB6C1
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Trie Autocomplete Pattern
@@ -102,8 +102,8 @@ graph TD
     M -->|Yes| K
     M -->|No| N["Done<br/>✓ Return results"]
     
-    style N fill:#90EE90
-    style D fill:#FFB6C1
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Trie Memory vs Speed Trade-off
@@ -123,9 +123,9 @@ graph TD
     F --> I["Use when<br/>few distinct chars"]
     D --> J["Use when<br/>sparse alphabet"]
     
-    style C fill:#90EE90
-    style D fill:#FFB6C1
-    style E fill:#FFD700
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

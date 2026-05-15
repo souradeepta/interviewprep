@@ -25,8 +25,8 @@ graph TD
     D --> F["Goal: O(log n) worst-case<br/>all operations"]
     E --> G["Goal: Fewer rebalances<br/>better insert/delete"]
     
-    style D fill:#90EE90
-    style E fill:#FFB6C1
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
     style F fill:#87CEEB
     style G fill:#87CEEB
 ```
@@ -56,12 +56,12 @@ graph TD
     M --> N
     N --> O["Continue up<br/>tree if needed"]
     
-    style F fill:#90EE90
+    style F fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style J fill:#87CEEB
     style K fill:#87CEEB
     style L fill:#87CEEB
     style M fill:#87CEEB
-    style N fill:#90EE90
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### AVL Deletion Decision Tree
@@ -91,7 +91,7 @@ graph TD
     P -->|Yes| N
     P -->|No| M
     
-    style M fill:#90EE90
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style N fill:#87CEEB
 ```
 

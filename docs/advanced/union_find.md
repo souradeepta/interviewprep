@@ -34,11 +34,11 @@ graph TD
     F --> K["Sort edges, union<br/>if not connected"]
     G --> L["Union all in group<br/>Group by root"]
     
-    style C fill:#90EE90
-    style D fill:#90EE90
-    style E fill:#90EE90
-    style F fill:#90EE90
-    style G fill:#90EE90
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Union-Find: find() Operation
@@ -54,8 +54,8 @@ graph TD
     G --> H["Path Compression:<br/>Make all point<br/>directly to root"]
     H --> I["Return root<br/>✓ Optimized"]
     
-    style D fill:#90EE90
-    style I fill:#90EE90
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style H fill:#87CEEB
 ```
 
@@ -86,8 +86,8 @@ graph TD
     M --> O
     N --> O
     
-    style E fill:#FFB6C1
-    style O fill:#90EE90
+    style E fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Union-Find Application Patterns
@@ -112,10 +112,10 @@ graph TD
     F --> F1["Time: O(n·α(n))"]
     G --> G1["Time: O(q·α(n))"]
     
-    style C fill:#90EE90
-    style D fill:#90EE90
-    style E fill:#FFD700
-    style F fill:#FFB6C1
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
     style G fill:#87CEEB
 ```
 

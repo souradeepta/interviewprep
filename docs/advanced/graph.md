@@ -51,11 +51,11 @@ graph TD
     N --> V["✓ Directed cycle"]
     O --> W["✓ Topological sort"]
     
-    style P fill:#90EE90
-    style Q fill:#90EE90
-    style R fill:#90EE90
-    style S fill:#90EE90
-    style T fill:#90EE90
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Representation: Adjacency List vs Matrix
@@ -77,8 +77,8 @@ graph TD
     G --> K["Get neighbors: O(V)"]
     G --> L["Check edge: O(1)"]
     
-    style C fill:#90EE90
-    style D fill:#FFB6C1
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### DFS vs BFS Application
@@ -105,7 +105,7 @@ graph TD
     J --> O["DFS simple check"]
     F --> P["DFS: finish times"]
     
-    style K fill:#90EE90
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style L fill:#87CEEB
     style M fill:#87CEEB
     style P fill:#87CEEB

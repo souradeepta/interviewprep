@@ -138,10 +138,10 @@ flowchart TD
     IsMisc -->|No| Generic["Check if problem<br/>is solvable with<br/>standard algorithms<br/>or optimization"]
     
     %% Styling
-    classDef startEnd fill:#90EE90,stroke:#228B22,stroke-width:3px,color:#000
+    classDef startEnd fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:3px,color:#000
     classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
     classDef algorithm fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
-    classDef complexity fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef complexity fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     classDef warning fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
     
     class Start,End startEnd
@@ -178,9 +178,9 @@ flowchart TD
     F -->|No| G["⚠️ CHT still possible<br/>but harder to use"]
     F -->|Yes| H["CHT APPLICABLE<br/>Proceed with optimization"]
     
-    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef applicable fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
-    classDef warning fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef warning fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     class H applicable
     class C,E notappl
     class G warning
@@ -203,8 +203,8 @@ flowchart TD
     
     classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
     classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
-    classDef optimal fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
-    classDef subopt fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef optimal fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
+    classDef subopt fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     
     class B,D decision
     class G,H action
@@ -228,8 +228,8 @@ flowchart TD
     Worth -->|n ≤ 5000| No["❌ Skip optimization<br/>O(n^2) fast enough"]
     Worth -->|n > 5000| Yes["Implement CHT<br/>n=10^6+ needed"]
     
-    classDef fast fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
-    classDef medium fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef fast fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
+    classDef medium fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     classDef skip fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
     
     class Deque fast
@@ -258,7 +258,7 @@ flowchart TD
     S4 --> End
     
     classDef problem fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
-    classDef solution fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef solution fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     
     class P1,P2,P3,P4 problem
     class S1,S2,S3,S4 solution
@@ -323,7 +323,7 @@ flowchart TD
     Q3 -->|Yes| Apply["DIGIT DP APPLICABLE<br/>O(d·S) complexity<br/>d=digits, S=states"]
     Q3 -->|No| Modify["⚠️ May need custom<br/>state design"]
     
-    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef applicable fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
     class Apply applicable
     class NotDig,NotDig2 notappl
@@ -450,7 +450,7 @@ flowchart TD
     Q3 -->|Yes| Apply["TREE DP APPLICABLE<br/>O(n·S) or O(n^2)<br/>S = states"]
     Q3 -->|No| Harder["⚠️ May need rerooting<br/>or DP on paths"]
     
-    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef applicable fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
     class Apply applicable
     class NotTree,NotDP notappl
@@ -476,7 +476,7 @@ flowchart TD
     
     classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
     classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
-    classDef output fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef output fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     
     class D,J decision
     class G,H action
@@ -511,7 +511,7 @@ flowchart TD
     M3 --> Ex3["Example: Colorings<br/>dp[v][color] =<br/>∏(dp[child][color'])"]
     M4 --> Ex4["Example: Max Path<br/>dp[v] = max of<br/>combining 2 paths"]
     
-    classDef method fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef method fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     class M1,M2,M3,M4 method
 ```
 
@@ -586,7 +586,7 @@ flowchart TD
     Q2 -->|k > 20| TooLarge["❌ SOS DP impractical<br/>Use different approach<br/>2^k too large"]
     Q2 -->|k ≤ 20| Apply["SOS DP APPLICABLE<br/>O(k·2^k) time<br/>O(2^k) space"]
     
-    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef applicable fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     classDef notappl fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
     class Apply applicable
     class NotSOS,TooLarge notappl
@@ -612,7 +612,7 @@ flowchart TD
     
     classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
     classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
-    classDef output fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef output fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     
     class F,I decision
     class G,H,J action
@@ -635,7 +635,7 @@ flowchart TD
     Back --> Time
     Time --> Space["Space: O(2^k)<br/>Single array"]
     
-    classDef var fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef var fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     class Op1,Op2,Op3,Op4,Back var
 ```
 
@@ -656,7 +656,7 @@ flowchart TD
     S3 --> End
     
     classDef problem fill:#FF6B6B,stroke:#DC143C,stroke-width:2px,color:#fff
-    classDef solution fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef solution fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     
     class P1,P2,P3 problem
     class S1,S2,S3 solution
@@ -811,8 +811,8 @@ flowchart TD
     Q2 -->|V ≤ 1000, any| Dinics["Dinic's Algorithm<br/>BEST practical<br/>O(V²E)"]
     Q2 -->|V > 1000, dense| PushRel["Push-Relabel<br/>Better for dense<br/>O(V^3) or variant"]
     
-    classDef applicable fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
-    classDef warning fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef applicable fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
+    classDef warning fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     class Dinics applicable
     class FF warning
 ```
@@ -835,7 +835,7 @@ flowchart TD
     
     classDef decision fill:#FFB84D,stroke:#FF8C00,stroke-width:2px,color:#000
     classDef action fill:#87CEEB,stroke:#4682B4,stroke-width:2px,color:#000
-    classDef output fill:#90EE90,stroke:#228B22,stroke-width:2px,color:#000
+    classDef output fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#228B22,stroke-width:2px,color:#000
     
     class F decision
     class E,G,H action
@@ -870,7 +870,7 @@ flowchart TD
     M3 --> Ex3["Level graph pruning<br/>Dinic's is practical<br/>RECOMMENDED"]
     M4 --> Ex4["Global approach<br/>Different philosophy<br/>Also efficient"]
     
-    classDef method fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
+    classDef method fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#DAA520,stroke-width:2px,color:#000
     class M1,M2,M3,M4 method
 ```
 

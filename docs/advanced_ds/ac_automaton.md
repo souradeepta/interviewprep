@@ -103,14 +103,14 @@ flowchart TD
     N --> O
     O --> P["⏱ Time: O(n)<br/>Total: O(m + n + k)"]
     
-    style A fill:#fff4e6
-    style C fill:#e3f2fd
-    style D fill:#e3f2fd
-    style E fill:#f3e5f5
-    style F fill:#f3e5f5
-    style G fill:#f3e5f5
-    style J fill:#e8f5e9
-    style M fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style P fill:#fff3e0
 ```
 
@@ -132,15 +132,15 @@ flowchart TD
     F --> L
     H --> L
     
-    style A fill:#fff4e6
-    style E fill:#e8f5e9
-    style F fill:#e8f5e9
-    style H fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style D fill:#ffebee
     style I fill:#ffebee
     style J fill:#fff3e0
     style K fill:#ffebee
-    style L fill:#e3f2fd
+    style L fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## AC Automaton Building Flowchart
@@ -167,11 +167,11 @@ flowchart TD
     Q -->|No| I
     Q -->|Yes| R["✓ Automaton ready<br/>O(m·σ) space"]
     
-    style A fill:#f3e5f5
-    style C fill:#f3e5f5
-    style E fill:#f3e5f5
-    style F fill:#f3e5f5
-    style R fill:#e8f5e9
+    style A fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Alternatives & Optimization Flowchart
@@ -199,11 +199,11 @@ flowchart TD
     O -->|Yes AC| P["AC Automaton"]
     O -->|No| Q["Alternative method"]
     
-    style A fill:#fff4e6
-    style P fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style Q fill:#ffebee
-    style K fill:#e3f2fd
-    style I fill:#e3f2fd
+    style K fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Common Patterns

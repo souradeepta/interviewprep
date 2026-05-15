@@ -204,7 +204,7 @@ graph TD
     style REMOVE_R fill:#87CEEB
     style APPEND fill:#87CEEB
     style RECORD fill:#87CEEB
-    style END fill:#90EE90
+    style END fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### 0-1 BFS with Deque
@@ -245,7 +245,7 @@ graph TD
     style ADD_R fill:#87CEEB
     style CHK_VIS fill:#FFA500
     style MARK fill:#87CEEB
-    style END fill:#90EE90
+    style END fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Deque as Stack vs Queue
@@ -416,7 +416,7 @@ graph TD
     style E4 fill:#FFB6C6
     style E5 fill:#FFB6C6
     style E6 fill:#FFE4B5
-    style PASS fill:#90EE90
+    style PASS fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

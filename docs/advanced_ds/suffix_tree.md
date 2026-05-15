@@ -101,17 +101,17 @@ flowchart TD
     K --> L
     L --> M["Return result"]
     
-    style A fill:#fff4e6
-    style C fill:#e3f2fd
-    style D fill:#e3f2fd
-    style E fill:#f3e5f5
-    style F fill:#f3e5f5
-    style G fill:#f3e5f5
-    style H fill:#f3e5f5
-    style I fill:#e8f5e9
-    style J fill:#e8f5e9
-    style K fill:#e8f5e9
-    style M fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     K --> L
 ```
 
@@ -144,12 +144,12 @@ flowchart TD
     D --> P["Alternative approach"]
     L --> P
     
-    style A fill:#fff4e6
-    style O fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style P fill:#ffebee
-    style E fill:#e3f2fd
-    style K fill:#e3f2fd
-    style N fill:#e3f2fd
+    style E fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Suffix Tree Construction & Query Flowchart
@@ -177,13 +177,13 @@ flowchart TD
     P --> Q
     Q --> R["Return match positions"]
     
-    style A fill:#f3e5f5
-    style C fill:#f3e5f5
-    style I fill:#f3e5f5
-    style H fill:#e8f5e9
-    style O fill:#e8f5e9
+    style A fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style P fill:#ffebee
-    style R fill:#e8f5e9
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Suffix Tree vs Suffix Array vs Trie Flowchart
@@ -206,9 +206,9 @@ flowchart TD
     H --> K
     I --> L["Direct string search"]
     
-    style A fill:#fff4e6
-    style J fill:#e8f5e9
-    style K fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style L fill:#ffebee
 ```
 

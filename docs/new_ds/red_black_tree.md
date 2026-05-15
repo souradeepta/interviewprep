@@ -224,15 +224,15 @@ graph TD
     F --> F3["❌ Rotating root<br/>without updating"]:::bug
     F3 --> F3a["✓ Check parent is None<br/>and update self.root"]:::fix
     
-    classDef goal fill:#FFD700,stroke:#333,stroke-width:3px,color:#000
+    classDef goal fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:3px,color:#000
     classDef step fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000
     classDef impl fill:#B0E0E6,stroke:#333,stroke-width:1px,color:#000
-    classDef best fill:#90EE90,stroke:#333,stroke-width:1px,color:#000
+    classDef best fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:1px,color:#000
     classDef detail fill:#E0F4FF,stroke:#333,stroke-width:1px,color:#000
     classDef key fill:#FFE0B2,stroke:#333,stroke-width:1px,color:#000
     classDef warning fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef bug fill:#FFB6C6,stroke:#333,stroke-width:1px,color:#000
-    classDef fix fill:#90EE90,stroke:#333,stroke-width:1px,color:#000
+    classDef fix fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:1px,color:#000
 ```
 
 ### Common Mistakes & Debugging
@@ -264,7 +264,7 @@ graph TD
     classDef warning fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef mistake fill:#FFB6C6,stroke:#333,stroke-width:2px,color:#000
     classDef impact fill:#FFCCCB,stroke:#333,stroke-width:1px,color:#000
-    classDef fix fill:#90EE90,stroke:#333,stroke-width:2px,color:#000
+    classDef fix fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ---

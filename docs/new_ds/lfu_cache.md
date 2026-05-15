@@ -180,11 +180,11 @@ graph TD
     F --> F3["get: 1 lookup<br/>+ 1 remove + 1 insert"]:::op
     F --> F4["eviction: O(1) by<br/>accessing freq_map[min_freq]<br/>tail pointer"]:::op
     
-    classDef goal fill:#FFD700,stroke:#333,stroke-width:3px,color:#000
+    classDef goal fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:3px,color:#000
     classDef struct fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000
     classDef impl fill:#B0E0E6,stroke:#333,stroke-width:1px,color:#000
     classDef detail fill:#E0F4FF,stroke:#333,stroke-width:1px,color:#000
-    classDef benefit fill:#90EE90,stroke:#333,stroke-width:1px,color:#000
+    classDef benefit fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:1px,color:#000
     classDef insight fill:#FFE0B2,stroke:#333,stroke-width:2px,color:#000
     classDef antipattern fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef mechanism fill:#FFFACD,stroke:#333,stroke-width:1px,color:#000
@@ -225,7 +225,7 @@ graph TD
     classDef warning fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef mistake fill:#FFB6C6,stroke:#333,stroke-width:2px,color:#000
     classDef impact fill:#FFCCCB,stroke:#333,stroke-width:1px,color:#000
-    classDef fix fill:#90EE90,stroke:#333,stroke-width:2px,color:#000
+    classDef fix fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ---

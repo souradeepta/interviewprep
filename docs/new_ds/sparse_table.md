@@ -106,7 +106,7 @@ graph TD
     
     classDef decision fill:#FFA500,stroke:#333,stroke-width:2px,color:#000
     classDef test fill:#FFE0B2,stroke:#333,stroke-width:2px,color:#000
-    classDef yes fill:#90EE90,stroke:#333,stroke-width:2px,color:#000
+    classDef yes fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:2px,color:#000
     classDef no fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef action fill:#4A90E2,stroke:#333,stroke-width:2px,color:#fff
 ```
@@ -184,9 +184,9 @@ graph TD
     D5 -->|Yes| D6["✓ Sparse Table<br/>is choice"]:::action
     D5 -->|No| D7["Use Segment Tree<br/>space=2n"]:::alt
     
-    classDef goal fill:#FFD700,stroke:#333,stroke-width:3px,color:#000
+    classDef goal fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:3px,color:#000
     classDef choose fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000
-    classDef benefit fill:#90EE90,stroke:#333,stroke-width:1px,color:#000
+    classDef benefit fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:1px,color:#000
     classDef cost fill:#FFB6C6,stroke:#333,stroke-width:1px,color:#000
     classDef tradeoff fill:#FFE0B2,stroke:#333,stroke-width:1px,color:#000
     classDef note fill:#FFFFFF,stroke:#999,stroke-width:1px,color:#000
@@ -239,7 +239,7 @@ graph TD
     E --> E7["❌ Not handling<br/>single-element query"]:::bug
     E7 --> E8["✓ Query [i,i]<br/>returns arr[i]"]:::fix
     
-    classDef goal fill:#FFD700,stroke:#333,stroke-width:3px,color:#000
+    classDef goal fill:#ffd699,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:3px,color:#000
     classDef step fill:#87CEEB,stroke:#333,stroke-width:2px,color:#000
     classDef init fill:#B0E0E6,stroke:#999,stroke-width:1px,color:#000
     classDef loop fill:#E0F4FF,stroke:#999,stroke-width:1px,color:#000
@@ -248,14 +248,14 @@ graph TD
     classDef base fill:#F0F0F0,stroke:#999,stroke-width:1px,color:#000
     classDef recurrence fill:#F5F5F5,stroke:#999,stroke-width:1px,color:#000
     classDef critical fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
-    classDef benefit fill:#90EE90,stroke:#333,stroke-width:1px,color:#000
+    classDef benefit fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:1px,color:#000
     classDef lookup fill:#D0D0D0,stroke:#999,stroke-width:1px,color:#000
     classDef window1 fill:#FFE0B2,stroke:#999,stroke-width:1px,color:#000
     classDef window2 fill:#FFE0B2,stroke:#999,stroke-width:1px,color:#000
     classDef close fill:#FFE0B2,stroke:#999,stroke-width:1px,color:#000
     classDef warning fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef bug fill:#FFB6C6,stroke:#333,stroke-width:1px,color:#000
-    classDef fix fill:#90EE90,stroke:#333,stroke-width:2px,color:#000
+    classDef fix fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ### Common Mistakes & Debugging Guide
@@ -287,7 +287,7 @@ graph TD
     classDef warning fill:#FF6B6B,stroke:#333,stroke-width:2px,color:#fff
     classDef mistake fill:#FFB6C6,stroke:#333,stroke-width:2px,color:#000
     classDef impact fill:#FFCCCB,stroke:#333,stroke-width:1px,color:#000
-    classDef fix fill:#90EE90,stroke:#333,stroke-width:2px,color:#000
+    classDef fix fill:#90ee90,color:#000,stroke:#333,stroke-width:2px,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ---

@@ -39,10 +39,10 @@ graph TD
     I --> M["Keep heap size K<br/>Drop large elements"]
     J --> N["Extract K largest<br/>from full heap"]
     
-    style G fill:#90EE90
-    style H fill:#90EE90
-    style I fill:#FFB6C1
-    style J fill:#FFB6C1
+    style G fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Heap Build vs Insert Decision
@@ -60,8 +60,8 @@ graph TD
     C --> G["Use heapify()<br/>Bottom-up approach"]
     D --> H["Use heappush()<br/>Each step O(log n)"]
     
-    style E fill:#90EE90
-    style F fill:#FFB6C1
+    style E fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ### Problem Pattern: Heap Application
@@ -82,11 +82,11 @@ graph TD
     F --> K["Time: O(n²)"]
     G --> L["Time: O((V+E) log V)"]
     
-    style C fill:#90EE90
-    style D fill:#90EE90
-    style E fill:#FFD700
-    style F fill:#FFB6C1
-    style G fill:#FFB6C1
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#ffd699,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

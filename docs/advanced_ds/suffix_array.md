@@ -113,15 +113,15 @@ flowchart TD
     M --> O
     N --> O
     
-    style A fill:#fff4e6
-    style C fill:#e3f2fd
-    style D fill:#e3f2fd
-    style E fill:#f3e5f5
-    style H fill:#f3e5f5
-    style L fill:#e8f5e9
-    style M fill:#e8f5e9
-    style N fill:#e8f5e9
-    style O fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Suffix Array Construction Methods Flowchart
@@ -147,14 +147,14 @@ flowchart TD
     N --> O
     O --> P["Use Kasai algorithm<br/>O(n) linear construction"]
     
-    style A fill:#f3e5f5
-    style C fill:#e3f2fd
-    style D fill:#e3f2fd
-    style E fill:#e3f2fd
-    style J fill:#e8f5e9
-    style M fill:#e8f5e9
-    style N fill:#e8f5e9
-    style P fill:#f3e5f5
+    style A fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Suffix Array Query Patterns Flowchart
@@ -184,11 +184,11 @@ flowchart TD
     F --> T["Binary search for P<br/>Check range size = 1<br/>or pattern not found"]
     T --> U["✓ Unique or absent"]
     
-    style A fill:#fff4e6
-    style L fill:#e8f5e9
-    style P fill:#e8f5e9
-    style S fill:#e8f5e9
-    style U fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style U fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Suffix Array vs Suffix Tree Comparison Flowchart
@@ -211,10 +211,10 @@ flowchart TD
     K --> M["Practical choice:<br/>SA+LCP most common<br/>Competitive programming"]
     L --> M
     
-    style A fill:#fff4e6
-    style K fill:#e8f5e9
-    style L fill:#e8f5e9
-    style M fill:#f3e5f5
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Common Patterns

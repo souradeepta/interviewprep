@@ -108,8 +108,8 @@ graph TD
     
     AQ --> AR["✅ DONE:<br/>Clean solution<br/>Good explanation<br/>Problem solved"]
     
-    style A fill:#ff9999
-    style AR fill:#99ff99
+    style A fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style AR fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     
     classDef step fill:#ffe6e6
     class B,F,J,R,W,AD,AK,AO step
@@ -160,7 +160,7 @@ graph TD
     S --> V
     U --> V
     
-    style V fill:#99ff99
+    style V fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -197,7 +197,7 @@ graph TD
     P --> R
     Q --> R
     
-    style R fill:#99ff99
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -232,7 +232,7 @@ graph TD
     M --> O["✓ Solution verified"]
     N --> O
     
-    style O fill:#99ff99
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -273,7 +273,7 @@ graph TD
     O --> Q
     P --> Q
     
-    style Q fill:#99ff99
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -312,7 +312,7 @@ graph TD
     
     R --> S["✓ Debug complete"]
     
-    style S fill:#99ff99
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

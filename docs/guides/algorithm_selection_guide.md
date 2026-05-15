@@ -196,8 +196,8 @@ graph TD
     
     BR["✓ Algorithm Selected<br/>Verify time/space"]
     
-    style A fill:#ff9999
-    style BR fill:#99ff99
+    style A fill:#ffb3ba,color:#000,stroke:#333,stroke-width:2px
+    style BR fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -237,13 +237,13 @@ graph TD
     D6 --> P["Linear algorithm<br/>Hash-based<br/>Greedy"]
     D7 --> Q["Streaming<br/>Precompute<br/>O(1) query"]
     
-    style K fill:#99ff99
-    style L fill:#99ff99
-    style M fill:#99ff99
-    style N fill:#99ff99
-    style O fill:#99ff99
-    style P fill:#99ff99
-    style Q fill:#99ff99
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style L fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -271,10 +271,10 @@ graph TD
     D3 --> J["Standard DP<br/>HashMap<br/>Graph storage"]
     D4 --> K["Full 2D DP<br/>Adjacency matrix<br/>Memo table"]
     
-    style H fill:#99ff99
-    style I fill:#99ff99
-    style J fill:#99ff99
-    style K fill:#99ff99
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -307,14 +307,14 @@ graph TD
     K --> S["✓ Counting sort"]
     L --> T["✓ Hash/sort"]
     
-    style M fill:#99ff99
-    style N fill:#99ff99
-    style O fill:#99ff99
-    style P fill:#99ff99
-    style Q fill:#99ff99
-    style R fill:#99ff99
-    style S fill:#99ff99
-    style T fill:#99ff99
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -356,14 +356,14 @@ graph TD
     Q --> Y["✓ Sequence DP"]
     R --> Z["✓ Subset DP"]
     
-    style S fill:#99ff99
-    style T fill:#99ff99
-    style U fill:#99ff99
-    style V fill:#99ff99
-    style W fill:#99ff99
-    style X fill:#99ff99
-    style Y fill:#99ff99
-    style Z fill:#99ff99
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style U fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style V fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style W fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style X fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Y fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Z fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -402,17 +402,17 @@ graph TD
     N --> Y["✓ Binary lifting O(log n)"]
     O --> Z["✓ HLD O(log² n)"]
     
-    style P fill:#99ff99
-    style Q fill:#99ff99
-    style R fill:#99ff99
-    style S fill:#99ff99
-    style T fill:#99ff99
-    style U fill:#99ff99
-    style V fill:#99ff99
-    style W fill:#99ff99
-    style X fill:#99ff99
-    style Y fill:#99ff99
-    style Z fill:#99ff99
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Q fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style U fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style V fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style W fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style X fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Y fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Z fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -455,18 +455,18 @@ graph TD
     P --> AB["✓ Manacher O(n)"]
     Q --> AC["✓ Suffix Array O(n log n)"]
     
-    style R fill:#99ff99
-    style S fill:#99ff99
-    style T fill:#99ff99
-    style U fill:#99ff99
-    style V fill:#99ff99
-    style W fill:#99ff99
-    style X fill:#99ff99
-    style Y fill:#99ff99
-    style Z fill:#99ff99
-    style AA fill:#99ff99
-    style AB fill:#99ff99
-    style AC fill:#99ff99
+    style R fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style S fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style T fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style U fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style V fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style W fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style X fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Y fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style Z fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style AA fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style AB fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style AC fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ---

@@ -108,13 +108,13 @@ flowchart TD
     L -->|No| O["❌ Can't cut<br/>non-adjacent"]
     I --> P["✓ LCA found<br/>during access<br/>Path query result"]
     
-    style A fill:#fff4e6
-    style D fill:#e3f2fd
-    style E fill:#f3e5f5
-    style F fill:#f3e5f5
-    style M fill:#e8f5e9
-    style N fill:#e8f5e9
-    style P fill:#e8f5e9
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style D fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style P fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
     style K fill:#ffebee
     style O fill:#ffebee
 ```
@@ -138,12 +138,12 @@ flowchart TD
     H --> J
     I --> J
     
-    style A fill:#fff4e6
-    style G fill:#e8f5e9
-    style H fill:#e8f5e9
-    style I fill:#e8f5e9
-    style E fill:#e3f2fd
-    style F fill:#e3f2fd
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style E fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#add8e6,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Link-Cut Tree Core Operations Flowchart
@@ -166,12 +166,12 @@ flowchart TD
     L --> N["cut(u,v): access(u)<br/>remove right child<br/>disconnect v<br/>O(log n)"]
     L --> O["path_query(u,v):<br/>access(u), access(v)<br/>query splay tree<br/>O(log n)"]
     
-    style A fill:#f3e5f5
-    style C fill:#f3e5f5
-    style J fill:#e8f5e9
-    style M fill:#e8f5e9
-    style N fill:#e8f5e9
-    style O fill:#e8f5e9
+    style A fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
+    style J fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style M fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style N fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style O fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## LCT vs HLD vs Union-Find Flowchart
@@ -193,12 +193,12 @@ flowchart TD
     H --> J
     J --> K["LCT pros: fastest<br/>LCT cons: hardest to code<br/>HLD: middle ground<br/>Union-Find: simplest"]
     
-    style A fill:#fff4e6
-    style C fill:#e8f5e9
-    style F fill:#e8f5e9
-    style G fill:#e8f5e9
-    style H fill:#e8f5e9
-    style K fill:#f3e5f5
+    style A fill:#deb887,color:#000,stroke:#333,stroke-width:2px
+    style C fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style F fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style G fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style H fill:#90ee90,color:#000,stroke:#333,stroke-width:2px
+    style K fill:#dda0dd,color:#000,stroke:#333,stroke-width:2px
 ```
 
 ## Common Patterns
