@@ -48,6 +48,54 @@ Signatures: Cryptographic proof
 Read-only: Prevent tampering
 ```
 
+
+## Architecture Diagram
+
+```
+┌──────────────────────────────────────┐
+│   Immutable Transaction Log          │
+│  ┌──────────────────────────────────┐  │
+│  │ Append-Only Log                  │  │
+│  │ - Never update/delete            │  │
+│  │ - Hash chain (blockchain-like)   │  │
+│  │ Snapshots (for fast restart)     │  │
+│  │ - Hourly checkpoint              │  │
+│  │ Balance Derivation               │  │
+│  │ - Replay log = current balance   │  │
+│  └──────────────────────────────────┘  │
+└──────────────────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Why append-only?** A: Immutable audit trail. Corruption detectable (hash breaks). Replaying gives any point-in-time state.
+
+**Q: Ledger bloat—retention?** A: Archive old entries (S3), keep recent (hot DB). Snapshots reduce replay time.
+
+**Q: Balance query performance?** A: Materialized view (balance table), updated via ledger replay. Or cache at query time.
+
+**Q: Reconciliation audits?** A: Periodic: replay ledger, compare balance snapshot. Detects bugs or data corruption.
+
+## Back-of-Envelope Calculations
+
+1M users, 10 txns/day avg = 10M ledger entries/day. Storage: 10M × 200B = 2GB/day = 730GB/year. Snapshot: hourly.
+
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Append-only log | Immutable, auditable | Slower queries |
+| Update-in-place | Fast, simple | Loses history, harder audit |
+| Event sourcing | Full history, replay | Complex, large storage |
+
+## Follow-up Interview Questions
+
+1. Query balance at specific timestamp? 2. Exporting ledger for tax/audit? 3. Compliance (GDPR retention)? 4. Corruption detection? 5. Performance at scale?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Time |

@@ -36,6 +36,53 @@ Last-write-wins: Latest timestamp wins
 Custom logic: Application-specific
 ```
 
+
+## Architecture Diagram
+
+```
+┌───────────────────────────────┐
+│   2-Phase Commit (2PC)        │
+│  Phase 1: Prepare             │
+│  - Coordinator asks all nodes │
+│  - Nodes lock & prepare       │
+│  Phase 2: Commit/Abort        │
+│  - All yes: commit            │
+│  - Any no: rollback all       │
+│  Timeout & Recovery           │
+│  - Coordinator timeout        │
+│  - Node replay from log       │
+└───────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Blocking problem?** A: 2PC locks during prepare (reduces concurrency). Solutions: Saga, eventual consistency.
+
+**Q: Timeout tuning?** A: Short: false failures. Long: latency. Typical: 10-30s.
+
+**Q: Saga alternative?** A: Compensating txns, no blocking, eventual. Saga requires rollback logic.
+
+**Q: Network partition?** A: Minority can't reach coordinator, waits forever (unsafe). Use Raft consensus.
+
+## Back-of-Envelope Calculations
+
+4 services, 100ms latency budget. Prepare: 80ms. Commit: 10ms. Throughput: 10 txn/sec (limited by latency).
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| 2PC | Atomic, simple | Blocking |
+| Saga | Eventual | Compensating logic |
+| Event sourcing | Full history | Complex |
+
+## Follow-up Interview Questions
+
+1. Test with network failures? 2. Nested txn? 3. Scale beyond 10 services? 4. Prepare latency bottleneck? 5. Monitor failures?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Trade-offs
 
 | Approach | Pros | Cons |

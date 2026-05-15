@@ -36,6 +36,54 @@ Merge results
 Use fan-out pattern
 ```
 
+
+## Architecture Diagram
+
+```
+┌──────────────────────────────────────┐
+│   Sharded Database Architecture      │
+│  ┌──────────────────────────────────┐  │
+│  │ Sharding Key: user_id            │  │
+│  │ Shard 1: user_id % 4 == 0        │  │
+│  │ Shard 2: user_id % 4 == 1        │  │
+│  │ Shard 3: user_id % 4 == 2        │  │
+│  │ Shard 4: user_id % 4 == 3        │  │
+│  │                                  │  │
+│  │ Directory: user_id → shard_id    │  │
+│  └──────────────────────────────────┘  │
+└──────────────────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Shard key selection?** A: Choose high-cardinality (user_id good, gender bad). Enables even distribution.
+
+**Q: Hot shard problem?** A: Uneven distribution if key skewed (celebrities). Solution: split hot shard, re-shard.
+
+**Q: Cross-shard queries?** A: Expensive, scatter-gather to all shards. Avoid if possible.
+
+**Q: Re-sharding complexity?** A: Double shards: migrate half of each to new shards. Zero-downtime hard, plan carefully.
+
+## Back-of-Envelope Calculations
+
+1B users, 4 shards: 250M per shard. Each shard: single master + replicas. Queries: shard_id = hash(user_id) % 4. Cross-shard: 4x latency.
+
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Range sharding | Easy range queries | Uneven distribution |
+| Hash sharding | Even distribution | Range queries hard |
+| Directory-based | Flexible, dynamic | Extra lookup latency |
+
+## Follow-up Interview Questions
+
+1. Dynamic re-sharding without downtime? 2. Handling growth (1B → 10B)? 3. Cross-shard transactions? 4. Load imbalance detection? 5. Disaster recovery per shard?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Trade-offs
 
 | Strategy | Pros | Cons |

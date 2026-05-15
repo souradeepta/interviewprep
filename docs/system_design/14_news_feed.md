@@ -43,6 +43,53 @@ followers: {user_id -> Set[follower_ids]}
 feeds: {user_id -> [post_ids]} (cache)
 ```
 
+
+## Architecture Diagram
+
+```
+┌──────────────────────────────────────────┐
+│      News Feed Service                   │
+│  ┌──────────────────────────────────────┐  │
+│  │ User Request: getFeed(userId)        │  │
+│  │                                      │  │
+│  │ 1. Get followed users (Redis)        │  │
+│  │ 2. Fetch posts from cache/DB         │  │
+│  │ 3. Rank by timestamp/engagement      │  │
+│  │ 4. Return top 20 posts               │  │
+│  └──────────────────────────────────────┘  │
+└──────────────────────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Why multi-layer caching?** A: L1 (Redis): hot data, 1hr. L2 (Memcached): warm data. L3 (DB): persistent. Reduces load.
+
+**Q: Feed freshness?** A: TTL 1hr + event-based invalidation on post. Trade: cache hit vs freshness.
+
+**Q: Ranking complexity?** A: Timestamp (simple), engagement score (time-decay), ML ranking. Simple fast, ML better UX.
+
+**Q: Scaling to billions?** A: Shard by userId. Each shard manages subset feeds. Replicate for HA. Cache miss hits only shard.
+
+## Back-of-Envelope Calculations
+
+1B users, 1K friends avg, 10 posts/day: 10K posts/user/day. Cache 90% hit rate: 5ms latency. Storage: 1B users × 100KB = 100TB distributed.
+
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Pull model | Fresh data, simple | O(followers) latency |
+| Push model | Fast O(1) | Complex, high storage |
+| Hybrid | Balances both | More complex |
+
+## Follow-up Interview Questions
+
+1. Real-time feed updates (WebSocket)? 2. Millions of followers handling? 3. Trending topics in feed? 4. Cache invalidation bottleneck at 10x. 5. High-value content prioritization?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Fanout-Write | Fanout-Read |

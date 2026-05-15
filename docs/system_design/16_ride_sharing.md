@@ -39,6 +39,50 @@ Process payment
 Generate receipt
 ```
 
+
+## Architecture Diagram
+
+```
+┌───────────────────────────────┐
+│   Ride-sharing Service        │
+│  Driver Location (GeoHash)    │
+│  - Update: every 2-5 sec      │
+│  Matching: distance < 5km     │
+│  Payment & Trip               │
+│  - Real-time tracking         │
+│  - Surge pricing              │
+└───────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Finding drivers within 5km?** A: GeoHash cells or Quadtree. Redis GeoHash O(log n) for radius queries.
+
+**Q: Surge pricing?** A: Real-time demand/supply ratio. Update every 5 min. Detect surge from queued requests.
+
+**Q: Match consistency?** A: Server decides (fair), client suggests (fast). Hybrid: server proposes top-3.
+
+**Q: Disputes?** A: Trip log (immutable). Manual review if disputed.
+
+## Back-of-Envelope Calculations
+
+1M drivers, 10M requests/day, 5K concurrent matches. Driver updates: 3M/sec (Redis). Match latency: ~10ms.
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Client matching | Fast | Unfair |
+| Server matching | Fair | Bottleneck |
+| Hybrid | Balanced | Complex |
+
+## Follow-up Interview Questions
+
+1. Ghost rides (fake location)? 2. Incentives for low-pay rides? 3. Real-time ETA? 4. Matching bottleneck at 10x? 5. Fairness testing?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Time |

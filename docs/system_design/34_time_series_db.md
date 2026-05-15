@@ -38,6 +38,52 @@ Downsampling: Return coarser resolution
 Distributed: Parallel across shards
 ```
 
+
+## Architecture Diagram
+
+```
+┌───────────────────────────────┐
+│   Time Series Data Storage   │
+│  Ingestion (InfluxDB)         │
+│  - Write-optimized            │
+│  - Append-only, no updates    │
+│  Compression                  │
+│  - Delta-of-delta encoding    │
+│  - XOR float (8x savings)     │
+│  Querying                     │
+│  - Range queries O(log n)     │
+│  - Aggregations (SUM, AVG)    │
+│  - Downsampled data           │
+└───────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Retention policy?** A: Raw: 7-30 days. Downsampled: 1 year. Archive cold storage. Trade recency vs cost.
+
+**Q: Cardinality explosion?** A: Limit label combos. Use aggregation. Avoid high-cardinality labels.
+
+**Q: Aggregation efficiency?** A: Pre-aggregate at write. Store 1min, rollup to 1h at query. Parallelization.
+
+## Back-of-Envelope Calculations
+
+1M servers, 1K metrics/server, 1 sample/min. Ingestion: 1B metrics/min. Storage: 8GB/min raw, 1GB/min compressed = 400TB/month.
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| General DB | Flexible | Poor compression |
+| TSDB | Optimized | Less flexible |
+| Data warehouse | Analytics | Slower |
+
+## Follow-up Interview Questions
+
+1. Query across timezones? 2. Real-time alerts? 3. Out-of-order writes? 4. Ingestion bottleneck? 5. Cold storage migration?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Time |

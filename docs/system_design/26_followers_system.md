@@ -37,6 +37,53 @@ Paginated results
 Caching top pages
 ```
 
+
+## Architecture Diagram
+
+```
+┌──────────────────────────────────────┐
+│   Social Graph (Followers)           │
+│  ┌──────────────────────────────────┐  │
+│  │ Following Graph                  │  │
+│  │ - user → [follower_ids] (Redis)  │  │
+│  │ - O(1) add/remove follower       │  │
+│  │ Follower Graph                   │  │
+│  │ - user → [following_ids]         │  │
+│  │ - Bidirectional relationship     │  │
+│  └──────────────────────────────────┘  │
+└──────────────────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Graph consistency?** A: Keep both directions in sync. Atomic update or eventual consistency?
+
+**Q: Large follower lists?** A: Pagination (fetch first 1000). Truncate in feed (show top K).
+
+**Q: Block/mute user?** A: Add to blocklist, filter from feed/notifications.
+
+**Q: Mutual follow detection?** A: Check if A in B's followers AND B in A's followers.
+
+## Back-of-Envelope Calculations
+
+1B users, avg 500 followers. Storage: 500B avg followers per user = 500GB Redis. Queries: is_follower O(1), get_followers O(n).
+
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| In-memory (Redis) | Fast, simple | Memory cost |
+| Graph DB (Neo4j) | Complex queries | Slower |
+| Materialized view | Pre-computed | Update lag |
+
+## Follow-up Interview Questions
+
+1. Handle celebrity (10M followers) efficiently? 2. Viral following (growth spike)? 3. Follow suggestion algorithm? 4. Privacy (hide followers)? 5. Analytics (who unfollowed)?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Time |

@@ -41,6 +41,53 @@ Reduce stock on order completion
 5. Confirm order
 ```
 
+
+## Architecture Diagram
+
+```
+┌───────────────────────────────────────┐
+│   E-commerce Platform                 │
+│  ┌───────────────────────────────────┐  │
+│  │ Product Catalog (Elasticsearch)   │  │
+│  │ - 100M products, <100ms search    │  │
+│  │ Shopping Cart (Redis, 24hr TTL)   │  │
+│  │ - <10ms read/write                │  │
+│  │ Order Processing                  │  │
+│  │ - Inventory, Payment, Fulfill     │  │
+│  └───────────────────────────────────┘  │
+└───────────────────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Inventory consistency?** A: Pessimistic lock or optimistic versioning. Use saga pattern for order flow.
+
+**Q: Cart timeout?** A: TTL 24hr, notify before expiry. Recover from backup.
+
+**Q: Product search scaling?** A: Elasticsearch cluster, shard by product_id, cache popular.
+
+**Q: Payment failure recovery?** A: Retry + exponential backoff, webhook from gateway, saga rollback.
+
+## Back-of-Envelope Calculations
+
+10M SKUs, 1M concurrent users, 1K orders/sec. Cart: 1M × 500B = 500GB Redis. Search: 100K QPS ES cluster. Payment: 1K req/sec (3-4 gateways).
+
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Monolithic | Simple, consistent | Poor scaling |
+| Microservices | Scalable, independent | Complex coordination |
+| Event-driven | Decoupled, responsive | Harder to debug |
+
+## Follow-up Interview Questions
+
+1. Flash sales (millions orders/sec)? 2. Real-time inventory across regions? 3. Fraud detection in payments? 4. Payment gateway bottleneck. 5. Return/refund workflow?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Time | Space |

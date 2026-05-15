@@ -45,6 +45,89 @@ public Product create(String type) {
 }
 ```
 
+
+## Architecture Diagram
+
+```
+[Visual representation of system components]
+```
+
+## Common Questions & Answers
+
+**Q: Factory Method vs Abstract Factory?**
+A: Factory Method: one factory creating one product type. Abstract Factory: factory creates families of related products. Use Factory Method for shape creation (Circle, Square). Use Abstract Factory for UI themes (DarkButton, LightButton, DarkWindow, LightWindow).
+
+**Q: Who decides which concrete class to instantiate?**
+A: Factory (encapsulation). Client never knows class names. Pass parameters (type string) to factory, factory decides. Benefits: client doesn't import concrete classes, factory can add intelligent logic (caching, pooling).
+
+**Q: What if adding new product requires factory modification?**
+A: Violates Open/Closed Principle. Solutions: (1) Reflection/Class loading, (2) Map<String, Class>, (3) Registry pattern. Trade: more flexible but adds complexity. For stable product set, simple if-else is fine.
+
+**Q: How to handle product initialization complexity?**
+A: Delegate to factory. Factory handles constructor parameters, post-initialization setup, dependency injection. Keeps client code clean. Alternative: Builder pattern for even more complex scenarios.
+
+## Back-of-Envelope Calculations
+
+For typical scenario (shape factory with 5 product types):
+- Storage: 5 shape classes × 1KB code = 5KB, shape instances vary (Circle=100 bytes, Square=100 bytes)
+- Throughput: Factory creation O(1), 1M objects/sec easily achievable
+- Latency: Factory.create() = 1-5μs (just instantiation), negligible vs application logic
+- Bandwidth: Negligible (only object creation metadata)
+
+Scaling: Factory pattern doesn't bottleneck; use caching/pooling for expensive products.
+
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Simple Factory | Straightforward, one point of creation | Violates OCP, all logic in one factory |
+| Factory Method | OCP compliant, subclasses decide | More classes, inheritance overhead |
+| Abstract Factory | Families of products | Complex, overkill for simple cases |
+
+## Follow-up Interview Questions
+
+1. How would you implement factory caching (reuse products instead of creating new)?
+2. What if product creation is expensive (database queries, network calls)? Implement lazy initialization.
+3. How to monitor which products are created and how often?
+4. What's the bottleneck at 10x scale? Creation itself is O(1); bottleneck is product usage.
+5. How would you implement versioning (create ProductV1 or ProductV2)?
+
+## Example Scenario Walkthrough
+
+Scenario: Shape drawing application using factory
+
+Initial state:
+- ShapeFactory with methods: create(type) -> Shape
+
+Step 1: Create circle
+- factory.create("circle")
+- Factory checks: type == "circle"
+- Instantiate: new Circle(radius=5)
+- Return Circle object
+
+Step 2: Create square
+- factory.create("square")
+- Factory checks: type == "square"
+- Instantiate: new Square(side=10)
+- Return Square object
+
+Step 3: Create rectangle
+- factory.create("rectangle")
+- Factory checks: type == "rectangle"
+- Instantiate: new Rectangle(width=20, height=10)
+- Return Rectangle object
+
+Step 4: Client code (decoupled from concrete classes)
+- Shape shape1 = factory.create("circle")
+- Shape shape2 = factory.create("square")
+- shape1.draw()  // Calls Circle.draw()
+- shape2.draw()  // Calls Square.draw()
+
+Step 5: Add new shape (Triangle) - factory modification
+- ShapeFactory.create("triangle") -> new Triangle(...)
+- No client code changes needed
+- Maintains encapsulation
+
 ## Trade-offs
 
 | Pro | Con |

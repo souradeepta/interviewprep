@@ -35,6 +35,52 @@ Offline: Store and push when online
 Badges: Unread count per user
 ```
 
+
+## Architecture Diagram
+
+```
+┌───────────────────────────────┐
+│   Chat Application            │
+│  WebSocket Server             │
+│  - User connection mgmt       │
+│  - Message broadcast          │
+│  Message Persistence          │
+│  - MongoDB (flexible)         │
+│  - Sharded by conversation_id │
+│  Delivery Tracking            │
+│  - Sent, Delivered, Read      │
+└───────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Message ordering (FIFO)?** A: Sequence numbers + validation. If out-of-order, buffer & replay.
+
+**Q: Offline delivery?** A: Queue with TTL (30 days). Deliver on reconnect.
+
+**Q: Typing indicator?** A: Send every 1-2 chars, debounce. Broadcast to participants. ~100ms acceptable.
+
+**Q: Group chat scaling?** A: <10: broadcast. 100+: fan-out via queue. 1000+: pub-sub topic.
+
+## Back-of-Envelope Calculations
+
+100M users, 1M concurrent, 10K msg/sec. WebSocket: 1M × 10KB = 10GB. Throughput: 10K/sec × 200B = 2MB/sec storage.
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Polling | Simple | High latency |
+| Long-polling | Better | Connection overhead |
+| WebSocket | Real-time | Firewall |
+
+## Follow-up Interview Questions
+
+1. Message search across convos? 2. E2E encryption? 3. Spam detection? 4. WebSocket bottleneck? 5. Message migration?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Time |

@@ -48,6 +48,53 @@ Geographic checks: Unusual locations
 3D Secure: For high-risk
 ```
 
+
+## Architecture Diagram
+
+```
+┌───────────────────────────────┐
+│   Payment Processing          │
+│  Payment Gateway              │
+│  - Stripe, PayPal, Square     │
+│  - PCI DSS compliance         │
+│  - TLS + vault encryption     │
+│  Transaction Processing       │
+│  - Authorize, Capture, Refund │
+│  Reconciliation               │
+│  - Match transactions         │
+│  - Anomaly detection (ML)     │
+└───────────────────────────────┘
+```
+
+## Common Questions & Answers
+
+**Q: Retry on failure?** A: Exponential backoff (1s, 2s, 4s, 8s), max 3 attempts. Store txn ID for idempotency.
+
+**Q: Idempotency?** A: UUID from client, stored server-side. Retried request returns same result.
+
+**Q: PCI DSS?** A: Never store card details. Tokenization: gateway issues token.
+
+**Q: Chargeback?** A: Track evidence (order, shipping). Respond to bank within deadline.
+
+## Back-of-Envelope Calculations
+
+1M txn/day, $1B volume. 98% success (2% retry). 2-5s per txn. Fraud: 0.1% (1K false positives, need review).
+## Design Choice Comparison
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| Gateway only | Simple | Less control |
+| Custom processor | Full control | PCI burden |
+| PSP | Balanced | Fees |
+
+## Follow-up Interview Questions
+
+1. Currency/forex risk? 2. Subscription billing? 3. Settlement timing? 4. Gateway bottleneck? 5. International methods?
+
+## Example Scenario Walkthrough
+
+[Describe a concrete example with step-by-step execution]
+
 ## Complexity
 
 | Operation | Time |
