@@ -194,23 +194,21 @@ Added comprehensive interview-focused algorithms with detailed documentation, de
 
 ## System Design Problems
 
-For real-world design problems (caching, rate limiting, parking lot, design patterns, distributed systems), see [`docs/system_design/`](docs/system_design/README.md).
+**39 comprehensive system design problems** covering real-world applications, distributed systems, and design patterns. See [`docs/system_design/`](docs/system_design/README.md) for details.
 
-| Problem | Category | Difficulty |
-|---------|----------|-----------|
-| LRU Cache | Caching | ★★★★☆ |
-| LFU Cache | Caching | ★★★★☆ |
-| Rate Limiter | Real-world Systems | ★★★★☆ |
-| URL Shortener | Real-world Systems | ★★★★☆ |
-| Parking Lot | OOP Design | ★★★★☆ |
-| Observer Pattern | Design Patterns | ★★★☆☆ |
-| Strategy Pattern | Design Patterns | ★★★☆☆ |
-| Factory Pattern | Design Patterns | ★★★☆☆ |
-| Decorator Pattern | Design Patterns | ★★★☆☆ |
-| Adapter Pattern | Design Patterns | ★★★☆☆ |
-| Pub-Sub System | Distributed Systems | ★★★★★ |
-| Thread Pool | Concurrency | ★★★★★ |
-| Load Balancer | Distributed Systems | ★★★★★ |
+**Tier 1 (13 problems):** Caching, Rate Limiting, URL Shortening, Parking Lot, Design Patterns (5), Pub-Sub, Thread Pool, Load Balancer
+
+**Tier 2 (26 problems):** News Feed, E-Commerce, Ride-Sharing, Chat System, Video Streaming, Database Sharding, Message Queue, Search Engine, Recommendation Engine, Leaderboard, Payment System, Wallet, Followers, Notifications, API Gateway, WebSocket, Distributed Transactions, Circuit Breaker, Saga Pattern, Photo Sharing, Time Series DB, Log Aggregation, Like/Comment System, Auction System, Transaction Ledger, Consensus Algorithm
+
+**Quick Reference:** 
+
+| # | Problem | Difficulty | # | Problem | Difficulty |
+|---|---------|-----------|---|---------|-----------|
+| 1-2 | LRU/LFU Cache | ★★★★☆ | 20 | Message Queue | ★★★★☆ |
+| 3-5 | Rate Limiter, URL Shortener, Parking Lot | ★★★★☆ | 21-23 | Search, Recommendation, Leaderboard | ★★★★☆ |
+| 6-10 | Design Patterns (5) | ★★★☆☆ | 24-26 | Payment, Wallet, Followers | ★★★★☆ |
+| 11-13 | Pub-Sub, Thread Pool, Load Balancer | ★★★★★ | 27-32 | Notifications, API Gateway, WebSocket, Distributed TX, Circuit Breaker, Saga | ★★★★☆ |
+| 14-19 | News Feed, E-Commerce, Ride-Sharing, Chat, Video, Sharding | ★★★★☆ | 33-39 | Photo Sharing, Time Series DB, Logging, Like/Comment, Auction, Ledger, Consensus | ★★★★☆ |
 
 ## Problem-Solving Guides
 

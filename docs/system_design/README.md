@@ -25,6 +25,44 @@ Comprehensive collection of real-world system design problems solved with detail
 12. **Thread Pool** — Task scheduling, worker threads, queue management
 13. **Load Balancer** — Request distribution, health checks, multiple strategies
 
+### Tier 3: Real-World Applications (26 Problems)
+
+#### Real-World Apps (6)
+14. **News Feed** — Timeline generation, fanout strategies, follower cache
+15. **E-Commerce** — Product catalog, shopping cart, order processing, inventory
+16. **Ride-Sharing** — Driver/rider matching, ETA, real-time tracking, payment
+17. **Chat System** — Message storage, group chat, notifications, delivery guarantees
+18. **Video Streaming** — Adaptive bitrate, CDN delivery, transcoding pipeline
+19. **Database Sharding** — Consistent hashing, distributed data, cross-shard queries
+
+#### Data & Infrastructure (7)
+20. **Message Queue** — Pub-sub, FIFO, consumer groups, dead letter queue
+21. **Search Engine** — Inverted index, ranking, distributed search, autocomplete
+22. **Recommendation Engine** — Collaborative filtering, content-based, cold start
+23. **Leaderboard** — Sorted sets, real-time rankings, pagination
+24. **Payment System** — Transaction processing, idempotency, fraud detection
+25. **Wallet System** — Balance tracking, double-entry bookkeeping, currency exchange
+26. **Followers System** — Social graph, timeline generation, mutual follows
+
+#### Advanced Patterns & APIs (6)
+27. **Notifications** — Multi-channel delivery (email, SMS, push, in-app)
+28. **API Gateway** — Routing, authentication, rate limiting, transformation
+29. **WebSocket Server** — Bidirectional communication, rooms, broadcast
+30. **Distributed Transactions** — 2-Phase Commit, Saga Pattern, eventual consistency
+31. **Circuit Breaker** — Failure detection, state transitions, cascading failures
+32. **Saga Pattern** — Long-running transactions, compensation, choreography
+
+#### Storage & Analytics (4)
+33. **Photo Sharing** — Upload pipeline, thumbnail generation, CDN delivery
+34. **Time Series DB** — Compression, retention policies, time-range queries
+35. **Log Aggregation** — Collection, parsing, storage, searching, alerting
+36. **Like/Comment System** — Atomic counters, caching, real-time updates
+
+#### Specialized Systems (3)
+37. **Auction System** — Bidding, winner determination, settlement, time management
+38. **Transaction Ledger** — Immutable log, audit trail, reconciliation
+39. **Consensus Algorithm** — Raft/Paxos, leader election, fault tolerance
+
 ## How to Use
 
 1. **Read the design doc** (`docs/system_design/NN_*.md`) — understand problem, constraints, trade-offs
