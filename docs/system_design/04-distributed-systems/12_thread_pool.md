@@ -172,6 +172,36 @@ Step 8: Shutdown sequence
 | Dynamic pool | Scales with load | Overhead, complexity |
 | Blocking queue | Thread-safe | Blocking calls |
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Task["Task Queue"]
+    Pool["Thread Pool<br/>N Worker Threads"]
+    Worker1["Worker 1"]
+    Worker2["Worker 2"]
+    WorkerN["Worker N"]
+
+    Task -->|Distribute| Pool
+    Pool --> Worker1
+    Pool --> Worker2
+    Pool --> WorkerN
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Task Submitted"] --> B["Add to Queue"]
+    B --> C{"Worker Available?"}
+    C -->|Yes| D["Assign to Worker"]
+    C -->|No| E["Wait in Queue"]
+    D --> F["Execute Task"]
+    E --> G["Wait for Worker"]
+    G --> D
+    F --> H["Return Result"]
+```
+
 ## Complexity
 
 | Operation | Time |

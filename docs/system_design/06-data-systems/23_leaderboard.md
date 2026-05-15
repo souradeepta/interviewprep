@@ -81,6 +81,33 @@ Consistent ordering
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User Scores"]
+    Update["Update Service"]
+    Redis["Redis<br/>Sorted Set"]
+    DB["Database"]
+    Ranking["Ranking"]
+
+    User -->|Score| Update
+    Update -->|Increment| Redis
+    Update -->|Persist| DB
+    Ranking -->|Compute| Redis
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["New Score"] --> B["Update Redis"]
+    B --> C["Persist DB"]
+    C --> D["Compute Ranks"]
+    D --> E["Cache Top 100"]
+    E --> F["Query Leaderboard"]
+```
+
 ## Complexity
 
 | Operation | Time |

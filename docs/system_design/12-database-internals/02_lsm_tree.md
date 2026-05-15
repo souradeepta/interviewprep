@@ -63,6 +63,20 @@ Writes:
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Write Request"] --> B["Append to WAL"]
+    B --> C["Insert to MemTable"]
+    C --> D{MemTable<br/>Full?}
+    D -->|Yes| E["Flush to Disk"]
+    D -->|No| F["Acknowledge"]
+    E --> G["Create L0 SSTable"]
+    G --> H["Trigger Compaction"]
+    H --> I["Merge SSTables"]
+```
+
 ## Implementation
 
 ### Python Implementation

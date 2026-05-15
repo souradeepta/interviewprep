@@ -55,6 +55,22 @@ User features → embedding → ANN search → Ranker → recommendations
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Training Phase"] --> B["Build User-Item Matrix"]
+    B --> C["SVD Factorization"]
+    C --> D["Get User/Item Vectors"]
+    D --> E["Store in Cache"]
+
+    F["Serving Phase"] --> G["Get User Vector"]
+    G --> H["Compute Similarity"]
+    H --> I["Score All Items"]
+    I --> J["Top-K"]
+    J --> K["Filter & Rank"]
+```
+
 ## Implementation
 
 ### Python Implementation

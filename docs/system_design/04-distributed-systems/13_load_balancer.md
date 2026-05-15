@@ -188,6 +188,39 @@ Step 8: S2 recovers
 | Random | No state | Less optimal |
 | IP Hash | Session persistence | Uneven distribution |
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Clients["Clients"]
+    LB["Load Balancer<br/>Round Robin/LeastConn"]
+    HealthCheck["Health Checker"]
+
+    Server1["Server 1"]
+    Server2["Server 2"]
+    Server3["Server 3"]
+    Server4["Server 4"]
+
+    Clients -->|Request| LB
+    LB -->|Monitor| HealthCheck
+    LB -->|Route| Server1
+    LB -->|Route| Server2
+    LB -->|Route| Server3
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Request Arrives"] --> B["Get Active Servers"]
+    B --> C["Select Server"]
+    C --> D{"Algorithm"}
+    D -->|Round Robin| E["Next"]
+    D -->|Least Conn| F["Lowest Load"]
+    E --> G["Route"]
+    F --> G
+```
+
 ## Complexity
 
 | Operation | Time |

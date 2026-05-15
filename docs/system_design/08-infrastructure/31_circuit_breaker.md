@@ -85,6 +85,32 @@ Service A → B fails: 5 failures open. A rejects 30s. B recovers: half-open 60s
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Client["Client"]
+    CB["Circuit Breaker"]
+    Service["Service"]
+    Fallback["Fallback"]
+
+    Client -->|Request| CB
+    CB -->|CLOSED| Service
+    CB -->|OPEN| Fallback
+    Service -->|Failure| CB
+```
+
+### Flow Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Closed
+    Closed --> Open: Threshold failed
+    Open --> HalfOpen: Timeout
+    HalfOpen --> Closed: Request OK
+    HalfOpen --> Open: Request Failed
+```
+
 ## Complexity
 
 | Operation | Time |

@@ -208,6 +208,33 @@ processor = PaymentProcessor(PayPalPayment())
 processor.process(100)  # PayPal
 ```
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Context["Context<br/>strategy: Strategy"]
+    Strategy["Strategy<br/>execute()"]
+    StrategyA["ConcreteA<br/>execute()"]
+    StrategyB["ConcreteB<br/>execute()"]
+
+    Context -->|uses| Strategy
+    Strategy <|--|StrategyA
+    Strategy <|--|StrategyB
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Client selects Strategy"] --> B["Context.setStrategy()"]
+    B --> C["Context.execute()"]
+    C --> D{"Which Strategy?"}
+    D -->|A| E["StrategyA.execute()"]
+    D -->|B| F["StrategyB.execute()"]
+    E --> G["Result"]
+    F --> G
+```
+
 ## Complexity
 
 | Operation | Time |

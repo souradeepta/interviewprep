@@ -87,6 +87,35 @@ Vertical scaling: Increase connections per server
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph LR
+    Client["WebSocket Client"]
+    Server["WebSocket Server"]
+    Broadcast["Broadcaster"]
+
+    Client -->|Connect| Server
+    Server -->|Register| Broadcast
+    Client -->|Send| Broadcast
+    Broadcast -->|Push| Client
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    participant B as Broadcaster
+
+    C->>S: Upgrade to WebSocket
+    S-->>C: 101 Switching
+    C->>S: Send Message
+    S->>B: Broadcast
+    B->>C: Push Update
+```
+
 ## Complexity
 
 | Operation | Time |

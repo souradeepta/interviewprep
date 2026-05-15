@@ -90,6 +90,47 @@ feeds: {user_id -> [post_ids]} (cache)
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    PostService["Post Service"]
+    FeedService["Feed Service"]
+    Cache["Cache<br/>Redis"]
+    DB["Database"]
+
+    User -->|Create Post| PostService
+    PostService -->|Store| DB
+    User -->|Get Feed| FeedService
+    FeedService -->|Check| Cache
+    Cache -->|Miss| DB
+    FeedService -->|Return| User
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant PS as Post Service
+    participant FS as Feed Service
+    participant C as Cache
+
+    U->>PS: Create Post
+    PS->>DB: Save
+    U->>FS: Get Feed
+    FS->>C: Check Cache
+    alt Hit
+        C-->>FS: Feed
+    else Miss
+        FS->>DB: Query
+        DB-->>FS: Results
+        FS->>C: Update
+    end
+    FS-->>U: Feed
+```
+
 ## Complexity
 
 | Operation | Fanout-Write | Fanout-Read |

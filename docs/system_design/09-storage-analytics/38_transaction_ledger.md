@@ -96,6 +96,31 @@ Read-only: Prevent tampering
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Transaction["Transaction"]
+    Ledger["Ledger Service"]
+    Storage["Storage"]
+    Audit["Audit Trail"]
+
+    Transaction -->|Record| Ledger
+    Ledger -->|Store| Storage
+    Ledger -->|Log| Audit
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Transaction"] --> B["Generate Entry"]
+    B --> C["Sign/Hash"]
+    C --> D["Append to Ledger"]
+    D --> E["Replicate"]
+    E --> F["Confirm"]
+```
+
 ## Complexity
 
 | Operation | Time |

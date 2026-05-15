@@ -87,6 +87,36 @@ Caching: Popular posts cached
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    LikeService["Like Service"]
+    CommentService["Comment Service"]
+    Cache["Cache"]
+    DB["Database"]
+
+    User -->|Like| LikeService
+    User -->|Comment| CommentService
+    LikeService -->|Store| Cache
+    CommentService -->|Store| Cache
+    Cache -->|Persist| DB
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["User Action"] --> B{"Type?"}
+    B -->|Like| C["Increment Count"]
+    B -->|Comment| D["Create Comment"]
+    C --> E["Update Cache"]
+    D --> E
+    E --> F["Persist"]
+    F --> G["Notify"]
+```
+
 ## Complexity
 
 | Operation | Time |

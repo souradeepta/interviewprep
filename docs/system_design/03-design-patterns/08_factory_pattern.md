@@ -48,8 +48,18 @@ public Product create(String type) {
 
 ## Architecture Diagram
 
-```
-[Visual representation of system components]
+```mermaid
+graph TB
+    Client["Client"]
+    Factory["Factory<br/>createProduct()"]
+    Product["Product"]
+    ProductA["ConcreteA"]
+    ProductB["ConcreteB"]
+
+    Client -->|uses| Factory
+    Factory -->|creates| Product
+    Product <|--| ProductA
+    Product <|--| ProductB
 ```
 
 ## Common Questions & Answers

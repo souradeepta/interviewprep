@@ -84,6 +84,32 @@ Caching top pages
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    FollowService["Follow Service"]
+    Graph["Graph DB"]
+    Cache["Cache"]
+
+    User -->|Follow/Unfollow| FollowService
+    FollowService -->|Store| Graph
+    FollowService -->|Cache| Cache
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Follow Request"] --> B["Check if exists"]
+    B --> C{"Already following?"}
+    C -->|Yes| D["Error"]
+    C -->|No| E["Add Edge"]
+    E --> F["Update Cache"]
+    F --> G["Confirm"]
+```
+
 ## Complexity
 
 | Operation | Time |

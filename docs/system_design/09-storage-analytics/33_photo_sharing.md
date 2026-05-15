@@ -88,6 +88,34 @@ Deduplication: Same photo detected
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    PhotoService["Photo Service"]
+    Storage["S3/GCS"]
+    DB["Database"]
+    Search["Search Index"]
+
+    User -->|Upload| PhotoService
+    PhotoService -->|Store| Storage
+    PhotoService -->|Metadata| DB
+    PhotoService -->|Index| Search
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Upload Photo"] --> B["Resize"]
+    B --> C["Generate Thumbnails"]
+    C --> D["Upload to Storage"]
+    D --> E["Store Metadata"]
+    E --> F["Index for Search"]
+    F --> G["Confirm"]
+```
+
 ## Complexity
 
 | Operation | Time |

@@ -193,6 +193,36 @@ class Trader(Observer):
             print('Sell signal!')
 ```
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Subject["Subject<br/>notifyObservers()"]
+    Observer1["Observer 1<br/>update()"]
+    Observer2["Observer 2<br/>update()"]
+    Observer3["Observer 3<br/>update()"]
+
+    Subject -->|notify| Observer1
+    Subject -->|notify| Observer2
+    Subject -->|notify| Observer3
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant E as Event
+    participant S as Subject
+    participant O1 as Observer 1
+    participant O2 as Observer 2
+
+    E->>S: Change State
+    S->>O1: notifyObservers()
+    S->>O2: notifyObservers()
+    O1->>O1: update()
+    O2->>O2: update()
+```
+
 ## Complexity
 
 | Operation | Time |

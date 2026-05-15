@@ -161,6 +161,41 @@ Step 7: Subscriber unsubscribes (cleanup)
 | Ordering challenges | Blocking calls |
 | Decoupled publishers/subs | Tight coupling |
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Publisher["Publisher"]
+    Broker["Message Broker<br/>Topic/Queue"]
+    Consumer1["Consumer 1"]
+    Consumer2["Consumer 2"]
+    Consumer3["Consumer 3"]
+
+    Publisher -->|Publish| Broker
+    Broker -->|Deliver| Consumer1
+    Broker -->|Deliver| Consumer2
+    Broker -->|Deliver| Consumer3
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Pub as Publisher
+    participant B as Broker
+    participant C1 as Consumer 1
+    participant C2 as Consumer 2
+
+    Pub->>B: Send Message
+    B->>B: Store in Topic
+    B->>C1: Deliver
+    B->>C2: Deliver
+    C1->>C1: Process
+    C2->>C2: Process
+    C1-->>B: ACK
+    C2-->>B: ACK
+```
+
 ## Complexity
 
 | Operation | Time |

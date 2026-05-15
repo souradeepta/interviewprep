@@ -88,6 +88,33 @@ A/B test: Measure engagement
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    Features["Features"]
+    Model["ML Model"]
+    Scorer["Scorer"]
+    Results["Results"]
+
+    User -->|Profile| Features
+    Features -->|Input| Model
+    Model -->|Vectors| Scorer
+    Scorer -->|Rank| Results
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Get User Vector"] --> B["Find Similar"]
+    B --> C["Score"]
+    C --> D["Filter"]
+    D --> E["Rank"]
+    E --> F["Return Top 10"]
+```
+
 ## Complexity
 
 | Operation | Time |

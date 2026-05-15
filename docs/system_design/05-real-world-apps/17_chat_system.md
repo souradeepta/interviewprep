@@ -81,6 +81,39 @@ Badges: Unread count per user
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User1["User 1"]
+    User2["User 2"]
+    WebSocket["WebSocket Server"]
+    MessageQueue["Message Queue"]
+    Storage["Storage"]
+
+    User1 -->|Send| WebSocket
+    WebSocket -->|Enqueue| MessageQueue
+    MessageQueue -->|Deliver| User2
+    MessageQueue -->|Store| Storage
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant U1 as User 1
+    participant WS as WebSocket
+    participant Q as Queue
+    participant U2 as User 2
+
+    U1->>WS: Send Message
+    WS->>Q: Enqueue
+    Q->>U2: Deliver (if online)
+    alt Offline
+        Q->>Storage: Mark unread
+    end
+```
+
 ## Complexity
 
 | Operation | Time |

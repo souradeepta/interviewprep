@@ -54,6 +54,36 @@ Custom logic: Application-specific
 └───────────────────────────────┘
 ```
 
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant C as Coordinator
+    participant D1 as Database 1
+    participant D2 as Database 2
+    participant D3 as Database 3
+
+    C->>D1: Prepare
+    C->>D2: Prepare
+    C->>D3: Prepare
+    D1-->>C: Ready
+    D2-->>C: Ready
+    D3-->>C: Ready
+    
+    alt All Ready
+        C->>D1: Commit
+        C->>D2: Commit
+        C->>D3: Commit
+        D1-->>C: ACK
+        D2-->>C: ACK
+        D3-->>C: ACK
+    else Any Failed
+        C->>D1: Rollback
+        C->>D2: Rollback
+        C->>D3: Rollback
+    end
+```
+
 ## Common Questions & Answers
 
 **Q: Blocking problem?** A: 2PC locks during prepare (reduces concurrency). Solutions: Saga, eventual consistency.

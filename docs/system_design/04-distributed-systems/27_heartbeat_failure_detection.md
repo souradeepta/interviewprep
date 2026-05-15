@@ -63,6 +63,19 @@ Node B fails: heartbeat stops ✓✗✗✗ → marked down after 3 missing
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Request Received"] --> B["Validate Input"]
+    B --> C["Process Request"]
+    C --> D["Access Data"]
+    D --> E["Compute Result"]
+    E --> F["Cache if applicable"]
+    F --> G["Format Response"]
+    G --> H["Send to Client"]
+```
+
 ## Implementation
 
 ### Python Implementation

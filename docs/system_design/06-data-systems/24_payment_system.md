@@ -95,6 +95,36 @@ Geographic checks: Unusual locations
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    PaymentGateway["Payment Gateway"]
+    Processor["Processor"]
+    Bank["Bank"]
+    Ledger["Ledger"]
+
+    User -->|Payment| PaymentGateway
+    PaymentGateway -->|Process| Processor
+    Processor -->|Authorize| Bank
+    PaymentGateway -->|Log| Ledger
+```
+
+### Flow Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Initiated
+    Initiated --> Validating
+    Validating --> Authorized: Valid
+    Authorized --> Captured
+    Captured --> Settled: Success
+    Captured --> Failed
+    Settled --> [*]
+    Failed --> [*]
+```
+
 ## Complexity
 
 | Operation | Time |

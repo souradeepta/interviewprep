@@ -93,6 +93,32 @@ ZooKeeper: 5-node cluster, 1000 txn/sec. Election: 150-300ms. Replication: 10-20
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Node1["Node 1"]
+    Node2["Node 2"]
+    Node3["Node 3"]
+    Consensus["Consensus<br/>RAFT/Paxos"]
+
+    Node1 -->|Heartbeat| Consensus
+    Node2 -->|Heartbeat| Consensus
+    Node3 -->|Heartbeat| Consensus
+```
+
+### Flow Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Follower
+    Follower --> Candidate: Timeout
+    Candidate --> Leader: Win election
+    Candidate --> Follower: Higher term
+    Leader --> Follower: Higher term
+    Leader --> Leader: Heartbeat
+```
+
 ## Complexity
 
 | Operation | Time |

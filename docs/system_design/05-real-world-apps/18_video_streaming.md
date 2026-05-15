@@ -86,6 +86,35 @@ Geographic distribution
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["Viewer"]
+    Player["Player<br/>Adaptive Bitrate"]
+    CDN["CDN Edge"]
+    Origin["Origin Server"]
+    Transcoder["Transcoder"]
+
+    User -->|Request| Player
+    Player -->|Fetch| CDN
+    CDN -->|Miss| Origin
+    Origin -->|Store| Transcoder
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Video Upload"] --> B["Transcode"]
+    B --> C["Multiple Bitrates"]
+    C --> D["Store Segments"]
+    D --> E["User Request"]
+    E --> F["Measure Bandwidth"]
+    F --> G["Select Bitrate"]
+    G --> H["Adapt if needed"]
+```
+
 ## Complexity
 
 | Operation | Time |

@@ -83,6 +83,42 @@ Generate receipt
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Rider["Rider"]
+    Driver["Driver"]
+    Matching["Matching Service"]
+    Location["Location Service"]
+    Payment["Payment Service"]
+
+    Rider -->|Request| Matching
+    Driver -->|Update Loc| Location
+    Matching -->|Query| Location
+    Matching -->|Assign| Driver
+    Rider -->|Pay| Payment
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant R as Rider
+    participant M as Matching
+    participant L as Location
+    participant D as Driver
+
+    R->>M: Request Ride
+    M->>L: Get nearby drivers
+    L-->>M: Drivers
+    M->>D: Offer ride
+    D->>D: Accept/Reject
+    alt Accepted
+        M->>R: Driver assigned
+    end
+```
+
 ## Complexity
 
 | Operation | Time |

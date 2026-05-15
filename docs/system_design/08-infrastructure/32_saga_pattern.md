@@ -92,6 +92,43 @@ Order saga: 5 steps, 200ms avg. Total: 1s happy. Retry: 7s worst case. Throughpu
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Client["Client"]
+    SagaOrchestrator["Saga Orchestrator"]
+    Service1["Service 1"]
+    Service2["Service 2"]
+    Service3["Service 3"]
+
+    Client -->|Request| SagaOrchestrator
+    SagaOrchestrator -->|Execute| Service1
+    Service1 -->|Success| Service2
+    Service2 -->|Success| Service3
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant O as Orchestrator
+    participant S1 as Service 1
+    participant S2 as Service 2
+    participant S3 as Service 3
+
+    O->>S1: Execute Step 1
+    S1-->>O: Success
+    O->>S2: Execute Step 2
+    S2-->>O: Success
+    O->>S3: Execute Step 3
+    S3-->>O: Success/Fail
+    alt Fail
+        O->>S1: Compensate
+        O->>S2: Compensate
+    end
+```
+
 ## Complexity
 
 | Pattern | Latency | Coupling |

@@ -66,6 +66,21 @@ Request rate: 1000 req/sec
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Request Arrives"] --> B["Get Active Servers"]
+    B --> C["Select by Algorithm"]
+    C --> D{"Algorithm"}
+    D -->|Round Robin| E["Next Server"]
+    D -->|Least Conn| F["Lowest Load"]
+    D -->|IP Hash| G["Same Server"]
+    E --> H["Route Request"]
+    F --> H
+    G --> H
+```
+
 ## Implementation
 
 ### Python Implementation

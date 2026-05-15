@@ -94,6 +94,34 @@ Aggregation: Error counts, rates
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Services["Services"]
+    Collector["Log Collector"]
+    Storage["Storage"]
+    Parser["Parser"]
+    Search["Search Engine"]
+
+    Services -->|Stream Logs| Collector
+    Collector -->|Parse| Parser
+    Parser -->|Store| Storage
+    Storage -->|Index| Search
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Log Line"] --> B["Collect"]
+    B --> C["Parse"]
+    C --> D["Extract Fields"]
+    D --> E["Enrich"]
+    E --> F["Store"]
+    F --> G["Index"]
+```
+
 ## Complexity
 
 | Operation | Time |

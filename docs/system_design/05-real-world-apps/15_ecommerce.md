@@ -88,6 +88,35 @@ Reduce stock on order completion
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    ProductService["Product Service"]
+    CartService["Cart Service"]
+    PaymentService["Payment Service"]
+    OrderService["Order Service"]
+
+    User -->|Browse| ProductService
+    User -->|Add to Cart| CartService
+    User -->|Checkout| PaymentService
+    PaymentService -->|Create| OrderService
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Browse Products"] --> B["Add to Cart"]
+    B --> C["Checkout"]
+    C --> D["Payment"]
+    D --> E{Success?}
+    E -->|Yes| F["Create Order"]
+    E -->|No| G["Retry"]
+    F --> H["Confirmation"]
+```
+
 ## Complexity
 
 | Operation | Time | Space |

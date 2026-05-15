@@ -59,6 +59,17 @@ Binary tree of hashes. Leaf nodes = data. Parent = hash(left + right).
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Search Key=15"] --> B["Compare at Root"]
+    B --> C{"15 in<br/>ranges?"}
+    C -->|10-20| D["Go to L2"]
+    D --> E["Linear Search<br/>in L2"]
+    E --> F["Found or Not"]
+```
+
 ## Implementation
 
 ### Python Implementation

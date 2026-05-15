@@ -82,6 +82,37 @@ Retry with backoff
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph LR
+    Producer["Producer"]
+    Broker["Kafka/RabbitMQ"]
+    Consumer1["Consumer 1"]
+    Consumer2["Consumer 2"]
+
+    Producer -->|Publish| Broker
+    Broker -->|Partition 1| Consumer1
+    Broker -->|Partition 2| Consumer2
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant P as Producer
+    participant B as Broker
+    participant C1 as Consumer 1
+    participant C2 as Consumer 2
+
+    P->>B: Send Message
+    B->>B: Partition & Store
+    B->>C1: Deliver
+    B->>C2: Deliver
+    C1->>C1: Process
+    C2->>C2: Process
+```
+
 ## Complexity
 
 | Operation | Time |

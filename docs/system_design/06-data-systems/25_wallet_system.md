@@ -90,6 +90,34 @@ Chargeback protection: Crypto signature
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User["User"]
+    Wallet["Wallet Service"]
+    Balance["Balance"]
+    Transaction["Transaction Log"]
+
+    User -->|Add Funds| Wallet
+    User -->|Spend| Wallet
+    Wallet -->|Update| Balance
+    Wallet -->|Record| Transaction
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["User Action"] --> B{"Type?"}
+    B -->|Add| C["Deposit"]
+    B -->|Spend| D["Charge"]
+    C --> E["Update Balance"]
+    D --> E
+    E --> F["Log Transaction"]
+    F --> G["Return Status"]
+```
+
 ## Complexity
 
 | Operation | Time |

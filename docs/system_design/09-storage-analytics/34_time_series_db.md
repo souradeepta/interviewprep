@@ -84,6 +84,34 @@ Distributed: Parallel across shards
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Metrics["Metrics"]
+    Ingestion["Ingestion Service"]
+    Storage["Time Series DB"]
+    Query["Query Engine"]
+    Visualization["Visualization"]
+
+    Metrics -->|Stream| Ingestion
+    Ingestion -->|Store| Storage
+    Query -->|Read| Storage
+    Query -->|Render| Visualization
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Metric arrives"] --> B["Timestamp"]
+    B --> C["Tags"]
+    C --> D["Value"]
+    D --> E["Compress"]
+    E --> F["Store Block"]
+    F --> G["Index"]
+```
+
 ## Complexity
 
 | Operation | Time |

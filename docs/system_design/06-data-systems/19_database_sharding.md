@@ -54,6 +54,24 @@ Use fan-out pattern
 └──────────────────────────────────────────┘
 ```
 
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Router
+    participant Shard1 as Shard 1
+    participant Shard2 as Shard 2
+    participant Shard3 as Shard 3
+    participant Shard4 as Shard 4
+
+    Client->>Router: get(user_id=42)
+    Router->>Router: shard_id = hash(42) % 4 = 2
+    Router->>Shard2: get(user_id=42)
+    Shard2-->>Router: user_data
+    Router-->>Client: return user_data
+```
+
 ## Common Questions & Answers
 
 **Q: Shard key selection?** A: Choose high-cardinality (user_id good, gender bad). Enables even distribution.

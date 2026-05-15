@@ -55,6 +55,19 @@ Upload → Transcode (1080p, 720p, 480p, ...) → CDN edge → Player
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Video Upload"] --> B["Transcode<br/>1080p,720p,480p"]
+    B --> C["Store Segments"]
+    C --> D["User Requests"]
+    D --> E["Measure Bandwidth"]
+    E --> F["Select Bitrate"]
+    F --> G["Fetch from CDN"]
+    G --> H["Adaptive Switch<br/>if needed"]
+```
+
 ## Implementation
 
 ### Python Implementation

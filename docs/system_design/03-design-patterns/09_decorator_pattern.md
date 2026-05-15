@@ -49,8 +49,16 @@ decorated.operation():  // DecoratorB behavior + DecoratorA + Original
 
 ## Architecture Diagram
 
-```
-[Visual representation of system components]
+```mermaid
+graph LR
+    Component["Component<br/>operation()"]
+    Decorator["Decorator<br/>operation()"]
+    ConcreteA["ConcreteA<br/>operation()"]
+    ConcreteB["ConcreteB<br/>operation()"]
+
+    Decorator -->|wraps| Component
+    ConcreteA -->|extends| Decorator
+    ConcreteB -->|extends| Decorator
 ```
 
 ## Common Questions & Answers

@@ -175,6 +175,36 @@ Step 6: Integration complete
 | Open/Closed principle | Complexity |
 | Reuses existing code | Don't overuse |
 
+### Architecture Diagram
+
+```mermaid
+graph LR
+    Client["Client"]
+    Target["Target Interface"]
+    Adapter["Adapter<br/>implements Target"]
+    Adaptee["Adaptee<br/>incompatible"]
+
+    Client -->|uses| Target
+    Adapter -->|implements| Target
+    Adapter -->|wraps| Adaptee
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as Adapter
+    participant E as Adaptee
+
+    C->>A: request()
+    A->>A: translate format
+    A->>E: specificRequest()
+    E-->>A: response
+    A->>A: translate format
+    A-->>C: response
+```
+
 ## Complexity
 
 | Operation | Time |

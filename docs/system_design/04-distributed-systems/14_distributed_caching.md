@@ -58,6 +58,19 @@ Cluster: 6 nodes, 100K keys, 1M req/sec. Throughput: 1M/sec distributed (166K/no
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Request Received"] --> B["Validate Input"]
+    B --> C["Process Request"]
+    C --> D["Access Data"]
+    D --> E["Compute Result"]
+    E --> F["Cache if applicable"]
+    F --> G["Format Response"]
+    G --> H["Send to Client"]
+```
+
 ## Implementation
 
 ### Python Implementation

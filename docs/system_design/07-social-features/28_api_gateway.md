@@ -95,6 +95,35 @@ Caching
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph LR
+    Client["Clients"]
+    Gateway["API Gateway<br/>Auth, Rate Limit"]
+    Service1["Service 1"]
+    Service2["Service 2"]
+
+    Client -->|Request| Gateway
+    Gateway -->|Validate| Gateway
+    Gateway -->|Route| Service1
+    Gateway -->|Route| Service2
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Request"] --> B["Authenticate"]
+    B --> C{"Valid?"}
+    C -->|No| D["401"]
+    C -->|Yes| E["Rate Check"]
+    E --> F{"OK?"}
+    F -->|No| G["429"]
+    F -->|Yes| H["Route"]
+    H --> I["Service Process"]
+```
+
 ## Complexity
 
 | Operation | Time |

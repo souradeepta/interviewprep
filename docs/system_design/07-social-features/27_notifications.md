@@ -82,6 +82,39 @@ Dead letter: Failed after retries
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Event["Event"]
+    NotificationService["Notification Service"]
+    Queue["Task Queue"]
+    Workers["Workers"]
+    Channels["Email/SMS/Push"]
+
+    Event -->|Create| NotificationService
+    NotificationService -->|Enqueue| Queue
+    Queue -->|Distribute| Workers
+    Workers -->|Send| Channels
+```
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant E as Event
+    participant NS as Service
+    participant Q as Queue
+    participant W as Worker
+    participant C as Channel
+
+    E->>NS: Notification Event
+    NS->>Q: Enqueue
+    Q-->>W: Task
+    W->>C: Send
+    C-->>User: Delivered
+```
+
 ## Complexity
 
 | Operation | Time |

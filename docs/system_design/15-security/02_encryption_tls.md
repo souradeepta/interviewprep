@@ -59,6 +59,22 @@ Client-Server TLS 1.3:
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Data at Rest"] --> B["Generate Key<br/>Random + KDF"]
+    B --> C["Encrypt<br/>AES-256-CBC"]
+    C --> D["Store in DB/S3"]
+
+    E["Request Data"] --> F["Retrieve<br/>from Storage"]
+    F --> G["Decrypt<br/>with Key"]
+    G --> H["Verify Integrity<br/>MAC"]
+    H --> I{Valid?}
+    I -->|Yes| J["Return Plaintext"]
+    I -->|No| K["Error"]
+```
+
 ## Implementation
 
 ### Python Implementation

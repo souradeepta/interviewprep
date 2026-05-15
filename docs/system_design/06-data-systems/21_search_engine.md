@@ -89,6 +89,34 @@ Edit distance for typos
 
 [Describe a concrete example with step-by-step execution]
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    Docs["Documents"]
+    Indexer["Indexer"]
+    Index["Inverted Index"]
+    Query["Query"]
+    Results["Results"]
+
+    Docs -->|Process| Indexer
+    Indexer -->|Build| Index
+    Query -->|Search| Index
+    Index -->|Score| Results
+```
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Query:"] --> B["Parse"]
+    B --> C["Tokenize"]
+    C --> D["Search Index"]
+    D --> E["Score TF-IDF"]
+    E --> F["Rank"]
+    F --> G["Return Top K"]
+```
+
 ## Complexity
 
 | Operation | Time |

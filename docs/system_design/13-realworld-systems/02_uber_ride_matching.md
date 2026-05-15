@@ -56,6 +56,28 @@ User → geohash(location) → nearby drivers (Redis) → scorer → dispatch
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant R as Rider
+    participant M as Matching
+    participant L as Location
+    participant D as Driver
+    participant N as Notification
+
+    R->>M: Request Ride
+    M->>L: Get nearby drivers
+    L-->>M: Driver list
+    M->>M: Score & rank
+    M->>D: Offer ride
+    D->>D: Accept/Reject
+    alt Accept
+        N->>R: Driver assigned
+        N->>D: Ride details
+    end
+```
+
 ## Implementation
 
 ### Python Implementation
