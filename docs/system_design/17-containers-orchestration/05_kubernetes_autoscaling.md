@@ -1,0 +1,370 @@
+# Kubernetes Autoscaling
+
+## Problem Statement
+
+Design automatic scaling of Kubernetes workloads in response to load: horizontal pod scaling (HPA), vertical pod scaling (VPA), and cluster node scaling (Cluster Autoscaler).
+
+## Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph Metrics["Metrics Pipeline"]
+        MS[Metrics Server\nCPU/Memory]
+        PA[Prometheus Adapter\nCustom Metrics]
+        EA[External Metrics\nSQS queue depth]
+    end
+
+    subgraph Scalers["Autoscalers"]
+        HPA[HPA Controller\nscales pod count]
+        VPA[VPA Controller\nscales pod resources]
+        CA[Cluster Autoscaler\nscales node count]
+        KEDA[KEDA\nevent-driven HPA]
+    end
+
+    subgraph Workloads["Workloads"]
+        D1[Deployment: web\nreplicas=3-20]
+        D2[Deployment: worker\nreplicas=1-50]
+    end
+
+    MS --> HPA
+    PA --> HPA
+    EA --> KEDA
+    HPA --> D1
+    KEDA --> D2
+    HPA --> CA
+    VPA --> D1
+```
+
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant MS as Metrics Server
+    participant HPA as HPA Controller
+    participant API as API Server
+    participant CA as Cluster Autoscaler
+    participant Cloud as Cloud Provider
+
+    loop Every 15s
+        HPA->>MS: GET /apis/metrics.k8s.io/v1beta1/pods
+        MS-->>HPA: {pod: "web-abc", cpu: 850m}
+        HPA->>HPA: desired = ceil(current * (actual/target))
+        HPA->>API: Patch Deployment replicas=7
+    end
+
+    API->>CA: Pending pods (no schedulable node)
+    CA->>CA: Simulate scheduling on new node
+    CA->>Cloud: CreateNodeGroup request
+    Cloud-->>CA: Node provisioning (2-3 min)
+    CA->>API: Node joins cluster
+    API->>API: Pending pods scheduled
+```
+
+## Design
+
+### HPA Algorithm
+
+```
+Desired replicas = ceil(currentReplicas * currentMetricValue / targetMetricValue)
+
+Example: CPU-based HPA
+  Target: 50% CPU utilization
+  Current: 3 pods, avg 80% CPU
+  Desired = ceil(3 * 80 / 50) = ceil(4.8) = 5 pods
+
+Stabilization window:
+  scaleDown.stabilizationWindowSeconds: 300 (5min)
+  -> Must see low utilization for 5min before scaling down
+  -> Prevents thrashing
+
+Scale behavior limits:
+  scaleDown: max 1 pod per 60s (avoid sudden capacity loss)
+  scaleUp: max 4 pods per 15s (burst capacity quickly)
+
+Multiple metrics:
+  CPU: target 60%
+  Memory: target 70%
+  HPA uses the metric requiring MOST replicas (conservative)
+```
+
+### Vertical Pod Autoscaler (VPA)
+
+```
+Modes:
+  Off:    Recommendations only (no automatic changes)
+  Initial: Set resources only at pod creation
+  Auto:   Evict and recreate pods with new resources
+  
+VPA and HPA conflict:
+  NEVER run both on same deployment with CPU/memory metrics
+  VPA changes resource requests -> HPA recalculates
+  Can use VPA (Off mode) + HPA (custom metrics) together
+
+VPA recommendation:
+  Based on historical usage + safety margin
+  LowerBound: minimum safe request
+  Target:     recommended request
+  UpperBound: maximum before diminishing returns
+```
+
+### Cluster Autoscaler
+
+```
+Scale UP trigger:
+  Pod stuck in Pending (Unschedulable) for >10s
+  CA simulates: would a new node fix this?
+  If yes: request cloud provider to add node
+  
+Scale DOWN trigger:
+  Node CPU + memory both < 50% for 10 consecutive minutes
+  CA simulates: can all pods fit on remaining nodes?
+  If yes: cordon + drain node, then delete VM
+
+Node pools:
+  Multiple node pools for different workload types
+  CA scales each pool independently
+  Min/Max per pool: --min=1 --max=10
+
+Limitations:
+  CA doesn't scale down nodes with PodDisruptionBudget violations
+  CA can't scale down nodes with pods using local storage
+  CA can't act on pods with certain annotations (safe-to-evict: false)
+```
+
+## Common Questions & Answers
+
+**Q: What is the HPA sync period?** A: 15 seconds (configurable). HPA polls Metrics Server every 15s. Scale-up can happen as fast as 15s after metric crosses threshold. Scale-down is slower due to stabilization window (default 5min).
+
+**Q: How does KEDA differ from HPA?** A: KEDA (Kubernetes Event-Driven Autoscaler) extends HPA to support external event sources: Kafka consumer lag, SQS queue depth, Redis list length, Prometheus queries. Also supports scale-to-zero (HPA minimum is 1).
+
+**Q: Why does scale-down have a stabilization window?** A: Prevents thrashing. Without it: spike -> scale up -> spike ends -> scale down -> next spike -> scale up again. 5-minute window ensures load is truly gone before removing pods.
+
+**Q: What is the relationship between HPA and Cluster Autoscaler?** A: HPA scales pods (horizontal). When HPA scales up more pods than current nodes can fit, pods go Pending. Cluster Autoscaler sees Pending pods and adds nodes. They're complementary, not competing.
+
+**Q: How do you autoscale on custom metrics?** A: Deploy Prometheus Adapter or KEDA. Define `ScaledObject` (KEDA) or `HorizontalPodAutoscaler` with `type: Pods` and metric name. Common: HTTP request rate, queue depth, business metrics.
+
+## Back-of-Envelope Calculations
+
+```
+HPA reaction time:
+  Metric scrape: 15s
+  HPA reconcile: 15s
+  Pod startup: 15s (cached image + readiness)
+  Total: ~45s from load spike to new pod serving traffic
+
+Node provisioning (cold start):
+  Cloud VM boot: 2-3 min
+  Node join cluster: +30s
+  Pod schedule + start: +30s
+  Total: ~4 min from pod Pending to serving
+
+Cost optimization with CA:
+  10 idle nodes x $0.10/hr = $0.10/hr savings per node removed
+  At $0.10/hr x 720hr/month = $72/month per idle node
+  10 nodes: $720/month savings
+
+Scale-to-zero with KEDA:
+  Batch jobs during off-hours (8hr/day traffic)
+  16hr idle at $0.10/hr x 10 nodes = $16/day savings
+  Monthly: $480 savings for 10-node batch cluster
+
+Stabilization window math:
+  Spike lasts 2 min -> 5 min stabilization -> no scale-down
+  Good: prevents thrash
+  Bad: overprovisioned for 3 min extra
+```
+
+## Design Choices
+
+| Scaler | Trigger | Scale Unit | Scale-to-Zero | Use Case |
+|---|---|---|---|---|
+| HPA (CPU/Mem) | Resource utilization | Pods | No (min=1) | Web services |
+| HPA (custom) | HTTP RPS, queue depth | Pods | No | API services |
+| KEDA | Event sources | Pods | Yes | Batch, queues |
+| VPA (Auto) | Resource waste | Pod CPU/Memory | No | DB, cache |
+| Cluster Autoscaler | Pending pods | Nodes | No (min=1) | All |
+| Karpenter | Pending pods | Nodes | Yes | AWS-native |
+
+## Follow-up Questions
+
+1. How does Karpenter differ from Cluster Autoscaler?
+2. How do you prevent autoscaling from disrupting stateful workloads?
+3. What is a PodDisruptionBudget and how does it interact with CA?
+4. How do you implement predictive autoscaling (scale before traffic arrives)?
+5. How does VPA work with Java apps that have large JVM heap?
+
+## Python Implementation
+
+```python
+import math
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+from collections import deque
+import time
+
+@dataclass
+class HPAConfig:
+    target_cpu_percent: float = 50.0
+    min_replicas: int = 1
+    max_replicas: int = 20
+    scale_up_stabilization_s: float = 0.0
+    scale_down_stabilization_s: float = 300.0
+    scale_up_pods_per_minute: int = 4
+    scale_down_pods_per_minute: int = 1
+
+@dataclass
+class PodMetrics:
+    name: str
+    cpu_percent: float
+    memory_percent: float
+
+class HPAController:
+    def __init__(self, config: HPAConfig):
+        self.cfg = config
+        self._current_replicas = config.min_replicas
+        self._scale_history: deque = deque(maxlen=100)
+        self._last_scale_up: float = 0
+        self._last_scale_down: float = 0
+
+    def compute_desired(self, pod_metrics: List[PodMetrics]) -> int:
+        if not pod_metrics:
+            return self.cfg.min_replicas
+        avg_cpu = sum(m.cpu_percent for m in pod_metrics) / len(pod_metrics)
+        desired = math.ceil(len(pod_metrics) * avg_cpu / self.cfg.target_cpu_percent)
+        desired = max(self.cfg.min_replicas, min(self.cfg.max_replicas, desired))
+        return desired
+
+    def reconcile(self, pod_metrics: List[PodMetrics]) -> int:
+        now = time.time()
+        desired = self.compute_desired(pod_metrics)
+        current = self._current_replicas
+
+        if desired > current:
+            # Scale up: check stabilization
+            if now - self._last_scale_up >= self.cfg.scale_up_stabilization_s:
+                step = min(self.cfg.scale_up_pods_per_minute, desired - current)
+                new_count = current + step
+                print(f"[HPA] Scale UP: {current} -> {new_count} (desired={desired})")
+                self._current_replicas = new_count
+                self._last_scale_up = now
+        elif desired < current:
+            # Scale down: check stabilization window
+            if now - self._last_scale_down >= self.cfg.scale_down_stabilization_s:
+                step = min(self.cfg.scale_down_pods_per_minute, current - desired)
+                new_count = current - step
+                print(f"[HPA] Scale DOWN: {current} -> {new_count} (desired={desired})")
+                self._current_replicas = new_count
+                self._last_scale_down = now
+            else:
+                remaining = self.cfg.scale_down_stabilization_s - (now - self._last_scale_down)
+                print(f"[HPA] Scale down deferred: stabilization {remaining:.0f}s remaining")
+        else:
+            print(f"[HPA] No change: replicas={current}, avg_cpu={sum(m.cpu_percent for m in pod_metrics)/len(pod_metrics):.1f}%")
+
+        return self._current_replicas
+
+class ClusterAutoscaler:
+    def __init__(self, min_nodes: int = 1, max_nodes: int = 10, cpu_per_node: int = 4000):
+        self._nodes = min_nodes
+        self.min_nodes = min_nodes
+        self.max_nodes = max_nodes
+        self.cpu_per_node = cpu_per_node
+
+    def check_pending(self, pending_pods: int, cpu_per_pod: int = 500) -> int:
+        needed_cpu = pending_pods * cpu_per_pod
+        needed_nodes = math.ceil(needed_cpu / self.cpu_per_node)
+        new_nodes = min(self._nodes + needed_nodes, self.max_nodes)
+        if new_nodes > self._nodes:
+            print(f"[CA] Scaling UP nodes: {self._nodes} -> {new_nodes} ({pending_pods} pending pods)")
+            self._nodes = new_nodes
+        return self._nodes
+
+    def check_idle(self, node_utilizations: List[float]) -> int:
+        idle = sum(1 for u in node_utilizations if u < 0.5)
+        if idle > 0 and self._nodes > self.min_nodes:
+            remove = min(idle, self._nodes - self.min_nodes)
+            self._nodes -= remove
+            print(f"[CA] Scaling DOWN nodes: removed {remove} idle nodes, now={self._nodes}")
+        return self._nodes
+
+# Simulation
+hpa = HPAController(HPAConfig(
+    target_cpu_percent=50,
+    min_replicas=2, max_replicas=10,
+    scale_down_stabilization_s=0  # 0 for demo
+))
+ca = ClusterAutoscaler(min_nodes=2, max_nodes=10)
+
+print("=== Low load ===")
+metrics = [PodMetrics(f"pod-{i}", cpu_percent=30.0, memory_percent=40.0) for i in range(2)]
+hpa.reconcile(metrics)
+
+print("\n=== High load ===")
+metrics = [PodMetrics(f"pod-{i}", cpu_percent=90.0, memory_percent=60.0) for i in range(2)]
+replicas = hpa.reconcile(metrics)
+
+print("\n=== Pending pods -> CA ===")
+ca.check_pending(pending_pods=5)
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class KubeAutoscaler {
+    record PodMetrics(String name, double cpuPercent) {}
+
+    static class HPA {
+        double targetCpu; int minReplicas, maxReplicas, current;
+
+        HPA(double targetCpu, int min, int max, int initial) {
+            this.targetCpu = targetCpu; this.minReplicas = min;
+            this.maxReplicas = max; this.current = initial;
+        }
+
+        int reconcile(List<PodMetrics> metrics) {
+            double avg = metrics.stream().mapToDouble(PodMetrics::cpuPercent).average().orElse(0);
+            int desired = (int) Math.ceil(current * avg / targetCpu);
+            desired = Math.max(minReplicas, Math.min(maxReplicas, desired));
+            System.out.printf("[HPA] avg=%.0f%% current=%d desired=%d%n", avg, current, desired);
+            current = desired;
+            return current;
+        }
+    }
+
+    static class ClusterAutoscaler {
+        int nodes, minNodes, maxNodes;
+        ClusterAutoscaler(int min, int max) { nodes = min; minNodes = min; maxNodes = max; }
+
+        int checkPending(int pendingPods) {
+            if (pendingPods > 0 && nodes < maxNodes) {
+                System.out.printf("[CA] Adding nodes for %d pending pods%n", pendingPods);
+                nodes = Math.min(nodes + 1, maxNodes);
+            }
+            return nodes;
+        }
+    }
+
+    public static void main(String[] args) {
+        HPA hpa = new HPA(50, 2, 10, 2);
+        var lowLoad = List.of(new PodMetrics("p1", 25), new PodMetrics("p2", 30));
+        var highLoad = List.of(new PodMetrics("p1", 85), new PodMetrics("p2", 90));
+
+        System.out.println("Low load:"); hpa.reconcile(lowLoad);
+        System.out.println("High load:"); hpa.reconcile(highLoad);
+
+        ClusterAutoscaler ca = new ClusterAutoscaler(2, 10);
+        ca.checkPending(3);
+    }
+}
+```
+
+## Complexity
+
+| Operation | Time |
+|---|---|
+| HPA desired replica calculation | O(pods) |
+| Cluster Autoscaler scale-up decision | O(pending pods x node pools) |
+| Cluster Autoscaler scale-down | O(nodes x pods/node) |
+| VPA recommendation generation | O(pod history samples) |
