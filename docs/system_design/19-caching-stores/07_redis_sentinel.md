@@ -1,0 +1,476 @@
+# Redis Sentinel
+
+## Problem Statement
+
+Design a high-availability Redis setup using Redis Sentinel for automatic failover — monitoring master health, electing a new master on failure, and reconfiguring clients without manual intervention.
+
+## Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph Sentinels["Sentinel Quorum (3 nodes)"]
+        S1["Sentinel 1\n192.168.1.1:26379"]
+        S2["Sentinel 2\n192.168.1.2:26379"]
+        S3["Sentinel 3\n192.168.1.3:26379"]
+    end
+
+    subgraph Redis["Redis Replication"]
+        M["Master\n192.168.1.10:6379"]
+        R1["Replica 1\n192.168.1.11:6379"]
+        R2["Replica 2\n192.168.1.12:6379"]
+    end
+
+    subgraph Clients["Application Clients"]
+        APP["App Server\n(Sentinel-aware client)"]
+    end
+
+    S1 -->|monitor + PING| M
+    S2 -->|monitor + PING| M
+    S3 -->|monitor + PING| M
+    S1 <-->|gossip| S2
+    S2 <-->|gossip| S3
+    M -->|replicate| R1
+    M -->|replicate| R2
+    APP -->|SENTINEL get-master-addr-by-name| S1
+```
+
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant S1 as Sentinel 1
+    participant S2 as Sentinel 2
+    participant S3 as Sentinel 3
+    participant M as Master
+    participant R1 as Replica 1
+    participant APP as Client
+
+    loop Every 1s
+        S1->>M: PING
+        M-->>S1: PONG
+    end
+
+    Note over M: Master fails (no PONG for down-after-ms)
+    S1->>S1: Mark master as SDOWN (subjective down)
+    S1->>S2: Is master SDOWN for you?
+    S2-->>S1: YES
+    S1->>S3: Is master SDOWN for you?
+    S3-->>S1: YES
+    S1->>S1: Quorum (2/3) reached -> ODOWN
+
+    S1->>S2: Vote for me as leader sentinel
+    S2-->>S1: VOTE granted
+    S1->>S1: I am the leader, starting failover
+
+    S1->>R1: SLAVEOF NO ONE (promote to master)
+    R1-->>S1: OK
+    S1->>R2: REPLICAOF 192.168.1.11 6379 (replicate from R1)
+    S1->>APP: CLIENT KILL (force reconnect)
+    APP->>S1: SENTINEL get-master-addr-by-name mymaster
+    S1-->>APP: 192.168.1.11:6379
+    APP->>R1: reconnect (new master)
+```
+
+## Design
+
+### Sentinel Configuration
+
+```
+# sentinel.conf
+sentinel monitor mymaster 192.168.1.10 6379 2
+  # 2 = quorum needed to declare ODOWN
+
+sentinel down-after-milliseconds mymaster 5000
+  # Time without PONG before SDOWN
+
+sentinel failover-timeout mymaster 60000
+  # Max time for failover to complete
+
+sentinel parallel-syncs mymaster 1
+  # Replicas to sync simultaneously during failover
+  # 1 = sequential (less disruption)
+
+sentinel auth-pass mymaster secretpassword
+  # Required if master has requirepass
+
+min-replicas-to-write 1
+min-replicas-max-lag 10
+  # Master refuses writes if fewer than 1 replica is in sync
+  # Prevents data loss on isolated master
+```
+
+### Failure Detection
+
+```
+SDOWN (Subjective Down):
+  Single sentinel sees master as unreachable
+  Conservative: might be network blip
+
+ODOWN (Objective Down):
+  Quorum (>= N) sentinels agree on SDOWN
+  Triggers failover process
+
+Quorum calculation:
+  3 sentinels, quorum=2: can detect failure if 1 sentinel fails
+  5 sentinels, quorum=3: can detect if 2 sentinels fail
+
+Failover leader election:
+  Sentinels vote for who runs the failover (Raft-like)
+  Majority vote (>N/2 sentinels) required
+  Leader sentinel orchestrates promotion
+```
+
+### Sentinel vs Cluster
+
+```
+Sentinel:
+  - Single shard, vertical scaling
+  - Simple setup
+  - Automatic failover for single-instance HA
+  - Client must use Sentinel-aware library
+  - Transparent to application after initial config
+
+Redis Cluster:
+  - Horizontal scaling (multiple shards)
+  - Higher complexity
+  - Built-in HA (replicas per shard)
+  - Different client protocol (hash slots)
+
+When to use Sentinel:
+  - Single Redis instance needs HA
+  - Not large enough to warrant cluster
+  - < 1TB data, < 1M ops/s
+```
+
+## Common Questions & Answers
+
+**Q: What is the minimum number of Sentinels?** A: 3. With 2 sentinels: if 1 fails, quorum of 1/2 = 50% — below majority, no failover. With 3: if 1 fails, remaining 2 can still reach quorum of 2/3. Odd numbers recommended (3, 5, 7).
+
+**Q: How does the application connect to Redis via Sentinel?** A: Client connects to any Sentinel and runs `SENTINEL get-master-addr-by-name mymaster` to get current master IP:port. Sentinel-aware clients (jedis, lettuce, redis-py) handle this automatically. On disconnect, they re-query Sentinel.
+
+**Q: Can Sentinel guarantee zero data loss?** A: No. Async replication means replicas may lag. Master failure before replica syncs = data loss. Use `min-replicas-to-write 1` + `min-replicas-max-lag 10` to reject writes when no up-to-date replica exists.
+
+**Q: How long does Sentinel failover take?** A: Detection: `down-after-milliseconds` (5-30s typical). Election: 1-2s. Promotion: 1-3s. Client reconnect: depends on client timeout. Total: 10-60 seconds. Not suitable for sub-second HA requirements (use active-active or Cluster).
+
+**Q: What happens to write requests during failover?** A: Writes to old master are rejected (it's down). Sentinel has not yet promoted new master — brief write gap. With client retry logic: ~30 second retry window until new master is ready.
+
+## Back-of-Envelope Calculations
+
+```
+Sentinel failover time:
+  down-after-ms: 10s (detection)
+  Leader election: 2s
+  SLAVEOF NO ONE: 1s
+  Replica re-sync: 2-5s
+  Client reconnect: 1-2s
+  Total: ~16-20 seconds
+
+Data loss window:
+  Async replication lag: ~1ms intra-DC
+  Master fails: lose ~1ms of writes
+  With min-replicas-max-lag=10: lose up to 10s if replica lags
+  
+Sentinel overhead:
+  3 sentinels x 200MB RAM each = 600MB total
+  PING overhead: 3 sentinels x 1 PING/s = minimal
+  Gossip: ~1KB/s between sentinels
+
+Client reconnect:
+  3 app servers x connection pool 10 = 30 connections to re-establish
+  TCP handshake + Redis auth: ~5ms each = 150ms total reconnect time
+```
+
+## Design Choices
+
+| Setup | HA | Capacity | Complexity | Failover Time |
+|---|---|---|---|---|
+| Standalone | None | 1x | Low | Manual |
+| Master + Replica | Read HA | 1x write | Low | Manual |
+| Sentinel (3+3) | Write HA | 1x | Medium | 10-60s |
+| Cluster (3+3) | Full HA | 3x | High | 30s per shard |
+| Multi-region Sentinel | Cross-DC | 1x | High | Minutes |
+
+## Follow-up Questions
+
+1. How do you upgrade Redis (master + replicas) with zero downtime using Sentinel?
+2. How does Redis Sentinel handle split-brain when network partitions occur?
+3. How do you monitor Sentinel events (failovers, reconfigurations)?
+4. How does client-side sentinel work in connection pooling libraries (e.g., Lettuce)?
+5. How do you set up Redis Sentinel in Kubernetes?
+
+## Python Implementation
+
+```python
+import socket
+import time
+import threading
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Tuple
+from enum import Enum
+import random
+
+class NodeState(Enum):
+    ALIVE = "alive"
+    SDOWN = "sdown"
+    ODOWN = "odown"
+
+@dataclass
+class RedisNode:
+    name: str
+    host: str
+    port: int
+    is_master: bool = True
+    replication_offset: int = 0
+    alive: bool = True
+
+@dataclass
+class SentinelNode:
+    sentinel_id: str
+    host: str
+    port: int
+    _sdown_flags: Dict[str, bool] = field(default_factory=dict)
+
+    def mark_sdown(self, node_name: str):
+        self._sdown_flags[node_name] = True
+
+    def is_sdown(self, node_name: str) -> bool:
+        return self._sdown_flags.get(node_name, False)
+
+class SentinelCluster:
+    def __init__(self, quorum: int = 2):
+        self.quorum = quorum
+        self._sentinels: List[SentinelNode] = []
+        self._nodes: Dict[str, RedisNode] = {}
+        self._current_master: Optional[str] = None
+        self._failover_in_progress = False
+        self._epoch = 0
+        self._votes: Dict[str, List[str]] = {}
+
+    def add_sentinel(self, sentinel: SentinelNode):
+        self._sentinels.append(sentinel)
+
+    def add_redis_node(self, node: RedisNode):
+        self._nodes[node.name] = node
+        if node.is_master:
+            self._current_master = node.name
+
+    def _ping_node(self, sentinel: SentinelNode, node_name: str) -> bool:
+        node = self._nodes.get(node_name)
+        return node.alive if node else False
+
+    def monitor_cycle(self):
+        for sentinel in self._sentinels:
+            for node_name, node in self._nodes.items():
+                if not node.is_master:
+                    continue
+                alive = self._ping_node(sentinel, node_name)
+                if not alive:
+                    sentinel.mark_sdown(node_name)
+
+    def check_odown(self, node_name: str) -> bool:
+        sdown_count = sum(1 for s in self._sentinels if s.is_sdown(node_name))
+        return sdown_count >= self.quorum
+
+    def _elect_leader_sentinel(self) -> Optional[SentinelNode]:
+        alive_sentinels = [s for s in self._sentinels]
+        if not alive_sentinels:
+            return None
+        # Raft-like: first sentinel that reaches quorum wins
+        votes: Dict[str, int] = {}
+        for sentinel in alive_sentinels:
+            candidate = random.choice(alive_sentinels).sentinel_id
+            votes[candidate] = votes.get(candidate, 0) + 1
+        winner = max(votes, key=votes.get)
+        if votes[winner] >= len(alive_sentinels) // 2 + 1:
+            return next(s for s in alive_sentinels if s.sentinel_id == winner)
+        return alive_sentinels[0]
+
+    def _select_new_master(self) -> Optional[str]:
+        replicas = [n for n in self._nodes.values() if not n.is_master and n.alive]
+        if not replicas:
+            return None
+        # Select replica with highest replication offset
+        best = max(replicas, key=lambda n: n.replication_offset)
+        return best.name
+
+    def failover(self, failed_master_name: str) -> bool:
+        if self._failover_in_progress:
+            print("[Sentinel] Failover already in progress")
+            return False
+
+        if not self.check_odown(failed_master_name):
+            print(f"[Sentinel] No ODOWN quorum for {failed_master_name}")
+            return False
+
+        self._failover_in_progress = True
+        leader = self._elect_leader_sentinel()
+        if not leader:
+            self._failover_in_progress = False
+            return False
+
+        print(f"[Sentinel] Failover started by leader: {leader.sentinel_id}")
+
+        # Mark failed master as dead
+        failed_node = self._nodes[failed_master_name]
+        failed_node.is_master = False
+
+        # Promote new master
+        new_master_name = self._select_new_master()
+        if not new_master_name:
+            print("[Sentinel] No suitable replica for promotion!")
+            self._failover_in_progress = False
+            return False
+
+        new_master = self._nodes[new_master_name]
+        new_master.is_master = True
+        self._current_master = new_master_name
+        self._epoch += 1
+
+        print(f"[Sentinel] Promoted {new_master_name} ({new_master.host}:{new_master.port}) as new master")
+
+        # Reconfigure other replicas
+        for name, node in self._nodes.items():
+            if name != new_master_name and not node.is_master and node.alive:
+                print(f"[Sentinel] Reconfiguring {name} to replicate from {new_master_name}")
+
+        self._failover_in_progress = False
+        return True
+
+    def get_master_addr(self) -> Optional[Tuple[str, int]]:
+        if self._current_master:
+            node = self._nodes.get(self._current_master)
+            if node and node.alive and node.is_master:
+                return node.host, node.port
+        return None
+
+class SentinelAwareClient:
+    def __init__(self, sentinels: List[Tuple[str, int]], master_name: str = "mymaster"):
+        self.sentinel_addrs = sentinels
+        self.master_name = master_name
+        self._master: Optional[Tuple[str, int]] = None
+        self._sentinel_cluster: Optional[SentinelCluster] = None
+
+    def connect(self, cluster: SentinelCluster):
+        self._sentinel_cluster = cluster
+        self._master = cluster.get_master_addr()
+        if self._master:
+            print(f"[Client] Connected to master at {self._master}")
+
+    def execute(self, command: str, *args) -> Any:
+        master = self._sentinel_cluster.get_master_addr() if self._sentinel_cluster else self._master
+        if not master:
+            raise ConnectionError("No master available")
+        print(f"[Client] Execute {command} on {master}")
+        return f"Result of {command}"
+
+    def reconnect(self):
+        self._master = self._sentinel_cluster.get_master_addr() if self._sentinel_cluster else None
+        if self._master:
+            print(f"[Client] Reconnected to new master: {self._master}")
+        else:
+            print("[Client] No master available yet")
+
+# Demo
+cluster = SentinelCluster(quorum=2)
+sentinels = [
+    SentinelNode("s1", "10.0.0.1", 26379),
+    SentinelNode("s2", "10.0.0.2", 26379),
+    SentinelNode("s3", "10.0.0.3", 26379),
+]
+for s in sentinels:
+    cluster.add_sentinel(s)
+
+nodes = [
+    RedisNode("master", "10.0.1.1", 6379, is_master=True, replication_offset=1000),
+    RedisNode("replica1", "10.0.1.2", 6379, is_master=False, replication_offset=999),
+    RedisNode("replica2", "10.0.1.3", 6379, is_master=False, replication_offset=995),
+]
+for n in nodes:
+    cluster.add_redis_node(n)
+
+client = SentinelAwareClient([("10.0.0.1", 26379)])
+client.connect(cluster)
+
+print(f"\nCurrent master: {cluster.get_master_addr()}")
+client.execute("SET", "key1", "value1")
+
+print("\n=== Simulating Master Failure ===")
+cluster._nodes["master"].alive = False
+cluster.monitor_cycle()
+print(f"SDOWN votes: {sum(1 for s in sentinels if s.is_sdown('master'))}")
+
+cluster.failover("master")
+print(f"\nNew master after failover: {cluster.get_master_addr()}")
+client.reconnect()
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class RedisSentinel {
+    enum State { ALIVE, SDOWN, ODOWN }
+
+    record RedisNode(String name, String host, int port, boolean isMaster, int replOffset) {}
+
+    static class Sentinel {
+        String id; Set<String> sdownFlags = new HashSet<>();
+        Sentinel(String id) { this.id = id; }
+        void markSdown(String name) { sdownFlags.add(name); }
+        boolean isSdown(String name) { return sdownFlags.contains(name); }
+    }
+
+    static class SentinelCluster {
+        List<Sentinel> sentinels = new ArrayList<>();
+        Map<String, RedisNode> nodes = new HashMap<>();
+        String masterName;
+        int quorum;
+
+        SentinelCluster(int quorum) { this.quorum = quorum; }
+        void addSentinel(Sentinel s) { sentinels.add(s); }
+        void addNode(RedisNode n) { nodes.put(n.name()); if (n.isMaster()) masterName = n.name(); }
+
+        boolean failover(String failedMaster) {
+            long sdownCount = sentinels.stream().filter(s -> s.isSdown(failedMaster)).count();
+            if (sdownCount < quorum) return false;
+            Optional<RedisNode> newMaster = nodes.values().stream()
+                .filter(n -> !n.isMaster())
+                .max(Comparator.comparingInt(RedisNode::replOffset));
+            newMaster.ifPresent(n -> {
+                masterName = n.name();
+                System.out.println("Promoted: " + n.name() + " at " + n.host() + ":" + n.port());
+            });
+            return newMaster.isPresent();
+        }
+
+        String[] getMasterAddr() {
+            RedisNode n = nodes.get(masterName);
+            return n != null ? new String[]{n.host(), String.valueOf(n.port())} : null;
+        }
+    }
+
+    public static void main(String[] args) {
+        SentinelCluster cluster = new SentinelCluster(2);
+        for (int i = 1; i <= 3; i++) cluster.addSentinel(new Sentinel("s" + i));
+        cluster.addNode(new RedisNode("master", "10.0.1.1", 6379, true, 1000));
+        cluster.addNode(new RedisNode("replica1", "10.0.1.2", 6379, false, 999));
+        cluster.addNode(new RedisNode("replica2", "10.0.1.3", 6379, false, 990));
+
+        System.out.println("Master: " + Arrays.toString(cluster.getMasterAddr()));
+        cluster.sentinels.forEach(s -> s.markSdown("master"));
+        cluster.failover("master");
+        System.out.println("New master: " + Arrays.toString(cluster.getMasterAddr()));
+    }
+}
+```
+
+## Complexity
+
+| Operation | Time |
+|---|---|
+| Sentinel PING check | O(1) per node |
+| ODOWN detection | O(sentinels) |
+| Leader election | O(sentinels) |
+| Failover promotion | O(replicas) |
+| Client reconnect | O(1) sentinel query |
