@@ -1,6 +1,6 @@
 # Advanced Algorithms
 
-A comprehensive guide to 25+ advanced algorithms covering dynamic programming optimization, graph algorithms, string matching, computational geometry, and advanced data structures. Each algorithm includes solution flowcharts, complexity analysis, use cases, and interview Q&A.
+A comprehensive guide to 26+ advanced algorithms covering dynamic programming optimization, graph algorithms, string matching, computational geometry, and advanced data structures. Each algorithm includes solution flowcharts, complexity analysis, use cases, and interview Q&A.
 
 ---
 
@@ -2201,6 +2201,73 @@ Output in original order: Q1=2, Q2=3, Q3=2
 1. **Q: Why does sorting queries improve time complexity?** A: Sorting ensures the two pointers move monotonically. Without sorting, pointers could jump around the array. With sorting, the total movement is O(m * sqrt(n)), which is better than brute force O(m * n).
 
 2. **Q: Can you use Mo's algorithm for online queries?** A: No, Mo's algorithm requires offline processing because it reorders queries. For online queries, use segment trees or other online structures.
+
+---
+
+## Boyer-Moore Majority Vote Algorithm
+
+**Description**
+
+Finds elements appearing more than n/k times in an array. For k=2, finds the majority element (>n/2). The algorithm uses a "voting" strategy: elements of different types cancel each other out, leaving only the majority candidate.
+
+**Solution Approach Flowchart**
+
+```mermaid
+flowchart TD
+    A["START: Find element<br/>with >n/2 frequency"] --> B["Initialize candidate=null,<br/>count=0"]
+    B --> C["Pass 1: Linear scan"]
+    C --> D["For each element:<br/>if count==0: new candidate<br/>else if equal: count++<br/>else: count--"]
+    D --> E["One candidate found<br/>or None"]
+    E --> F["Pass 2: Verify candidate"]
+    F --> G["Count occurrences"]
+    G --> H{"Count<br/>>&nbsp;n/2?"}
+    H -->|Yes| I["END: Majority found"]
+    H -->|No| J["END: No majority"]
+```
+
+**Complexity**
+
+- Time: O(n) for two passes
+- Space: O(1) for majority, O(k) for top-k frequent
+- Optimal for this problem class
+
+**When to Use**
+
+- Find majority element (>n/2)
+- Find k elements appearing >n/(k+1) times
+- Limited memory constraints
+- Interview favorites
+
+**Example**
+
+```
+Array: [3, 3, 4, 2, 4, 4, 2, 4, 4]
+Find majority (>n/2 = >4.5):
+
+Pass 1 - Voting:
+  idx 0: count=0 → candidate=3, count=1
+  idx 1: 3==3 → count=2
+  idx 2: 4!=3 → count=1
+  idx 3: 2!=3 → count=0
+  idx 4: count=0 → candidate=4, count=1
+  idx 5: 4==4 → count=2
+  idx 6: 2!=4 → count=1
+  idx 7: 4==4 → count=2
+  idx 8: 4==4 → count=3
+  Candidate=4
+
+Pass 2 - Verify:
+  Count of 4: 5 occurrences
+  5 > 4? YES → 4 is majority ✓
+```
+
+**Interview Q&A**
+
+1. **Q: Why does the voting approach work?** A: When we see different elements, we "cancel" them out. Each majority element can neutralize one non-majority element. After cancellation, the remaining candidate must be the majority.
+
+2. **Q: What if there's no majority element?** A: The algorithm still finds a candidate, but verification in pass 2 will show count ≤ n/2. Always verify!
+
+3. **Q: How do we find k elements appearing >n/(k+1) times?** A: Maintain k candidates with counters. When we exceed k distinct elements, decrement all counters and remove zeros. This generalizes the majority voting idea.
 
 ---
 

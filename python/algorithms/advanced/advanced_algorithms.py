@@ -1585,6 +1585,84 @@ class MosAlgorithm:
 # MISCELLANEOUS ADVANCED ALGORITHMS
 # ============================================================================
 
+class BoyerMooreVoting:
+    """
+    Boyer-Moore Majority Vote Algorithm - Find majority element(s)
+
+    Find element(s) appearing more than n/k times in array.
+
+    Time: O(n)
+    Space: O(k)
+    """
+
+    @staticmethod
+    def find_majority_element(arr: List[int]) -> List[int]:
+        """Find all elements appearing more than n/2 times."""
+        if not arr:
+            return []
+
+        candidate = None
+        count = 0
+
+        # Phase 1: Find candidate
+        for num in arr:
+            if count == 0:
+                candidate = num
+                count = 1
+            elif num == candidate:
+                count += 1
+            else:
+                count -= 1
+
+        # Phase 2: Verify candidate
+        count = 0
+        for num in arr:
+            if num == candidate:
+                count += 1
+
+        if count > len(arr) // 2:
+            return [candidate]
+        return []
+
+    @staticmethod
+    def find_top_k_frequent(arr: List[int], k: int) -> List[int]:
+        """Find all k elements appearing more than n/(k+1) times."""
+        if not arr or k == 0:
+            return []
+
+        # Phase 1: Find up to k candidates
+        candidates = {}
+        count_arr = {}
+
+        for num in arr:
+            if num in candidates:
+                count_arr[num] += 1
+            elif len(candidates) < k:
+                candidates[num] = True
+                count_arr[num] = 1
+            else:
+                # Reduce all counts by 1
+                for c in list(candidates.keys()):
+                    count_arr[c] -= 1
+                    if count_arr[c] == 0:
+                        del candidates[c]
+                        del count_arr[c]
+
+                count_arr[num] = 1
+                candidates[num] = True
+
+        # Phase 2: Verify candidates
+        result = []
+        threshold = len(arr) // (k + 1)
+
+        for candidate in candidates:
+            count = sum(1 for num in arr if num == candidate)
+            if count > threshold:
+                result.append(candidate)
+
+        return result
+
+
 class QuickSelect:
     """
     QuickSelect - Find k-th smallest element in O(n) average time
@@ -1834,8 +1912,18 @@ if __name__ == "__main__":
     print(f"Activities: {activities}")
     print(f"Maximum non-overlapping: {selected}")
 
-    # 12. QuickSelect
-    print("\n12. QUICKSELECT - Find k-th smallest")
+    # 12. BOYER-MOORE MAJORITY VOTE
+    print("\n12. BOYER-MOORE MAJORITY VOTE ALGORITHM")
+    print("-" * 70)
+    arr = [3, 3, 4, 2, 4, 4, 2, 4, 4]
+    majority = BoyerMooreVoting.find_majority_element(arr)
+    print(f"Array: {arr}")
+    print(f"Majority element (>n/2): {majority}")
+    top_k = BoyerMooreVoting.find_top_k_frequent([1, 1, 1, 2, 2, 3], k=2)
+    print(f"Top k=2 frequent (>n/3): {top_k}")
+
+    # 13. QuickSelect
+    print("\n13. QUICKSELECT - Find k-th smallest")
     print("-" * 70)
     arr = [3, 2, 1, 5, 4]
     k = 2
@@ -1843,16 +1931,16 @@ if __name__ == "__main__":
     print(f"Array: {[3, 2, 1, 5, 4]}")
     print(f"{k}-th smallest element (0-indexed): {result}")
 
-    # 13. Huffman Coding
-    print("\n13. HUFFMAN CODING")
+    # 14. Huffman Coding
+    print("\n14. HUFFMAN CODING")
     print("-" * 70)
     frequencies = {'a': 5, 'b': 9, 'c': 12, 'd': 13, 'e': 16, 'f': 45}
     codes = HuffmanCoding.build_codes(frequencies)
     print(f"Frequencies: {frequencies}")
     print(f"Huffman codes: {codes}")
 
-    # 14. Z-Algorithm
-    print("\n14. Z-ALGORITHM")
+    # 15. Z-Algorithm
+    print("\n15. Z-ALGORITHM")
     print("-" * 70)
     pattern = "aab"
     text = "aabaaab"

@@ -961,6 +961,95 @@ public class AdvancedAlgorithms {
     // ========================================================================
 
     /**
+     * Boyer-Moore Majority Vote Algorithm - Find majority element(s)
+     * Time: O(n)
+     * Space: O(1) for majority, O(k) for top-k
+     */
+    static class BoyerMooreVoting {
+        static List<Integer> findMajorityElement(int[] arr) {
+            if (arr.length == 0) return new ArrayList<>();
+
+            int candidate = 0;
+            int count = 0;
+
+            // Phase 1: Find candidate
+            for (int num : arr) {
+                if (count == 0) {
+                    candidate = num;
+                    count = 1;
+                } else if (num == candidate) {
+                    count++;
+                } else {
+                    count--;
+                }
+            }
+
+            // Phase 2: Verify candidate
+            count = 0;
+            for (int num : arr) {
+                if (num == candidate) count++;
+            }
+
+            List<Integer> result = new ArrayList<>();
+            if (count > arr.length / 2) {
+                result.add(candidate);
+            }
+            return result;
+        }
+
+        static List<Integer> findTopKFrequent(int[] arr, int k) {
+            if (arr.length == 0 || k == 0) return new ArrayList<>();
+
+            // Phase 1: Find up to k candidates
+            Map<Integer, Integer> candidates = new HashMap<>();
+            Map<Integer, Integer> counts = new HashMap<>();
+
+            for (int num : arr) {
+                if (candidates.containsKey(num)) {
+                    counts.put(num, counts.get(num) + 1);
+                } else if (candidates.size() < k) {
+                    candidates.put(num, 1);
+                    counts.put(num, 1);
+                } else {
+                    // Reduce all counts by 1
+                    List<Integer> toRemove = new ArrayList<>();
+                    for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+                        int c = entry.getValue() - 1;
+                        if (c == 0) {
+                            toRemove.add(entry.getKey());
+                        } else {
+                            counts.put(entry.getKey(), c);
+                        }
+                    }
+                    for (int c : toRemove) {
+                        candidates.remove(c);
+                        counts.remove(c);
+                    }
+
+                    counts.put(num, 1);
+                    candidates.put(num, 1);
+                }
+            }
+
+            // Phase 2: Verify candidates
+            List<Integer> result = new ArrayList<>();
+            int threshold = arr.length / (k + 1);
+
+            for (int candidate : candidates.keySet()) {
+                int count = 0;
+                for (int num : arr) {
+                    if (num == candidate) count++;
+                }
+                if (count > threshold) {
+                    result.add(candidate);
+                }
+            }
+
+            return result;
+        }
+    }
+
+    /**
      * QuickSelect - Find k-th smallest element
      * Time: O(n) average
      */
@@ -1160,8 +1249,19 @@ public class AdvancedAlgorithms {
         points.add(new Point(5, 1));
         System.out.println("Minimum distance: " + String.format("%.4f", ClosestPair.closest(points)));
 
-        // 6. Boyer-Moore
-        System.out.println("\n6. BOYER-MOORE STRING MATCHING");
+        // 6. Boyer-Moore Majority Vote
+        System.out.println("\n6. BOYER-MOORE MAJORITY VOTE ALGORITHM");
+        System.out.println("-".repeat(70));
+        int[] arr = {3, 3, 4, 2, 4, 4, 2, 4, 4};
+        System.out.println("Array: " + java.util.Arrays.toString(arr));
+        List<Integer> majority = BoyerMooreVoting.findMajorityElement(arr);
+        System.out.println("Majority element (>n/2): " + majority);
+        int[] arr2 = {1, 1, 1, 2, 2, 3};
+        List<Integer> topK = BoyerMooreVoting.findTopKFrequent(arr2, 2);
+        System.out.println("Top k=2 frequent (>n/3): " + topK);
+
+        // 7. Boyer-Moore String Matching
+        System.out.println("\n7. BOYER-MOORE STRING MATCHING");
         System.out.println("-".repeat(70));
         BoyerMoore bms = new BoyerMoore("PATTERN");
         String text = "THIS IS A PATTERN MATCHING PATTERN ALGORITHM";
@@ -1169,8 +1269,8 @@ public class AdvancedAlgorithms {
         System.out.println("Pattern: PATTERN");
         System.out.println("Matches at: " + bms.search(text));
 
-        // 7. Z-Algorithm
-        System.out.println("\n7. Z-ALGORITHM");
+        // 8. Z-Algorithm
+        System.out.println("\n8. Z-ALGORITHM");
         System.out.println("-".repeat(70));
         String pattern = "aab";
         String txt = "aabaaab";
@@ -1178,8 +1278,8 @@ public class AdvancedAlgorithms {
         System.out.println("Text: " + txt);
         System.out.println("Matches at: " + ZAlgorithm.patternSearch(pattern, txt));
 
-        // 8. Heavy-Light Decomposition
-        System.out.println("\n8. HEAVY-LIGHT DECOMPOSITION");
+        // 9. Heavy-Light Decomposition
+        System.out.println("\n9. HEAVY-LIGHT DECOMPOSITION");
         System.out.println("-".repeat(70));
         @SuppressWarnings("unchecked")
         List<Integer>[] adj = new List[5];
@@ -1192,16 +1292,16 @@ public class AdvancedAlgorithms {
         HeavyLightDecomposition hld = new HeavyLightDecomposition(5, adj);
         System.out.println("Path from 3 to 4: " + hld.getPath(3, 4));
 
-        // 9. Square Root Decomposition
-        System.out.println("\n9. SQUARE ROOT DECOMPOSITION");
+        // 10. Square Root Decomposition
+        System.out.println("\n10. SQUARE ROOT DECOMPOSITION");
         System.out.println("-".repeat(70));
-        int[] arr = {1, 3, 5, 7, 9, 11};
-        SquareRootDecomposition sqrt = new SquareRootDecomposition(arr);
-        System.out.println("Array: " + Arrays.toString(arr));
+        int[] sqrtArr = {1, 3, 5, 7, 9, 11};
+        SquareRootDecomposition sqrt = new SquareRootDecomposition(sqrtArr);
+        System.out.println("Array: " + Arrays.toString(sqrtArr));
         System.out.println("Range sum [1, 4]: " + sqrt.rangeSum(1, 4));
 
-        // 10. Activity Selection
-        System.out.println("\n10. ACTIVITY SELECTION");
+        // 11. Activity Selection
+        System.out.println("\n11. ACTIVITY SELECTION");
         System.out.println("-".repeat(70));
         ActivitySelection.Activity[] activities = {
                 new ActivitySelection.Activity(1, 3),
@@ -1212,8 +1312,8 @@ public class AdvancedAlgorithms {
         };
         System.out.println("Maximum non-overlapping activities: " + ActivitySelection.maxActivities(activities));
 
-        // 11. QuickSelect
-        System.out.println("\n11. QUICKSELECT");
+        // 12. QuickSelect
+        System.out.println("\n12. QUICKSELECT");
         System.out.println("-".repeat(70));
         int[] testArr = {3, 2, 1, 5, 4};
         System.out.println("Array: " + Arrays.toString(testArr));

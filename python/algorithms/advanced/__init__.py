@@ -49,6 +49,7 @@ from .advanced_algorithms import (
     MosAlgorithm,
 
     # Miscellaneous
+    BoyerMooreVoting,
     QuickSelect,
     HuffmanCoding,
     ActivitySelection,
@@ -64,5 +65,5 @@ __all__ = [
     'ConvexHullGrahamScan', 'ConvexHullAndrewChain', 'ClosestPair',
     'LineIntersection', 'PointInPolygon',
     'HeavyLightDecomposition', 'SquareRootDecomposition', 'MosAlgorithm',
-    'QuickSelect', 'HuffmanCoding', 'ActivitySelection',
+    'BoyerMooreVoting', 'QuickSelect', 'HuffmanCoding', 'ActivitySelection',
 ]
