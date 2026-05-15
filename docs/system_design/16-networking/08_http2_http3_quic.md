@@ -152,18 +152,6 @@ Built-in TLS 1.3:       No separate TLS handshake layer
 | First-byte latency | 2 RTT | 2 RTT | 0 RTT (resume) |
 | Mobile network changes | Breaks TCP | Breaks TCP | Survives |
 
-## Common Questions & Answers
-
-**Q: Why did HTTP/2 server push get deprecated?** A: Servers couldn't know what client already caches. Chrome removed support in 2022. Better alternatives: `103 Early Hints`, `<link rel=preload>` headers.
-
-**Q: What is TCP head-of-line blocking in HTTP/2?** A: HTTP/2 has multiple streams per TCP connection. If one TCP packet is lost, all streams wait for retransmission. QUIC fixes this — each stream is independently reliable.
-
-**Q: What is 0-RTT and the replay attack risk?** A: Client sends request in first QUIC packet without waiting for handshake. Risk: attacker replays the 0-RTT data. Mitigation: only use for idempotent GET requests, server-side anti-replay tokens.
-
-**Q: What is connection migration in QUIC?** A: QUIC identifies connections by connection ID, not IP:port tuple. When user switches WiFi to cellular, QUIC continues seamlessly. TCP would reset.
-
-**Q: HPACK vs QPACK?** A: HPACK (HTTP/2): head-of-line blocking in header compression — decoder must process in order. QPACK (HTTP/3): allows out-of-order processing, designed for QUIC streams.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -203,14 +191,6 @@ QUIC overhead vs TCP:
 | Internal microservices | gRPC over HTTP/2 |
 | Real-time streaming | HTTP/2 or WebSocket |
 | Legacy clients (IE, old Android) | HTTP/1.1 fallback |
-
-## Follow-up Questions
-
-1. How does QPACK handle out-of-order stream processing?
-2. How do CDNs support HTTP/3 while origin only speaks HTTP/2?
-3. What is the impact of packet reordering on QUIC vs TCP?
-4. How does HTTP/2 prioritization help page loading?
-5. Design a content negotiation system that picks HTTP version per client.
 
 ## Python Implementation
 
@@ -344,3 +324,88 @@ public class HTTP2Simulation {
 | Concurrent streams | 6 connections | Unlimited | Unlimited |
 | Header size | 200-800B | 20-100B | 20-100B |
 | HOL blocking | App level | TCP level | None |
+
+## Common Questions & Answers
+
+**Q: What is caching and why do we need it?**
+
+A: Caching stores frequently accessed data in fast storage (memory) to reduce latency and load on slower backends (database). Trade space (cache) for speed (latency). Critical for systems serving millions of requests per second.
+
+**Q: What are the main cache eviction policies?**
+
+A: LRU (least recently used), LFU (least frequently used), FIFO (first in first out), TTL (time-based), Random, and ARC (adaptive replacement). Choose based on access patterns: LRU for temporal, LFU for frequency, TTL for time-sensitive data.
+
+**Q: What is cache hit rate and cache miss rate?**
+
+A: Hit rate = successful_finds / total_accesses. Miss rate = 1 - hit rate. P(hit) = hits / (hits + misses). Target 80%+ hit rates for effective caching. Too-small cache gives low hit rate (wasted resources). Too-large cache uses more memory than needed.
+
+**Q: How do you handle cache invalidation when backend data changes?**
+
+A: Use TTL (time-based expiration), active invalidation (notify cache on write), cache-aside pattern (client checks backend), or write-through (update both). Active invalidation is fastest but complex. TTL is simplest but has stale data window.
+
+**Q: What is the cache-aside pattern?**
+
+A: Application checks cache first. On miss, fetch from backend, update cache, then return. Simple to implement. Risk: race condition where multiple threads fetch same miss simultaneously (thundering herd problem).
+
+**Q: What is write-through caching?**
+
+A: Writes go to both cache and backend simultaneously (synchronously). Ensures consistency: read always gets latest. Cost: write latency includes backend write. Safer than write-back but slower.
+
+**Q: What is write-back (write-behind) caching?**
+
+A: Writes go to cache only; backend updated asynchronously later (batch or periodic). Fast writes. Risk: data loss if cache fails before flushing. Need durability guarantees (persistence, replication).
+
+**Q: How do you choose cache size?**
+
+A: Estimate working set (frequently accessed data volume). Add 20-30% buffer for margin. Monitor hit rate: if < 80%, increase size. If > 95%, might be oversized (waste). Use tools like cachegrind to profile.
+
+**Q: What's the difference between client-side and server-side caching?**
+
+A: Client cache (browser): reduces network round-trips, entirely controlled by client. Server cache (memory, Redis): shared across clients, controlled by server. Multi-level caching often best.
+
+**Q: How do you measure cache effectiveness?**
+
+A: Hit rate (primary metric), latency reduction (P99 latency with vs. without cache), backend load reduction, and memory cost per cache entry. Calculate ROI: cost of cache vs. benefit (reduced latency, backend load).
+
+## Follow-up Questions & Answers
+
+**Q: How do you prevent the thundering herd problem in caches?**
+
+A: When popular key expires, many threads fetch from backend simultaneously causing spike. Solutions: probabilistic early expiration (refresh before TTL), request coalescing (single thread rebuilds, others wait), or bloom filters (detect non-existent keys fast).
+
+**Q: How would you implement multi-level cache hierarchy?**
+
+A: Use L1 (fast, small, in-process), L2 (medium, local machine), L3 (large, remote, Redis). Check L1, miss→L2, miss→L3, miss→backend. On write: update all levels. Trade space for speed across levels.
+
+**Q: Can you implement read-through caching (automatic population)?**
+
+A: Yes, cache loader/resolver called on miss. Transparent to application. Backend automatically uses cache layer. More complex than cache-aside but cleaner separation.
+
+**Q: How do you handle hot keys in distributed caches?**
+
+A: Hot key = key accessed by many threads/clients. Replicate hot keys on multiple cache nodes. Use local in-process caches for very hot keys. Monitor and detect hot keys automatically.
+
+**Q: What's the difference between warm and cold cache startup?**
+
+A: Cold cache: empty at start, misses until populated (slow ramp-up). Warm cache: pre-loaded from previous state (RDB/snapshot). Warm startup is critical for production (instant performance).
+
+**Q: How would you measure cache effectiveness for business metrics?**
+
+A: Track hit rate, P99 latency (with/without cache), backend QPS reduction, revenue impact. Calculate cache size vs. cost savings. A/B test to prove business value.
+
+**Q: What happens when cache size is insufficient for working set?**
+
+A: Constant evictions = high miss rate = ineffective cache. Solution: increase cache size, improve eviction policy, reduce working set, or use better hardware (faster storage).
+
+**Q: How do you debug cache issues in production?**
+
+A: Monitor hit rate continuously. Profile cache keys (which keys are accessed). Check for cache stampedes (sudden miss spike). Use distributed tracing to see cache path.
+
+**Q: How would you implement a persistent cache?**
+
+A: Combine memory cache (fast) with persistent backend (database, RocksDB, LevelDB). Write-back pattern: batch updates to persistent store. Trade latency for durability.
+
+**Q: Can you use caching for write-heavy workloads?**
+
+A: Write caching is risky (consistency issues). Use carefully: write-through for safety, write-back for speed. Good for batch writes (aggregate before writing). Monitor durability guarantees.
+

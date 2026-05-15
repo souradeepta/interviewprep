@@ -248,18 +248,6 @@ Redlock (multi-node):
     Use ZooKeeper/etcd for stronger guarantees
 ```
 
-## Common Questions & Answers
-
-**Q: What is the difference between MULTI/EXEC and Lua scripts?** A: MULTI/EXEC queues commands and runs them atomically but cannot branch (no if-then). Lua runs arbitrary scripting logic (loops, conditionals) atomically. Lua is strictly more powerful. MULTI/EXEC is simpler for straightforward multi-command atomicity; Lua required when logic depends on Redis values.
-
-**Q: Why does Redis say transactions are not truly ACID?** A: Redis transactions are A (atomic execution) and I (isolated). But not D (durable by default — persistence is optional) and not "C" in the traditional sense. Runtime errors in EXEC don't roll back prior commands in the queue — only syntax errors at queue time fail the whole transaction.
-
-**Q: How do you use Lua for a distributed lock release safely?** A: Always check-and-delete atomically: `if GET(lock) == my_id then DEL(lock)`. Without Lua, two operations (GET then DEL) have a race: you might delete another owner's lock. The Lua script runs atomically, so the check and delete happen without interruption.
-
-**Q: What happens to a Lua script if it runs too long?** A: By default, if a Lua script runs >5 seconds (lua-time-limit=5000ms), Redis logs a warning and starts refusing new commands (returns BUSY error). The script can be killed with `SCRIPT KILL` (if it hasn't written) or `DEBUG RELOAD`. This is why scripts must be short and deterministic.
-
-**Q: How does Redis Cluster affect EVAL scripts?** A: In Redis Cluster, all keys accessed in a script must be on the same slot (same node). Pass ALL keys via KEYS[] array — Redis validates they map to the same slot. Use hash tags `{prefix}` to force co-location. Cross-slot scripts fail with CROSSSLOT error.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -298,14 +286,6 @@ WATCH retry overhead:
 | Lua EVAL | Full scripting | No (atomic) | Medium | Complex logic |
 | Lua EVALSHA | Full scripting | No (atomic) | Medium | Production (cached) |
 | Redlock | N/A | On acquire fail | High | Distributed lock |
-
-## Follow-up Questions
-
-1. How do you implement a distributed semaphore using Redis Lua scripts?
-2. What are the safety concerns with Redlock and how does fencing tokens address them?
-3. How do you debug Lua scripts in Redis (SCRIPT DEBUG, redis-cli --ldb)?
-4. How do you use Redis pipelines vs MULTI/EXEC for performance optimization?
-5. How do you implement a distributed leaky bucket rate limiter in Redis?
 
 ## Python Implementation
 
@@ -667,3 +647,88 @@ public class RedisLuaTransactions {
 | Sliding window RL (Lua) | O(log N) | Yes | Yes |
 | Token bucket (Lua) | O(1) | Yes | Yes |
 | Distributed lock (Lua) | O(1) | Yes | Yes |
+
+## Common Questions & Answers
+
+**Q: What is Redis and when do you use it?**
+
+A: In-memory key-value data store with sub-millisecond latency. Used for caching (reduce DB load), sessions (user state), queues, real-time counters, leaderboards. Very fast but volatile (data loss on crash without persistence).
+
+**Q: What data structures does Redis support?**
+
+A: Strings (simple values), Lists (FIFO queues), Sets (unique values), Hashes (objects), Sorted Sets (leaderboards), Streams (Kafka-like), HyperLogLog (cardinality), Bitmaps (bitwise ops). Rich beyond simple cache.
+
+**Q: How does Redis persistence work?**
+
+A: RDB (snapshot): periodic point-in-time backup (fast, compact). AOF (append-only file): log all writes (durable, slower). BGSAVE/BGREWRITEAOF: background operations. Choose: speed vs. durability trade-off. Most use both.
+
+**Q: What is Redis replication?**
+
+A: Master-slave architecture: master accepts writes, slaves replicate. Read from master (strong consistency) or slaves (eventual, faster). Slaves can be read-only replicas or chain-replicate to others.
+
+**Q: What is Redis Sentinel?**
+
+A: High availability solution: monitors Redis instances, detects failures, promotes replica to master automatically. Requires 3+ Sentinel instances (majority quorum). Client connects via Sentinel instead of Redis directly.
+
+**Q: What is Redis Cluster?**
+
+A: Distributed Redis: data sharded across multiple nodes (hash slots). Auto-sharding, automatic failover, rebalancing. More complex than Sentinel. Required for massive scale (TB+ data).
+
+**Q: How do you choose between Sentinel and Cluster?**
+
+A: Sentinel: single master, high availability. Cluster: distributed, massive scale. Sentinel for most (simpler), Cluster only if need horizontal scaling. Data > memory = use Cluster.
+
+**Q: How do you handle eviction when Redis runs out of memory?**
+
+A: Set maxmemory policy: LRU, LFU, TTL, random, or no-eviction. LRU/LFU common for caching. TTL for session data. No-eviction blocks writes (safe but risky). Monitor memory usage constantly.
+
+**Q: What is key expiration in Redis?**
+
+A: Keys have optional TTL (time-to-live). After expiration, key automatically deleted. Lazy deletion (on access) + periodic cleanup. Use for session data, cache, or temporary counters. Check expiration policy for accuracy.
+
+**Q: How do you secure Redis?**
+
+A: Use password authentication (requirepass). ACLs (Redis 6+): per-user permissions. Run inside VPC (no internet access). Disable dangerous commands (FLUSHDB, CONFIG). TLS for remote connections.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement distributed locking with Redis?**
+
+A: SET key value EX ttl NX (atomic: set if not exists with TTL). Acquire lock, execute critical section, delete key. Risk: crash loses lock (data consistency issue). Redlock solves this with multiple instances.
+
+**Q: What is Redlock and what problem does it solve?**
+
+A: Distributed lock across 5 Redis instances. Acquire lock on majority (quorum). Survives single instance failure. Overkill for most, but necessary for safety-critical sections. Trade: performance for correctness.
+
+**Q: How would you implement rate limiting with Redis?**
+
+A: Use sorted set with timestamps or hash with counters. Increment on each request, check against limit. Fast (O(log n)). Alternative: token bucket in Lua script. Faster than database.
+
+**Q: How do you handle Redis memory limits and eviction policy?**
+
+A: Set maxmemory (bytes), maxmemory-policy (LRU/LFU/TTL/random). Monitor hit rate (eviction = misses). Can also manually delete old keys or use cache-aside with database.
+
+**Q: Can you use Redis for reliable message queues?**
+
+A: Partially. Lists (basic) or Streams (better). Lists: FIFO, no persistence without RDB. Streams: replicas, consumer groups, reliable delivery (Kafka-like). For critical: use Kafka instead.
+
+**Q: How would you implement Pub/Sub in Redis?**
+
+A: Publisher sends to channel, subscribers receive. Fire-and-forget (no persistence). Good for notifications. Bad for reliable messaging (missed if subscriber offline). Better: Streams for reliable pub/sub.
+
+**Q: How do you scale Redis beyond single node?**
+
+A: Use Cluster (distributed), replicate read-heavy workload (slaves), or shard in application code. Cluster best for massive scale. Replication for read scaling. App sharding for distributed control.
+
+**Q: Can you implement transactions in Redis?**
+
+A: MULTI/EXEC: atomic batch of commands. Optimistic locking with WATCH. No rollback (all-or-nothing at command level). Use Lua scripts for complex atomic operations.
+
+**Q: How would you debug Redis performance issues?**
+
+A: SLOWLOG: find slow commands. MONITOR: see all commands in real-time. Memory analysis: MEMORY DOCTOR, key usage patterns. Network: latency between app and Redis. Profiling tools.
+
+**Q: How do you backup and restore Redis?**
+
+A: Backup: RDB snapshots, AOF files, or replication. Restore: copy files, or use Redis replication + replicaof. Backup strategy: periodic snapshots + AOF for durability. Test recovery regularly.
+

@@ -136,16 +136,6 @@ sequenceDiagram
     Router-->>Client: return user_data
 ```
 
-## Common Questions & Answers
-
-**Q: Shard key selection?** A: Choose high-cardinality (user_id good, gender bad). Enables even distribution.
-
-**Q: Hot shard problem?** A: Uneven distribution if key skewed (celebrities). Solution: split hot shard, re-shard.
-
-**Q: Cross-shard queries?** A: Expensive, scatter-gather to all shards. Avoid if possible.
-
-**Q: Re-sharding complexity?** A: Double shards: migrate half of each to new shards. Zero-downtime hard, plan carefully.
-
 ## Back-of-Envelope Calculations
 
 1B users, 4 shards: 250M per shard. Each shard: single master + replicas. Queries: shard_id = hash(user_id) % 4. Cross-shard: 4x latency.
@@ -247,3 +237,88 @@ public class ShardedDatabase {
     }
 }
 ```
+
+## Common Questions & Answers
+
+**Q: What is database sharding and why do we need it?**
+
+A: Sharding distributes data across multiple databases to scale horizontally beyond single-machine limits. Each shard holds subset of data. Enables serving more throughput and storing larger datasets. Trade-off: querying across shards is harder.
+
+**Q: What are common sharding strategies?**
+
+A: Range-based (user_id: 1-1M, 1M-2M, etc.), hash-based (hash(key) % num_shards), directory-based (lookup table), geographic (shard by region). Choose based on query patterns and data distribution.
+
+**Q: What is the hot shard problem?**
+
+A: One shard receives much more traffic/data than others due to skewed distribution (e.g., all new users in same range). Becomes bottleneck. Solution: split hot shard, use better sharding key, or combine with caching.
+
+**Q: How do you route queries to correct shard?**
+
+A: Middleware computes shard_id = hash(key) % num_shards or range lookup. Routes request to correct database. Must be consistent: same key always routes to same shard. Client or proxy layer handles routing.
+
+**Q: What happens when you add a new shard?**
+
+A: Data must be re-distributed. Existing shards reshare (redistribute their data). Causes temporary downtime and data movement overhead. Use consistent hashing to minimize data movement.
+
+**Q: Can you join data across shards?**
+
+A: Very difficult. Requires querying multiple shards and joining in application code (slow). Solution: denormalize (store denormalized copies), use distributed query engine (Presto), or redesign schema.
+
+**Q: How do you handle transactions across shards?**
+
+A: Distributed transactions (2-phase commit) are slow and risky. Prefer: single-shard transactions (common case), saga pattern (multi-step local transactions), or eventual consistency (async coordination).
+
+**Q: How do you choose sharding key?**
+
+A: Key used to determine shard. Must have good cardinality (many unique values) and distribute evenly. Avoid sharding by frequently queried field (makes range queries hard). Common: user_id (for user-centric), timestamp (for time-series).
+
+**Q: What is consistent hashing and when to use it?**
+
+A: Hash-based sharding that minimizes data movement on shard count changes. When you add/remove shard, only ~1/n data moves (not all). Distributed systems standard (Dynamo, Cassandra, consistent caching).
+
+**Q: How do you monitor shard health and skew?**
+
+A: Track data size per shard, QPS per shard, latency per shard. Alert on skew (some shards much larger/busier). Manually or auto-rebalance when detected.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement geo-distributed sharding?**
+
+A: Shard by geographic region (US, EU, APAC). Each region has replicas across data centers. Route based on user location. Handle eventual consistency between regions (strong eventual consistency).
+
+**Q: How do you prevent hot keys within a shard?**
+
+A: Detect hot keys (some keys far more accessed). Create micro-shards for hot keys (hash(key, counter) for replicas). Use caching layer above database. Monitor continuously.
+
+**Q: What is the trade-off between range sharding and hash sharding?**
+
+A: Range: enables range queries easily but may create hot shards (recent data). Hash: distributes evenly but makes range queries require scatter-gather. Choose based on query patterns.
+
+**Q: How would you re-shard with minimal downtime?**
+
+A: Dual-write strategy: write to both old and new shard layouts simultaneously. Gradually migrate data. Verify consistency. Switch reads to new layout. Clean up old shards.
+
+**Q: Can you shard by multiple columns (composite key)?**
+
+A: Yes, use (col1, col2) as shard key. Example: (user_id, tenant_id). Better distribution but more complex routing. Worth it for multi-tenant systems.
+
+**Q: How do you handle shard failures?**
+
+A: Use replication within each shard (master-slave). Detect failure, promote replica. Use consensus (Raft) for automatic failover. Trade: replication cost vs. availability.
+
+**Q: How would you implement resharding without data movement (virtual sharding)?**
+
+A: Map logical shards to physical shards via lookup table. When resharding, update mapping (no data movement). Trade: lookup overhead vs. seamless resharding.
+
+**Q: How do you implement cross-shard aggregations?**
+
+A: Scatter query to all shards. Gather results. Aggregate (sum, avg, max). Example: COUNT(*) requires hitting all shards. Slow but necessary for global analytics.
+
+**Q: Can you migrate from single database to sharded?**
+
+A: Yes, gradually. Start with logical sharding (single physical DB). Add more physical shards incrementally. Dual-write during migration. Atomic switch after validation.
+
+**Q: How do you handle uneven shard growth?**
+
+A: Monitor size growth. Split large shards before they get too big. Use growth-aware splitting (split at median timestamp for time-series). Automate with monitoring tools.
+

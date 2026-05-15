@@ -143,18 +143,6 @@ Zero Trust (modern): No "trusted" VPN network
   No lateral movement even if connected
 ```
 
-## Common Questions & Answers
-
-**Q: IPSec vs WireGuard?** A: WireGuard is faster, simpler, modern crypto, easier to audit. IPSec is more mature, widely supported (iOS, enterprise routers), more configuration options. WireGuard preferred for new deployments.
-
-**Q: How does NAT traversal work for VPN?** A: VPN traffic blocked by NAT (no inbound port mapping). Solutions: NAT-T for IPSec (UDP port 4500). WireGuard handles it natively via UDP. OpenVPN uses TCP 443 (passes through most firewalls as HTTPS).
-
-**Q: VPN vs Zero Trust Network Access?** A: Traditional VPN: castle-and-moat (once inside, access everything). ZTNA: authenticate every request, least-privilege, assume breach. VPN grants network access; ZTNA grants application access.
-
-**Q: Site-to-Site vs Remote Access VPN?** A: Site-to-Site: connects two networks (branch offices), always-on, gateway-to-gateway. Remote Access: individual users connect to corporate network on demand.
-
-**Q: How does Tailscale work?** A: WireGuard-based mesh VPN. Each device has public/private key. Coordination server (DERP) helps with NAT traversal. Creates direct peer-to-peer connections between devices.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -191,14 +179,6 @@ WireGuard key rotation:
 | OpenVPN | 500 Mbps | Medium | No | Cross-platform, legacy |
 | SSTP | 200 Mbps | Medium | No | Windows-native |
 | SSL VPN (clientless) | 100 Mbps | Low | Yes | Browser-based access |
-
-## Follow-up Questions
-
-1. How does Tailscale build mesh VPN using WireGuard?
-2. What is ZTNA and how does it replace VPN for application access?
-3. How do you implement MFA for VPN authentication?
-4. Design a VPN that auto-reconnects when user moves between networks.
-5. What is SD-WAN and how does it replace branch office VPN?
 
 ## Python Implementation
 
@@ -354,3 +334,88 @@ public class VPNGateway {
 | Encrypt/decrypt | O(n) payload bytes |
 | Peer lookup | O(1) |
 | Key rotation (WireGuard) | O(1) every 3 min |
+
+## Common Questions & Answers
+
+**Q: What is caching and why do we need it?**
+
+A: Caching stores frequently accessed data in fast storage (memory) to reduce latency and load on slower backends (database). Trade space (cache) for speed (latency). Critical for systems serving millions of requests per second.
+
+**Q: What are the main cache eviction policies?**
+
+A: LRU (least recently used), LFU (least frequently used), FIFO (first in first out), TTL (time-based), Random, and ARC (adaptive replacement). Choose based on access patterns: LRU for temporal, LFU for frequency, TTL for time-sensitive data.
+
+**Q: What is cache hit rate and cache miss rate?**
+
+A: Hit rate = successful_finds / total_accesses. Miss rate = 1 - hit rate. P(hit) = hits / (hits + misses). Target 80%+ hit rates for effective caching. Too-small cache gives low hit rate (wasted resources). Too-large cache uses more memory than needed.
+
+**Q: How do you handle cache invalidation when backend data changes?**
+
+A: Use TTL (time-based expiration), active invalidation (notify cache on write), cache-aside pattern (client checks backend), or write-through (update both). Active invalidation is fastest but complex. TTL is simplest but has stale data window.
+
+**Q: What is the cache-aside pattern?**
+
+A: Application checks cache first. On miss, fetch from backend, update cache, then return. Simple to implement. Risk: race condition where multiple threads fetch same miss simultaneously (thundering herd problem).
+
+**Q: What is write-through caching?**
+
+A: Writes go to both cache and backend simultaneously (synchronously). Ensures consistency: read always gets latest. Cost: write latency includes backend write. Safer than write-back but slower.
+
+**Q: What is write-back (write-behind) caching?**
+
+A: Writes go to cache only; backend updated asynchronously later (batch or periodic). Fast writes. Risk: data loss if cache fails before flushing. Need durability guarantees (persistence, replication).
+
+**Q: How do you choose cache size?**
+
+A: Estimate working set (frequently accessed data volume). Add 20-30% buffer for margin. Monitor hit rate: if < 80%, increase size. If > 95%, might be oversized (waste). Use tools like cachegrind to profile.
+
+**Q: What's the difference between client-side and server-side caching?**
+
+A: Client cache (browser): reduces network round-trips, entirely controlled by client. Server cache (memory, Redis): shared across clients, controlled by server. Multi-level caching often best.
+
+**Q: How do you measure cache effectiveness?**
+
+A: Hit rate (primary metric), latency reduction (P99 latency with vs. without cache), backend load reduction, and memory cost per cache entry. Calculate ROI: cost of cache vs. benefit (reduced latency, backend load).
+
+## Follow-up Questions & Answers
+
+**Q: How do you prevent the thundering herd problem in caches?**
+
+A: When popular key expires, many threads fetch from backend simultaneously causing spike. Solutions: probabilistic early expiration (refresh before TTL), request coalescing (single thread rebuilds, others wait), or bloom filters (detect non-existent keys fast).
+
+**Q: How would you implement multi-level cache hierarchy?**
+
+A: Use L1 (fast, small, in-process), L2 (medium, local machine), L3 (large, remote, Redis). Check L1, miss→L2, miss→L3, miss→backend. On write: update all levels. Trade space for speed across levels.
+
+**Q: Can you implement read-through caching (automatic population)?**
+
+A: Yes, cache loader/resolver called on miss. Transparent to application. Backend automatically uses cache layer. More complex than cache-aside but cleaner separation.
+
+**Q: How do you handle hot keys in distributed caches?**
+
+A: Hot key = key accessed by many threads/clients. Replicate hot keys on multiple cache nodes. Use local in-process caches for very hot keys. Monitor and detect hot keys automatically.
+
+**Q: What's the difference between warm and cold cache startup?**
+
+A: Cold cache: empty at start, misses until populated (slow ramp-up). Warm cache: pre-loaded from previous state (RDB/snapshot). Warm startup is critical for production (instant performance).
+
+**Q: How would you measure cache effectiveness for business metrics?**
+
+A: Track hit rate, P99 latency (with/without cache), backend QPS reduction, revenue impact. Calculate cache size vs. cost savings. A/B test to prove business value.
+
+**Q: What happens when cache size is insufficient for working set?**
+
+A: Constant evictions = high miss rate = ineffective cache. Solution: increase cache size, improve eviction policy, reduce working set, or use better hardware (faster storage).
+
+**Q: How do you debug cache issues in production?**
+
+A: Monitor hit rate continuously. Profile cache keys (which keys are accessed). Check for cache stampedes (sudden miss spike). Use distributed tracing to see cache path.
+
+**Q: How would you implement a persistent cache?**
+
+A: Combine memory cache (fast) with persistent backend (database, RocksDB, LevelDB). Write-back pattern: batch updates to persistent store. Trade latency for durability.
+
+**Q: Can you use caching for write-heavy workloads?**
+
+A: Write caching is risky (consistency issues). Use carefully: write-through for safety, write-back for speed. Good for batch writes (aggregate before writing). Monitor durability guarantees.
+

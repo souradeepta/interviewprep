@@ -193,18 +193,6 @@ LFU vs LRU:
   LFU better for: Zipf-distributed access (most real-world)
 ```
 
-## Common Questions & Answers
-
-**Q: Why does Redis use approximate LRU instead of true LRU?** A: True LRU requires a doubly-linked list of all keys (gigabytes of pointers for millions of keys). Redis uses 3 bytes per key to store last-access timestamp. Sampling 5-10 random keys gives 95-98% accuracy at near-zero overhead.
-
-**Q: When should you choose LFU over LRU?** A: When access pattern is skewed (Pareto/Zipf): a few keys get most traffic. LFU keeps truly popular keys. LRU may evict popular keys if they haven't been accessed recently (e.g., during a scan or backup operation).
-
-**Q: What happens when Redis hits maxmemory with noeviction?** A: Redis returns OOM error to write commands (SET, LPUSH, etc.). Read commands (GET) still work. Application must handle OOM error and either retry later or skip caching.
-
-**Q: How do you tune maxmemory-policy for a session cache?** A: Use `allkeys-lru` (sessions are all temporary, evict oldest accessed). Set TTL on all sessions. If sessions have priority: `volatile-ttl` (shorter TTL = lower priority = evict first).
-
-**Q: How do you measure cache eviction rate?** A: `INFO stats` -> evicted_keys counter. Monitor evicted_keys/s. If high: cache is too small. Redis also reports keyspace_hits, keyspace_misses for hit rate calculation.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -243,14 +231,6 @@ TTL vs eviction:
 | volatile-lru | Depends | Permanent keys | Low |
 | volatile-ttl | Medium | Permanent keys | Low |
 | allkeys-random | Low | No | None |
-
-## Follow-up Questions
-
-1. How does Redis implement LFU counters without per-key linked lists?
-2. How do you evict specific cache prefixes without scanning all keys?
-3. How does the W-TinyLFU algorithm (Caffeine cache) improve on LFU?
-4. How do you implement a two-level cache (L1 local + L2 Redis) with eviction?
-5. How does Redis memory fragmentation affect eviction behavior?
 
 ## Python Implementation
 
@@ -516,3 +496,88 @@ public class CacheEviction {
 | LFU (min-heap) | O(log n) | O(log n) | O(n) | 100% |
 | LFU (frequency map) | O(1) | O(1) | O(n) | 100% |
 | FIFO | O(1) | O(1) | O(n) | N/A |
+
+## Common Questions & Answers
+
+**Q: What is caching and why do we need it?**
+
+A: Caching stores frequently accessed data in fast storage (memory) to reduce latency and load on slower backends (database). Trade space (cache) for speed (latency). Critical for systems serving millions of requests per second.
+
+**Q: What are the main cache eviction policies?**
+
+A: LRU (least recently used), LFU (least frequently used), FIFO (first in first out), TTL (time-based), Random, and ARC (adaptive replacement). Choose based on access patterns: LRU for temporal, LFU for frequency, TTL for time-sensitive data.
+
+**Q: What is cache hit rate and cache miss rate?**
+
+A: Hit rate = successful_finds / total_accesses. Miss rate = 1 - hit rate. P(hit) = hits / (hits + misses). Target 80%+ hit rates for effective caching. Too-small cache gives low hit rate (wasted resources). Too-large cache uses more memory than needed.
+
+**Q: How do you handle cache invalidation when backend data changes?**
+
+A: Use TTL (time-based expiration), active invalidation (notify cache on write), cache-aside pattern (client checks backend), or write-through (update both). Active invalidation is fastest but complex. TTL is simplest but has stale data window.
+
+**Q: What is the cache-aside pattern?**
+
+A: Application checks cache first. On miss, fetch from backend, update cache, then return. Simple to implement. Risk: race condition where multiple threads fetch same miss simultaneously (thundering herd problem).
+
+**Q: What is write-through caching?**
+
+A: Writes go to both cache and backend simultaneously (synchronously). Ensures consistency: read always gets latest. Cost: write latency includes backend write. Safer than write-back but slower.
+
+**Q: What is write-back (write-behind) caching?**
+
+A: Writes go to cache only; backend updated asynchronously later (batch or periodic). Fast writes. Risk: data loss if cache fails before flushing. Need durability guarantees (persistence, replication).
+
+**Q: How do you choose cache size?**
+
+A: Estimate working set (frequently accessed data volume). Add 20-30% buffer for margin. Monitor hit rate: if < 80%, increase size. If > 95%, might be oversized (waste). Use tools like cachegrind to profile.
+
+**Q: What's the difference between client-side and server-side caching?**
+
+A: Client cache (browser): reduces network round-trips, entirely controlled by client. Server cache (memory, Redis): shared across clients, controlled by server. Multi-level caching often best.
+
+**Q: How do you measure cache effectiveness?**
+
+A: Hit rate (primary metric), latency reduction (P99 latency with vs. without cache), backend load reduction, and memory cost per cache entry. Calculate ROI: cost of cache vs. benefit (reduced latency, backend load).
+
+## Follow-up Questions & Answers
+
+**Q: How do you prevent the thundering herd problem in caches?**
+
+A: When popular key expires, many threads fetch from backend simultaneously causing spike. Solutions: probabilistic early expiration (refresh before TTL), request coalescing (single thread rebuilds, others wait), or bloom filters (detect non-existent keys fast).
+
+**Q: How would you implement multi-level cache hierarchy?**
+
+A: Use L1 (fast, small, in-process), L2 (medium, local machine), L3 (large, remote, Redis). Check L1, miss→L2, miss→L3, miss→backend. On write: update all levels. Trade space for speed across levels.
+
+**Q: Can you implement read-through caching (automatic population)?**
+
+A: Yes, cache loader/resolver called on miss. Transparent to application. Backend automatically uses cache layer. More complex than cache-aside but cleaner separation.
+
+**Q: How do you handle hot keys in distributed caches?**
+
+A: Hot key = key accessed by many threads/clients. Replicate hot keys on multiple cache nodes. Use local in-process caches for very hot keys. Monitor and detect hot keys automatically.
+
+**Q: What's the difference between warm and cold cache startup?**
+
+A: Cold cache: empty at start, misses until populated (slow ramp-up). Warm cache: pre-loaded from previous state (RDB/snapshot). Warm startup is critical for production (instant performance).
+
+**Q: How would you measure cache effectiveness for business metrics?**
+
+A: Track hit rate, P99 latency (with/without cache), backend QPS reduction, revenue impact. Calculate cache size vs. cost savings. A/B test to prove business value.
+
+**Q: What happens when cache size is insufficient for working set?**
+
+A: Constant evictions = high miss rate = ineffective cache. Solution: increase cache size, improve eviction policy, reduce working set, or use better hardware (faster storage).
+
+**Q: How do you debug cache issues in production?**
+
+A: Monitor hit rate continuously. Profile cache keys (which keys are accessed). Check for cache stampedes (sudden miss spike). Use distributed tracing to see cache path.
+
+**Q: How would you implement a persistent cache?**
+
+A: Combine memory cache (fast) with persistent backend (database, RocksDB, LevelDB). Write-back pattern: batch updates to persistent store. Trade latency for durability.
+
+**Q: Can you use caching for write-heavy workloads?**
+
+A: Write caching is risky (consistency issues). Use carefully: write-through for safety, write-back for speed. Good for batch writes (aggregate before writing). Monitor durability guarantees.
+

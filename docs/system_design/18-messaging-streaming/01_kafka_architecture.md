@@ -198,18 +198,6 @@ Rebalancing:
   Cooperative/incremental rebalance: only moved partitions pause
 ```
 
-## Common Questions & Answers
-
-**Q: Why is Kafka faster than traditional message queues?** A: Sequential disk writes (OS page cache). Zero-copy (`sendfile` syscall). Batch compression. No per-message routing overhead. Consumers maintain offset (broker is stateless per consumer).
-
-**Q: What is the difference between a queue and a log (Kafka)?** A: Queue: message consumed once, then deleted. Log: messages retained, multiple consumer groups read independently at their own offset. Kafka allows replay; queues don't.
-
-**Q: How does Kafka guarantee ordering?** A: Within a partition: strict ordering. Across partitions: no guarantee. Use a consistent key (e.g., `user_id`) to route related messages to the same partition.
-
-**Q: What happens when a broker fails?** A: ZooKeeper/KRaft detects failure. Controller elects a new leader from ISR. Consumers reconnect to new leader. Producer retries. Typical failover: 5-30 seconds.
-
-**Q: How does KRaft replace ZooKeeper?** A: KRaft (Kafka Raft Metadata mode) moves metadata management into Kafka itself. Controller uses Raft consensus. Eliminates ZooKeeper dependency. Available as default since Kafka 3.3.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -248,14 +236,6 @@ Partition count:
 | Replication factor | 3 (survive 2 failures) | 2 (cheaper) |
 | Metadata store | KRaft (modern) | ZooKeeper (legacy) |
 | Compression | zstd (best ratio) | lz4 (fastest) |
-
-## Follow-up Questions
-
-1. How does Kafka achieve exactly-once semantics end-to-end?
-2. What is the role of the Kafka Controller and how does leader election work?
-3. How do you choose the right number of partitions for a topic?
-4. How does Kafka handle backpressure when consumers are slow?
-5. What is tiered storage in Kafka and how does it reduce broker disk costs?
 
 ## Python Implementation
 
@@ -475,3 +455,88 @@ public class KafkaSimulator {
 | Key-based partition routing | O(1) |
 | Consumer group rebalance | O(consumers x partitions) |
 | Offset commit | O(1) |
+
+## Common Questions & Answers
+
+**Q: What is Apache Kafka?**
+
+A: Distributed event streaming platform (publish-subscribe messaging system). Stores event streams durable in log-based architecture. Supports multiple subscribers reading same data, replay capability, distributed processing. Critical infrastructure for real-time systems.
+
+**Q: How is Kafka different from traditional message queues?**
+
+A: Kafka persists all messages in ordered append-only log. Queues delete after consumption. Kafka supports multiple independent subscribers of same data. Enables replay, reprocessing, multiple consumers. Trade-off: different API, operational complexity.
+
+**Q: What is a Kafka topic and partition?**
+
+A: Topic: named event stream (orders, clicks, logs). Partition: ordered, immutable log within topic. Messages with same key go to same partition (order guarantee). Multiple partitions enable parallelism.
+
+**Q: What is a consumer group?**
+
+A: Set of consumers reading same topic collaboratively. Each partition assigned to one consumer in group. Enable parallel processing and scaling. If consumer dies, partition reassigned to other consumer.
+
+**Q: How does Kafka guarantee ordering?**
+
+A: Messages in single partition ordered by offset. Messages with same key always go to same partition (key routing). Therefore: same-key messages processed in order. Different keys can process out-of-order (parallel).
+
+**Q: What does acks setting do?**
+
+A: acks=0: producer doesn't wait (fire-and-forget). acks=1: wait for leader ack (fast). acks=all: wait for all replicas ack (safest, slowest). Choose: reliability vs. latency trade-off.
+
+**Q: What is at-least-once delivery guarantee?**
+
+A: Messages guaranteed delivered but may be duplicated. If producer retries on timeout, message could appear twice. Consumer must be idempotent (handle duplicates safely).
+
+**Q: How do you scale Kafka?**
+
+A: Add more partitions (parallelism), add more consumer replicas (throughput), add more brokers (storage/availability). Monitor lag, rebalance. Orchestrate with Kubernetes.
+
+**Q: What is consumer lag?**
+
+A: Difference between latest message offset and consumer's current offset. High lag = consumer falling behind. Monitor continuously, alert if lag growing. Indicates consumer too slow or too few consumers.
+
+**Q: How do you monitor Kafka health?**
+
+A: Track broker metrics (CPU, disk, network), consumer lag, in-sync replicas (ISR), partition distribution. Use tools like Burrow, LinkedIn monitoring. Alert on anomalies.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement exactly-once semantics in Kafka?**
+
+A: Use Kafka transactions (producer idempotency + atomic writes). Consumer must track processed message IDs. Or use idempotent producer + idempotent consumer. Trade: performance for correctness. Requires Kafka 0.11+.
+
+**Q: How do you handle backpressure (producer faster than consumer)?**
+
+A: Consumer lags behind (offset < latest). Use monitoring to detect. Scaling options: add more consumer threads, optimize consumer code, reduce producer rate, or buffer in queue. Choose based on SLA.
+
+**Q: How would you implement Kafka in multi-region setup?**
+
+A: Use MirrorMaker to replicate topics across regions. Choose consistency model (strong = sync, eventual = async). Handle failover (which region is primary). Complex operational model.
+
+**Q: What is Kafka Streams?**
+
+A: Library for stream processing on Kafka. Stateless (map, filter, flatMap), stateful (aggregate, join, window). Good for simple transformations. Alternative to Spark/Flink for JVM applications.
+
+**Q: How do you debug Kafka performance issues?**
+
+A: Monitor broker metrics (CPU, disk utilization), network latency, GC pauses. Check consumer lag, partition skew. Profile producer/consumer code. Check network bandwidth between brokers.
+
+**Q: How would you handle late-arriving messages?**
+
+A: Kafka preserves order within partition. Late messages appear out of order w.r.t. other partitions. Application must handle. Use timestamps for processing time logic. Consider grace period for windowed aggregations.
+
+**Q: How do you implement message ordering guarantees?**
+
+A: Send messages with same key (routes to same partition). Consumer reads single partition (ordered). Tradeoff: single partition limits throughput. Use multiple partitions + key if you need both.
+
+**Q: Can you compact Kafka topics?**
+
+A: Yes, log compaction mode: keeps latest value per key. Useful for state topics (user profiles). Trade: smaller storage but must maintain keys. Different from default delete mode.
+
+**Q: How would you implement Kafka with transactions?**
+
+A: Atomic multi-partition writes (Kafka 0.11+). Transactional producer: multiple puts before commit. Isolation level: read_committed (default) vs. read_uncommitted. Producer and consumer transaction APIs.
+
+**Q: How do you handle Kafka rebalancing?**
+
+A: When consumer joins/leaves, partitions reassigned. Brief unavailability during rebalance. Minimize with heartbeat tuning, larger batches, optimize consumer code. Monitor rebalance frequency and duration.
+

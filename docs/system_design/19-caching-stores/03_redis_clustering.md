@@ -187,18 +187,6 @@ During migration:
   ASK vs MOVED: MOVED = permanent new location, ASK = try here for this request
 ```
 
-## Common Questions & Answers
-
-**Q: Why 16384 slots (not a power of 2 like 16384 = 2^14)?** A: 16384 slots fit in 2KB gossip messages (16384 bits = 2048 bytes). Large enough to rebalance without significant per-slot overhead. Trade-off between granularity and message size.
-
-**Q: What is the difference between MOVED and ASK redirects?** A: MOVED: key permanently belongs to another node — update slot map, always go there. ASK: key temporarily migrating — try there for this one request only, don't update slot map. ASK is transient during resharding.
-
-**Q: What operations don't work across cluster nodes?** A: Multi-key commands (MGET, MSET, SUNION) require all keys on same slot. Transactions (MULTI/EXEC) only work within a single slot. Pub/Sub: messages only reach subscribers on same shard (use a separate Redis instance for pub/sub).
-
-**Q: How does Redis Cluster handle split-brain?** A: Nodes require quorum (>N/2 masters reachable) to continue serving writes. If a partition isolates minority masters: they stop accepting writes. Prevents split-brain writes. Minority partition stays in read-only mode.
-
-**Q: How many replicas should each master have?** A: Minimum 1 replica per master. For critical data: 2 replicas. With 1 replica: can lose 1 master per shard without data loss. Cluster minimum: 3 masters + 3 replicas = 6 nodes.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -237,14 +225,6 @@ Resharding time:
 | Sentinel (3 nodes) | 1x | Write HA | Medium |
 | Cluster (3+3 nodes) | 3x | Write HA | High |
 | Cluster + replicas | Nx | Full HA | High |
-
-## Follow-up Questions
-
-1. How does Redis Cluster handle a network partition (split-brain prevention)?
-2. How do you perform a rolling upgrade of a Redis Cluster without downtime?
-3. How does consistent hashing differ from Redis's slot-based approach?
-4. How do you migrate from Redis Sentinel to Redis Cluster?
-5. What is the difference between cluster-enabled mode and standalone Redis?
 
 ## Python Implementation
 
@@ -489,3 +469,88 @@ public class RedisCluster {
 | MOVED redirect handling | O(1) |
 | Cluster gossip | O(log n) per message |
 | Failover election | O(replicas) |
+
+## Common Questions & Answers
+
+**Q: What is Redis and when do you use it?**
+
+A: In-memory key-value data store with sub-millisecond latency. Used for caching (reduce DB load), sessions (user state), queues, real-time counters, leaderboards. Very fast but volatile (data loss on crash without persistence).
+
+**Q: What data structures does Redis support?**
+
+A: Strings (simple values), Lists (FIFO queues), Sets (unique values), Hashes (objects), Sorted Sets (leaderboards), Streams (Kafka-like), HyperLogLog (cardinality), Bitmaps (bitwise ops). Rich beyond simple cache.
+
+**Q: How does Redis persistence work?**
+
+A: RDB (snapshot): periodic point-in-time backup (fast, compact). AOF (append-only file): log all writes (durable, slower). BGSAVE/BGREWRITEAOF: background operations. Choose: speed vs. durability trade-off. Most use both.
+
+**Q: What is Redis replication?**
+
+A: Master-slave architecture: master accepts writes, slaves replicate. Read from master (strong consistency) or slaves (eventual, faster). Slaves can be read-only replicas or chain-replicate to others.
+
+**Q: What is Redis Sentinel?**
+
+A: High availability solution: monitors Redis instances, detects failures, promotes replica to master automatically. Requires 3+ Sentinel instances (majority quorum). Client connects via Sentinel instead of Redis directly.
+
+**Q: What is Redis Cluster?**
+
+A: Distributed Redis: data sharded across multiple nodes (hash slots). Auto-sharding, automatic failover, rebalancing. More complex than Sentinel. Required for massive scale (TB+ data).
+
+**Q: How do you choose between Sentinel and Cluster?**
+
+A: Sentinel: single master, high availability. Cluster: distributed, massive scale. Sentinel for most (simpler), Cluster only if need horizontal scaling. Data > memory = use Cluster.
+
+**Q: How do you handle eviction when Redis runs out of memory?**
+
+A: Set maxmemory policy: LRU, LFU, TTL, random, or no-eviction. LRU/LFU common for caching. TTL for session data. No-eviction blocks writes (safe but risky). Monitor memory usage constantly.
+
+**Q: What is key expiration in Redis?**
+
+A: Keys have optional TTL (time-to-live). After expiration, key automatically deleted. Lazy deletion (on access) + periodic cleanup. Use for session data, cache, or temporary counters. Check expiration policy for accuracy.
+
+**Q: How do you secure Redis?**
+
+A: Use password authentication (requirepass). ACLs (Redis 6+): per-user permissions. Run inside VPC (no internet access). Disable dangerous commands (FLUSHDB, CONFIG). TLS for remote connections.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement distributed locking with Redis?**
+
+A: SET key value EX ttl NX (atomic: set if not exists with TTL). Acquire lock, execute critical section, delete key. Risk: crash loses lock (data consistency issue). Redlock solves this with multiple instances.
+
+**Q: What is Redlock and what problem does it solve?**
+
+A: Distributed lock across 5 Redis instances. Acquire lock on majority (quorum). Survives single instance failure. Overkill for most, but necessary for safety-critical sections. Trade: performance for correctness.
+
+**Q: How would you implement rate limiting with Redis?**
+
+A: Use sorted set with timestamps or hash with counters. Increment on each request, check against limit. Fast (O(log n)). Alternative: token bucket in Lua script. Faster than database.
+
+**Q: How do you handle Redis memory limits and eviction policy?**
+
+A: Set maxmemory (bytes), maxmemory-policy (LRU/LFU/TTL/random). Monitor hit rate (eviction = misses). Can also manually delete old keys or use cache-aside with database.
+
+**Q: Can you use Redis for reliable message queues?**
+
+A: Partially. Lists (basic) or Streams (better). Lists: FIFO, no persistence without RDB. Streams: replicas, consumer groups, reliable delivery (Kafka-like). For critical: use Kafka instead.
+
+**Q: How would you implement Pub/Sub in Redis?**
+
+A: Publisher sends to channel, subscribers receive. Fire-and-forget (no persistence). Good for notifications. Bad for reliable messaging (missed if subscriber offline). Better: Streams for reliable pub/sub.
+
+**Q: How do you scale Redis beyond single node?**
+
+A: Use Cluster (distributed), replicate read-heavy workload (slaves), or shard in application code. Cluster best for massive scale. Replication for read scaling. App sharding for distributed control.
+
+**Q: Can you implement transactions in Redis?**
+
+A: MULTI/EXEC: atomic batch of commands. Optimistic locking with WATCH. No rollback (all-or-nothing at command level). Use Lua scripts for complex atomic operations.
+
+**Q: How would you debug Redis performance issues?**
+
+A: SLOWLOG: find slow commands. MONITOR: see all commands in real-time. Memory analysis: MEMORY DOCTOR, key usage patterns. Network: latency between app and Redis. Profiling tools.
+
+**Q: How do you backup and restore Redis?**
+
+A: Backup: RDB snapshots, AOF files, or replication. Restore: copy files, or use Redis replication + replicaof. Backup strategy: periodic snapshots + AOF for durability. Test recovery regularly.
+

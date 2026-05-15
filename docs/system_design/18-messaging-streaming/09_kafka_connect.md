@@ -208,18 +208,6 @@ Benefit: Capture changes at DB level, not application level
   Includes DELETEs (can't do with timestamp polling)
 ```
 
-## Common Questions & Answers
-
-**Q: Debezium vs JDBC polling — when to use each?** A: Debezium: low latency (~ms), captures DELETEs, no load on application. Requires DB replication slot setup. JDBC: simpler setup, works with any JDBC DB, but no DELETEs, higher polling latency (seconds), higher DB load.
-
-**Q: How does Kafka Connect handle connector failures?** A: Connect workers restart failed tasks automatically. Connector state stored in Kafka (connect-configs, connect-offsets, connect-status topics). Worker crash: another worker in the cluster takes over its tasks (rebalance).
-
-**Q: How do you scale Kafka Connect?** A: Add more worker nodes to the Connect cluster. Tasks distributed across workers. `tasks.max` controls max parallelism per connector. For high-throughput sinks: increase `tasks.max` to match Kafka partition count.
-
-**Q: What is exactly-once in Kafka Connect?** A: With `exactly.once.source.support=enabled` (Kafka 3.3+): source connectors use Kafka transactions to atomically commit offset + produce. Sink connectors use read_committed + idempotent writes.
-
-**Q: How do you manage connector configuration as code?** A: Terraform Kafka provider. Strimzi KafkaConnector CRD (Kubernetes). GitOps: store JSON configs in git, apply via CI/CD with `curl -X POST /connectors`. Infrastructure-as-code prevents configuration drift.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -258,14 +246,6 @@ Connect cluster sizing:
 | Application publish | <10ms | Medium | Yes |
 | Kafka Connect S3 Sink | N/A | Low | Yes |
 | Stream API (custom) | <10ms | High | Yes |
-
-## Follow-up Questions
-
-1. How does Debezium handle schema changes in the source database?
-2. How do you implement exactly-once for Kafka Connect sink connectors?
-3. How do you monitor connector lag and task health at scale?
-4. How does the S3 Sink connector partition data for efficient Athena queries?
-5. How do you migrate data from an existing database to Kafka without downtime?
 
 ## Python Implementation
 
@@ -478,3 +458,88 @@ public class KafkaConnectSimulator {
 | Sink write (batched) | O(batch size) |
 | Connector rebalance | O(tasks x workers) |
 | CDC WAL read | O(1) streaming |
+
+## Common Questions & Answers
+
+**Q: What is Apache Kafka?**
+
+A: Distributed event streaming platform (publish-subscribe messaging system). Stores event streams durable in log-based architecture. Supports multiple subscribers reading same data, replay capability, distributed processing. Critical infrastructure for real-time systems.
+
+**Q: How is Kafka different from traditional message queues?**
+
+A: Kafka persists all messages in ordered append-only log. Queues delete after consumption. Kafka supports multiple independent subscribers of same data. Enables replay, reprocessing, multiple consumers. Trade-off: different API, operational complexity.
+
+**Q: What is a Kafka topic and partition?**
+
+A: Topic: named event stream (orders, clicks, logs). Partition: ordered, immutable log within topic. Messages with same key go to same partition (order guarantee). Multiple partitions enable parallelism.
+
+**Q: What is a consumer group?**
+
+A: Set of consumers reading same topic collaboratively. Each partition assigned to one consumer in group. Enable parallel processing and scaling. If consumer dies, partition reassigned to other consumer.
+
+**Q: How does Kafka guarantee ordering?**
+
+A: Messages in single partition ordered by offset. Messages with same key always go to same partition (key routing). Therefore: same-key messages processed in order. Different keys can process out-of-order (parallel).
+
+**Q: What does acks setting do?**
+
+A: acks=0: producer doesn't wait (fire-and-forget). acks=1: wait for leader ack (fast). acks=all: wait for all replicas ack (safest, slowest). Choose: reliability vs. latency trade-off.
+
+**Q: What is at-least-once delivery guarantee?**
+
+A: Messages guaranteed delivered but may be duplicated. If producer retries on timeout, message could appear twice. Consumer must be idempotent (handle duplicates safely).
+
+**Q: How do you scale Kafka?**
+
+A: Add more partitions (parallelism), add more consumer replicas (throughput), add more brokers (storage/availability). Monitor lag, rebalance. Orchestrate with Kubernetes.
+
+**Q: What is consumer lag?**
+
+A: Difference between latest message offset and consumer's current offset. High lag = consumer falling behind. Monitor continuously, alert if lag growing. Indicates consumer too slow or too few consumers.
+
+**Q: How do you monitor Kafka health?**
+
+A: Track broker metrics (CPU, disk, network), consumer lag, in-sync replicas (ISR), partition distribution. Use tools like Burrow, LinkedIn monitoring. Alert on anomalies.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement exactly-once semantics in Kafka?**
+
+A: Use Kafka transactions (producer idempotency + atomic writes). Consumer must track processed message IDs. Or use idempotent producer + idempotent consumer. Trade: performance for correctness. Requires Kafka 0.11+.
+
+**Q: How do you handle backpressure (producer faster than consumer)?**
+
+A: Consumer lags behind (offset < latest). Use monitoring to detect. Scaling options: add more consumer threads, optimize consumer code, reduce producer rate, or buffer in queue. Choose based on SLA.
+
+**Q: How would you implement Kafka in multi-region setup?**
+
+A: Use MirrorMaker to replicate topics across regions. Choose consistency model (strong = sync, eventual = async). Handle failover (which region is primary). Complex operational model.
+
+**Q: What is Kafka Streams?**
+
+A: Library for stream processing on Kafka. Stateless (map, filter, flatMap), stateful (aggregate, join, window). Good for simple transformations. Alternative to Spark/Flink for JVM applications.
+
+**Q: How do you debug Kafka performance issues?**
+
+A: Monitor broker metrics (CPU, disk utilization), network latency, GC pauses. Check consumer lag, partition skew. Profile producer/consumer code. Check network bandwidth between brokers.
+
+**Q: How would you handle late-arriving messages?**
+
+A: Kafka preserves order within partition. Late messages appear out of order w.r.t. other partitions. Application must handle. Use timestamps for processing time logic. Consider grace period for windowed aggregations.
+
+**Q: How do you implement message ordering guarantees?**
+
+A: Send messages with same key (routes to same partition). Consumer reads single partition (ordered). Tradeoff: single partition limits throughput. Use multiple partitions + key if you need both.
+
+**Q: Can you compact Kafka topics?**
+
+A: Yes, log compaction mode: keeps latest value per key. Useful for state topics (user profiles). Trade: smaller storage but must maintain keys. Different from default delete mode.
+
+**Q: How would you implement Kafka with transactions?**
+
+A: Atomic multi-partition writes (Kafka 0.11+). Transactional producer: multiple puts before commit. Isolation level: read_committed (default) vs. read_uncommitted. Producer and consumer transaction APIs.
+
+**Q: How do you handle Kafka rebalancing?**
+
+A: When consumer joins/leaves, partitions reassigned. Brief unavailability during rebalance. Minimize with heartbeat tuning, larger batches, optimize consumer code. Monitor rebalance frequency and duration.
+

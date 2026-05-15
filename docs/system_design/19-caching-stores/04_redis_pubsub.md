@@ -187,18 +187,6 @@ Redis Streams vs Pub/Sub:
   Use Pub/Sub for: real-time broadcast, ephemeral events
 ```
 
-## Common Questions & Answers
-
-**Q: What happens when no subscribers are on a channel?** A: PUBLISH returns 0. Message is dropped. No buffering, no persistence. If subscriber reconnects, it misses all messages published while disconnected.
-
-**Q: How do you scale Redis Pub/Sub for 1M subscribers?** A: Redis handles ~50K connections natively. For 1M subscribers: (1) WebSocket gateway layer: few WebSocket servers subscribe to Redis, then fan-out to connections. (2) Horizontal: multiple Redis Pub/Sub instances behind load balancer (but then split channels). (3) Redis Streams with consumer groups.
-
-**Q: Can you use Redis Pub/Sub for guaranteed delivery?** A: No. Pub/Sub is fire-and-forget. Use Redis Streams for guaranteed delivery with consumer groups, ACKs, and replay. Or use Kafka/RabbitMQ for enterprise reliability.
-
-**Q: How do keyspace notifications work for cache invalidation?** A: Subscribe to `__keyevent@0__:expired` and `__keyevent@0__:del`. When a cached key expires or is deleted, application receives the event and can remove it from application-level cache (e.g., local in-memory cache).
-
-**Q: What is the overhead of Pub/Sub on Redis performance?** A: Each PUBLISH scans all subscription maps: O(N) where N = matching subscriptions. At 10K subscribers to same channel: PUBLISH adds ~10ms overhead. For millions of subscriptions: use pattern subscriptions carefully (each PSUBSCRIBE is O(patterns x subscriptions) to match).
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -238,14 +226,6 @@ Fan-out architecture:
 | Kafka + WS gateway | Durable | Millions | High |
 | SSE + Pub/Sub | Browser-native | Stateless scaling | Medium |
 | WebSocket + Redis | Real-time | Horizontal | Medium |
-
-## Follow-up Questions
-
-1. How would you build a real-time chat system using Redis Pub/Sub?
-2. How do you handle subscriber reconnection and missed messages?
-3. How does Redis Streams consumer groups differ from Pub/Sub?
-4. How do you implement distributed cache invalidation using keyspace notifications?
-5. What is Redis Shard Pub/Sub (Redis 7.0) and how does it scale in cluster mode?
 
 ## Python Implementation
 
@@ -433,3 +413,88 @@ public class RedisPubSubSimulator {
 | PUBLISH (N subscribers) | O(N) |
 | PSUBSCRIBE matching | O(patterns) |
 | Keyspace notification | O(matching subscribers) |
+
+## Common Questions & Answers
+
+**Q: What is Redis and when do you use it?**
+
+A: In-memory key-value data store with sub-millisecond latency. Used for caching (reduce DB load), sessions (user state), queues, real-time counters, leaderboards. Very fast but volatile (data loss on crash without persistence).
+
+**Q: What data structures does Redis support?**
+
+A: Strings (simple values), Lists (FIFO queues), Sets (unique values), Hashes (objects), Sorted Sets (leaderboards), Streams (Kafka-like), HyperLogLog (cardinality), Bitmaps (bitwise ops). Rich beyond simple cache.
+
+**Q: How does Redis persistence work?**
+
+A: RDB (snapshot): periodic point-in-time backup (fast, compact). AOF (append-only file): log all writes (durable, slower). BGSAVE/BGREWRITEAOF: background operations. Choose: speed vs. durability trade-off. Most use both.
+
+**Q: What is Redis replication?**
+
+A: Master-slave architecture: master accepts writes, slaves replicate. Read from master (strong consistency) or slaves (eventual, faster). Slaves can be read-only replicas or chain-replicate to others.
+
+**Q: What is Redis Sentinel?**
+
+A: High availability solution: monitors Redis instances, detects failures, promotes replica to master automatically. Requires 3+ Sentinel instances (majority quorum). Client connects via Sentinel instead of Redis directly.
+
+**Q: What is Redis Cluster?**
+
+A: Distributed Redis: data sharded across multiple nodes (hash slots). Auto-sharding, automatic failover, rebalancing. More complex than Sentinel. Required for massive scale (TB+ data).
+
+**Q: How do you choose between Sentinel and Cluster?**
+
+A: Sentinel: single master, high availability. Cluster: distributed, massive scale. Sentinel for most (simpler), Cluster only if need horizontal scaling. Data > memory = use Cluster.
+
+**Q: How do you handle eviction when Redis runs out of memory?**
+
+A: Set maxmemory policy: LRU, LFU, TTL, random, or no-eviction. LRU/LFU common for caching. TTL for session data. No-eviction blocks writes (safe but risky). Monitor memory usage constantly.
+
+**Q: What is key expiration in Redis?**
+
+A: Keys have optional TTL (time-to-live). After expiration, key automatically deleted. Lazy deletion (on access) + periodic cleanup. Use for session data, cache, or temporary counters. Check expiration policy for accuracy.
+
+**Q: How do you secure Redis?**
+
+A: Use password authentication (requirepass). ACLs (Redis 6+): per-user permissions. Run inside VPC (no internet access). Disable dangerous commands (FLUSHDB, CONFIG). TLS for remote connections.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement distributed locking with Redis?**
+
+A: SET key value EX ttl NX (atomic: set if not exists with TTL). Acquire lock, execute critical section, delete key. Risk: crash loses lock (data consistency issue). Redlock solves this with multiple instances.
+
+**Q: What is Redlock and what problem does it solve?**
+
+A: Distributed lock across 5 Redis instances. Acquire lock on majority (quorum). Survives single instance failure. Overkill for most, but necessary for safety-critical sections. Trade: performance for correctness.
+
+**Q: How would you implement rate limiting with Redis?**
+
+A: Use sorted set with timestamps or hash with counters. Increment on each request, check against limit. Fast (O(log n)). Alternative: token bucket in Lua script. Faster than database.
+
+**Q: How do you handle Redis memory limits and eviction policy?**
+
+A: Set maxmemory (bytes), maxmemory-policy (LRU/LFU/TTL/random). Monitor hit rate (eviction = misses). Can also manually delete old keys or use cache-aside with database.
+
+**Q: Can you use Redis for reliable message queues?**
+
+A: Partially. Lists (basic) or Streams (better). Lists: FIFO, no persistence without RDB. Streams: replicas, consumer groups, reliable delivery (Kafka-like). For critical: use Kafka instead.
+
+**Q: How would you implement Pub/Sub in Redis?**
+
+A: Publisher sends to channel, subscribers receive. Fire-and-forget (no persistence). Good for notifications. Bad for reliable messaging (missed if subscriber offline). Better: Streams for reliable pub/sub.
+
+**Q: How do you scale Redis beyond single node?**
+
+A: Use Cluster (distributed), replicate read-heavy workload (slaves), or shard in application code. Cluster best for massive scale. Replication for read scaling. App sharding for distributed control.
+
+**Q: Can you implement transactions in Redis?**
+
+A: MULTI/EXEC: atomic batch of commands. Optimistic locking with WATCH. No rollback (all-or-nothing at command level). Use Lua scripts for complex atomic operations.
+
+**Q: How would you debug Redis performance issues?**
+
+A: SLOWLOG: find slow commands. MONITOR: see all commands in real-time. Memory analysis: MEMORY DOCTOR, key usage patterns. Network: latency between app and Redis. Profiling tools.
+
+**Q: How do you backup and restore Redis?**
+
+A: Backup: RDB snapshots, AOF files, or replication. Restore: copy files, or use Redis replication + replicaof. Backup strategy: periodic snapshots + AOF for durability. Test recovery regularly.
+

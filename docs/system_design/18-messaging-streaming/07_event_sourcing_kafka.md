@@ -190,18 +190,6 @@ For "read your own writes":
   Or: client-side caching of own mutations
 ```
 
-## Common Questions & Answers
-
-**Q: Why use event sourcing?** A: (1) Complete audit trail. (2) Time travel (replay to any point). (3) Multiple independent projections (CQRS). (4) Event-driven integration (events are the API). (5) Bug recovery (fix projection, replay to correct state).
-
-**Q: What is the downside of event sourcing?** A: Complexity overhead (CQRS, eventual consistency). Query complexity (no direct SQL). Schema evolution of events is hard (immutable!). Performance for heavily-updated aggregates (many events). Not suitable for all domains.
-
-**Q: How do you handle event schema evolution?** A: Version events (`OrderCreated_v1`, `OrderCreated_v2`). Upcasters: transform old events to new schema when reading. Avro/Protobuf with schema registry for forwards/backwards compatibility. Never modify an event type, create a new version.
-
-**Q: What is the Outbox Pattern?** A: Atomically write event to database outbox table AND update domain state (same DB transaction). Separate process reads outbox and publishes to Kafka. Guarantees: event published if-and-only-if state updated.
-
-**Q: How does CQRS help with event sourcing?** A: Command side: optimized for writes (append-only events). Query side: optimized read models (denormalized, indexed). Queries don't need to replay events — they read the projection. Different scaling strategies for reads vs writes.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -238,14 +226,6 @@ Write throughput:
 | Traditional DB | Strong | Flexible SQL | Low |
 | Event sourcing + same DB | Strong | Same DB | Medium |
 | Event-driven (no sourcing) | Eventual | Flexible | Medium |
-
-## Follow-up Questions
-
-1. How do you handle concurrent commands on the same aggregate?
-2. How do you implement saga pattern across multiple aggregates using events?
-3. How do you migrate from traditional CRUD to event sourcing?
-4. How do you implement a projection that reads from multiple event streams?
-5. How does the Outbox Pattern guarantee exactly-once event publishing?
 
 ## Python Implementation
 
@@ -525,3 +505,88 @@ public class EventSourcing {
 | Load aggregate (with snapshot) | O(events since snapshot) |
 | Rebuild projection | O(total events) |
 | Concurrent write check | O(1) with version compare |
+
+## Common Questions & Answers
+
+**Q: What is Apache Kafka?**
+
+A: Distributed event streaming platform (publish-subscribe messaging system). Stores event streams durable in log-based architecture. Supports multiple subscribers reading same data, replay capability, distributed processing. Critical infrastructure for real-time systems.
+
+**Q: How is Kafka different from traditional message queues?**
+
+A: Kafka persists all messages in ordered append-only log. Queues delete after consumption. Kafka supports multiple independent subscribers of same data. Enables replay, reprocessing, multiple consumers. Trade-off: different API, operational complexity.
+
+**Q: What is a Kafka topic and partition?**
+
+A: Topic: named event stream (orders, clicks, logs). Partition: ordered, immutable log within topic. Messages with same key go to same partition (order guarantee). Multiple partitions enable parallelism.
+
+**Q: What is a consumer group?**
+
+A: Set of consumers reading same topic collaboratively. Each partition assigned to one consumer in group. Enable parallel processing and scaling. If consumer dies, partition reassigned to other consumer.
+
+**Q: How does Kafka guarantee ordering?**
+
+A: Messages in single partition ordered by offset. Messages with same key always go to same partition (key routing). Therefore: same-key messages processed in order. Different keys can process out-of-order (parallel).
+
+**Q: What does acks setting do?**
+
+A: acks=0: producer doesn't wait (fire-and-forget). acks=1: wait for leader ack (fast). acks=all: wait for all replicas ack (safest, slowest). Choose: reliability vs. latency trade-off.
+
+**Q: What is at-least-once delivery guarantee?**
+
+A: Messages guaranteed delivered but may be duplicated. If producer retries on timeout, message could appear twice. Consumer must be idempotent (handle duplicates safely).
+
+**Q: How do you scale Kafka?**
+
+A: Add more partitions (parallelism), add more consumer replicas (throughput), add more brokers (storage/availability). Monitor lag, rebalance. Orchestrate with Kubernetes.
+
+**Q: What is consumer lag?**
+
+A: Difference between latest message offset and consumer's current offset. High lag = consumer falling behind. Monitor continuously, alert if lag growing. Indicates consumer too slow or too few consumers.
+
+**Q: How do you monitor Kafka health?**
+
+A: Track broker metrics (CPU, disk, network), consumer lag, in-sync replicas (ISR), partition distribution. Use tools like Burrow, LinkedIn monitoring. Alert on anomalies.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement exactly-once semantics in Kafka?**
+
+A: Use Kafka transactions (producer idempotency + atomic writes). Consumer must track processed message IDs. Or use idempotent producer + idempotent consumer. Trade: performance for correctness. Requires Kafka 0.11+.
+
+**Q: How do you handle backpressure (producer faster than consumer)?**
+
+A: Consumer lags behind (offset < latest). Use monitoring to detect. Scaling options: add more consumer threads, optimize consumer code, reduce producer rate, or buffer in queue. Choose based on SLA.
+
+**Q: How would you implement Kafka in multi-region setup?**
+
+A: Use MirrorMaker to replicate topics across regions. Choose consistency model (strong = sync, eventual = async). Handle failover (which region is primary). Complex operational model.
+
+**Q: What is Kafka Streams?**
+
+A: Library for stream processing on Kafka. Stateless (map, filter, flatMap), stateful (aggregate, join, window). Good for simple transformations. Alternative to Spark/Flink for JVM applications.
+
+**Q: How do you debug Kafka performance issues?**
+
+A: Monitor broker metrics (CPU, disk utilization), network latency, GC pauses. Check consumer lag, partition skew. Profile producer/consumer code. Check network bandwidth between brokers.
+
+**Q: How would you handle late-arriving messages?**
+
+A: Kafka preserves order within partition. Late messages appear out of order w.r.t. other partitions. Application must handle. Use timestamps for processing time logic. Consider grace period for windowed aggregations.
+
+**Q: How do you implement message ordering guarantees?**
+
+A: Send messages with same key (routes to same partition). Consumer reads single partition (ordered). Tradeoff: single partition limits throughput. Use multiple partitions + key if you need both.
+
+**Q: Can you compact Kafka topics?**
+
+A: Yes, log compaction mode: keeps latest value per key. Useful for state topics (user profiles). Trade: smaller storage but must maintain keys. Different from default delete mode.
+
+**Q: How would you implement Kafka with transactions?**
+
+A: Atomic multi-partition writes (Kafka 0.11+). Transactional producer: multiple puts before commit. Isolation level: read_committed (default) vs. read_uncommitted. Producer and consumer transaction APIs.
+
+**Q: How do you handle Kafka rebalancing?**
+
+A: When consumer joins/leaves, partitions reassigned. Brief unavailability during rebalance. Minimize with heartbeat tuning, larger batches, optimize consumer code. Monitor rebalance frequency and duration.
+

@@ -206,18 +206,6 @@ When to use Sentinel:
   - < 1TB data, < 1M ops/s
 ```
 
-## Common Questions & Answers
-
-**Q: What is the minimum number of Sentinels?** A: 3. With 2 sentinels: if 1 fails, quorum of 1/2 = 50% — below majority, no failover. With 3: if 1 fails, remaining 2 can still reach quorum of 2/3. Odd numbers recommended (3, 5, 7).
-
-**Q: How does the application connect to Redis via Sentinel?** A: Client connects to any Sentinel and runs `SENTINEL get-master-addr-by-name mymaster` to get current master IP:port. Sentinel-aware clients (jedis, lettuce, redis-py) handle this automatically. On disconnect, they re-query Sentinel.
-
-**Q: Can Sentinel guarantee zero data loss?** A: No. Async replication means replicas may lag. Master failure before replica syncs = data loss. Use `min-replicas-to-write 1` + `min-replicas-max-lag 10` to reject writes when no up-to-date replica exists.
-
-**Q: How long does Sentinel failover take?** A: Detection: `down-after-milliseconds` (5-30s typical). Election: 1-2s. Promotion: 1-3s. Client reconnect: depends on client timeout. Total: 10-60 seconds. Not suitable for sub-second HA requirements (use active-active or Cluster).
-
-**Q: What happens to write requests during failover?** A: Writes to old master are rejected (it's down). Sentinel has not yet promoted new master — brief write gap. With client retry logic: ~30 second retry window until new master is ready.
-
 ## Back-of-Envelope Calculations
 
 ```
@@ -253,14 +241,6 @@ Client reconnect:
 | Sentinel (3+3) | Write HA | 1x | Medium | 10-60s |
 | Cluster (3+3) | Full HA | 3x | High | 30s per shard |
 | Multi-region Sentinel | Cross-DC | 1x | High | Minutes |
-
-## Follow-up Questions
-
-1. How do you upgrade Redis (master + replicas) with zero downtime using Sentinel?
-2. How does Redis Sentinel handle split-brain when network partitions occur?
-3. How do you monitor Sentinel events (failovers, reconfigurations)?
-4. How does client-side sentinel work in connection pooling libraries (e.g., Lettuce)?
-5. How do you set up Redis Sentinel in Kubernetes?
 
 ## Python Implementation
 
@@ -538,3 +518,88 @@ public class RedisSentinel {
 | Leader election | O(sentinels) |
 | Failover promotion | O(replicas) |
 | Client reconnect | O(1) sentinel query |
+
+## Common Questions & Answers
+
+**Q: What is Redis and when do you use it?**
+
+A: In-memory key-value data store with sub-millisecond latency. Used for caching (reduce DB load), sessions (user state), queues, real-time counters, leaderboards. Very fast but volatile (data loss on crash without persistence).
+
+**Q: What data structures does Redis support?**
+
+A: Strings (simple values), Lists (FIFO queues), Sets (unique values), Hashes (objects), Sorted Sets (leaderboards), Streams (Kafka-like), HyperLogLog (cardinality), Bitmaps (bitwise ops). Rich beyond simple cache.
+
+**Q: How does Redis persistence work?**
+
+A: RDB (snapshot): periodic point-in-time backup (fast, compact). AOF (append-only file): log all writes (durable, slower). BGSAVE/BGREWRITEAOF: background operations. Choose: speed vs. durability trade-off. Most use both.
+
+**Q: What is Redis replication?**
+
+A: Master-slave architecture: master accepts writes, slaves replicate. Read from master (strong consistency) or slaves (eventual, faster). Slaves can be read-only replicas or chain-replicate to others.
+
+**Q: What is Redis Sentinel?**
+
+A: High availability solution: monitors Redis instances, detects failures, promotes replica to master automatically. Requires 3+ Sentinel instances (majority quorum). Client connects via Sentinel instead of Redis directly.
+
+**Q: What is Redis Cluster?**
+
+A: Distributed Redis: data sharded across multiple nodes (hash slots). Auto-sharding, automatic failover, rebalancing. More complex than Sentinel. Required for massive scale (TB+ data).
+
+**Q: How do you choose between Sentinel and Cluster?**
+
+A: Sentinel: single master, high availability. Cluster: distributed, massive scale. Sentinel for most (simpler), Cluster only if need horizontal scaling. Data > memory = use Cluster.
+
+**Q: How do you handle eviction when Redis runs out of memory?**
+
+A: Set maxmemory policy: LRU, LFU, TTL, random, or no-eviction. LRU/LFU common for caching. TTL for session data. No-eviction blocks writes (safe but risky). Monitor memory usage constantly.
+
+**Q: What is key expiration in Redis?**
+
+A: Keys have optional TTL (time-to-live). After expiration, key automatically deleted. Lazy deletion (on access) + periodic cleanup. Use for session data, cache, or temporary counters. Check expiration policy for accuracy.
+
+**Q: How do you secure Redis?**
+
+A: Use password authentication (requirepass). ACLs (Redis 6+): per-user permissions. Run inside VPC (no internet access). Disable dangerous commands (FLUSHDB, CONFIG). TLS for remote connections.
+
+## Follow-up Questions & Answers
+
+**Q: How would you implement distributed locking with Redis?**
+
+A: SET key value EX ttl NX (atomic: set if not exists with TTL). Acquire lock, execute critical section, delete key. Risk: crash loses lock (data consistency issue). Redlock solves this with multiple instances.
+
+**Q: What is Redlock and what problem does it solve?**
+
+A: Distributed lock across 5 Redis instances. Acquire lock on majority (quorum). Survives single instance failure. Overkill for most, but necessary for safety-critical sections. Trade: performance for correctness.
+
+**Q: How would you implement rate limiting with Redis?**
+
+A: Use sorted set with timestamps or hash with counters. Increment on each request, check against limit. Fast (O(log n)). Alternative: token bucket in Lua script. Faster than database.
+
+**Q: How do you handle Redis memory limits and eviction policy?**
+
+A: Set maxmemory (bytes), maxmemory-policy (LRU/LFU/TTL/random). Monitor hit rate (eviction = misses). Can also manually delete old keys or use cache-aside with database.
+
+**Q: Can you use Redis for reliable message queues?**
+
+A: Partially. Lists (basic) or Streams (better). Lists: FIFO, no persistence without RDB. Streams: replicas, consumer groups, reliable delivery (Kafka-like). For critical: use Kafka instead.
+
+**Q: How would you implement Pub/Sub in Redis?**
+
+A: Publisher sends to channel, subscribers receive. Fire-and-forget (no persistence). Good for notifications. Bad for reliable messaging (missed if subscriber offline). Better: Streams for reliable pub/sub.
+
+**Q: How do you scale Redis beyond single node?**
+
+A: Use Cluster (distributed), replicate read-heavy workload (slaves), or shard in application code. Cluster best for massive scale. Replication for read scaling. App sharding for distributed control.
+
+**Q: Can you implement transactions in Redis?**
+
+A: MULTI/EXEC: atomic batch of commands. Optimistic locking with WATCH. No rollback (all-or-nothing at command level). Use Lua scripts for complex atomic operations.
+
+**Q: How would you debug Redis performance issues?**
+
+A: SLOWLOG: find slow commands. MONITOR: see all commands in real-time. Memory analysis: MEMORY DOCTOR, key usage patterns. Network: latency between app and Redis. Profiling tools.
+
+**Q: How do you backup and restore Redis?**
+
+A: Backup: RDB snapshots, AOF files, or replication. Restore: copy files, or use Redis replication + replicaof. Backup strategy: periodic snapshots + AOF for durability. Test recovery regularly.
+
