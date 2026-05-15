@@ -29,6 +29,15 @@ datastructures/
 └── README.md
 ```
 
+## 📚 Interview Prep Resources
+
+Comprehensive guides to master system design interviews and problem-solving patterns:
+
+- **[Problem-to-Pattern Matcher](docs/patterns/)** — Recognize 50+ problem types and immediately identify the best data structures and algorithms to use
+- **[System Design Interview Framework](docs/frameworks/)** — 4-phase framework with step-by-step guide, comprehensive checklist, and common follow-ups for all system designs in this repo
+
+Use these resources alongside the implementations in this repo to prepare for technical interviews.
+
 ## Data Structures Covered
 
 ### Basic
