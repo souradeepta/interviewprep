@@ -119,3 +119,91 @@ flowchart TD
 | Write | O(1) |
 | Range query | O(log n + k) |
 | Aggregation | O(k) |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass, field
+from typing import List, Dict, Tuple, Optional
+from collections import defaultdict
+import bisect
+
+@dataclass
+class DataPoint:
+    timestamp: int  # Unix ms
+    value: float
+    tags: Dict[str, str] = field(default_factory=dict)
+
+class TimeSeries:
+    def __init__(self, name: str):
+        self.name = name
+        self._timestamps: List[int] = []
+        self._values: List[float] = []
+
+    def write(self, ts: int, value: float):
+        idx = bisect.bisect_left(self._timestamps, ts)
+        self._timestamps.insert(idx, ts)
+        self._values.insert(idx, value)
+
+    def query(self, start: int, end: int) -> List[Tuple[int, float]]:
+        lo = bisect.bisect_left(self._timestamps, start)
+        hi = bisect.bisect_right(self._timestamps, end)
+        return list(zip(self._timestamps[lo:hi], self._values[lo:hi]))
+
+    def aggregate(self, start: int, end: int, fn: str = "avg") -> Optional[float]:
+        points = [v for _, v in self.query(start, end)]
+        if not points:
+            return None
+        if fn == "avg": return sum(points) / len(points)
+        if fn == "sum": return sum(points)
+        if fn == "max": return max(points)
+        if fn == "min": return min(points)
+        return None
+
+class TimeSeriesDB:
+    def __init__(self):
+        self._series: Dict[str, TimeSeries] = {}
+
+    def write(self, metric: str, ts: int, value: float):
+        if metric not in self._series:
+            self._series[metric] = TimeSeries(metric)
+        self._series[metric].write(ts, value)
+
+    def query(self, metric: str, start: int, end: int) -> List[Tuple[int, float]]:
+        return self._series.get(metric, TimeSeries(metric)).query(start, end)
+
+# Usage
+db = TimeSeriesDB()
+for i, v in enumerate([12.5, 13.0, 11.8, 14.2]):
+    db.write("cpu.usage", 1000 + i * 1000, v)
+print(db.query("cpu.usage", 1000, 4000))
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class TimeSeriesDB {
+    private Map<String, TreeMap<Long, Double>> series = new HashMap<>();
+
+    public void write(String metric, long timestamp, double value) {
+        series.computeIfAbsent(metric, k -> new TreeMap<>()).put(timestamp, value);
+    }
+
+    public NavigableMap<Long, Double> query(String metric, long start, long end) {
+        TreeMap<Long, Double> ts = series.getOrDefault(metric, new TreeMap<>());
+        return ts.subMap(start, true, end, true);
+    }
+
+    public OptionalDouble aggregate(String metric, long start, long end, String fn) {
+        Collection<Double> values = query(metric, start, end).values();
+        return switch (fn) {
+            case "avg" -> values.stream().mapToDouble(d -> d).average();
+            case "max" -> values.stream().mapToDouble(d -> d).max();
+            case "min" -> values.stream().mapToDouble(d -> d).min();
+            default -> OptionalDouble.empty();
+        };
+    }
+}
+```

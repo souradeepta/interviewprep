@@ -120,3 +120,82 @@ sequenceDiagram
 | Publish | O(1) |
 | Consume | O(k) where k=batch |
 | ACK | O(1) |
+
+## Python Implementation
+
+```python
+from collections import deque
+from threading import Lock, Condition
+from dataclasses import dataclass
+from typing import Optional, Any
+
+@dataclass
+class Message:
+    msg_id: int
+    payload: Any
+    acknowledged: bool = False
+
+class MessageQueue:
+    def __init__(self, max_size: int = 1000):
+        self._queue: deque[Message] = deque()
+        self._max_size = max_size
+        self._lock = Lock()
+        self._not_empty = Condition(self._lock)
+        self._not_full = Condition(self._lock)
+        self._counter = 0
+
+    def send(self, payload: Any, timeout: float = None) -> bool:
+        with self._not_full:
+            if len(self._queue) >= self._max_size:
+                self._not_full.wait(timeout)
+                if len(self._queue) >= self._max_size:
+                    return False
+            self._counter += 1
+            self._queue.append(Message(self._counter, payload))
+            self._not_empty.notify()
+            return True
+
+    def receive(self, timeout: float = None) -> Optional[Message]:
+        with self._not_empty:
+            if not self._queue:
+                self._not_empty.wait(timeout)
+                if not self._queue:
+                    return None
+            msg = self._queue.popleft()
+            self._not_full.notify()
+            return msg
+
+# Usage
+q = MessageQueue(max_size=10)
+q.send({"event": "user.signup", "user_id": 42})
+msg = q.receive()
+print(msg.payload)  # {'event': 'user.signup', 'user_id': 42}
+```
+
+## Java Implementation
+
+```java
+import java.util.concurrent.*;
+
+public class MessageQueue<T> {
+    private final BlockingQueue<T> queue;
+
+    public MessageQueue(int capacity) {
+        this.queue = new ArrayBlockingQueue<>(capacity);
+    }
+
+    public boolean send(T payload) throws InterruptedException {
+        return queue.offer(payload, 100, TimeUnit.MILLISECONDS);
+    }
+
+    public T receive() throws InterruptedException {
+        return queue.poll(100, TimeUnit.MILLISECONDS);
+    }
+
+    public static void main(String[] args) throws Exception {
+        MessageQueue<String> q = new MessageQueue<>(100);
+        q.send("hello");
+        System.out.println(q.receive()); // hello
+    }
+}
+```

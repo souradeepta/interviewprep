@@ -118,3 +118,125 @@ stateDiagram-v2
 | Check state | O(1) |
 | Record success/failure | O(1) |
 | State transition | O(1) |
+
+## Python Implementation
+
+```python
+from enum import Enum
+from typing import Callable, TypeVar, Any
+import time
+import functools
+
+T = TypeVar("T")
+
+class CircuitState(Enum):
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
+
+class CircuitBreaker:
+    def __init__(self, failure_threshold: int = 5, recovery_timeout: float = 60.0,
+                 half_open_max_calls: int = 3):
+        self.state = CircuitState.CLOSED
+        self._failure_count = 0
+        self._success_count = 0
+        self._failure_threshold = failure_threshold
+        self._recovery_timeout = recovery_timeout
+        self._half_open_max_calls = half_open_max_calls
+        self._opened_at: float = 0
+
+    def call(self, fn: Callable[..., T], *args, **kwargs) -> T:
+        if self.state == CircuitState.OPEN:
+            if time.time() - self._opened_at >= self._recovery_timeout:
+                self.state = CircuitState.HALF_OPEN
+                self._success_count = 0
+            else:
+                raise Exception("Circuit is OPEN - request rejected")
+
+        try:
+            result = fn(*args, **kwargs)
+            self._on_success()
+            return result
+        except Exception:
+            self._on_failure()
+            raise
+
+    def _on_success(self):
+        if self.state == CircuitState.HALF_OPEN:
+            self._success_count += 1
+            if self._success_count >= self._half_open_max_calls:
+                self.state = CircuitState.CLOSED
+                self._failure_count = 0
+        else:
+            self._failure_count = 0
+
+    def _on_failure(self):
+        self._failure_count += 1
+        if self._failure_count >= self._failure_threshold:
+            self.state = CircuitState.OPEN
+            self._opened_at = time.time()
+
+# Usage
+cb = CircuitBreaker(failure_threshold=3)
+
+def unstable_api():
+    raise ConnectionError("Service down")
+
+for i in range(5):
+    try:
+        cb.call(unstable_api)
+    except Exception as e:
+        print(f"[{cb.state.value}] {e}")
+```
+
+## Java Implementation
+
+```java
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+
+public class CircuitBreaker {
+    enum State { CLOSED, OPEN, HALF_OPEN }
+
+    private volatile State state = State.CLOSED;
+    private AtomicInteger failures = new AtomicInteger(0);
+    private final int threshold;
+    private final long recoveryMs;
+    private volatile long openedAt;
+
+    public CircuitBreaker(int threshold, long recoveryMs) {
+        this.threshold = threshold;
+        this.recoveryMs = recoveryMs;
+    }
+
+    public <T> T call(Supplier<T> fn) {
+        if (state == State.OPEN) {
+            if (System.currentTimeMillis() - openedAt >= recoveryMs) {
+                state = State.HALF_OPEN;
+            } else {
+                throw new RuntimeException("Circuit is OPEN");
+            }
+        }
+        try {
+            T result = fn.get();
+            onSuccess();
+            return result;
+        } catch (Exception e) {
+            onFailure();
+            throw e;
+        }
+    }
+
+    private void onSuccess() {
+        failures.set(0);
+        state = State.CLOSED;
+    }
+
+    private void onFailure() {
+        if (failures.incrementAndGet() >= threshold) {
+            state = State.OPEN;
+            openedAt = System.currentTimeMillis();
+        }
+    }
+}
+```

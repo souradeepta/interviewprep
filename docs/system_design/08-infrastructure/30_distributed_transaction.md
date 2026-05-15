@@ -120,3 +120,122 @@ sequenceDiagram
 | 2PC | Atomic | Blocking, slow |
 | Saga | Flexible | Complex, eventual consistency |
 | ES | Audit trail | Storage overhead |
+
+## Python Implementation
+
+```python
+from enum import Enum
+from typing import List, Callable, Optional
+
+class TxnState(Enum):
+    INITIAL = "initial"
+    PREPARED = "prepared"
+    COMMITTED = "committed"
+    ABORTED = "aborted"
+
+class Participant:
+    def __init__(self, name: str):
+        self.name = name
+        self.state = TxnState.INITIAL
+
+    def prepare(self) -> bool:
+        # Simulate prepare phase - returns True if ready to commit
+        self.state = TxnState.PREPARED
+        print(f"[{self.name}] Prepared")
+        return True
+
+    def commit(self):
+        self.state = TxnState.COMMITTED
+        print(f"[{self.name}] Committed")
+
+    def abort(self):
+        self.state = TxnState.ABORTED
+        print(f"[{self.name}] Aborted")
+
+class TwoPhaseCommit:
+    def __init__(self, participants: List[Participant]):
+        self._participants = participants
+
+    def execute(self) -> bool:
+        # Phase 1: Prepare
+        votes = [p.prepare() for p in self._participants]
+        if all(votes):
+            # Phase 2: Commit
+            for p in self._participants:
+                p.commit()
+            return True
+        else:
+            # Phase 2: Abort
+            for p in self._participants:
+                p.abort()
+            return False
+
+# Saga Pattern
+class SagaStep:
+    def __init__(self, action: Callable, compensation: Callable):
+        self.action = action
+        self.compensation = compensation
+
+class SagaOrchestrator:
+    def __init__(self, steps: List[SagaStep]):
+        self._steps = steps
+
+    def execute(self):
+        completed = []
+        for step in self._steps:
+            try:
+                step.action()
+                completed.append(step)
+            except Exception as e:
+                print(f"Step failed: {e}, compensating...")
+                for s in reversed(completed):
+                    s.compensation()
+                return False
+        return True
+
+# Usage
+p1, p2, p3 = Participant("DB1"), Participant("DB2"), Participant("DB3")
+txn = TwoPhaseCommit([p1, p2, p3])
+print("Success:", txn.execute())
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class TwoPhaseCommit {
+    interface Participant {
+        boolean prepare();
+        void commit();
+        void abort();
+    }
+
+    private List<Participant> participants;
+
+    public TwoPhaseCommit(List<Participant> participants) {
+        this.participants = participants;
+    }
+
+    public boolean execute() {
+        boolean allReady = participants.stream().allMatch(Participant::prepare);
+        if (allReady) {
+            participants.forEach(Participant::commit);
+        } else {
+            participants.forEach(Participant::abort);
+        }
+        return allReady;
+    }
+
+    public static void main(String[] args) {
+        List<Participant> ps = List.of(
+            new Participant() {
+                public boolean prepare() { System.out.println("DB1 prepared"); return true; }
+                public void commit() { System.out.println("DB1 committed"); }
+                public void abort() { System.out.println("DB1 aborted"); }
+            }
+        );
+        System.out.println("Success: " + new TwoPhaseCommit(ps).execute());
+    }
+}
+```

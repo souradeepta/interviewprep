@@ -109,3 +109,77 @@ sequenceDiagram
 | Range | Simple joins | Uneven distribution |
 | Hash | Even distribution | Hard to scale |
 | Consistent hash | Scale-friendly | Complex implementation |
+
+## Python Implementation
+
+```python
+import hashlib
+from typing import Any, Dict, List
+
+class Shard:
+    def __init__(self, shard_id: int):
+        self.shard_id = shard_id
+        self._data: Dict[str, Any] = {}
+
+    def get(self, key: str) -> Any:
+        return self._data.get(key)
+
+    def put(self, key: str, value: Any):
+        self._data[key] = value
+
+class ShardedDatabase:
+    def __init__(self, num_shards: int = 4):
+        self._shards = [Shard(i) for i in range(num_shards)]
+        self._num_shards = num_shards
+
+    def _shard_for(self, key: str) -> Shard:
+        hash_val = int(hashlib.md5(key.encode()).hexdigest(), 16)
+        return self._shards[hash_val % self._num_shards]
+
+    def get(self, key: str) -> Any:
+        return self._shard_for(key).get(key)
+
+    def put(self, key: str, value: Any):
+        self._shard_for(key).put(key, value)
+
+# Usage
+db = ShardedDatabase(num_shards=4)
+db.put("user:1001", {"name": "Alice"})
+db.put("user:1002", {"name": "Bob"})
+print(db.get("user:1001"))  # {'name': 'Alice'}
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class ShardedDatabase {
+    private List<Map<String, Object>> shards;
+    private int numShards;
+
+    public ShardedDatabase(int numShards) {
+        this.numShards = numShards;
+        this.shards = new ArrayList<>();
+        for (int i = 0; i < numShards; i++) shards.add(new HashMap<>());
+    }
+
+    private int shardFor(String key) {
+        return Math.abs(key.hashCode()) % numShards;
+    }
+
+    public void put(String key, Object value) {
+        shards.get(shardFor(key)).put(key, value);
+    }
+
+    public Object get(String key) {
+        return shards.get(shardFor(key)).get(key);
+    }
+
+    public static void main(String[] args) {
+        ShardedDatabase db = new ShardedDatabase(4);
+        db.put("user:1", Map.of("name", "Alice"));
+        System.out.println(db.get("user:1")); // {name=Alice}
+    }
+}
+```

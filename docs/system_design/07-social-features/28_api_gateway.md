@@ -132,3 +132,110 @@ flowchart TD
 | Authenticate | O(1) |
 | Rate limit | O(1) |
 | Transform | O(k) where k=payload |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass
+from typing import Dict, Callable, Optional
+from collections import defaultdict
+import time
+
+@dataclass
+class Request:
+    method: str
+    path: str
+    headers: Dict[str, str]
+    body: Optional[str] = None
+
+@dataclass
+class Response:
+    status_code: int
+    body: str
+    headers: Dict[str, str] = None
+
+class RateLimiter:
+    def __init__(self, max_rps: int):
+        self._max_rps = max_rps
+        self._counts: Dict[str, list] = defaultdict(list)
+
+    def is_allowed(self, client_id: str) -> bool:
+        now = time.time()
+        self._counts[client_id] = [t for t in self._counts[client_id] if now - t < 1.0]
+        if len(self._counts[client_id]) >= self._max_rps:
+            return False
+        self._counts[client_id].append(now)
+        return True
+
+class APIGateway:
+    def __init__(self, rate_limit: int = 100):
+        self._routes: Dict[str, Callable] = {}
+        self._rate_limiter = RateLimiter(rate_limit)
+        self._auth_keys: set = set()
+
+    def register_route(self, path: str, handler: Callable):
+        self._routes[path] = handler
+
+    def add_api_key(self, key: str):
+        self._auth_keys.add(key)
+
+    def handle(self, request: Request, client_id: str) -> Response:
+        api_key = request.headers.get("X-API-Key", "")
+        if api_key not in self._auth_keys:
+            return Response(401, "Unauthorized")
+        if not self._rate_limiter.is_allowed(client_id):
+            return Response(429, "Too Many Requests")
+        handler = self._routes.get(request.path)
+        if not handler:
+            return Response(404, "Not Found")
+        return handler(request)
+
+# Usage
+gw = APIGateway(rate_limit=10)
+gw.add_api_key("secret-key")
+gw.register_route("/users", lambda req: Response(200, '{"users": []}'))
+resp = gw.handle(Request("GET", "/users", {"X-API-Key": "secret-key"}), "client1")
+print(resp.status_code, resp.body)  # 200 {"users": []}
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+import java.util.function.Function;
+
+public class APIGateway {
+    private Map<String, Function<Map<String, String>, String>> routes = new HashMap<>();
+    private Set<String> apiKeys = new HashSet<>();
+    private Map<String, List<Long>> rateCounts = new HashMap<>();
+    private int maxRps;
+
+    public APIGateway(int maxRps) { this.maxRps = maxRps; }
+
+    public void addRoute(String path, Function<Map<String, String>, String> handler) {
+        routes.put(path, handler);
+    }
+
+    public void addApiKey(String key) { apiKeys.add(key); }
+
+    public Map<String, Object> handle(String path, Map<String, String> headers, String clientId) {
+        if (!apiKeys.contains(headers.getOrDefault("X-API-Key", "")))
+            return Map.of("status", 401, "body", "Unauthorized");
+        if (!isAllowed(clientId))
+            return Map.of("status", 429, "body", "Too Many Requests");
+        Function<Map<String, String>, String> handler = routes.get(path);
+        if (handler == null)
+            return Map.of("status", 404, "body", "Not Found");
+        return Map.of("status", 200, "body", handler.apply(headers));
+    }
+
+    private boolean isAllowed(String clientId) {
+        long now = System.currentTimeMillis();
+        List<Long> ts = rateCounts.computeIfAbsent(clientId, k -> new ArrayList<>());
+        ts.removeIf(t -> now - t > 1000);
+        if (ts.size() >= maxRps) return false;
+        ts.add(now);
+        return true;
+    }
+}
+```

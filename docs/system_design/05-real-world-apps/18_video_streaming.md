@@ -123,3 +123,93 @@ flowchart TD
 | Transcode | O(n) CPU-intensive |
 | Stream | O(1) per request |
 | Store segment | O(log n) |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass, field
+from typing import List, Dict, Optional
+from enum import Enum
+
+class VideoQuality(Enum):
+    SD = "480p"
+    HD = "720p"
+    FHD = "1080p"
+    UHD = "4K"
+
+@dataclass
+class VideoSegment:
+    segment_id: int
+    quality: VideoQuality
+    url: str
+    duration_s: float
+
+@dataclass
+class Video:
+    video_id: str
+    title: str
+    segments: Dict[VideoQuality, List[VideoSegment]] = field(default_factory=dict)
+    thumbnail_url: str = ""
+
+class StreamingService:
+    def __init__(self):
+        self._videos: Dict[str, Video] = {}
+        self._cdn_nodes: List[str] = []
+
+    def upload(self, video: Video):
+        self._videos[video.video_id] = video
+
+    def get_manifest(self, video_id: str) -> Dict:
+        video = self._videos[video_id]
+        return {
+            "video_id": video_id,
+            "title": video.title,
+            "qualities": [q.value for q in video.segments.keys()],
+            "thumbnail": video.thumbnail_url,
+        }
+
+    def get_segment(self, video_id: str, quality: VideoQuality, segment_id: int) -> Optional[VideoSegment]:
+        segs = self._videos[video_id].segments.get(quality, [])
+        return segs[segment_id] if segment_id < len(segs) else None
+
+    def adaptive_quality(self, bandwidth_mbps: float) -> VideoQuality:
+        if bandwidth_mbps >= 25: return VideoQuality.UHD
+        if bandwidth_mbps >= 8: return VideoQuality.FHD
+        if bandwidth_mbps >= 5: return VideoQuality.HD
+        return VideoQuality.SD
+
+# Usage
+svc = StreamingService()
+v = Video("v1", "My Video")
+svc.upload(v)
+quality = svc.adaptive_quality(10)
+print(quality)  # VideoQuality.FHD
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class StreamingService {
+    enum Quality { SD, HD, FHD, UHD }
+    record Segment(int id, Quality quality, String url) {}
+    record Video(String id, String title, Map<Quality, List<Segment>> segments) {}
+
+    private Map<String, Video> videos = new HashMap<>();
+
+    public void upload(Video v) { videos.put(v.id(), v); }
+
+    public Quality adaptiveQuality(double bandwidthMbps) {
+        if (bandwidthMbps >= 25) return Quality.UHD;
+        if (bandwidthMbps >= 8)  return Quality.FHD;
+        if (bandwidthMbps >= 5)  return Quality.HD;
+        return Quality.SD;
+    }
+
+    public Optional<Segment> getSegment(String videoId, Quality q, int idx) {
+        List<Segment> segs = videos.get(videoId).segments().getOrDefault(q, List.of());
+        return idx < segs.size() ? Optional.of(segs.get(idx)) : Optional.empty();
+    }
+}
+```

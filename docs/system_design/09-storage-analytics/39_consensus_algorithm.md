@@ -126,3 +126,137 @@ stateDiagram-v2
 | Normal case | O(log n) |
 | Leader failure | O(election timeout) |
 | Network partition | Blocked |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Set
+from enum import Enum
+import random
+
+class NodeRole(Enum):
+    FOLLOWER = "follower"
+    CANDIDATE = "candidate"
+    LEADER = "leader"
+
+@dataclass
+class LogEntry:
+    term: int
+    command: str
+    index: int
+
+class RaftNode:
+    def __init__(self, node_id: str, peers: List[str]):
+        self.node_id = node_id
+        self.peers = peers
+        self.role = NodeRole.FOLLOWER
+        self.current_term = 0
+        self.voted_for: Optional[str] = None
+        self.log: List[LogEntry] = []
+        self.commit_index = 0
+        self.leader_id: Optional[str] = None
+        self._votes_received: Set[str] = set()
+
+    def start_election(self):
+        self.current_term += 1
+        self.role = NodeRole.CANDIDATE
+        self.voted_for = self.node_id
+        self._votes_received = {self.node_id}
+        print(f"[{self.node_id}] Starting election for term {self.current_term}")
+
+    def request_vote(self, candidate_id: str, term: int) -> bool:
+        if term < self.current_term:
+            return False
+        if term > self.current_term:
+            self.current_term = term
+            self.role = NodeRole.FOLLOWER
+            self.voted_for = None
+        if self.voted_for is None or self.voted_for == candidate_id:
+            self.voted_for = candidate_id
+            return True
+        return False
+
+    def receive_vote(self, voter_id: str, granted: bool):
+        if granted and self.role == NodeRole.CANDIDATE:
+            self._votes_received.add(voter_id)
+            majority = (len(self.peers) + 1) // 2 + 1
+            if len(self._votes_received) >= majority:
+                self.role = NodeRole.LEADER
+                self.leader_id = self.node_id
+                print(f"[{self.node_id}] Became LEADER for term {self.current_term}")
+
+    def append_entry(self, term: int, command: str) -> bool:
+        if term < self.current_term:
+            return False
+        self.current_term = term
+        self.role = NodeRole.FOLLOWER
+        entry = LogEntry(term, command, len(self.log))
+        self.log.append(entry)
+        return True
+
+# Simple majority vote simulation
+def simulate_election(nodes: List[RaftNode]):
+    candidate = nodes[0]
+    candidate.start_election()
+    for node in nodes[1:]:
+        granted = node.request_vote(candidate.node_id, candidate.current_term)
+        candidate.receive_vote(node.node_id, granted)
+    return candidate
+
+# Usage
+nodes = [RaftNode(f"N{i}", [f"N{j}" for j in range(5) if j != i]) for i in range(5)]
+leader = simulate_election(nodes)
+print(f"Leader: {leader.node_id}, Role: {leader.role}")
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class RaftNode {
+    enum Role { FOLLOWER, CANDIDATE, LEADER }
+
+    private String id;
+    private List<String> peers;
+    private Role role = Role.FOLLOWER;
+    private int term = 0;
+    private String votedFor = null;
+    private Set<String> votes = new HashSet<>();
+
+    public RaftNode(String id, List<String> peers) {
+        this.id = id;
+        this.peers = peers;
+    }
+
+    public void startElection() {
+        term++;
+        role = Role.CANDIDATE;
+        votedFor = id;
+        votes.clear();
+        votes.add(id);
+        System.out.println(id + " starting election for term " + term);
+    }
+
+    public boolean requestVote(String candidateId, int candidateTerm) {
+        if (candidateTerm < term) return false;
+        if (candidateTerm > term) { term = candidateTerm; role = Role.FOLLOWER; votedFor = null; }
+        if (votedFor == null || votedFor.equals(candidateId)) {
+            votedFor = candidateId;
+            return true;
+        }
+        return false;
+    }
+
+    public void receiveVote(String voterId, boolean granted) {
+        if (granted && role == Role.CANDIDATE) {
+            votes.add(voterId);
+            if (votes.size() > (peers.size() + 1) / 2) {
+                role = Role.LEADER;
+                System.out.println(id + " became LEADER for term " + term);
+            }
+        }
+    }
+}
+```

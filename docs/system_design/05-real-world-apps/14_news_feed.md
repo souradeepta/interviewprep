@@ -138,3 +138,79 @@ sequenceDiagram
 | post | O(n) where n=followers | O(1) |
 | getFeed | O(k) where k=feed_size | O(n*k) |
 | Space | O(users*posts) | O(posts) |
+
+## Python Implementation
+
+```python
+import heapq
+from dataclasses import dataclass, field
+from typing import List, Dict
+
+@dataclass
+class Post:
+    post_id: int
+    user_id: int
+    content: str
+    timestamp: int
+
+    def __lt__(self, other):
+        return self.timestamp > other.timestamp  # Max-heap by timestamp
+
+class NewsFeedService:
+    def __init__(self):
+        self.posts: Dict[int, List[Post]] = {}  # user_id -> posts
+        self.follows: Dict[int, set] = {}
+
+    def post(self, user_id: int, content: str, timestamp: int):
+        post = Post(len(self.posts), user_id, content, timestamp)
+        self.posts.setdefault(user_id, []).append(post)
+
+    def follow(self, follower: int, followee: int):
+        self.follows.setdefault(follower, set()).add(followee)
+
+    def get_feed(self, user_id: int, limit: int = 10) -> List[Post]:
+        followees = self.follows.get(user_id, set()) | {user_id}
+        all_posts = []
+        for uid in followees:
+            for p in self.posts.get(uid, []):
+                heapq.heappush(all_posts, p)
+        return [heapq.heappop(all_posts) for _ in range(min(limit, len(all_posts)))]
+
+# Usage
+feed = NewsFeedService()
+feed.follow(1, 2)
+feed.post(2, "Hello!", 100)
+feed.post(2, "World!", 200)
+print([p.content for p in feed.get_feed(1)])  # ['World!', 'Hello!']
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class NewsFeedService {
+    private Map<Integer, List<int[]>> posts = new HashMap<>(); // userId -> [time, postId]
+    private Map<Integer, Set<Integer>> follows = new HashMap<>();
+
+    public void post(int userId, int timestamp) {
+        posts.computeIfAbsent(userId, k -> new ArrayList<>())
+             .add(new int[]{timestamp, userId});
+    }
+
+    public void follow(int follower, int followee) {
+        follows.computeIfAbsent(follower, k -> new HashSet<>()).add(followee);
+    }
+
+    public List<int[]> getFeed(int userId) {
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> b[0] - a[0]);
+        Set<Integer> followees = follows.getOrDefault(userId, new HashSet<>());
+        followees.add(userId);
+        for (int uid : followees)
+            pq.addAll(posts.getOrDefault(uid, Collections.emptyList()));
+        List<int[]> result = new ArrayList<>();
+        while (!pq.isEmpty() && result.size() < 10) result.add(pq.poll());
+        return result;
+    }
+}
+```

@@ -211,3 +211,69 @@ sequenceDiagram
 |-----------|------|
 | adapt | O(1) |
 | delegate | O(1) |
+
+## Python Implementation
+
+```python
+class EuropeanSocket:
+    def voltage(self) -> int: return 220
+    def live(self) -> int: return 1
+    def neutral(self) -> int: return -1
+
+class USASocket:
+    def voltage(self) -> int: return 110
+    def live(self) -> int: return 1
+    def neutral(self) -> int: return -1
+
+class EuropeanToUSAAdapter:
+    def __init__(self, socket: EuropeanSocket):
+        self._socket = socket
+
+    def voltage(self) -> int:
+        return 110  # Convert 220V to 110V
+
+    def live(self) -> int: return self._socket.live()
+    def neutral(self) -> int: return self._socket.neutral()
+
+class AmericanDevice:
+    def charge(self, socket: USASocket):
+        if socket.voltage() == 110:
+            print(f"Charging at {socket.voltage()}V")
+        else:
+            raise ValueError("Incompatible voltage")
+
+# Usage
+eu_socket = EuropeanSocket()
+adapter = EuropeanToUSAAdapter(eu_socket)
+device = AmericanDevice()
+device.charge(adapter)  # Charging at 110V
+```
+
+## Java Implementation
+
+```java
+public interface USSocket {
+    int voltage();
+    int live();
+    int neutral();
+}
+
+public class EuropeanSocket {
+    public int voltage() { return 220; }
+    public int live() { return 1; }
+    public int neutral() { return -1; }
+}
+
+public class EuropeanToUSAdapter implements USSocket {
+    private EuropeanSocket socket;
+    public EuropeanToUSAdapter(EuropeanSocket socket) { this.socket = socket; }
+    public int voltage() { return 110; }
+    public int live() { return socket.live(); }
+    public int neutral() { return socket.neutral(); }
+}
+
+// Usage
+EuropeanSocket eu = new EuropeanSocket();
+USSocket adapter = new EuropeanToUSAdapter(eu);
+System.out.println("Voltage: " + adapter.voltage()); // 110
+```

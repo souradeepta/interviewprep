@@ -122,3 +122,79 @@ flowchart TD
 | User similarity | O(u) |
 | Recommendations | O(u*i) precomputed |
 | Re-ranking | O(k log k) |
+
+## Python Implementation
+
+```python
+from typing import Dict, List, Set
+from collections import defaultdict
+import math
+
+class RecommendationEngine:
+    def __init__(self):
+        self._user_items: Dict[int, Set[int]] = defaultdict(set)
+        self._item_users: Dict[int, Set[int]] = defaultdict(set)
+
+    def record_interaction(self, user_id: int, item_id: int):
+        self._user_items[user_id].add(item_id)
+        self._item_users[item_id].add(user_id)
+
+    def _jaccard_similarity(self, user_a: int, user_b: int) -> float:
+        a, b = self._user_items[user_a], self._user_items[user_b]
+        if not a or not b:
+            return 0.0
+        return len(a & b) / len(a | b)
+
+    def recommend(self, user_id: int, top_k: int = 5) -> List[int]:
+        seen = self._user_items[user_id]
+        scores: Dict[int, float] = defaultdict(float)
+        for other_user, items in self._user_items.items():
+            if other_user == user_id:
+                continue
+            sim = self._jaccard_similarity(user_id, other_user)
+            for item in items - seen:
+                scores[item] += sim
+        return sorted(scores, key=scores.get, reverse=True)[:top_k]
+
+# Usage
+engine = RecommendationEngine()
+engine.record_interaction(1, 10)
+engine.record_interaction(1, 20)
+engine.record_interaction(2, 10)
+engine.record_interaction(2, 30)
+print(engine.recommend(1))  # [30] (item 30 seen by similar user 2)
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class RecommendationEngine {
+    private Map<Integer, Set<Integer>> userItems = new HashMap<>();
+    private Map<Integer, Set<Integer>> itemUsers = new HashMap<>();
+
+    public void recordInteraction(int userId, int itemId) {
+        userItems.computeIfAbsent(userId, k -> new HashSet<>()).add(itemId);
+        itemUsers.computeIfAbsent(itemId, k -> new HashSet<>()).add(userId);
+    }
+
+    public List<Integer> recommend(int userId, int topK) {
+        Set<Integer> seen = userItems.getOrDefault(userId, Set.of());
+        Map<Integer, Double> scores = new HashMap<>();
+        for (Map.Entry<Integer, Set<Integer>> e : userItems.entrySet()) {
+            if (e.getKey() == userId) continue;
+            Set<Integer> common = new HashSet<>(seen);
+            common.retainAll(e.getValue());
+            double sim = (double) common.size() / (seen.size() + e.getValue().size() - common.size());
+            for (int item : e.getValue()) {
+                if (!seen.contains(item))
+                    scores.merge(item, sim, Double::sum);
+            }
+        }
+        return scores.entrySet().stream()
+            .sorted(Map.Entry.<Integer, Double>comparingByValue().reversed())
+            .limit(topK).map(Map.Entry::getKey).toList();
+    }
+}
+```

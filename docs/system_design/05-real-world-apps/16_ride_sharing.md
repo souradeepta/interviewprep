@@ -127,3 +127,89 @@ sequenceDiagram
 | Calculate ETA | O(1) |
 | Update location | O(1) |
 | Complete ride | O(1) |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass
+from typing import List, Optional, Tuple
+import math
+
+@dataclass
+class Location:
+    lat: float
+    lng: float
+
+    def distance_to(self, other: "Location") -> float:
+        return math.sqrt((self.lat - other.lat)**2 + (self.lng - other.lng)**2)
+
+@dataclass
+class Driver:
+    driver_id: str
+    name: str
+    location: Location
+    available: bool = True
+
+@dataclass
+class Ride:
+    ride_id: str
+    rider_id: str
+    driver_id: str
+    pickup: Location
+    dropoff: Location
+    status: str = "requested"
+
+class RideSharingService:
+    def __init__(self):
+        self._drivers: List[Driver] = []
+        self._rides: dict[str, Ride] = {}
+
+    def register_driver(self, driver: Driver):
+        self._drivers.append(driver)
+
+    def request_ride(self, rider_id: str, pickup: Location, dropoff: Location) -> Optional[Ride]:
+        available = [d for d in self._drivers if d.available]
+        if not available:
+            return None
+        nearest = min(available, key=lambda d: d.location.distance_to(pickup))
+        nearest.available = False
+        ride_id = f"RIDE-{len(self._rides)+1}"
+        ride = Ride(ride_id, rider_id, nearest.driver_id, pickup, dropoff)
+        self._rides[ride_id] = ride
+        return ride
+
+# Usage
+svc = RideSharingService()
+svc.register_driver(Driver("D1", "Alice", Location(37.7, -122.4)))
+ride = svc.request_ride("R1", Location(37.8, -122.5), Location(37.9, -122.6))
+print(ride.ride_id, ride.driver_id)  # RIDE-1 D1
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class RideSharingService {
+    record Location(double lat, double lng) {
+        double distanceTo(Location o) {
+            return Math.sqrt(Math.pow(lat-o.lat, 2) + Math.pow(lng-o.lng, 2));
+        }
+    }
+    static class Driver {
+        String id, name; Location loc; boolean available = true;
+        Driver(String id, String name, Location loc) { this.id=id; this.name=name; this.loc=loc; }
+    }
+    record Ride(String id, String riderId, String driverId, Location pickup, Location dropoff) {}
+
+    private List<Driver> drivers = new ArrayList<>();
+
+    public void registerDriver(Driver d) { drivers.add(d); }
+
+    public Optional<Ride> requestRide(String riderId, Location pickup, Location dropoff) {
+        return drivers.stream().filter(d -> d.available)
+            .min(Comparator.comparingDouble(d -> d.loc.distanceTo(pickup)))
+            .map(d -> { d.available = false; return new Ride("R-1", riderId, d.id, pickup, dropoff); });
+    }
+}
+```

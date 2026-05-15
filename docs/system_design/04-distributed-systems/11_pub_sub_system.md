@@ -204,3 +204,61 @@ sequenceDiagram
 | unsubscribe | O(1) |
 | publish | O(n) where n=subscribers |
 | Space | O(t+s+m) where t=topics, s=subscribers, m=messages |
+
+## Python Implementation
+
+```python
+from collections import defaultdict
+from typing import Callable, Any
+
+class EventBroker:
+    def __init__(self):
+        self._subscribers: dict[str, list[Callable]] = defaultdict(list)
+
+    def subscribe(self, topic: str, handler: Callable[[Any], None]):
+        self._subscribers[topic].append(handler)
+
+    def unsubscribe(self, topic: str, handler: Callable):
+        self._subscribers[topic].remove(handler)
+
+    def publish(self, topic: str, message: Any):
+        for handler in self._subscribers[topic]:
+            handler(message)
+
+# Usage
+broker = EventBroker()
+
+def email_handler(msg): print(f"Email: {msg}")
+def sms_handler(msg): print(f"SMS: {msg}")
+
+broker.subscribe("order.placed", email_handler)
+broker.subscribe("order.placed", sms_handler)
+broker.publish("order.placed", {"order_id": 42, "total": 99.99})
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+import java.util.function.Consumer;
+
+public class EventBroker {
+    private Map<String, List<Consumer<Object>>> subscribers = new HashMap<>();
+
+    public void subscribe(String topic, Consumer<Object> handler) {
+        subscribers.computeIfAbsent(topic, k -> new ArrayList<>()).add(handler);
+    }
+
+    public void publish(String topic, Object message) {
+        subscribers.getOrDefault(topic, Collections.emptyList())
+                   .forEach(h -> h.accept(message));
+    }
+
+    public static void main(String[] args) {
+        EventBroker broker = new EventBroker();
+        broker.subscribe("user.signup", msg -> System.out.println("Email: " + msg));
+        broker.subscribe("user.signup", msg -> System.out.println("SMS: " + msg));
+        broker.publish("user.signup", "New user joined");
+    }
+}
+```

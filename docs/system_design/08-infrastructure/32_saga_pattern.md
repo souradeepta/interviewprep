@@ -135,3 +135,102 @@ sequenceDiagram
 |---------|---------|----------|
 | Orchestration | Higher | Low |
 | Choreography | Lower | High |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass
+from typing import List, Callable, Optional
+
+@dataclass
+class SagaStep:
+    name: str
+    execute: Callable
+    compensate: Callable
+
+class SagaResult:
+    def __init__(self, success: bool, failed_step: Optional[str] = None):
+        self.success = success
+        self.failed_step = failed_step
+
+class SagaOrchestrator:
+    def __init__(self, steps: List[SagaStep]):
+        self._steps = steps
+
+    def run(self) -> SagaResult:
+        executed: List[SagaStep] = []
+        for step in self._steps:
+            try:
+                print(f"Executing: {step.name}")
+                step.execute()
+                executed.append(step)
+            except Exception as e:
+                print(f"Failed at {step.name}: {e}. Rolling back...")
+                for s in reversed(executed):
+                    try:
+                        s.compensate()
+                        print(f"Compensated: {s.name}")
+                    except Exception as ce:
+                        print(f"Compensation failed for {s.name}: {ce}")
+                return SagaResult(False, step.name)
+        return SagaResult(True)
+
+# Usage: Order saga
+order_id = "ORD-1"
+inventory_reserved = False
+payment_charged = False
+
+steps = [
+    SagaStep(
+        "reserve_inventory",
+        execute=lambda: globals().update({"inventory_reserved": True}),
+        compensate=lambda: globals().update({"inventory_reserved": False})
+    ),
+    SagaStep(
+        "charge_payment",
+        execute=lambda: globals().update({"payment_charged": True}),
+        compensate=lambda: globals().update({"payment_charged": False})
+    ),
+    SagaStep(
+        "ship_order",
+        execute=lambda: (_ for _ in ()).throw(RuntimeError("Shipping failed")),
+        compensate=lambda: print("Shipping compensation (no-op)")
+    ),
+]
+
+result = SagaOrchestrator(steps).run()
+print("Success:", result.success, "| inventory:", inventory_reserved)
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class SagaOrchestrator {
+    record Step(String name, Runnable execute, Runnable compensate) {}
+
+    private final List<Step> steps;
+
+    public SagaOrchestrator(List<Step> steps) { this.steps = steps; }
+
+    public boolean run() {
+        Deque<Step> executed = new ArrayDeque<>();
+        for (Step step : steps) {
+            try {
+                System.out.println("Executing: " + step.name());
+                step.execute().run();
+                executed.push(step);
+            } catch (Exception e) {
+                System.out.println("Failed: " + step.name() + " - rolling back");
+                executed.forEach(s -> {
+                    try { s.compensate().run(); }
+                    catch (Exception ce) { System.err.println("Compensation failed: " + s.name()); }
+                });
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```

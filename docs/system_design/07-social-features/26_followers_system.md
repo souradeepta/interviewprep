@@ -118,3 +118,73 @@ flowchart TD
 | Unfollow | O(1) |
 | Get followers | O(k) where k=followers |
 | Check mutual | O(min(a,b)) |
+
+## Python Implementation
+
+```python
+from typing import Dict, Set, List
+
+class FollowersService:
+    def __init__(self):
+        self._following: Dict[int, Set[int]] = {}  # user_id -> set of followed
+        self._followers: Dict[int, Set[int]] = {}  # user_id -> set of followers
+
+    def follow(self, follower_id: int, followee_id: int):
+        self._following.setdefault(follower_id, set()).add(followee_id)
+        self._followers.setdefault(followee_id, set()).add(follower_id)
+
+    def unfollow(self, follower_id: int, followee_id: int):
+        self._following.get(follower_id, set()).discard(followee_id)
+        self._followers.get(followee_id, set()).discard(follower_id)
+
+    def get_followers(self, user_id: int) -> List[int]:
+        return list(self._followers.get(user_id, set()))
+
+    def get_following(self, user_id: int) -> List[int]:
+        return list(self._following.get(user_id, set()))
+
+    def follower_count(self, user_id: int) -> int:
+        return len(self._followers.get(user_id, set()))
+
+    def is_following(self, follower_id: int, followee_id: int) -> bool:
+        return followee_id in self._following.get(follower_id, set())
+
+    def mutual_follows(self, user_a: int, user_b: int) -> bool:
+        return self.is_following(user_a, user_b) and self.is_following(user_b, user_a)
+
+# Usage
+svc = FollowersService()
+svc.follow(1, 2)
+svc.follow(2, 1)
+print(svc.follower_count(2))  # 1
+print(svc.mutual_follows(1, 2))  # True
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+
+public class FollowersService {
+    private Map<Integer, Set<Integer>> following = new HashMap<>();
+    private Map<Integer, Set<Integer>> followers = new HashMap<>();
+
+    public void follow(int followerId, int followeeId) {
+        following.computeIfAbsent(followerId, k -> new HashSet<>()).add(followeeId);
+        followers.computeIfAbsent(followeeId, k -> new HashSet<>()).add(followerId);
+    }
+
+    public void unfollow(int followerId, int followeeId) {
+        following.getOrDefault(followerId, Set.of()).remove(followeeId);
+        followers.getOrDefault(followeeId, Set.of()).remove(followerId);
+    }
+
+    public int followerCount(int userId) {
+        return followers.getOrDefault(userId, Set.of()).size();
+    }
+
+    public boolean isFollowing(int follower, int followee) {
+        return following.getOrDefault(follower, Set.of()).contains(followee);
+    }
+}
+```

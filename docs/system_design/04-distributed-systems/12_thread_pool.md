@@ -209,3 +209,61 @@ flowchart TD
 | execute | O(1) |
 | worker.run | O(task time) |
 | shutdown | O(n) where n=workers |
+
+## Python Implementation
+
+```python
+from concurrent.futures import ThreadPoolExecutor
+from typing import Callable, Any
+import time
+
+class ThreadPool:
+    def __init__(self, max_workers: int = 4):
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._futures = []
+
+    def submit(self, fn: Callable, *args, **kwargs):
+        future = self._executor.submit(fn, *args, **kwargs)
+        self._futures.append(future)
+        return future
+
+    def shutdown(self, wait: bool = True):
+        self._executor.shutdown(wait=wait)
+
+def task(task_id: int, duration: float):
+    time.sleep(duration)
+    return f"Task {task_id} done"
+
+# Usage
+pool = ThreadPool(max_workers=4)
+futures = [pool.submit(task, i, 0.1) for i in range(10)]
+results = [f.result() for f in futures]
+pool.shutdown()
+print(results)
+```
+
+## Java Implementation
+
+```java
+import java.util.concurrent.*;
+
+public class ThreadPoolExample {
+    public static void main(String[] args) throws Exception {
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+        List<Future<String>> futures = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            final int taskId = i;
+            futures.add(pool.submit(() -> {
+                Thread.sleep(100);
+                return "Task " + taskId + " done";
+            }));
+        }
+
+        for (Future<String> f : futures) {
+            System.out.println(f.get());
+        }
+        pool.shutdown();
+    }
+}
+```

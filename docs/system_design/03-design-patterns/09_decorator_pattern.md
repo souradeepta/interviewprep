@@ -153,3 +153,77 @@ Step 5: Client receives decorated coffee
 |-----------|------|
 | decorate | O(1) |
 | operation | O(n) where n=decorators |
+
+## Python Implementation
+
+```python
+from abc import ABC, abstractmethod
+
+class Coffee(ABC):
+    @abstractmethod
+    def cost(self) -> float: pass
+    @abstractmethod
+    def description(self) -> str: pass
+
+class SimpleCoffee(Coffee):
+    def cost(self): return 1.0
+    def description(self): return "Simple Coffee"
+
+class CoffeeDecorator(Coffee):
+    def __init__(self, coffee: Coffee):
+        self._coffee = coffee
+    def cost(self): return self._coffee.cost()
+    def description(self): return self._coffee.description()
+
+class MilkDecorator(CoffeeDecorator):
+    def cost(self): return self._coffee.cost() + 0.5
+    def description(self): return self._coffee.description() + ", Milk"
+
+class SugarDecorator(CoffeeDecorator):
+    def cost(self): return self._coffee.cost() + 0.25
+    def description(self): return self._coffee.description() + ", Sugar"
+
+class WhipDecorator(CoffeeDecorator):
+    def cost(self): return self._coffee.cost() + 1.0
+    def description(self): return self._coffee.description() + ", Whip"
+
+# Usage
+coffee = SimpleCoffee()
+coffee = MilkDecorator(coffee)
+coffee = SugarDecorator(coffee)
+coffee = WhipDecorator(coffee)
+print(coffee.description(), "->", coffee.cost())  # Simple Coffee, Milk, Sugar, Whip -> 2.75
+```
+
+## Java Implementation
+
+```java
+public interface Coffee {
+    double cost();
+    String description();
+}
+
+public class SimpleCoffee implements Coffee {
+    public double cost() { return 1.0; }
+    public String description() { return "Simple Coffee"; }
+}
+
+public abstract class CoffeeDecorator implements Coffee {
+    protected Coffee coffee;
+    public CoffeeDecorator(Coffee coffee) { this.coffee = coffee; }
+    public double cost() { return coffee.cost(); }
+    public String description() { return coffee.description(); }
+}
+
+public class MilkDecorator extends CoffeeDecorator {
+    public MilkDecorator(Coffee coffee) { super(coffee); }
+    public double cost() { return coffee.cost() + 0.5; }
+    public String description() { return coffee.description() + ", Milk"; }
+}
+
+public class WhipDecorator extends CoffeeDecorator {
+    public WhipDecorator(Coffee coffee) { super(coffee); }
+    public double cost() { return coffee.cost() + 1.0; }
+    public String description() { return coffee.description() + ", Whip"; }
+}
+```

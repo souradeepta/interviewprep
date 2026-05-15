@@ -121,3 +121,89 @@ sequenceDiagram
 | Send message | O(1) |
 | Get messages | O(k) where k=messages |
 | Group update | O(n) where n=members |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass, field
+from typing import List, Dict
+from datetime import datetime
+
+@dataclass
+class Message:
+    sender_id: str
+    content: str
+    timestamp: datetime = field(default_factory=datetime.now)
+
+@dataclass
+class ChatRoom:
+    room_id: str
+    members: List[str] = field(default_factory=list)
+    messages: List[Message] = field(default_factory=list)
+
+class ChatService:
+    def __init__(self):
+        self._rooms: Dict[str, ChatRoom] = {}
+        self._user_rooms: Dict[str, List[str]] = {}
+
+    def create_room(self, room_id: str) -> ChatRoom:
+        room = ChatRoom(room_id)
+        self._rooms[room_id] = room
+        return room
+
+    def join_room(self, user_id: str, room_id: str):
+        self._rooms[room_id].members.append(user_id)
+        self._user_rooms.setdefault(user_id, []).append(room_id)
+
+    def send_message(self, room_id: str, sender_id: str, content: str) -> Message:
+        msg = Message(sender_id, content)
+        self._rooms[room_id].messages.append(msg)
+        return msg
+
+    def get_history(self, room_id: str, limit: int = 50) -> List[Message]:
+        return self._rooms[room_id].messages[-limit:]
+
+# Usage
+chat = ChatService()
+chat.create_room("room1")
+chat.join_room("alice", "room1")
+chat.join_room("bob", "room1")
+chat.send_message("room1", "alice", "Hello!")
+msgs = chat.get_history("room1")
+print(msgs[0].content)  # Hello!
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+import java.time.Instant;
+
+public class ChatService {
+    record Message(String senderId, String content, Instant ts) {}
+    record Room(String id, List<String> members, List<Message> messages) {}
+
+    private Map<String, Room> rooms = new HashMap<>();
+
+    public Room createRoom(String id) {
+        Room room = new Room(id, new ArrayList<>(), new ArrayList<>());
+        rooms.put(id, room);
+        return room;
+    }
+
+    public void joinRoom(String userId, String roomId) {
+        rooms.get(roomId).members().add(userId);
+    }
+
+    public Message sendMessage(String roomId, String senderId, String content) {
+        Message msg = new Message(senderId, content, Instant.now());
+        rooms.get(roomId).messages().add(msg);
+        return msg;
+    }
+
+    public List<Message> getHistory(String roomId, int limit) {
+        List<Message> msgs = rooms.get(roomId).messages();
+        return msgs.subList(Math.max(0, msgs.size() - limit), msgs.size());
+    }
+}
+```

@@ -124,3 +124,107 @@ sequenceDiagram
 | Send | O(1) |
 | Broadcast | O(n) |
 | Join room | O(1) |
+
+## Python Implementation
+
+```python
+from dataclasses import dataclass, field
+from typing import Dict, Set, Callable, Any
+from collections import defaultdict
+import json
+import threading
+
+@dataclass
+class WebSocketConnection:
+    conn_id: str
+    user_id: str
+    rooms: Set[str] = field(default_factory=set)
+    send_fn: Callable = None
+
+class WebSocketServer:
+    def __init__(self):
+        self._connections: Dict[str, WebSocketConnection] = {}
+        self._rooms: Dict[str, Set[str]] = defaultdict(set)
+        self._message_handlers: Dict[str, Callable] = {}
+        self._lock = threading.Lock()
+
+    def connect(self, conn_id: str, user_id: str, send_fn: Callable):
+        with self._lock:
+            conn = WebSocketConnection(conn_id, user_id, send_fn=send_fn)
+            self._connections[conn_id] = conn
+
+    def disconnect(self, conn_id: str):
+        with self._lock:
+            conn = self._connections.pop(conn_id, None)
+            if conn:
+                for room in conn.rooms:
+                    self._rooms[room].discard(conn_id)
+
+    def join_room(self, conn_id: str, room: str):
+        with self._lock:
+            self._connections[conn_id].rooms.add(room)
+            self._rooms[room].add(conn_id)
+
+    def broadcast(self, room: str, message: Any):
+        with self._lock:
+            payload = json.dumps(message)
+            for conn_id in self._rooms[room]:
+                conn = self._connections.get(conn_id)
+                if conn and conn.send_fn:
+                    conn.send_fn(payload)
+
+    def register_handler(self, event: str, handler: Callable):
+        self._message_handlers[event] = handler
+
+    def on_message(self, conn_id: str, raw: str):
+        data = json.loads(raw)
+        event = data.get("type")
+        handler = self._message_handlers.get(event)
+        if handler:
+            handler(conn_id, data)
+
+# Usage
+messages = []
+server = WebSocketServer()
+server.connect("c1", "alice", lambda msg: messages.append(("c1", msg)))
+server.connect("c2", "bob", lambda msg: messages.append(("c2", msg)))
+server.join_room("c1", "general")
+server.join_room("c2", "general")
+server.broadcast("general", {"type": "message", "text": "Hello!"})
+print(len(messages))  # 2
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
+
+public class WebSocketServer {
+    record Connection(String id, String userId, Set<String> rooms, Consumer<String> send) {}
+
+    private Map<String, Connection> connections = new ConcurrentHashMap<>();
+    private Map<String, Set<String>> rooms = new ConcurrentHashMap<>();
+
+    public void connect(String connId, String userId, Consumer<String> send) {
+        connections.put(connId, new Connection(connId, userId, new HashSet<>(), send));
+    }
+
+    public void disconnect(String connId) {
+        Connection conn = connections.remove(connId);
+        if (conn != null) conn.rooms().forEach(r -> rooms.getOrDefault(r, Set.of()).remove(connId));
+    }
+
+    public void joinRoom(String connId, String room) {
+        connections.get(connId).rooms().add(room);
+        rooms.computeIfAbsent(room, k -> ConcurrentHashMap.newKeySet()).add(connId);
+    }
+
+    public void broadcast(String room, String message) {
+        rooms.getOrDefault(room, Set.of()).stream()
+            .map(connections::get).filter(Objects::nonNull)
+            .forEach(c -> c.send().accept(message));
+    }
+}
+```

@@ -229,3 +229,67 @@ flowchart TD
 | selectServer (LC) | O(n) where n=servers |
 | selectServer (Random) | O(1) |
 | route | O(select + handle) |
+
+## Python Implementation
+
+```python
+from itertools import cycle
+from typing import List
+
+class LoadBalancer:
+    def __init__(self, servers: List[str], strategy: str = "round_robin"):
+        self._servers = servers
+        self._strategy = strategy
+        self._cycle = cycle(servers)
+        self._weights = {s: 1 for s in servers}
+        self._active = set(servers)
+
+    def get_server(self) -> str:
+        if self._strategy == "round_robin":
+            while True:
+                server = next(self._cycle)
+                if server in self._active:
+                    return server
+        return list(self._active)[0]
+
+    def mark_down(self, server: str):
+        self._active.discard(server)
+
+    def mark_up(self, server: str):
+        self._active.add(server)
+
+# Usage
+lb = LoadBalancer(["s1:8080", "s2:8080", "s3:8080"])
+for _ in range(6):
+    print(lb.get_server())  # s1, s2, s3, s1, s2, s3
+lb.mark_down("s2:8080")
+print(lb.get_server())  # s1 or s3
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class LoadBalancer {
+    private List<String> servers;
+    private Set<String> active;
+    private AtomicInteger index = new AtomicInteger(0);
+
+    public LoadBalancer(List<String> servers) {
+        this.servers = new ArrayList<>(servers);
+        this.active = new HashSet<>(servers);
+    }
+
+    public String getServer() {
+        List<String> up = servers.stream()
+            .filter(active::contains).toList();
+        if (up.isEmpty()) throw new RuntimeException("No servers available");
+        return up.get(index.getAndIncrement() % up.size());
+    }
+
+    public void markDown(String server) { active.remove(server); }
+    public void markUp(String server) { active.add(server); }
+}
+```
