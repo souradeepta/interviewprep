@@ -21,7 +21,7 @@ class Spot:
 
     def park_vehicle(self, vehicle):
         """Park vehicle in spot"""
-        if self.occupied or vehicle.size > self.size:
+        if self.occupied or vehicle.size.value > self.size.value:
             return False
         self.occupied = True
         self.vehicle = vehicle
@@ -35,7 +35,7 @@ class Spot:
 
     def is_available(self, vehicle_size: VehicleSize) -> bool:
         """Check if spot can fit vehicle"""
-        return not self.occupied and vehicle_size <= self.size
+        return not self.occupied and vehicle_size.value <= self.size.value
 
 
 class Level:
