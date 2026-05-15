@@ -9,6 +9,24 @@ Design a consensus algorithm for distributed systems to agree on state.
 - Safety: No two values decided
 - Fault tolerance: Work with failures
 
+
+## Code Explanation (Detailed)
+
+### Implementation Approach
+The code demonstrates core patterns and trade-offs.
+
+### Key Operations
+Each operation shows algorithm and performance characteristics.
+
+### Concurrency and Atomicity
+Locking strategies, race condition prevention.
+
+### Edge Cases
+Boundary conditions and error handling.
+
+### Performance Optimization
+Techniques for reducing latency and throughput.
+
 ## Design
 
 ### Raft Algorithm
@@ -59,25 +77,24 @@ Consensus Algorithm (Raft/Paxos) is a critical component in modern distributed s
 
 ## PRD
 
-**Functional Requirements:**
-- Correct behavior under all specified operating conditions
-- Reliable operation with explicit failure modes
-- Data consistency or eventual consistency guarantees as specified
-- Clear mechanisms for error handling and recovery
-- Monitoring and observability hooks
+### Functional Requirements
+- Core operations work correctly
+- Explicit error handling
+- Consistency guarantees defined
+- Monitoring and observability
 
-**Non-Functional Requirements:**
-- **Performance**: Sub-100ms P99 latency for standard operations; measure and track tail latencies
-- **Availability**: 99.99%+ uptime with automatic failover and graceful degradation
-- **Scalability**: Support 10-100x current load with minimal architectural modifications
-- **Consistency**: Specify whether strong, eventual, or causal consistency is required
-- **Cost Efficiency**: Minimize operational cost per unit of throughput; consider compute, memory, and network costs
-- **Operational Simplicity**: Reduce complexity to minimize human error and operational toil
+### Non-Functional Requirements
+- Performance targets met
+- Availability SLA achieved
+- Scalability headroom
+- Cost efficient
 
-**Constraints:**
-- Resource limits (memory for caches, disk for databases, network bandwidth)
-- Deployment constraints (cloud provider limits, regulatory requirements)
-- Latency budgets (maximum acceptable delay for operations)
+### Success Metrics
+- Benchmarks met
+- Uptime targets met
+- Resource budgets
+- No data loss
+
 
 ## Flow
 
@@ -91,23 +108,6 @@ The typical operational flow for this system involves these key phases:
 6. **Observability**: Record metrics (latency, throughput, errors), logs (for debugging), and traces (for performance analysis)
 
 This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
-
-## Code Explanation
-
-The provided implementations demonstrate key architectural concepts and design patterns:
-
-**Python Implementation**: Uses built-in Python structures and standard library features to express the core logic clearly. Python emphasizes readability and conciseness—each operation's purpose should be obvious without extensive comments. You'll see different implementation approaches (e.g., using OrderedDict vs. manual linked lists) that represent trade-offs between convenience and fine-grained control.
-
-**Java Implementation**: Shows how to implement the same logic with explicit memory management and type safety. Java's strong typing forces clear interface design; you'll see how generics, null safety, mutable state, and thread safety are handled. This implementation style is closer to production systems at scale.
-
-**Key Implementation Patterns**:
-- **Initialization**: Setting up core data structures, thread pools, or connection pools with specified capacity and configuration
-- **Read Operations**: Fetching data while maintaining O(1) or O(log n) access, updating metadata (access times, hit counts, etc.)
-- **Write Operations**: Inserting/updating data while handling eviction policies, balancing tree structures, or replicating state
-- **Edge Cases**: Handling capacity limits, concurrent access, data consistency, and error conditions
-- **Performance Optimization**: Using techniques like batch operations, lazy evaluation, or caching to reduce latency
-
-Each line of code represents a deliberate choice about performance characteristics, memory usage, safety guarantees, and implementation complexity. Understanding these trade-offs is essential for using this component effectively in production systems.
 
 ## Architecture Diagram
 

@@ -27,25 +27,24 @@ LRU Cache is a critical component in modern distributed systems. In real-world a
 
 ## PRD
 
-**Functional Requirements:**
-- Correct behavior under all specified operating conditions
-- Reliable operation with explicit failure modes
-- Data consistency or eventual consistency guarantees as specified
-- Clear mechanisms for error handling and recovery
-- Monitoring and observability hooks
+### Functional Requirements
+- Get(key) in O(1): retrieve value, mark recently used
+- Put(key, value) in O(1): insert/update, evict LRU if over capacity
+- Eviction when full: remove least recently used item
+- Consistency: each key maps to one value, size ≤ capacity
 
-**Non-Functional Requirements:**
-- **Performance**: Sub-100ms P99 latency for standard operations; measure and track tail latencies
-- **Availability**: 99.99%+ uptime with automatic failover and graceful degradation
-- **Scalability**: Support 10-100x current load with minimal architectural modifications
-- **Consistency**: Specify whether strong, eventual, or causal consistency is required
-- **Cost Efficiency**: Minimize operational cost per unit of throughput; consider compute, memory, and network costs
-- **Operational Simplicity**: Reduce complexity to minimize human error and operational toil
+### Non-Functional Requirements
+- Performance: O(1) get/put, no O(n) operations
+- Space: O(capacity) + overhead
+- Thread safety: handle concurrent access safely
+- Eviction latency: microseconds, not milliseconds
 
-**Constraints:**
-- Resource limits (memory for caches, disk for databases, network bandwidth)
-- Deployment constraints (cloud provider limits, regulatory requirements)
-- Latency budgets (maximum acceptable delay for operations)
+### Success Metrics
+- Hit rate 80%+ on typical workloads
+- Consistent O(1) latency (< 1μs)
+- No memory leaks
+- Correct edge cases
+
 
 ## Flow
 
@@ -60,22 +59,35 @@ The typical operational flow for this system involves these key phases:
 
 This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
 
-## Code Explanation
 
-The provided implementations demonstrate key architectural concepts and design patterns:
+## Code Explanation (Detailed)
 
-**Python Implementation**: Uses built-in Python structures and standard library features to express the core logic clearly. Python emphasizes readability and conciseness—each operation's purpose should be obvious without extensive comments. You'll see different implementation approaches (e.g., using OrderedDict vs. manual linked lists) that represent trade-offs between convenience and fine-grained control.
+### Python OrderedDict Implementation
+The OrderedDict approach is clearest and production-ready:
+- Maintains insertion order automatically
+- move_to_end(key) marks as recently used in O(1)
+- popitem(last=False) evicts LRU in O(1)
 
-**Java Implementation**: Shows how to implement the same logic with explicit memory management and type safety. Java's strong typing forces clear interface design; you'll see how generics, null safety, mutable state, and thread safety are handled. This implementation style is closer to production systems at scale.
+### Key Operations
+**GET: Check cache, move to front (mark recent)**
+1. Check if key in cache (HashMap O(1))
+2. If yes: move_to_end (relink pointers O(1))
+3. Return value or -1
 
-**Key Implementation Patterns**:
-- **Initialization**: Setting up core data structures, thread pools, or connection pools with specified capacity and configuration
-- **Read Operations**: Fetching data while maintaining O(1) or O(log n) access, updating metadata (access times, hit counts, etc.)
-- **Write Operations**: Inserting/updating data while handling eviction policies, balancing tree structures, or replicating state
-- **Edge Cases**: Handling capacity limits, concurrent access, data consistency, and error conditions
-- **Performance Optimization**: Using techniques like batch operations, lazy evaluation, or caching to reduce latency
+**PUT: Insert or update, evict if needed**
+1. If key exists: move_to_end (mark recent)
+2. Insert/update value (HashMap O(1))
+3. If size > capacity: popitem(last=False) removes LRU
 
-Each line of code represents a deliberate choice about performance characteristics, memory usage, safety guarantees, and implementation complexity. Understanding these trade-offs is essential for using this component effectively in production systems.
+### Edge Cases
+- Capacity=1: every put evicts previous
+- Duplicate put: update value, move to end
+- Get on empty: return -1 (miss)
+
+### Performance
+- All operations: O(1) time
+- Space: O(capacity) + overhead (~48B per entry)
+- No scanning, no O(n) operations
 
 ## Architecture Diagram
 

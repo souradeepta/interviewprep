@@ -9,6 +9,33 @@ Design a sharding strategy for horizontally scaling database across multiple nod
 - Minimal data movement on scale
 - Handle shard failures
 
+
+## Code Explanation (Detailed)
+
+### Sharding Key Selection
+Hash-based: shard_id = hash(key) % num_shards
+- Even distribution (no hot shards from skew)
+- Consistent hashing minimizes resharding
+
+### Query Routing
+1. Compute shard_id from key
+2. Route to master (write) or replica (read)
+3. Async replication to other replicas
+
+### Handling Hot Shards
+1. Detect via monitoring (QPS per shard)
+2. Solutions:
+   - Add more replicas (read scaling)
+   - Cache hot keys locally (in-process)
+   - Split shard (expensive but permanent)
+
+### Resharding Data
+1. Dual-write: write to old and new
+2. Migrate: copy data to new shards
+3. Verify: checksums match
+4. Switch: route to new
+5. Cleanup: remove old shards
+
 ## Design
 
 ### Sharding Keys
@@ -51,25 +78,26 @@ Database Sharding is a critical component in modern distributed systems. In real
 
 ## PRD
 
-**Functional Requirements:**
-- Correct behavior under all specified operating conditions
-- Reliable operation with explicit failure modes
-- Data consistency or eventual consistency guarantees as specified
-- Clear mechanisms for error handling and recovery
-- Monitoring and observability hooks
+### Functional Requirements
+- Partition data across multiple shards
+- Route queries to correct shard
+- Replicate within each shard
+- Support resharding (add/remove shards)
+- Cross-shard scatter-gather queries
 
-**Non-Functional Requirements:**
-- **Performance**: Sub-100ms P99 latency for standard operations; measure and track tail latencies
-- **Availability**: 99.99%+ uptime with automatic failover and graceful degradation
-- **Scalability**: Support 10-100x current load with minimal architectural modifications
-- **Consistency**: Specify whether strong, eventual, or causal consistency is required
-- **Cost Efficiency**: Minimize operational cost per unit of throughput; consider compute, memory, and network costs
-- **Operational Simplicity**: Reduce complexity to minimize human error and operational toil
+### Non-Functional Requirements
+- Scalability: 100+ shards, petabyte scale
+- Availability: 99.99%, auto-failover
+- Latency: < 100ms single-shard, < 500ms cross-shard
+- Consistency: strong within shard, eventual across shards
+- Operational simplicity: auto-rebalance, monitoring
 
-**Constraints:**
-- Resource limits (memory for caches, disk for databases, network bandwidth)
-- Deployment constraints (cloud provider limits, regulatory requirements)
-- Latency budgets (maximum acceptable delay for operations)
+### Success Metrics
+- Even data distribution (< 10% skew)
+- Even traffic distribution (< 10% skew)
+- Resharding in < 1 hour
+- Query routing overhead < 1ms
+
 
 ## Flow
 
@@ -83,23 +111,6 @@ The typical operational flow for this system involves these key phases:
 6. **Observability**: Record metrics (latency, throughput, errors), logs (for debugging), and traces (for performance analysis)
 
 This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
-
-## Code Explanation
-
-The provided implementations demonstrate key architectural concepts and design patterns:
-
-**Python Implementation**: Uses built-in Python structures and standard library features to express the core logic clearly. Python emphasizes readability and conciseness—each operation's purpose should be obvious without extensive comments. You'll see different implementation approaches (e.g., using OrderedDict vs. manual linked lists) that represent trade-offs between convenience and fine-grained control.
-
-**Java Implementation**: Shows how to implement the same logic with explicit memory management and type safety. Java's strong typing forces clear interface design; you'll see how generics, null safety, mutable state, and thread safety are handled. This implementation style is closer to production systems at scale.
-
-**Key Implementation Patterns**:
-- **Initialization**: Setting up core data structures, thread pools, or connection pools with specified capacity and configuration
-- **Read Operations**: Fetching data while maintaining O(1) or O(log n) access, updating metadata (access times, hit counts, etc.)
-- **Write Operations**: Inserting/updating data while handling eviction policies, balancing tree structures, or replicating state
-- **Edge Cases**: Handling capacity limits, concurrent access, data consistency, and error conditions
-- **Performance Optimization**: Using techniques like batch operations, lazy evaluation, or caching to reduce latency
-
-Each line of code represents a deliberate choice about performance characteristics, memory usage, safety guarantees, and implementation complexity. Understanding these trade-offs is essential for using this component effectively in production systems.
 
 ## Architecture Diagram
 
