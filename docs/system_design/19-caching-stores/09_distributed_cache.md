@@ -1,0 +1,579 @@
+# Distributed Cache Design
+
+## Problem Statement
+
+Design a distributed cache that scales horizontally, handles node failures gracefully, minimizes hotspot issues, and maintains consistency across cache nodes — covering consistent hashing, replication strategies, and cache coherence.
+
+## Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph Clients["Client Layer"]
+        C1["App Server 1"]
+        C2["App Server 2"]
+        C3["App Server 3"]
+    end
+
+    subgraph Router["Smart Client / Proxy"]
+        CH["Consistent Hash Ring\n+ Virtual Nodes"]
+        PROXY["Twemproxy / mcrouter\nor Redis Cluster"]
+    end
+
+    subgraph CacheLayer["Cache Cluster"]
+        subgraph Shard1["Shard A"]
+            A_M["Primary"]
+            A_R["Replica"]
+        end
+        subgraph Shard2["Shard B"]
+            B_M["Primary"]
+            B_R["Replica"]
+        end
+        subgraph Shard3["Shard C"]
+            C_M["Primary"]
+            C_R["Replica"]
+        end
+    end
+
+    DB["Database"]
+
+    C1 & C2 & C3 --> Router
+    Router --> Shard1 & Shard2 & Shard3
+    Shard1 & Shard2 & Shard3 --> DB
+```
+
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant H as Hash Router
+    participant P as Cache Primary
+    participant R as Cache Replica
+    participant D as Database
+
+    C->>H: GET user:1234
+    H->>H: hash("user:1234") -> node B
+    H->>P: GET user:1234
+    P-->>H: MISS
+    H->>D: SELECT * FROM users WHERE id=1234
+    D-->>H: {id:1234, name:Alice}
+    H->>P: SET user:1234 {data} EX 3600
+    P->>R: async replicate
+    H-->>C: {id:1234, name:Alice}
+
+    Note over C,R: Read scaling: reads from replica
+    C->>H: GET user:1234 (read replica)
+    H->>R: GET user:1234
+    R-->>H: HIT: {id:1234, name:Alice}
+    H-->>C: {id:1234, name:Alice}
+```
+
+## Design
+
+### Consistent Hashing
+
+```
+Problem with simple modular hashing:
+  node = hash(key) % N
+  Add/remove node: ~100% keys remap -> cold cache
+
+Consistent hashing:
+  Ring: 0 to 2^32-1
+  Nodes placed at hash(node_id) positions
+  Key assigned to next clockwise node
+  Add/remove: only keys between two adjacent nodes remap
+  Average remapped: 1/N of total keys
+
+Virtual nodes (vnodes):
+  Physical node has 150-200 virtual positions
+  Prevents hotspots when nodes have different capacities
+  Smoother distribution even with few physical nodes
+
+Hash ring with virtual nodes:
+  Node A (32GB): 200 vnodes
+  Node B (16GB): 100 vnodes (half the capacity)
+  Node C (32GB): 200 vnodes
+  Keys distributed proportionally
+```
+
+### Replication Strategies
+
+```
+1. Leader-Follower (Primary-Replica):
+   Writes -> primary only
+   Reads -> primary or replica (replica lag acceptable)
+   Failover: replica promoted on primary failure
+   
+   Redis Sentinel / Redis Cluster approach
+
+2. Leaderless (Dynamo-style):
+   Writes -> any N nodes (quorum write)
+   Reads -> any R nodes (quorum read)
+   W + R > N: strong consistency
+   W=1, R=1: maximum availability, possible stale reads
+   
+   W=2, R=2, N=3: one node can fail without data loss or stale reads
+
+3. Write-through replication:
+   Write succeeds only when all replicas ACK
+   Strong consistency, higher write latency
+   
+4. Write-behind replication:
+   Async propagation (fire-and-forget)
+   Lower write latency, possible replication lag
+
+Cache-specific strategy:
+  Async replication usually sufficient (cache is not source of truth)
+  Strong consistency only needed when cache + DB consistency critical
+```
+
+### Hotspot Prevention
+
+```
+Problem: "celebrity key" - one key gets 100K req/s
+  e.g., viral post, game leaderboard, stock price
+  
+Solutions:
+
+1. Local in-process cache (L1):
+   Small LRU in each app server (1-5% of keys)
+   Hot keys cached locally, never hit Redis
+   TTL: very short (1-5s) for freshness
+   
+   app_cache = LRUCache(1000)  # 1000 hot keys
+
+2. Key replication with suffix:
+   popular_key -> N copies: key:0, key:1, ..., key:N-1
+   Read: key:random(N) (round-robin read)
+   Write: write all N copies (or async propagation)
+   
+   def get_hot_key(key, N=10):
+       return cache.get(f"{key}:{random.randint(0, N-1)}")
+
+3. Request coalescing (singleflight):
+   Multiple requests for same missing key -> one DB query
+   Others wait and share the result
+   
+4. Jitter on TTL:
+   Instead of TTL=3600, use TTL=3600 + random(-60, 60)
+   Prevents thundering herd at simultaneous expiry
+
+5. Probabilistic early refresh:
+   T = original TTL, t = remaining TTL
+   Refresh with probability P(t) = e^(-beta * t)
+   As key approaches expiry, refresh probability increases
+   One request triggers refresh before expiry
+```
+
+### Cache Coherence
+
+```
+Invalidation patterns:
+
+1. TTL-based (simplest):
+   Data inconsistent for at most TTL duration
+   No explicit invalidation needed
+   Use when stale tolerance acceptable
+
+2. Write-invalidate:
+   On DB update: DEL cache key
+   Next read: miss -> re-populate from DB
+   Risk: thundering herd
+
+3. Write-update:
+   On DB update: SET cache key (with new value)
+   No miss window, but race condition risk
+   Two concurrent writes -> cache = older value
+
+4. Event-driven invalidation:
+   DB change event (CDC/Debezium) -> Kafka -> cache invalidator
+   Subscribe to DB changes, invalidate affected keys
+   Eventually consistent, no direct DB-cache coupling
+
+5. Tagged invalidation:
+   Group keys by tag: {tag:user:1234} -> [profile, sessions, orders]
+   On user update: invalidate all tagged keys
+   Redis: use Sets to track tags per key
+
+Cache-aside vs write-through coherence:
+  Cache-aside: invalidate after DB write (DEL key)
+  Write-through: update cache atomically with DB write
+  Both: eventual consistency possible in race conditions
+```
+
+## Common Questions & Answers
+
+**Q: How do you handle cache stampede when a hot key expires in a distributed cache?** A: Multiple strategies combined: (1) Probabilistic early refresh — some requests start a background refresh before TTL expires. (2) Mutex on miss — only one thread queries DB, others wait. In Redis: `SET lock:key 1 NX EX 5` before DB query. (3) Stale-while-revalidate — serve stale value while async refresh runs. (4) Key replication across multiple cache nodes to distribute reads.
+
+**Q: What is the N+1 cache problem?** A: When fetching a list (e.g., 100 posts), cache each post individually. Reading the list requires 100 cache lookups. Solution: cache the list result as a separate key. Trade-off: list cache becomes stale when any item updates. Use short TTL on list cache + invalidate on writes.
+
+**Q: How do you implement distributed cache without a dedicated cache cluster?** A: Peer-to-peer: each app server holds a partition of the cache (e.g., Hazelcast, Memcached-like embedding). Each node is both client and server. Cons: tight coupling between app and cache, GC pressure. Better: dedicated cache cluster for most use cases.
+
+**Q: How do you ensure consistency between cache and database with eventual consistency?** A: Accept a bounded inconsistency window (TTL duration). For critical data: shorter TTL or write-invalidate. Use optimistic locking (version numbers) to detect stale reads. Design application to handle stale data gracefully (e.g., show "last updated X minutes ago").
+
+**Q: How do you partition cache keys across a cluster when keys have different sizes and access frequencies?** A: Consistent hashing distributes keys, but hot keys still concentrate on one node. Solutions: virtual nodes (proportional distribution), local L1 cache for hot keys, and key splitting (replicate hot keys across shards). Monitor per-shard memory and CPU; rebalance if skewed.
+
+## Back-of-Envelope Calculations
+
+```
+Cluster sizing:
+  10M active users, 500B cache per user session
+  Total data: 5GB
+  With 3x replication: 15GB cache needed
+  3 nodes x 8GB Redis = 24GB (with headroom)
+
+Hit rate improvement with read replicas:
+  100K req/s, 1 primary handles 80K (80% hits)
+  Add 2 replicas: reads distributed 3-way
+  Primary: ~27K req/s, each replica: ~27K req/s
+  Primary write pressure reduced 3x
+
+Consistent hashing remapping:
+  100 nodes, 10M keys
+  Remove 1 node: ~100K keys remapped (1%)
+  Vs modular hashing: 10M keys remapped (100%)
+
+Hotspot math:
+  1 viral post: 500K req/s
+  Single Redis node max: ~100K req/s -> saturated
+  With 10 key replicas: each node handles 50K req/s (OK)
+  With L1 local cache (100 app servers): 5K req/s each -> trivial
+
+Replication lag impact:
+  Async replication: <1ms intra-DC
+  Acceptable for: session cache, product catalog
+  Not acceptable for: payment status, inventory count
+```
+
+## Design Choices
+
+| Strategy | Consistency | Availability | Complexity |
+|---|---|---|---|
+| Single node | Strong | Low (SPOF) | Minimal |
+| Primary-replica | Eventual (reads) | High (replica serves) | Low |
+| Quorum (W+R>N) | Strong | Medium | Medium |
+| Leaderless | Tunable | High | High |
+| L1+L2 (local+Redis) | Eventual | Very high | Medium |
+| CDN + Redis | Eventual | Highest | High |
+
+## Follow-up Questions
+
+1. How does Facebook's Memcached architecture (Scaling Memcache at Facebook) handle regional consistency?
+2. How do you implement a distributed rate limiter using a distributed cache cluster?
+3. What is the Thundering Herd problem in distributed caches and how do you mitigate it at scale?
+4. How do you handle cache partition failures without cascading to the database?
+5. How does a multi-region distributed cache maintain consistency across data centers?
+
+## Python Implementation
+
+```python
+import hashlib
+import time
+import random
+import threading
+from typing import Any, Dict, List, Optional, Tuple
+from collections import OrderedDict
+
+class CacheNode:
+    def __init__(self, node_id: str, capacity: int = 1000):
+        self.node_id = node_id
+        self._store: Dict[str, Tuple[Any, float]] = {}
+        self._capacity = capacity
+        self._hits = 0
+        self._misses = 0
+        self.alive = True
+
+    def get(self, key: str) -> Optional[Any]:
+        entry = self._store.get(key)
+        if entry is None:
+            self._misses += 1
+            return None
+        value, expires_at = entry
+        if expires_at and time.time() > expires_at:
+            del self._store[key]
+            self._misses += 1
+            return None
+        self._hits += 1
+        return value
+
+    def set(self, key: str, value: Any, ttl: int = 0) -> bool:
+        if len(self._store) >= self._capacity and key not in self._store:
+            return False
+        expires_at = time.time() + ttl if ttl else 0
+        self._store[key] = (value, expires_at)
+        return True
+
+    def delete(self, key: str) -> bool:
+        return self._store.pop(key, None) is not None
+
+    def stats(self) -> dict:
+        total = self._hits + self._misses
+        return {
+            "node": self.node_id,
+            "keys": len(self._store),
+            "hits": self._hits,
+            "misses": self._misses,
+            "hit_rate": f"{self._hits / max(1, total) * 100:.1f}%",
+        }
+
+class ConsistentHashRing:
+    def __init__(self, virtual_nodes: int = 150):
+        self._ring: List[Tuple[int, str]] = []
+        self._nodes: Dict[str, CacheNode] = {}
+        self._vnodes = virtual_nodes
+
+    def add_node(self, node: CacheNode):
+        self._nodes[node.node_id] = node
+        for i in range(self._vnodes):
+            h = int(hashlib.md5(f"{node.node_id}:{i}".encode()).hexdigest(), 16)
+            self._ring.append((h, node.node_id))
+        self._ring.sort()
+
+    def remove_node(self, node_id: str) -> List[str]:
+        if node_id not in self._nodes:
+            return []
+        affected_keys = list(self._nodes[node_id]._store.keys())
+        self._ring = [(h, n) for h, n in self._ring if n != node_id]
+        del self._nodes[node_id]
+        return affected_keys
+
+    def get_node(self, key: str) -> Optional[CacheNode]:
+        if not self._ring:
+            return None
+        h = int(hashlib.md5(key.encode()).hexdigest(), 16)
+        for ring_hash, node_id in self._ring:
+            if h <= ring_hash:
+                node = self._nodes.get(node_id)
+                if node and node.alive:
+                    return node
+        return self._nodes.get(self._ring[0][1])
+
+    def get_n_nodes(self, key: str, n: int) -> List[CacheNode]:
+        if not self._ring:
+            return []
+        h = int(hashlib.md5(key.encode()).hexdigest(), 16)
+        seen = set()
+        result = []
+        start = next((i for i, (rh, _) in enumerate(self._ring) if rh >= h), 0)
+        for offset in range(len(self._ring)):
+            idx = (start + offset) % len(self._ring)
+            _, node_id = self._ring[idx]
+            if node_id not in seen and node_id in self._nodes and self._nodes[node_id].alive:
+                seen.add(node_id)
+                result.append(self._nodes[node_id])
+                if len(result) == n:
+                    break
+        return result
+
+class L1L2Cache:
+    def __init__(self, ring: ConsistentHashRing, l1_size: int = 100,
+                 l1_ttl: int = 5, hot_threshold: int = 10):
+        self._ring = ring
+        self._l1: OrderedDict = OrderedDict()
+        self._l1_size = l1_size
+        self._l1_ttl = l1_ttl
+        self._l1_expires: Dict[str, float] = {}
+        self._access_count: Dict[str, int] = {}
+        self._hot_threshold = hot_threshold
+        self._l1_hits = 0
+        self._l2_hits = 0
+        self._misses = 0
+
+    def _l1_get(self, key: str) -> Optional[Any]:
+        if key not in self._l1:
+            return None
+        if time.time() > self._l1_expires.get(key, 0):
+            self._l1.pop(key, None)
+            return None
+        self._l1.move_to_end(key)
+        return self._l1[key]
+
+    def _l1_set(self, key: str, value: Any):
+        if len(self._l1) >= self._l1_size:
+            self._l1.popitem(last=False)
+        self._l1[key] = value
+        self._l1_expires[key] = time.time() + self._l1_ttl
+
+    def get(self, key: str) -> Optional[Any]:
+        # L1 check
+        val = self._l1_get(key)
+        if val is not None:
+            self._l1_hits += 1
+            return val
+        # L2 check
+        node = self._ring.get_node(key)
+        if node:
+            val = node.get(key)
+            if val is not None:
+                self._l2_hits += 1
+                self._access_count[key] = self._access_count.get(key, 0) + 1
+                if self._access_count[key] >= self._hot_threshold:
+                    self._l1_set(key, val)
+                return val
+        self._misses += 1
+        return None
+
+    def set(self, key: str, value: Any, ttl: int = 3600) -> bool:
+        nodes = self._ring.get_n_nodes(key, 2)
+        success = any(n.set(key, value, ttl) for n in nodes)
+        if key in self._l1:
+            self._l1_set(key, value)
+        return success
+
+    def invalidate(self, key: str):
+        self._l1.pop(key, None)
+        node = self._ring.get_node(key)
+        if node:
+            node.delete(key)
+
+    def stats(self) -> dict:
+        total = self._l1_hits + self._l2_hits + self._misses
+        return {
+            "l1_hits": self._l1_hits, "l2_hits": self._l2_hits,
+            "misses": self._misses,
+            "l1_hit_rate": f"{self._l1_hits / max(1, total) * 100:.1f}%",
+        }
+
+# Demo
+print("=== Distributed Cache Demo ===\n")
+
+ring = ConsistentHashRing(virtual_nodes=50)
+nodes = [CacheNode(f"node-{i}", capacity=500) for i in range(3)]
+for n in nodes:
+    ring.add_node(n)
+
+# Show distribution
+key_distribution: Dict[str, int] = {}
+for i in range(300):
+    key = f"key:{i}"
+    node = ring.get_node(key)
+    if node:
+        key_distribution[node.node_id] = key_distribution.get(node.node_id, 0) + 1
+
+print("Key distribution across nodes:")
+for node_id, count in sorted(key_distribution.items()):
+    print(f"  {node_id}: {count} keys ({count/300*100:.1f}%)")
+
+# L1+L2 cache with hot key detection
+cache = L1L2Cache(ring, l1_size=50, l1_ttl=5, hot_threshold=5)
+
+# Populate
+for i in range(50):
+    cache.set(f"user:{i}", {"id": i, "name": f"User{i}"}, ttl=3600)
+
+# Simulate hot key access
+print("\nSimulating hot key access for 'user:1':")
+for _ in range(10):
+    cache.get("user:1")
+
+print(f"  In L1 cache after 10 hits: {'user:1' in cache._l1}")
+print(f"  Cache stats: {cache.stats()}")
+
+# Node failure + rebalancing
+print("\n=== Node Failure Simulation ===")
+failed_node = "node-1"
+nodes[1].alive = False
+affected = ring.remove_node(failed_node)
+print(f"Node {failed_node} removed. {len(affected)} keys need rebalancing")
+
+# Keys still readable from L2 (other nodes) if replicated
+for key in affected[:3]:
+    val = cache.get(key)
+    print(f"  {key}: {'recovered' if val is not None else 'lost'}")
+```
+
+## Java Implementation
+
+```java
+import java.util.*;
+import java.security.MessageDigest;
+
+public class DistributedCache {
+    static class Node {
+        String id;
+        Map<String, Object> store = new HashMap<>();
+        boolean alive = true;
+
+        Node(String id) { this.id = id; }
+
+        void set(String k, Object v) { store.put(k, v); }
+        Object get(String k) { return store.get(k); }
+        boolean del(String k) { return store.remove(k) != null; }
+    }
+
+    static class ConsistentHashRing {
+        TreeMap<Long, Node> ring = new TreeMap<>();
+        Map<String, Node> nodes = new HashMap<>();
+
+        void addNode(Node n, int vnodes) {
+            nodes.put(n.id, n);
+            for (int i = 0; i < vnodes; i++) {
+                long h = hash(n.id + ":" + i);
+                ring.put(h, n);
+            }
+        }
+
+        Node getNode(String key) {
+            if (ring.isEmpty()) return null;
+            long h = hash(key);
+            Map.Entry<Long, Node> entry = ring.ceilingEntry(h);
+            if (entry == null) entry = ring.firstEntry();
+            Node n = entry.getValue();
+            return n.alive ? n : ring.values().stream().filter(x -> x.alive).findFirst().orElse(null);
+        }
+
+        long hash(String s) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte[] b = md.digest(s.getBytes());
+                long h = 0;
+                for (int i = 0; i < 8; i++) h = (h << 8) | (b[i] & 0xFF);
+                return h & Long.MAX_VALUE;
+            } catch (Exception e) { return s.hashCode() & Long.MAX_VALUE; }
+        }
+
+        void set(String key, Object value) {
+            Node n = getNode(key);
+            if (n != null) n.set(key, value);
+        }
+
+        Object get(String key) {
+            Node n = getNode(key);
+            return n != null ? n.get(key) : null;
+        }
+    }
+
+    public static void main(String[] args) {
+        ConsistentHashRing ring = new ConsistentHashRing();
+        for (int i = 0; i < 3; i++) ring.addNode(new Node("node-" + i), 100);
+
+        // Populate and show distribution
+        Map<String, Integer> dist = new HashMap<>();
+        for (int i = 0; i < 300; i++) {
+            String key = "key:" + i;
+            Node n = ring.getNode(key);
+            if (n != null) dist.merge(n.id, 1, Integer::sum);
+            ring.set(key, "value-" + i);
+        }
+        System.out.println("Distribution: " + dist);
+
+        // Read-write
+        ring.set("user:1", Map.of("name", "Alice"));
+        System.out.println("user:1 = " + ring.get("user:1"));
+
+        // Simulate node failure
+        ring.nodes.get("node-1").alive = false;
+        System.out.println("After node-1 failure, user:1 = " + ring.get("user:1"));
+    }
+}
+```
+
+## Complexity
+
+| Operation | Consistent Hash | Modular Hash |
+|---|---|---|
+| Key lookup | O(log V) V=vnodes | O(1) |
+| Add node remapping | O(K/N) keys | O(K) keys (all) |
+| Remove node remapping | O(K/N) keys | O(K) keys (all) |
+| Hotspot mitigation | Vnodes help | None |
+| Quorum read (N replicas) | O(R) reads | O(R) reads |
