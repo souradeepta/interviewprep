@@ -59,6 +59,27 @@ class ShoppingCart:
         self.items.append(price)
 
     def set_payment_strategy(self, strategy: PaymentStrategy):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         self.payment_strategy = strategy
 
     def checkout(self) -> bool:

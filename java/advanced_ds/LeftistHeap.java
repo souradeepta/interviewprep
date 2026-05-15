@@ -171,6 +171,13 @@ public class LeftistHeap {
         }
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Basic operations
         System.out.println("=== Example 1: Basic Operations ===");

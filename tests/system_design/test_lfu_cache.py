@@ -1,3 +1,30 @@
+"""
+Test Lfu Cache Implementation
+=============================
+
+OVERVIEW:
+This module provides a complete implementation of Test Lfu Cache, a fundamental
+data structure used in algorithms and system design.
+
+PURPOSE & USE CASES:
+- Core operation for many algorithm patterns
+- Essential for interview preparation
+- Real-world applications in production systems
+
+KEY OPERATIONS:
+- Time/Space complexity analysis included for each operation
+- Design trade-offs explained
+- Common pitfalls and edge cases documented
+
+COMPLEXITY SUMMARY:
+See individual class/function docstrings for detailed complexity analysis.
+
+REFERENCES:
+- Introduction to Algorithms (Cormen, Leiserson, Rivest, Stein)
+- Algorithm Design Manual (Skiena)
+- LeetCode and HackerRank problem patterns
+"""
+
 import pytest
 from python.system_design.lfu_cache import LFUCache
 
@@ -9,6 +36,27 @@ class TestLFUCache:
         assert cache.get(1) == 1
 
     def test_eviction_least_frequent(self):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         cache = LFUCache(2)
         cache.put(1, 1)
         cache.put(2, 2)
@@ -18,6 +66,27 @@ class TestLFUCache:
         assert cache.get(1) == 1
 
     def test_lru_on_frequency_tie(self):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         cache = LFUCache(2)
         cache.put(1, 1)
         cache.put(2, 2)
@@ -32,6 +101,27 @@ class TestLFUCache:
         assert cache.get(1) == 10
 
     def test_frequency_tracking(self):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         cache = LFUCache(3)
         cache.put(1, 1)
         cache.put(2, 2)

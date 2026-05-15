@@ -107,6 +107,13 @@ public class PersistentSegmentTree {
      * @param val New value
      * @return Version number (0-indexed)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int update(int idx, long val) {
         if (versions.isEmpty()) {
             return -1;
@@ -140,6 +147,13 @@ public class PersistentSegmentTree {
      * @param r Right index (inclusive)
      * @return Sum of elements in range
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public long query(int version, int l, int r) {
         if (version < 0 || version >= versions.size()) {
             return 0;
@@ -154,6 +168,13 @@ public class PersistentSegmentTree {
      * @param version Version number
      * @param idx Index
      * @return Value at index
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public long pointQuery(int version, int idx) {
         return query(version, idx, idx);
@@ -242,6 +263,13 @@ public class PersistentSegmentTree {
             return newNode;
         }
 
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public int update(int idx, long val) {
             if (versions.isEmpty()) {
                 return -1;
@@ -267,6 +295,13 @@ public class PersistentSegmentTree {
             return Math.max(leftMax, rightMax);
         }
 
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public long queryMax(int version, int l, int r) {
             if (version < 0 || version >= versions.size()) {
                 return Long.MIN_VALUE;
@@ -275,11 +310,25 @@ public class PersistentSegmentTree {
             return queryMax(versions.get(version), 0, n - 1, l, r);
         }
 
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public int getNumVersions() {
             return versions.size();
         }
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Range sum with version history
         System.out.println("=== Range Sum with Version History ===");

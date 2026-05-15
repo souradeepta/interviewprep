@@ -57,6 +57,13 @@ public class DancingLinks {
      * @param matrix 2D binary matrix where 1 indicates membership
      * @param names Optional column names
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public DancingLinks(int[][] matrix, String[] names) {
         this.matrix = matrix;
         this.rows = matrix.length;
@@ -267,6 +274,13 @@ public class DancingLinks {
         return row;
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Simple exact cover
         System.out.println("=== Example 1: Simple Exact Cover ===");

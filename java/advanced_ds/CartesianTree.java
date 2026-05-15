@@ -98,6 +98,13 @@ public class CartesianTree {
      * @param r Right index (inclusive)
      * @return Minimum value
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int queryMin(int l, int r) {
         if (l > r || l < 0 || r >= n) {
             return Integer.MAX_VALUE;
@@ -131,6 +138,13 @@ public class CartesianTree {
      * @param l Left index (inclusive)
      * @param r Right index (inclusive)
      * @return Maximum value
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int queryMax(int l, int r) {
         if (l > r || l < 0 || r >= n) {
@@ -197,6 +211,13 @@ public class CartesianTree {
         }
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: RMQ on simple array
         System.out.println("=== Example 1: Range Minimum Query ===");

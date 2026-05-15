@@ -1,5 +1,24 @@
 import java.util.*;
 
+/**
+ * ParkingLot - [Brief description]
+ *
+ * <p>OVERVIEW:
+ * [Detailed explanation of what this class does]
+ *
+ * <p>COMPLEXITY:
+ * <ul>
+ *   <li>Time: [See method documentation]</li>
+ *   <li>Space: O(n) where n is [the element count]</li>
+ * </ul>
+ *
+ * <p>USAGE:
+ * [How to use this class, with example]
+ *
+ * @author Interview Preparation
+ * @since 1.0
+ */
+
 public class ParkingLot {
     enum VehicleSize { COMPACT(1), REGULAR(2), LARGE(3);
         int val; VehicleSize(int v) { val = v; }
@@ -34,6 +53,13 @@ public class ParkingLot {
         return false;
     }
     
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         ParkingLot lot = new ParkingLot(2, 10, 20, 5);
         Vehicle v1 = new Vehicle("ABC123", VehicleSize.COMPACT);

@@ -97,6 +97,13 @@ public class KDTree {
         }
 
         @Override
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public String toString() {
             return String.format("%s (dist: %.2f)", Arrays.toString(point), distance);
         }
@@ -107,6 +114,13 @@ public class KDTree {
      *
      * @param point Query point
      * @return Nearest neighbor info
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public NearestNeighbor nearestNeighbor(double[] point) {
         if (root == null) {
@@ -157,6 +171,13 @@ public class KDTree {
      * @param k Number of neighbors
      * @return List of nearest neighbors sorted by distance
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public List<NearestNeighbor> kNearestNeighbors(double[] point, int k) {
         PriorityQueue<NearestNeighbor> best = new PriorityQueue<>((a, b) ->
                 Double.compare(b.distance, a.distance));
@@ -205,6 +226,13 @@ public class KDTree {
      * @param lower Lower bounds
      * @param upper Upper bounds
      * @return Points in range
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public List<double[]> rangeSearch(double[] lower, double[] upper) {
         List<double[]> result = new ArrayList<>();
@@ -256,6 +284,13 @@ public class KDTree {
         return Math.sqrt(sum);
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: 2D nearest neighbor
         System.out.println("=== Example 1: 2D Nearest Neighbor ===");

@@ -48,6 +48,27 @@ class ShoppingCart:
         self.total = 0.0
 
     def add_item(self, price: float):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         self.total += price
 
     def checkout(self) -> bool:

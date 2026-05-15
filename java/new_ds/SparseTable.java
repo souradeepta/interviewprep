@@ -82,6 +82,13 @@ public class SparseTable {
      * @param arr the input array (must be non-empty)
      * @throws IllegalArgumentException if arr is null or empty
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public SparseTable(int[] arr) {
         if (arr == null || arr.length == 0) {
             throw new IllegalArgumentException("Cannot build SparseTable on a null or empty array");
@@ -168,6 +175,13 @@ public class SparseTable {
      * @param r right bound (inclusive, 0-indexed)
      * @return minimum value in the range
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int query(int l, int r) {
         validateRange(l, r);
         int k      = log2[r - l + 1];
@@ -185,6 +199,13 @@ public class SparseTable {
      * @param l left bound (inclusive, 0-indexed)
      * @param r right bound (inclusive, 0-indexed)
      * @return index of the minimum element in the range
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int queryIndex(int l, int r) {
         validateRange(l, r);
@@ -206,6 +227,13 @@ public class SparseTable {
      * @param r right bound (inclusive, 0-indexed)
      * @return maximum value in the range
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int queryMax(int l, int r) {
         validateRange(l, r);
         int k      = log2[r - l + 1];
@@ -223,6 +251,13 @@ public class SparseTable {
     }
 
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("SparseTable(n=%d, levels=%d)%n", n, levels));

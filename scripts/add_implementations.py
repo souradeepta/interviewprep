@@ -410,6 +410,27 @@ class DistributedRateLimiter:
         self.redis = redis.Redis(host=redis_host)
 
     def is_allowed(self, user_id: str, limit: int, window: int):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         \"\"\"
         limit: max requests
         window: time window in seconds
@@ -619,6 +640,26 @@ from enum import Enum
 from typing import Optional
 
 class VehicleSize(Enum):
+"""
+VehicleSize - [Brief description of this class]
+
+ATTRIBUTES:
+    [List key attributes/fields]
+
+METHODS:
+    [List key public methods]
+
+TIME COMPLEXITY:
+    [Summarize key operation complexities]
+
+SPACE COMPLEXITY:
+    O([n]) - where n is [what n represents]
+
+DESIGN NOTES:
+    - Why this implementation approach
+    - Trade-offs vs alternatives
+    - When to use vs alternatives
+"""
     COMPACT = 1
     REGULAR = 2
     LARGE = 3
@@ -640,6 +681,27 @@ class ParkingSpot:
         self.vehicle = vehicle
 
     def remove_vehicle(self):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         self.occupied = False
         self.vehicle = None
 
@@ -687,6 +749,27 @@ class Level:
         self._update_available()
 
     def _update_available(self):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         for size in VehicleSize:
             self.available_count[size] = sum(
                 1 for spot in self.spots
@@ -711,12 +794,54 @@ class ParkingLot:
         return False
 
     def unpark_vehicle(self, level_num: int, spot_num: int):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         level = self.levels[level_num]
         spot = level.spots[spot_num]
         level.unpark_vehicle(spot)
         print(f"Vehicle {spot.vehicle} unparked")
 
     def display_availability(self):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         for level in self.levels:
             print(f"Level {level.level_number}:")
             for size in VehicleSize:
@@ -843,6 +968,27 @@ class OptimizedLevel:
         }
 
     def find_closest_spot(self, size):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         # O(log n) instead of O(n)
         return heapq.heappop(self.available_heaps[size])
 ```

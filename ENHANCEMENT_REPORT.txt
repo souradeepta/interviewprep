@@ -1,0 +1,445 @@
+================================================================================
+DOCUMENTATION ENHANCEMENT REPORT
+================================================================================
+
+SUMMARY
+--------------------------------------------------------------------------------
+Generated: 2026-05-15 10:55:18
+Total files processed: 210
+Modified files: 0
+Skipped files: 58
+Failed files: 152
+Total processing time: 0.16s
+Average time per file: 0.00s
+Log file: /home/sbisw/github/datastructures/logs/enhancement_20260515_105518.log
+Metadata file: /home/sbisw/github/datastructures/.enhance_metadata.json
+
+[DRY RUN MODE] - No changes were written to disk
+
+SKIPPED FILES
+--------------------------------------------------------------------------------
+  - java/system_design/APIGateway.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/AuctionSystem.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/ChatSystem.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/CircuitBreaker.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/ConsensusAlgorithm.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/DatabaseSharding.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/DistributedTx.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/Ecommerce.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/FollowersSystem.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/Leaderboard.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/LikeCommentSystem.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/LogAggregator.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/MessageQueue.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/NewsFeed.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/Notifications.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/PaymentSystem.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/PhotoSharing.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/RecommendationEngine.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/RideSharing.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/SagaPattern.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/SearchEngine.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/TimeSeriesDB.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/TransactionLedger.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/VideoStreaming.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/WalletSystem.java
+      └─ Insufficient content (2 lines)
+  - java/system_design/WebSocketServer.java
+      └─ Insufficient content (2 lines)
+  - python/advanced/__init__.py
+      └─ Insufficient content (0 lines)
+  - python/advanced/btree.py
+      └─ Already extensively documented
+  - python/advanced/heap.py
+      └─ Already extensively documented
+  - python/advanced_ds/__init__.py
+      └─ Insufficient content (0 lines)
+  - python/advanced_ds/b_plus_tree.py
+      └─ Already extensively documented
+  - python/advanced_ds/kd_tree.py
+      └─ Already extensively documented
+  - python/advanced_ds/persistent_segment_tree.py
+      └─ Already extensively documented
+  - python/advanced_ds/segment_tree_lazy.py
+      └─ Already extensively documented
+  - python/algorithms/advanced/advanced_algorithms.py
+      └─ File too large (58894/50000 chars)
+  - python/algorithms/dp/dp.py
+      └─ Already extensively documented
+  - python/algorithms/graph/graph_algorithms.py
+      └─ Already extensively documented
+  - python/algorithms/math/__init__.py
+      └─ Insufficient content (0 lines)
+  - python/algorithms/math/math_algorithms.py
+      └─ Already extensively documented
+  - python/algorithms/sorting/sorting.py
+      └─ Already extensively documented
+  - python/algorithms/string/__init__.py
+      └─ Insufficient content (0 lines)
+  - python/algorithms/string/string_algorithms.py
+      └─ Already extensively documented
+  - python/basic/__init__.py
+      └─ Insufficient content (0 lines)
+  - python/basic/deque_ds.py
+      └─ Already extensively documented
+  - python/basic/hashmap.py
+      └─ Already extensively documented
+  - python/basic/linked_list.py
+      └─ Already extensively documented
+  - python/basic/queue_ds.py
+      └─ Already extensively documented
+  - python/basic/stack.py
+      └─ Already extensively documented
+  - python/new_ds/__init__.py
+      └─ Insufficient content (0 lines)
+  - python/new_ds/red_black_tree.py
+      └─ Already extensively documented
+  - scripts/add_code_implementations.py
+      └─ File too large (82330/50000 chars)
+  - scripts/add_comprehensive_diagrams.py
+      └─ Already extensively documented
+  - scripts/add_diagrams_all_concepts.py
+      └─ Already extensively documented
+  - scripts/add_diagrams_remaining.py
+      └─ Already extensively documented
+  - scripts/add_gof_patterns.py
+      └─ File too large (56665/50000 chars)
+  - scripts/add_mermaid_diagrams.py
+      └─ Already extensively documented
+  - scripts/create_networking_remaining.py
+      └─ File too large (95706/50000 chars)
+  - scripts/enhance_remaining_docs.py
+      └─ Already extensively documented
+
+FAILED FILES
+--------------------------------------------------------------------------------
+  ✗ java/advanced/AVLTree.java
+      └─ API error
+  ✗ java/advanced/BST.java
+      └─ API error
+  ✗ java/advanced/BTree.java
+      └─ API error
+  ✗ java/advanced/FenwickTree.java
+      └─ API error
+  ✗ java/advanced/Graph.java
+      └─ API error
+  ✗ java/advanced/LRUCache.java
+      └─ API error
+  ✗ java/advanced/MinHeap.java
+      └─ API error
+  ✗ java/advanced/SegmentTree.java
+      └─ API error
+  ✗ java/advanced/Trie.java
+      └─ API error
+  ✗ java/advanced/UnionFind.java
+      └─ API error
+  ✗ java/advanced_ds/AhoCorasickAutomaton.java
+      └─ API error
+  ✗ java/advanced_ds/BPlusTree.java
+      └─ API error
+  ✗ java/advanced_ds/CartesianTree.java
+      └─ API error
+  ✗ java/advanced_ds/DancingLinks.java
+      └─ API error
+  ✗ java/advanced_ds/FibonacciHeap.java
+      └─ API error
+  ✗ java/advanced_ds/HeavyLightDecomposition.java
+      └─ API error
+  ✗ java/advanced_ds/KDTree.java
+      └─ API error
+  ✗ java/advanced_ds/LeftistHeap.java
+      └─ API error
+  ✗ java/advanced_ds/LinkCutTree.java
+      └─ API error
+  ✗ java/advanced_ds/PersistentSegmentTree.java
+      └─ API error
+  ✗ java/advanced_ds/SegmentTreeLazy.java
+      └─ API error
+  ✗ java/advanced_ds/SplayTree.java
+      └─ API error
+  ✗ java/advanced_ds/SuffixArray.java
+      └─ API error
+  ✗ java/advanced_ds/SuffixTree.java
+      └─ API error
+  ✗ java/advanced_ds/VanEmdoBoasTree.java
+      └─ API error
+  ✗ java/algorithms/advanced/AdvancedAlgorithms.java
+      └─ API error
+  ✗ java/algorithms/dp/DP.java
+      └─ API error
+  ✗ java/algorithms/graph/GraphAlgorithms.java
+      └─ API error
+  ✗ java/algorithms/math/MathAlgorithms.java
+      └─ API error
+  ✗ java/algorithms/searching/Searching.java
+      └─ API error
+  ✗ java/algorithms/sorting/Sorting.java
+      └─ API error
+  ✗ java/algorithms/string/StringAlgorithms.java
+      └─ API error
+  ✗ java/basic/Deque.java
+      └─ API error
+  ✗ java/basic/DoublyLinkedList.java
+      └─ API error
+  ✗ java/basic/DynamicArray.java
+      └─ API error
+  ✗ java/basic/HashMap.java
+      └─ API error
+  ✗ java/basic/Queue.java
+      └─ API error
+  ✗ java/basic/SinglyLinkedList.java
+      └─ API error
+  ✗ java/basic/Stack.java
+      └─ API error
+  ✗ java/new_ds/BloomFilter.java
+      └─ API error
+  ✗ java/new_ds/LFUCache.java
+      └─ API error
+  ✗ java/new_ds/RedBlackTree.java
+      └─ API error
+  ✗ java/new_ds/SkipList.java
+      └─ API error
+  ✗ java/new_ds/SparseTable.java
+      └─ API error
+  ✗ java/new_ds/Treap.java
+      └─ API error
+  ✗ java/system_design/AdapterPattern.java
+      └─ API error
+  ✗ java/system_design/DecoratorPattern.java
+      └─ API error
+  ✗ java/system_design/FactoryPattern.java
+      └─ API error
+  ✗ java/system_design/LFUCache.java
+      └─ API error
+  ✗ java/system_design/LRUCache.java
+      └─ API error
+  ✗ java/system_design/LoadBalancer.java
+      └─ API error
+  ✗ java/system_design/ObserverPattern.java
+      └─ API error
+  ✗ java/system_design/ParkingLot.java
+      └─ API error
+  ✗ java/system_design/PubSubSystem.java
+      └─ API error
+  ✗ java/system_design/RateLimiter.java
+      └─ API error
+  ✗ java/system_design/StrategyPattern.java
+      └─ API error
+  ✗ java/system_design/ThreadPool.java
+      └─ API error
+  ✗ java/system_design/URLShortener.java
+      └─ API error
+  ✗ python/advanced/avl_tree.py
+      └─ API error
+  ✗ python/advanced/bst.py
+      └─ API error
+  ✗ python/advanced/fenwick_tree.py
+      └─ API error
+  ✗ python/advanced/graph.py
+      └─ API error
+  ✗ python/advanced/lru_cache.py
+      └─ API error
+  ✗ python/advanced/segment_tree.py
+      └─ API error
+  ✗ python/advanced/trie.py
+      └─ API error
+  ✗ python/advanced/union_find.py
+      └─ API error
+  ✗ python/advanced_ds/ac_automaton.py
+      └─ API error
+  ✗ python/advanced_ds/cartesian_tree.py
+      └─ API error
+  ✗ python/advanced_ds/dancing_links.py
+      └─ API error
+  ✗ python/advanced_ds/fibonacci_heap.py
+      └─ API error
+  ✗ python/advanced_ds/heavy_light_decomposition.py
+      └─ API error
+  ✗ python/advanced_ds/leftist_heap.py
+      └─ API error
+  ✗ python/advanced_ds/link_cut_tree.py
+      └─ API error
+  ✗ python/advanced_ds/splay_tree.py
+      └─ API error
+  ✗ python/advanced_ds/suffix_array.py
+      └─ API error
+  ✗ python/advanced_ds/suffix_tree.py
+      └─ API error
+  ✗ python/advanced_ds/van_emde_boas_tree.py
+      └─ API error
+  ✗ python/algorithms/advanced/__init__.py
+      └─ API error
+  ✗ python/algorithms/dp/__init__.py
+      └─ API error
+  ✗ python/algorithms/dp/test_backtracking.py
+      └─ API error
+  ✗ python/algorithms/dp/test_grid_dp.py
+      └─ API error
+  ✗ python/algorithms/graph/__init__.py
+      └─ API error
+  ✗ python/algorithms/graph/test_tree_graph_patterns.py
+      └─ API error
+  ✗ python/algorithms/searching/__init__.py
+      └─ API error
+  ✗ python/algorithms/searching/searching.py
+      └─ API error
+  ✗ python/algorithms/sorting/__init__.py
+      └─ API error
+  ✗ python/basic/array.py
+      └─ API error
+  ✗ python/new_ds/bloom_filter.py
+      └─ API error
+  ✗ python/new_ds/lfu_cache.py
+      └─ API error
+  ✗ python/new_ds/skip_list.py
+      └─ API error
+  ✗ python/new_ds/sparse_table.py
+      └─ API error
+  ✗ python/new_ds/treap.py
+      └─ API error
+  ✗ python/system_design/__init__.py
+      └─ API error
+  ✗ python/system_design/adapter_pattern.py
+      └─ API error
+  ✗ python/system_design/api_gateway.py
+      └─ API error
+  ✗ python/system_design/auction_system.py
+      └─ API error
+  ✗ python/system_design/chat_system.py
+      └─ API error
+  ✗ python/system_design/circuit_breaker.py
+      └─ API error
+  ✗ python/system_design/consensus_algorithm.py
+      └─ API error
+  ✗ python/system_design/database_sharding.py
+      └─ API error
+  ✗ python/system_design/decorator_pattern.py
+      └─ API error
+  ✗ python/system_design/distributed_transaction.py
+      └─ API error
+  ✗ python/system_design/ecommerce.py
+      └─ API error
+  ✗ python/system_design/factory_pattern.py
+      └─ API error
+  ✗ python/system_design/followers_system.py
+      └─ API error
+  ✗ python/system_design/leaderboard.py
+      └─ API error
+  ✗ python/system_design/lfu_cache.py
+      └─ API error
+  ✗ python/system_design/like_comment_system.py
+      └─ API error
+  ✗ python/system_design/load_balancer.py
+      └─ API error
+  ✗ python/system_design/log_aggregation.py
+      └─ API error
+  ✗ python/system_design/lru_cache.py
+      └─ API error
+  ✗ python/system_design/message_queue.py
+      └─ API error
+  ✗ python/system_design/news_feed.py
+      └─ API error
+  ✗ python/system_design/notifications.py
+      └─ API error
+  ✗ python/system_design/observer_pattern.py
+      └─ API error
+  ✗ python/system_design/parking_lot.py
+      └─ API error
+  ✗ python/system_design/payment_system.py
+      └─ API error
+  ✗ python/system_design/photo_sharing.py
+      └─ API error
+  ✗ python/system_design/pub_sub_system.py
+      └─ API error
+  ✗ python/system_design/rate_limiter.py
+      └─ API error
+  ✗ python/system_design/recommendation_engine.py
+      └─ API error
+  ✗ python/system_design/ride_sharing.py
+      └─ API error
+  ✗ python/system_design/saga_pattern.py
+      └─ API error
+  ✗ python/system_design/search_engine.py
+      └─ API error
+  ✗ python/system_design/strategy_pattern.py
+      └─ API error
+  ✗ python/system_design/thread_pool.py
+      └─ API error
+  ✗ python/system_design/time_series_db.py
+      └─ API error
+  ✗ python/system_design/transaction_ledger.py
+      └─ API error
+  ✗ python/system_design/url_shortener.py
+      └─ API error
+  ✗ python/system_design/video_streaming.py
+      └─ API error
+  ✗ python/system_design/wallet_system.py
+      └─ API error
+  ✗ python/system_design/websocket_server.py
+      └─ API error
+  ✗ scripts/add_30_concepts.py
+      └─ API error
+  ✗ scripts/add_code_and_diagrams.py
+      └─ API error
+  ✗ scripts/add_code_to_30.py
+      └─ API error
+  ✗ scripts/add_distributed_systems.py
+      └─ API error
+  ✗ scripts/add_implementations.py
+      └─ API error
+  ✗ scripts/add_qa.py
+      └─ API error
+  ✗ scripts/enhance_30_concepts.py
+      └─ API error
+  ✗ scripts/enhance_all_designs.py
+      └─ API error
+  ✗ scripts/enhance_distributed_systems.py
+      └─ API error
+  ✗ scripts/enhance_distributed_systems_complete.py
+      └─ API error
+  ✗ scripts/enhance_docs.py
+      └─ API error
+  ✗ scripts/enhance_prd_code.py
+      └─ API error
+  ✗ scripts/enhance_remaining_docs_v2.py
+      └─ API error
+  ✗ scripts/generate_implementations.py
+      └─ API error
+  ✗ scripts/write_net_files.py
+      └─ API error
+  ✗ tests/system_design/test_lfu_cache.py
+      └─ API error
+  ✗ tests/system_design/test_lru_cache.py
+      └─ API error
+  ✗ tests/system_design/test_parking_lot.py
+      └─ API error
+  ✗ tests/system_design/test_rate_limiter.py
+      └─ API error
+  ✗ tests/system_design/test_url_shortener.py
+      └─ API error
+
+================================================================================

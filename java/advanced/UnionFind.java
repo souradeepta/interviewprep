@@ -37,6 +37,13 @@ public class UnionFind {
      *
      * @param n number of elements (n >= 1)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public UnionFind(int n) {
         if (n < 1) throw new IllegalArgumentException("n must be >= 1");
         parent = new int[n];
@@ -59,6 +66,13 @@ public class UnionFind {
      *
      * @param x element index (0-indexed)
      * @return root representative of x's component
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int find(int x) {
         checkElement(x);
@@ -89,6 +103,13 @@ public class UnionFind {
      * @param x first element
      * @param y second element
      * @return {@code true} if the two elements were in different components (a merge occurred)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public boolean union(int x, int y) {
         int rootX = find(x);
@@ -122,6 +143,13 @@ public class UnionFind {
      * @param y second element
      * @return {@code true} if connected
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean connected(int x, int y) {
         return find(x) == find(y);
     }
@@ -136,6 +164,13 @@ public class UnionFind {
      * <p>Time: O(1) | Space: O(1).
      *
      * @return number of components
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int getNumComponents() {
         return numComponents;
@@ -152,6 +187,13 @@ public class UnionFind {
      *
      * @param x element index
      * @return size of x's component
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int componentSize(int x) {
         int root = find(x);
@@ -183,6 +225,13 @@ public class UnionFind {
      * @return multi-line Union-Find state string
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         int n = parent.length;
         StringBuilder sb = new StringBuilder();
@@ -219,6 +268,13 @@ public class UnionFind {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== Union-Find Demo ===\n");
 

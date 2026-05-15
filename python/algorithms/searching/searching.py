@@ -1,22 +1,161 @@
 """
-searching.py — Complete searching algorithm implementations for SDE interview prep.
+Comprehensive Searching Algorithm Implementations
+=================================================
 
-Algorithms included:
-    1. binary_search           — O(log n), iterative
-    2. binary_search_recursive — O(log n), recursive
-    3. binary_search_first     — O(log n), find first occurrence
-    4. binary_search_last      — O(log n), find last occurrence
-    5. search_rotated_array    — O(log n), search in rotated sorted array
-    6. find_peak               — O(log n), find any peak element
-    7. ternary_search          — O(log₃ n), divide search space into thirds
-    8. exponential_search      — O(log n), for unknown-size or large arrays
-    9. interpolation_search    — O(log log n) avg for uniform data
+Complete reference guide for searching algorithms with focus on binary search
+and its variants. These algorithms are fundamental to SDE interviews and
+real-world systems.
 
-All functions assume 0-indexed lists. Functions that require sorted input
-document this requirement in their docstring.
+ALGORITHM CLASSIFICATION:
 
-Usage:
-    python searching.py    # runs the full demo block
+CATEGORY 1: Linear Search (Baseline)
+─────────────────────────────────────
+- Linear search: O(n) time, works on unsorted arrays
+- Used only when n is very small or array is unsorted
+- Rarely the right choice in interviews (consider hash tables instead)
+
+CATEGORY 2: Binary Search (Log-time Search)
+──────────────────────────────────────────────
+Binary search achieves O(log n) by repeatedly halving the search space.
+Requirements: Array must be sorted or have binary-searchable property
+
+Algorithms:
+1. binary_search()           — Standard binary search, returns any matching index
+2. binary_search_recursive() — Same algorithm, recursive implementation
+3. binary_search_first()     — Find first (leftmost) occurrence of target
+4. binary_search_last()      — Find last (rightmost) occurrence of target
+5. search_rotated_array()    — Search in rotated sorted array (rotated 0-n times)
+6. find_peak()               — Find any peak (arr[i] > arr[i±1])
+7. interpolation_search()    — O(log log n) avg on uniformly distributed data
+
+CATEGORY 3: Specialized Search
+──────────────────────────────
+- ternary_search(): divide space into 3 parts (useful for finding unimodal max)
+- exponential_search(): O(log n) on unsorted but for large/unbounded arrays
+
+THE BINARY SEARCH PRINCIPLE:
+
+Classic Problem Setup:
+    Sorted array:  [1, 3, 5, 7, 9, 11, 13]
+                    ^           ^           ^
+                   lo          mid         hi
+
+Each iteration:
+1. Calculate mid = lo + (hi - lo) // 2  (overflow-safe)
+2. Compare arr[mid] with target:
+   - If arr[mid] == target: found! Return index
+   - If arr[mid] < target:  search right half (lo = mid + 1)
+   - If arr[mid] > target:  search left half (hi = mid - 1)
+3. Continue until lo > hi (not found)
+
+Iterations needed: ceil(log₂(n))
+    n=1:        0 iterations (immediate)
+    n=10:       4 iterations
+    n=100:      7 iterations
+    n=1,000:    10 iterations
+    n=1,000,000:20 iterations
+
+WHY BINARY SEARCH MATTERS:
+
+1. Performance Multiplier
+   - 1,000,000 elements: linear search ≈ 500,000 steps avg
+   - Same data: binary search ≈ 20 steps
+   - That's a 25,000x speedup!
+
+2. Conceptual Foundation
+   - Demonstrates divide-and-conquer principle
+   - Base case for more complex algorithms
+   - Foundation for understanding complexity classes
+
+3. Interview Litmus Test
+   - If you can't solve binary search, harder algorithms impossible
+   - Interviewers expect flawless binary search implementation
+   - Off-by-one errors here indicate deeper problem-solving issues
+
+VARIANTS AND THEIR PROBLEMS:
+
+VARIANT 1: Find First/Last Occurrence
+Problem: Duplicates exist; you need first (or last) index
+    Input:  [1, 1, 1, 3, 3, 3, 5, 5, 5]  target = 3
+    Standard binary_search: might return index 3, 4, or 5
+    binary_search_first():  must return 3
+    binary_search_last():   must return 5
+
+Pattern: When arr[mid] == target, don't immediately return; narrow search
+  - For first: binary search left side even after finding match
+  - For last:  binary search right side even after finding match
+
+VARIANT 2: Search Rotated Sorted Array
+Problem: Array was sorted, then rotated: [7, 8, 9, 1, 2, 3, 4, 5, 6]
+Solution: Identify which half is sorted, search the sorted half
+
+Key insight: At least one half is always sorted
+  Example: [7, 8, 9, 1, 2, 3]  mid=9
+           left [7, 8, 9] is sorted; right [1, 2, 3] is sorted
+           Check if target is in sorted half; recurse to that half
+
+VARIANT 3: Find Peak Element
+Problem: Find index i where arr[i] > arr[i-1] and arr[i] > arr[i+1]
+         (a "peak" can be at start or end: only need one neighbor)
+
+Solution: Use binary search on derivative
+  - If arr[mid] < arr[mid+1]: peak is to the right (arr[mid+1] > arr[mid])
+  - If arr[mid] > arr[mid+1]: peak is to the left or at mid
+  - Converges to some peak due to array structure
+
+INTERVIEW PREPARATION CHECKLIST:
+
+✓ MUST KNOW:
+  - Implement binary search perfectly (no off-by-one errors)
+  - Understand why O(log n) only works on sorted data
+  - Know difference between < and <=, and when to use each
+  - Be able to tweak binary search for first/last occurrence
+
+✓ SHOULD KNOW:
+  - How to detect and search rotated sorted array
+  - How binary search applies to finding peaks
+  - Interpolation search concept (O(log log n) on uniform data)
+  - Why linear search sometimes beats binary for small n
+
+✓ BONUS:
+  - Complex variants: searching 2D matrix, search in mountain array
+  - Theoretical analysis: why we need ≤ in loop condition
+  - Understand off-by-one errors through invariant reasoning
+
+COMMON MISTAKES IN INTERVIEWS:
+
+❌ MISTAKE 1: Off-by-one in loop
+   WRONG:  while lo < hi:      # misses single-element array
+   RIGHT:  while lo <= hi:     # includes single element
+
+❌ MISTAKE 2: Incorrect midpoint calculation
+   WRONG:  mid = (lo + hi) // 2    # overflows in some languages
+   RIGHT:  mid = lo + (hi - lo) // 2
+
+❌ MISTAKE 3: Returning early on first match (when duplicates exist)
+   WRONG:  if arr[mid] == target: return mid
+   RIGHT:  (for binary_search_first) narrow search left even on match
+
+❌ MISTAKE 4: Assuming solution exists
+   WRONG:  return lo  (without checking arr[lo] == target)
+   RIGHT:  return lo if lo < len(arr) and arr[lo] == target else -1
+
+REAL-WORLD CONTEXT:
+
+1. Database Indices: B-trees use binary search principles
+2. Version Finding: "which version introduced the bug?" → binary search
+3. Capacity Planning: "how many servers needed?" → binary search answer
+4. API Rate Limits: "what's max throughput?" → binary search to find limit
+
+Usage Examples:
+    # Find if value exists (fast)
+    idx = binary_search([1,3,5,7,9], 5)  # returns 2
+
+    # Find position to insert (maintaining sort)
+    idx = binary_search_first([1,3,3,3,5], 3)  # returns 1
+
+    # Search in rotated array
+    idx = search_rotated_array([4,5,6,7,0,1,2], 0)  # returns 4
 """
 
 from typing import List, Optional

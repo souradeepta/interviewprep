@@ -116,6 +116,13 @@ public class AhoCorasickAutomaton {
         }
 
         @Override
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public String toString() {
             return String.format("(%d, \"%s\")", position, pattern);
         }
@@ -126,6 +133,13 @@ public class AhoCorasickAutomaton {
      *
      * @param text Text to search in
      * @return List of matches (position, pattern)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public List<Match> search(String text) {
         List<Match> matches = new ArrayList<>();
@@ -168,6 +182,13 @@ public class AhoCorasickAutomaton {
         }
 
         @Override
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public String toString() {
             return String.format("(%d, %d)", position, patternId);
         }
@@ -178,6 +199,13 @@ public class AhoCorasickAutomaton {
      *
      * @param text Text to search in
      * @return List of matches (position, pattern_id)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public List<MatchId> searchWithIds(String text) {
         List<MatchId> matches = new ArrayList<>();
@@ -205,6 +233,13 @@ public class AhoCorasickAutomaton {
         return matches;
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Basic pattern matching
         System.out.println("=== Example 1: Basic Pattern Matching ===");

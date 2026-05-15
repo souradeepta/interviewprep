@@ -62,6 +62,13 @@ public class StringAlgorithms {
      * @param pattern the pattern string
      * @return the failure (prefix) function array of length {@code pattern.length()}
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int[] buildFailureFunction(String pattern) {
         int m = pattern.length();
         int[] failure = new int[m];
@@ -114,6 +121,13 @@ public class StringAlgorithms {
      *   <li>The failure function encodes the self-similarity structure of the pattern.
      *   <li>Never backtracks in the text — {@code i} (text pointer) only moves forward.
      * </ul>
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static List<Integer> kmpSearch(String text, String pattern) {
         List<Integer> matches = new ArrayList<>();
@@ -180,6 +194,13 @@ public class StringAlgorithms {
      *   <li>Rabin-Karp's real advantage over KMP: trivially extends to multi-pattern search.
      * </ul>
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static List<Integer> rabinKarpSearch(String text, String pattern) {
         List<Integer> matches = new ArrayList<>();
         if (text == null || pattern == null || pattern.isEmpty() || pattern.length() > text.length()) {
@@ -244,6 +265,13 @@ public class StringAlgorithms {
      *   <li>When all patterns have the same length this achieves a true O(n) scan for all patterns.
      *   <li>For mixed lengths, Aho-Corasick is the asymptotically optimal choice: O(n + total_m + matches).
      * </ul>
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static Map<String, List<Integer>> rabinKarpMulti(String text, List<String> patterns) {
         Map<String, List<Integer>> result = new LinkedHashMap<>();
@@ -335,6 +363,13 @@ public class StringAlgorithms {
      *   <li>{@code Z[0]} is undefined (the whole string trivially equals itself); conventionally 0.
      * </ul>
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static List<Integer> zAlgorithm(String text, String pattern) {
         List<Integer> matches = new ArrayList<>();
         if (text == null || pattern == null || pattern.isEmpty() || pattern.length() > text.length()) {
@@ -398,6 +433,13 @@ public class StringAlgorithms {
      *   <li>In the transformed string, {@code p[i]} equals the palindrome length in the original.
      *   <li>Start index in original: {@code (centerIdx - maxLen) / 2}.
      * </ul>
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static String manacher(String s) {
         if (s == null || s.isEmpty()) return "";
@@ -474,6 +516,13 @@ public class StringAlgorithms {
      *   <li>LC 567 (Permutation in String) is essentially the same problem.
      * </ul>
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static List<Integer> findAnagrams(String text, String pattern) {
         List<Integer> result = new ArrayList<>();
         if (text == null || pattern == null || pattern.length() > text.length()) {
@@ -546,6 +595,13 @@ public class StringAlgorithms {
      *   <li>Common follow-up: return ALL longest common substrings.
      * </ul>
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static String longestCommonSubstring(String s1, String s2) {
         if (s1 == null || s2 == null || s1.isEmpty() || s2.isEmpty()) return "";
 
@@ -603,6 +659,13 @@ public class StringAlgorithms {
      *   <li>Pair with {@link #runLengthDecode} for a round-trip test.
      * </ul>
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static String runLengthEncode(String s) {
         if (s == null || s.isEmpty()) return "";
 
@@ -656,6 +719,13 @@ public class StringAlgorithms {
      *   <li>Multi-digit counts require accumulating digits before parsing — a common edge case.
      *   <li>A state-machine (CHAR state → DIGIT state) cleanly handles the parsing logic.
      * </ul>
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static String runLengthDecode(String s) {
         if (s == null || s.isEmpty()) return "";

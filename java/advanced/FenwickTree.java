@@ -40,6 +40,13 @@ public class FenwickTree {
      *
      * @param n the number of elements (1-indexed up to n)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public FenwickTree(int n) {
         if (n <= 0) throw new IllegalArgumentException("Size must be positive");
         this.n   = n;
@@ -55,6 +62,13 @@ public class FenwickTree {
      * <p>Time: O(n) | Space: O(n).
      *
      * @param arr source array (0-indexed)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public FenwickTree(int[] arr) {
         this(arr.length);
@@ -79,6 +93,13 @@ public class FenwickTree {
      * @param i     1-indexed position (1 &le; i &le; n)
      * @param delta the amount to add
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void update(int i, int delta) {
         checkIndex(i);
         for (; i <= n; i += i & (-i)) {
@@ -97,6 +118,13 @@ public class FenwickTree {
      *
      * @param i 1-indexed upper bound (1 &le; i &le; n)
      * @return sum of elements from index 1 to i
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int prefixSum(int i) {
         checkIndex(i);
@@ -119,6 +147,13 @@ public class FenwickTree {
      * @param l left bound (1-indexed, inclusive)
      * @param r right bound (1-indexed, inclusive)
      * @return sum of elements from index l to r
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int rangeQuery(int l, int r) {
         if (l < 1 || r > n || l > r)
@@ -151,6 +186,13 @@ public class FenwickTree {
      * @return multi-line Fenwick Tree representation
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("FenwickTree (n=").append(n).append("):\n");
@@ -191,6 +233,13 @@ public class FenwickTree {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== Fenwick Tree (BIT) Demo ===\n");
 

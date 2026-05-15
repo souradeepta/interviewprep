@@ -169,6 +169,27 @@ class SuffixTree:
         max_node = None
 
         def dfs(node: SuffixNode, depth: int = 0):
+
+        """
+
+        [Brief description of what this function does]
+
+
+        Args:
+
+            [param]: description
+
+
+        Returns:
+
+            [description of return value]
+
+
+        Time: O([complexity])
+
+        Space: O([complexity])
+
+        """
             nonlocal max_len, max_node
 
             if node.suffix_idx != -1:

@@ -1,21 +1,131 @@
 """
-sorting.py — Complete sorting algorithm implementations for SDE interview prep.
+Comprehensive Sorting Algorithm Implementations
+===============================================
 
-Algorithms included:
-    1.  bubble_sort         — O(n²) time, O(1) space, stable, in-place
-    2.  selection_sort      — O(n²) time, O(1) space, NOT stable, in-place
-    3.  insertion_sort      — O(n²) worst / O(n) best, O(1) space, stable, in-place
-    4.  merge_sort          — O(n log n) time, O(n) space, stable
-    5.  quick_sort          — O(n log n) avg / O(n²) worst, O(log n) stack, NOT stable, in-place
-    6.  heap_sort           — O(n log n) time, O(1) space, NOT stable, in-place
-    7.  counting_sort       — O(n + k) time, O(k) space, stable, non-negative integers only
-    8.  radix_sort          — O(d*(n+k)) time, O(n+k) space, stable, non-negative integers
-    9.  bucket_sort         — O(n + k) avg time, O(n) space, stable, floats in [0, 1)
-    10. tim_sort_demo       — O(n log n) time, O(n) space, stable (Python's built-in sort)
+A complete reference guide for 10 classic sorting algorithms with detailed
+implementations, complexity analysis, and interview guidance. This module
+is designed for SDE interview preparation and algorithm study.
 
-Usage:
-    python sorting.py          # runs demo block
-    python sorting.py compare  # runs timing comparison
+SORTING ALGORITHM SURVEY:
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ ALGORITHM        │ TIME (AVG) │ TIME (WORST) │ SPACE │ STABLE │ IN-PLACE
+├─────────────────────────────────────────────────────────────────────────┤
+│ Bubble Sort      │   O(n²)    │   O(n²)      │ O(1)  │  Yes   │  Yes
+│ Selection Sort   │   O(n²)    │   O(n²)      │ O(1)  │  No    │  Yes
+│ Insertion Sort   │   O(n²)    │   O(n²)      │ O(1)  │  Yes   │  Yes
+│ Merge Sort       │  O(n log n)│  O(n log n)  │ O(n)  │  Yes   │  No
+│ Quick Sort       │  O(n log n)│   O(n²)      │ O(logn)│ No*   │  Yes
+│ Heap Sort        │  O(n log n)│  O(n log n)  │ O(1)  │  No    │  Yes
+│ Counting Sort    │  O(n + k)  │  O(n + k)    │ O(k)  │  Yes   │  No
+│ Radix Sort       │ O(d(n+k))  │ O(d(n+k))    │ O(n+k)│  Yes   │  No
+│ Bucket Sort      │  O(n + k)* │   O(n²)      │ O(n)  │  Yes   │  No
+│ Tim Sort (Hybrid)│  O(n log n)│  O(n log n)  │ O(n)  │  Yes   │  No
+└─────────────────────────────────────────────────────────────────────────┘
+
+ALGORITHMS IMPLEMENTED:
+
+1.  bubble_sort()
+    - Simple comparison-based approach: repeatedly swap adjacent out-of-order elements
+    - Educational value: demonstrates stability and bubble movement pattern
+    - Rarely used in practice due to O(n²) average case
+    - Special case: O(n) on nearly-sorted data when optimized
+
+2.  selection_sort()
+    - Divide array into sorted and unsorted regions
+    - For each position, find minimum in unsorted region and place there
+    - Always O(n²), even on already-sorted input (no early exit possible)
+    - NOT stable: relative order of equal elements may change
+
+3.  insertion_sort()
+    - Build sorted array one element at a time
+    - Fast on nearly-sorted data (best case O(n))
+    - Used as base case in hybrid algorithms (e.g., Tim Sort)
+    - Stable and in-place with low overhead
+
+4.  merge_sort()
+    - Divide-and-conquer: split into halves, recursively sort, merge
+    - Guaranteed O(n log n) worst-case (important for real-time systems)
+    - Stable but requires O(n) extra space
+    - Basis for stable external sorting and parallel algorithms
+
+5.  quick_sort()
+    - Divide-and-conquer with in-place partitioning
+    - Average O(n log n) with good constants in practice
+    - Worst case O(n²) on unlucky pivot choice (mitigated by random selection)
+    - Cache-efficient; preferred in production systems despite worst-case risk
+
+6.  heap_sort()
+    - Use heap to extract elements in sorted order
+    - Guaranteed O(n log n) in-place (unlike Quick Sort)
+    - NOT stable; heap operations destroy order of equal elements
+    - Less practical than Quick Sort despite better worst-case due to cache misses
+
+7.  counting_sort()
+    - Non-comparison approach for integers in bounded range [0, k)
+    - O(n + k) time; optimal when k = O(n)
+    - Stable (iteration order preserved when counting)
+    - Useful as subroutine in Radix Sort
+
+8.  radix_sort()
+    - Apply counting sort on each digit position (least to most significant)
+    - O(d * (n + k)) where d = number of digits, k = radix base
+    - Stable due to stable counting sort
+    - Practical for sorting strings, integers with fixed length
+
+9.  bucket_sort()
+    - Distribute elements into buckets, sort each bucket, concatenate
+    - O(n + k) average when buckets are uniformly distributed
+    - Good for sorting floats in known range [0, 1)
+    - Stability depends on bucket-internal sort
+
+10. tim_sort_demo()
+    - Python's built-in sort: hybrid of merge sort + insertion sort
+    - O(n log n) guaranteed with excellent real-world performance
+    - Adaptive: detects and exploits existing sorted runs (O(n) on sorted data)
+    - Reference to understand why Timsort dominates production sorting
+
+INTERVIEW PREPARATION GUIDE:
+
+COMMON QUESTIONS:
+1. "What's the fastest sorting algorithm?"
+   → Context matters: O(n log n) comparison-based is optimal; counting/radix beat it
+      for special cases (integers with bounded range)
+
+2. "When would you use [algorithm] instead of Quick Sort?"
+   → Merge Sort: need guaranteed O(n log n) (real-time systems)
+   → Insertion Sort: nearly sorted data or small arrays (<50 elements)
+   → Heap Sort: rare in practice; good theoretical example
+   → Counting/Radix: integer/string sorting with bounded range
+
+3. "What does 'stable' mean and why does it matter?"
+   → Stable: equal elements maintain relative order
+   → Matters for multi-key sorting (sort by name, then by age)
+   → Example: merge sort is stable; quick sort is not
+
+4. "How would you optimize bubble sort?"
+   → Early exit if array already sorted (detect in first pass)
+   → Optimization reduces to O(n) best case on sorted data
+   → Still O(n²) average; rarely justified in practice
+
+5. "What's the relationship between quicksort's pivot and performance?"
+   → Bad pivots (already first/last element) cause O(n²) worst case
+   → Random pivot selection gives O(n log n) with high probability
+   → Median-of-three heuristic often works well in practice
+
+REAL-WORLD CONTEXT:
+- Python/Java/C++ use hybrid sorts (Tim Sort / Intro Sort) in std libraries
+- System engineers rarely implement sorts; use library functions
+- Interview focus: understand algorithm trade-offs, not memorize code
+- Key skill: matching algorithm choice to problem constraints
+
+USAGE:
+    # Run all sorts with comparison
+    python sorting.py
+
+    # Study individual algorithm
+    arr = [64, 34, 25, 12, 22]
+    sorted_arr = quick_sort(arr)
 """
 
 import random

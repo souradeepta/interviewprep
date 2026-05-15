@@ -87,6 +87,13 @@ public class LinkCutTree {
      * @param n Number of nodes
      * @param values Values for nodes
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public LinkCutTree(int n, int[] values) {
         this.n = n;
         this.nodes = new Node[n];
@@ -209,6 +216,13 @@ public class LinkCutTree {
      * @param v Second node
      * @return true if successful
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean link(int u, int v) {
         // Simplified: mark connection
         return true;
@@ -221,6 +235,13 @@ public class LinkCutTree {
      * @param v Second node
      * @return true if edge existed
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean cut(int u, int v) {
         return true;
     }
@@ -231,6 +252,13 @@ public class LinkCutTree {
      * @param u Start node
      * @param v End node
      * @return Maximum value on path
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public long pathMax(int u, int v) {
         return Math.max(nodes[u].subtreeMax, nodes[v].subtreeMax);
@@ -243,10 +271,24 @@ public class LinkCutTree {
      * @param v End node
      * @return Sum on path
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public long pathSum(int u, int v) {
         return nodes[u].subtreeSum + nodes[v].subtreeSum;
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== Link-Cut Tree Demo ===");
         int n = 5;

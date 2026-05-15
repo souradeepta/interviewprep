@@ -35,6 +35,13 @@ public class GraphAlgorithms {
      * @return int[] dist where dist[i] is the shortest distance from start to i;
      *         unreachable nodes have Integer.MAX_VALUE
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int[] dijkstra(Map<Integer, List<int[]>> graph, int start, int n) {
         int[] dist = new int[n];
         Arrays.fill(dist, Integer.MAX_VALUE);
@@ -77,6 +84,13 @@ public class GraphAlgorithms {
      * @return Object[] with two elements: int[] dist and boolean hasNegCycle.
      *         Access as {@code (int[]) result[0]} and {@code (boolean) result[1]}.
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static Object[] bellmanFord(int n, int[][] edges, int start) {
         int[] dist = new int[n];
         Arrays.fill(dist, Integer.MAX_VALUE);
@@ -118,6 +132,13 @@ public class GraphAlgorithms {
      * @param matrix n x n adjacency matrix; matrix[i][i] == 0,
      *               matrix[i][j] == INF if no direct edge
      * @return the same matrix, updated with shortest path distances
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static int[][] floydWarshall(int[][] matrix) {
         int n = matrix.length;
@@ -174,6 +195,13 @@ public class GraphAlgorithms {
      * @return Object[] with (List&lt;int[]&gt; mstEdges, int totalWeight).
      *         mstEdges contains {u, v, w} for each chosen edge.
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static Object[] kruskalMST(int n, int[][] edges) {
         // Sort edges by weight
         int[][] sorted = edges.clone();
@@ -207,6 +235,13 @@ public class GraphAlgorithms {
      * @param start starting node
      * @param n     total number of nodes
      * @return List of int[] {u, v, w} representing MST edges
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static List<int[]> primMST(Map<Integer, List<int[]>> graph, int start, int n) {
         boolean[] inMST = new boolean[n];
@@ -255,6 +290,13 @@ public class GraphAlgorithms {
      * @param graph directed adjacency list: node -> list of neighbors
      * @param n     number of nodes (0-indexed)
      * @return List of SCCs, each SCC is a List of node indices
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static List<List<Integer>> tarjanSCC(Map<Integer, List<Integer>> graph, int n) {
         sccTimer = 0;
@@ -314,6 +356,13 @@ public class GraphAlgorithms {
      * @param n     number of nodes (0-indexed)
      * @return int[] topological order, or empty array if cycle detected
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int[] topologicalSortKahn(Map<Integer, List<Integer>> graph, int n) {
         int[] inDegree = new int[n];
         for (int u = 0; u < n; u++) {
@@ -360,6 +409,13 @@ public class GraphAlgorithms {
      * @param end   int[]{row, col}
      * @return List of int[]{row, col} path from start to end (inclusive),
      *         or empty list if no path exists
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static List<int[]> astar(int[][] grid, int[] start, int[] end) {
         int rows = grid.length, cols = grid[0].length;
@@ -434,6 +490,13 @@ public class GraphAlgorithms {
     // Main demo
     // -----------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== Dijkstra ===");
         Map<Integer, List<int[]>> g1 = new HashMap<>();

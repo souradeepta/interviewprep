@@ -110,6 +110,13 @@ public class SegmentTreeLazy {
          * @param r Right index (inclusive)
          * @param val Value to add
          */
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public void update(int l, int r, long val) {
             if (n > 0) {
                 updateRange(0, 0, n - 1, l, r, val);
@@ -122,6 +129,13 @@ public class SegmentTreeLazy {
          * @param l Left index (inclusive)
          * @param r Right index (inclusive)
          * @return Sum of elements in range
+         */
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
          */
         public long query(int l, int r) {
             if (n == 0) return 0;
@@ -246,6 +260,13 @@ public class SegmentTreeLazy {
          * @param r Right index (inclusive)
          * @param val Value to assign
          */
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public void update(int l, int r, long val) {
             if (n > 0) {
                 updateRange(0, 0, n - 1, l, r, val);
@@ -259,6 +280,13 @@ public class SegmentTreeLazy {
          * @param r Right index (inclusive)
          * @return Minimum value in range
          */
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public long queryMin(int l, int r) {
             if (n == 0) return Long.MAX_VALUE;
             return queryMin(0, 0, n - 1, l, r);
@@ -271,12 +299,26 @@ public class SegmentTreeLazy {
          * @param r Right index (inclusive)
          * @return Maximum value in range
          */
+        /**
+         * [Brief description]
+         *
+         * @param [param] [description]
+         * @return [description]
+         * @time O([complexity])
+         */
         public long queryMax(int l, int r) {
             if (n == 0) return Long.MIN_VALUE;
             return queryMax(0, 0, n - 1, l, r);
         }
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Test range sum with range add
         System.out.println("=== Range Sum Query with Range Add ===");

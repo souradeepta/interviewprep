@@ -180,6 +180,13 @@ public class VanEmdoBoasTree {
      * @param x Element to check
      * @return true if x is in tree
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean member(int x) {
         if (x < 0 || x >= u) {
             return false;
@@ -208,6 +215,13 @@ public class VanEmdoBoasTree {
      *
      * @param x Element
      * @return Successor of x, or null if none
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public Integer successor(int x) {
         if (u == 1) {
@@ -253,6 +267,13 @@ public class VanEmdoBoasTree {
      * @param x Element
      * @return Predecessor of x, or null if none
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public Integer predecessor(int x) {
         if (u == 1) {
             return null;
@@ -291,6 +312,13 @@ public class VanEmdoBoasTree {
         return index(prevCluster, clusters[prevCluster].max);
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Basic operations
         System.out.println("=== Example 1: Basic Operations ===");

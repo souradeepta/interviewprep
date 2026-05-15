@@ -25,6 +25,27 @@ class ConsistentHash:
         return hash(key) % (2**32)
 
     def add_node(self, node):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         for i in range(self.replicas):
             virtual_key = f"{node}:{i}"
             hash_key = self._hash(virtual_key)
@@ -32,6 +53,27 @@ class ConsistentHash:
         self.sorted_keys = sorted(self.ring.keys())
 
     def remove_node(self, node):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         for i in range(self.replicas):
             virtual_key = f"{node}:{i}"
             hash_key = self._hash(virtual_key)
@@ -39,6 +81,27 @@ class ConsistentHash:
         self.sorted_keys = sorted(self.ring.keys())
 
     def get_node(self, key):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         if not self.ring:
             return None
         hash_key = self._hash(key)
@@ -87,6 +150,27 @@ class GeoHash:
         self.precision = precision
 
     def encode(self):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         lat_range = [-90, 90]
         lon_range = [-180, 180]
         geohash = []
@@ -184,6 +268,27 @@ class Trie:
         self.root = TrieNode()
 
     def insert(self, word):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         node = self.root
         for char in word:
             if char not in node.children:
@@ -192,6 +297,27 @@ class Trie:
         node.is_end = True
 
     def search(self, word):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         node = self._find_node(word)
         return node is not None and node.is_end
 
@@ -202,6 +328,27 @@ class Trie:
         return self._dfs(node, prefix)
 
     def _find_node(self, prefix):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         node = self.root
         for char in prefix:
             if char not in node.children:
@@ -210,6 +357,27 @@ class Trie:
         return node
 
     def _dfs(self, node, word):
+
+    """
+
+    [Brief description of what this function does]
+
+
+    Args:
+
+        [param]: description
+
+
+    Returns:
+
+        [description of return value]
+
+
+    Time: O([complexity])
+
+    Space: O([complexity])
+
+    """
         results = []
         if node.is_end:
             results.append(word)

@@ -62,6 +62,13 @@ public class FibonacciHeap {
      * @param key Key to insert
      * @return Node containing key
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public Node insert(int key) {
         Node newNode = new Node(key);
         numNodes++;
@@ -156,6 +163,13 @@ public class FibonacciHeap {
      *
      * @param node Node to update
      * @param newKey New key (must be <= current)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void decreaseKey(Node node, int newKey) {
         if (newKey > node.key) {
@@ -291,6 +305,13 @@ public class FibonacciHeap {
         }
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Basic operations
         System.out.println("=== Example 1: Basic Operations ===");

@@ -1,15 +1,182 @@
 """
-Graph Algorithms
-================
-Implementations of classical graph algorithms for SDE interview preparation.
+Comprehensive Graph Algorithms for SDE Interviews
+=================================================
 
-Each function includes:
-- Docstring with algorithm description and complexity
-- Concrete usage example via __main__
+This module implements the most important graph algorithms tested in technical
+interviews. Each algorithm includes time/space complexity, detailed explanation,
+and practical guidance on when to apply it.
 
-Graph representation convention (unless stated otherwise):
+GRAPH THEORY FUNDAMENTALS:
+
+Graph Representation:
+    Adjacency List (used here): {node: [(neighbor, weight), ...]}
+    Example: {'A': [('B', 1), ('C', 4)], 'B': [('C', 2)], 'C': []}
+
+    Space: O(V + E) where V = nodes, E = edges
+    Lookup edge (A→B): O(degree(A)) = O(V) worst case
+
+    Adjacency Matrix: 2D array where matrix[i][j] = weight
+    Space: O(V²)
+    Lookup edge: O(1)
+    → Use for dense graphs (many edges), adjacency list for sparse
+
+Graph Properties:
+    Directed vs Undirected: edges have direction or not
+    Weighted vs Unweighted: edges have costs or all cost 1
+    Cyclic vs Acyclic: contains cycles or not (DAGs are acyclic)
+    Connected vs Disconnected: all nodes reachable or not
+
+ALGORITHM CLASSIFICATION:
+
+CATEGORY 1: Shortest Path (Single Source)
+──────────────────────────────────────────
+1. Dijkstra's Algorithm
+   - When: Non-negative edge weights, single source
+   - Time: O((V + E) log V) with binary heap
+   - Returns: shortest distance and predecessor path
+   - Limitation: Fails with negative weights
+
+2. Bellman-Ford Algorithm
+   - When: Negative edge weights allowed (but no negative cycles)
+   - Time: O(V * E), slower than Dijkstra
+   - Returns: shortest distances, detects negative cycles
+   - Advantage: Handles negative edges unlike Dijkstra
+
+CATEGORY 2: Shortest Path (All Pairs)
+──────────────────────────────────────
+3. Floyd-Warshall
+   - When: Need shortest paths between ALL node pairs
+   - Time: O(V³)
+   - Space: O(V²)
+   - Handles: Negative edges (no negative cycles)
+   - Use case: Small graphs (V < 500); dense graphs
+
+CATEGORY 3: Traversal
+──────────────────────
+4. Depth-First Search (DFS)
+   - When: Visit all reachable nodes, find cycles, topological sort
+   - Time: O(V + E)
+   - Space: O(V) call stack / O(V) visited set
+   - Variants: Recursive (clean) vs iterative (avoid stack overflow)
+
+5. Breadth-First Search (BFS)
+   - When: Find shortest path in unweighted graph, level-order traversal
+   - Time: O(V + E)
+   - Space: O(V) queue
+   - Property: Guarantees shortest path in unweighted graphs
+
+CATEGORY 4: Minimum Spanning Tree
+──────────────────────────────────
+6. Kruskal's Algorithm
+   - When: Find MST (subset of edges with minimum total weight)
+   - Time: O(E log E) sorting + O(E α(V)) union-find
+   - Approach: Sort edges by weight, greedily add edges (union-find prevents cycles)
+   - Space: O(V + E)
+
+7. Prim's Algorithm
+   - When: Find MST, similar to Dijkstra
+   - Time: O(E log V) with binary heap
+   - Approach: Start with one node, greedily expand to closest unvisited
+   - Space: O(V + E)
+
+CATEGORY 5: Topological Sorting
+────────────────────────────────
+8. Topological Sort (DFS-based)
+   - When: Process tasks with dependencies, order jobs
+   - Time: O(V + E)
+   - Precondition: Graph must be a DAG (Directed Acyclic Graph)
+   - Returns: Valid topological ordering (not unique)
+   - Application: Build systems, job scheduling, course prerequisites
+
+CATEGORY 6: Connectivity
+────────────────────────
+9. Union-Find (Disjoint Set Union)
+   - When: Check connectivity, find connected components
+   - Time: Nearly O(1) with path compression (O(α(n)) amortized)
+   - Space: O(V)
+   - Application: Detect cycles in undirected graphs, Kruskal's algorithm
+
+10. Connected Components
+    - When: Find all separate components in undirected graph
+    - Time: O(V + E) using DFS/BFS
+    - Space: O(V)
+    - Application: Network analysis, image processing
+
+CATEGORY 7: Special Graph Types
+────────────────────────────────
+11. Bipartite Graph Check
+    - When: Check if graph can be 2-colored
+    - Time: O(V + E) BFS/DFS with coloring
+    - Space: O(V)
+    - Application: Matching problems, odd-cycle detection
+
+INTERVIEW QUESTION PATTERNS:
+
+PATTERN 1: "Find shortest path from A to B"
+    If unweighted → BFS (guarantees shortest)
+    If weighted, non-negative → Dijkstra
+    If weighted, with negatives → Bellman-Ford or DP
+
+PATTERN 2: "What nodes are reachable from X?"
+    DFS or BFS from X, count visited nodes
+    Could also ask connected components (multiple sources)
+
+PATTERN 3: "Process tasks in dependency order"
+    Topological sort (tasks = nodes, dependencies = edges)
+    Check for cycles (would make ordering impossible)
+
+PATTERN 4: "Find minimum cost spanning tree"
+    Kruskal (sort edges) or Prim (build from nodes)
+    Use union-find to detect cycles (Kruskal) or visited set (Prim)
+
+PATTERN 5: "Is graph bipartite?"
+    2-color BFS/DFS; if any conflict found → not bipartite
+
+COMMON MISTAKES:
+
+❌ Using Dijkstra with negative weights (gives wrong answer)
+❌ BFS on weighted graph expecting shortest path (only works unweighted)
+❌ Topological sort without checking DAG property
+❌ Not checking graph connectivity before algorithms needing connected graphs
+❌ Confusing MST (minimum spanning TREE) with shortest path (different problems)
+
+GRAPH ALGORITHM SELECTION GUIDE:
+
+Question                          → Algorithm          → Time
+─────────────────────────────────────────────────────────────
+Shortest path A→B?                → Dijkstra            → O((V+E)logV)
+Shortest path ALL pairs?          → Floyd-Warshall     → O(V³)
+Visit all reachable?              → DFS/BFS            → O(V+E)
+Task ordering?                    → Topological sort   → O(V+E)
+Minimum spanning tree?            → Kruskal/Prim       → O(ElogE)/O(ElogV)
+Check connectivity?               → Union-Find/DFS     → O(α(n))/O(V+E)
+Find components?                  → DFS/BFS multi-src  → O(V+E)
+Is bipartite?                     → 2-color BFS        → O(V+E)
+Detect cycle (directed)?          → DFS colors         → O(V+E)
+Detect cycle (undirected)?        → Union-Find         → O(Eα(n))
+
+Graph Representation Recommendation:
+    Sparse graph (E << V²) → Adjacency list (space efficient)
+    Dense graph (E ≈ V²) → Adjacency matrix (fast lookups)
+    This repository uses adjacency list; convert if needed
+
+IMPLEMENTATION NOTES:
+
+Graph convention used throughout:
     graph: dict[node, list[tuple[neighbor, weight]]]
-    e.g.  {'A': [('B', 1), ('C', 4)], 'B': [('C', 2)], 'C': []}
+    Example: {'A': [('B', 1), ('C', 4)], 'B': [('C', 2)], 'C': []}
+
+    For unweighted graphs, weight is typically 1:
+        graph: dict[node, list[neighbor]]
+        Can convert: {u: [(v, 1) for v in neighbors]}
+
+Time/Space complexity always given for each algorithm.
+See individual function docstrings for detailed implementation notes.
+
+REFERENCES:
+    - Introduction to Algorithms (Cormen et al.) - comprehensive treatment
+    - Algorithm Design Manual (Skiena) - practical focus
+    - LeetCode graph problems - real interview patterns
 """
 
 import heapq

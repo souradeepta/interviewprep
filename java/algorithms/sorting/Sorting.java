@@ -45,6 +45,13 @@ public class Sorting {
      *
      * @param arr the array to sort (modified in-place)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void bubbleSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
         int n = arr.length;
@@ -78,6 +85,13 @@ public class Sorting {
      *
      * @param arr the array to sort (modified in-place)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void selectionSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
         int n = arr.length;
@@ -107,6 +121,13 @@ public class Sorting {
      * </ul>
      *
      * @param arr the array to sort (modified in-place)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static void insertionSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
@@ -139,6 +160,13 @@ public class Sorting {
      * </ul>
      *
      * @param arr the array to sort (modified in-place)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static void binaryInsertionSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
@@ -174,6 +202,13 @@ public class Sorting {
      * </ul>
      *
      * @param arr the array to sort (modified in-place)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static void mergeSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
@@ -215,6 +250,13 @@ public class Sorting {
      *
      * @param arr the array to sort (modified in-place)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void mergeSortBottomUp(int[] arr) {
         if (arr == null || arr.length < 2) return;
         int n = arr.length;
@@ -246,6 +288,13 @@ public class Sorting {
      * </ul>
      *
      * @param arr the array to sort (modified in-place)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static void quickSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
@@ -293,6 +342,13 @@ public class Sorting {
      * </ul>
      *
      * @param arr the array to sort (modified in-place)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static void heapSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
@@ -344,6 +400,13 @@ public class Sorting {
      * @param arr the array to sort (modified in-place); all values must be &gt;= 0
      * @throws IllegalArgumentException if any element is negative
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void countingSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
 
@@ -384,6 +447,13 @@ public class Sorting {
      * </ul>
      *
      * @param arr the array to sort (modified in-place); all values must be &gt;= 0
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static void radixSort(int[] arr) {
         if (arr == null || arr.length < 2) return;
@@ -435,6 +505,13 @@ public class Sorting {
      * @param arr the array to sort; all values must satisfy 0 &lt;= v &lt; 1
      * @return a new sorted double array
      * @throws IllegalArgumentException if any value is outside [0, 1)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static double[] bucketSort(double[] arr) {
         if (arr == null || arr.length < 2) return arr == null ? new double[0] : arr.clone();

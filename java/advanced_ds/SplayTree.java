@@ -132,6 +132,13 @@ public class SplayTree {
      * @param key Key to insert
      * @return true if key was inserted, false if duplicate
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean insert(int key) {
         if (root == null) {
             root = new Node(key);
@@ -173,6 +180,13 @@ public class SplayTree {
      * @param key Key to search for
      * @return true if key exists
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean search(int key) {
         Node curr = root;
         while (curr != null) {
@@ -193,6 +207,13 @@ public class SplayTree {
      *
      * @param key Key to delete
      * @return true if key was deleted
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public boolean delete(int key) {
         if (!search(key)) {
@@ -249,6 +270,13 @@ public class SplayTree {
         }
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         SplayTree tree = new SplayTree();
 

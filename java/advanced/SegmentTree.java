@@ -39,6 +39,13 @@ public class SegmentTree {
      *
      * @param arr the source array (non-null, non-empty)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public SegmentTree(int[] arr) {
         if (arr == null || arr.length == 0)
             throw new IllegalArgumentException("Array must be non-null and non-empty");
@@ -61,6 +68,13 @@ public class SegmentTree {
      * @param node  current segment tree node index (1-based)
      * @param start left boundary of the segment
      * @param end   right boundary of the segment
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void build(int[] arr, int node, int start, int end) {
         if (start == end) {
@@ -87,6 +101,13 @@ public class SegmentTree {
      * @return sum of arr[l..r]
      * @throws IndexOutOfBoundsException if indices are out of range
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int query(int l, int r) {
         checkRange(l, r);
         return queryRec(1, 0, n - 1, l, r);
@@ -112,6 +133,13 @@ public class SegmentTree {
      * @param i   0-based index to update
      * @param val new value
      * @throws IndexOutOfBoundsException if {@code i} is out of range
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void update(int i, int val) {
         if (i < 0 || i >= n)
@@ -156,6 +184,13 @@ public class SegmentTree {
      * @return multi-line tree representation
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("SegmentTree (n=").append(n).append("):\n");
@@ -193,6 +228,13 @@ public class SegmentTree {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== Segment Tree Demo ===\n");
 

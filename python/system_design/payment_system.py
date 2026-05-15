@@ -1,3 +1,30 @@
+"""
+Payment System Implementation
+=============================
+
+OVERVIEW:
+This module provides a complete implementation of Payment System, a fundamental
+data structure used in algorithms and system design.
+
+PURPOSE & USE CASES:
+- Core operation for many algorithm patterns
+- Essential for interview preparation
+- Real-world applications in production systems
+
+KEY OPERATIONS:
+- Time/Space complexity analysis included for each operation
+- Design trade-offs explained
+- Common pitfalls and edge cases documented
+
+COMPLEXITY SUMMARY:
+See individual class/function docstrings for detailed complexity analysis.
+
+REFERENCES:
+- Introduction to Algorithms (Cormen, Leiserson, Rivest, Stein)
+- Algorithm Design Manual (Skiena)
+- LeetCode and HackerRank problem patterns
+"""
+
 import uuid
 class Payment: __init__(self, u, amt): self.id=str(uuid.uuid4()); self.user=u; self.amount=amt; self.status='pending'
 class Gateway: pass

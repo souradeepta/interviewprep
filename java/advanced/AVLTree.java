@@ -53,6 +53,13 @@ public class AVLTree {
      * @param node the node (may be null)
      * @return height
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int height(Node node) {
         return node == null ? -1 : node.height;
     }
@@ -78,6 +85,13 @@ public class AVLTree {
      * @param node the node
      * @return balance factor in [-2, 2] during rebalancing
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int getBalance(Node node) {
         return node == null ? 0 : height(node.left) - height(node.right);
     }
@@ -101,6 +115,13 @@ public class AVLTree {
      *
      * @param y the pivot node
      * @return the new root of this subtree
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public Node rotateLeft(Node y) {
         Node x  = y.right;
@@ -130,6 +151,13 @@ public class AVLTree {
      *
      * @param y the pivot node
      * @return the new root of this subtree
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public Node rotateRight(Node y) {
         Node x  = y.left;
@@ -182,6 +210,13 @@ public class AVLTree {
      *
      * @param key the key to insert
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void insert(int key) {
         root = insertRec(root, key);
     }
@@ -208,6 +243,13 @@ public class AVLTree {
      * <p>Time: O(log n) | Space: O(log n).
      *
      * @param key the key to delete
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void delete(int key) {
         root = deleteRec(root, key);
@@ -251,6 +293,13 @@ public class AVLTree {
      * @param key the key to search for
      * @return {@code true} if found
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean search(int key) {
         Node cur = root;
         while (cur != null) {
@@ -272,6 +321,13 @@ public class AVLTree {
      *
      * @return size
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int size() { return size; }
 
     // -------------------------------------------------------------------------
@@ -286,6 +342,13 @@ public class AVLTree {
      * @return ASCII tree string
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         if (root == null) return "(empty tree)";
         StringBuilder sb = new StringBuilder();
@@ -310,6 +373,13 @@ public class AVLTree {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         AVLTree avl = new AVLTree();
 

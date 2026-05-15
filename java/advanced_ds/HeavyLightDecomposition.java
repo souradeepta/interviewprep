@@ -95,6 +95,13 @@ public class HeavyLightDecomposition {
      * @param values Vertex values
      */
     @SuppressWarnings("unchecked")
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public HeavyLightDecomposition(int n, List<int[]> edges, int[] values) {
         this.n = n;
         this.values = values.clone();
@@ -189,6 +196,13 @@ public class HeavyLightDecomposition {
      * @param u Vertex index
      * @param val New value
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void update(int u, int val) {
         values[u] = val;
         buildSegmentTrees();
@@ -200,6 +214,13 @@ public class HeavyLightDecomposition {
      * @param u Start vertex
      * @param v End vertex
      * @return Maximum value on path u-v
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int queryPath(int u, int v) {
         if (segTrees.isEmpty()) {
@@ -237,6 +258,13 @@ public class HeavyLightDecomposition {
         return segTrees.get(cid).query(start, end);
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example: Tree with path queries
         //     0

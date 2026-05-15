@@ -80,6 +80,13 @@ public class BTree {
      * @param key the key to find
      * @return {@code true} if found
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean search(int key) {
         return searchRec(root, key);
     }
@@ -105,6 +112,13 @@ public class BTree {
      * <p>Time: O(t * log_t(n)) | Space: O(log_t(n)).
      *
      * @param key the key to insert
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void insert(int key) {
         if (search(key)) return; // duplicate
@@ -164,6 +178,13 @@ public class BTree {
      * @param i      index of the child to split
      * @param child  the full child node
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void splitChild(BTreeNode parent, int i, BTreeNode child) {
         BTreeNode newNode = new BTreeNode(t, child.leaf);
         newNode.n = t - 1;
@@ -213,6 +234,13 @@ public class BTree {
      * <p>Time: O(t * log_t(n)) | Space: O(log_t(n)).
      *
      * @param key the key to delete
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void delete(int key) {
         if (!search(key)) return;
@@ -372,6 +400,13 @@ public class BTree {
      * @return multi-line tree string
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("B-Tree (t=").append(t).append("):\n");
@@ -399,6 +434,13 @@ public class BTree {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== B-Tree Demo (t=3, max 5 keys/node) ===\n");
 

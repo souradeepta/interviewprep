@@ -1,11 +1,37 @@
 import java.util.*;
 
+/**
+ * LFUCache - [Brief description]
+ *
+ * <p>OVERVIEW:
+ * [Detailed explanation of what this class does]
+ *
+ * <p>COMPLEXITY:
+ * <ul>
+ *   <li>Time: [See method documentation]</li>
+ *   <li>Space: O(n) where n is [the element count]</li>
+ * </ul>
+ *
+ * <p>USAGE:
+ * [How to use this class, with example]
+ *
+ * @author Interview Preparation
+ * @since 1.0
+ */
+
 public class LFUCache {
     private int capacity, minFreq;
     private Map<Integer, Integer> cache;
     private Map<Integer, Integer> freq;
     private Map<Integer, LinkedHashSet<Integer>> freqList;
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public LFUCache(int capacity) {
         this.capacity = capacity;
         this.cache = new HashMap<>();
@@ -14,12 +40,26 @@ public class LFUCache {
         this.minFreq = 0;
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int get(int key) {
         if (!cache.containsKey(key)) return -1;
         incrementFreq(key);
         return cache.get(key);
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void put(int key, int value) {
         if (capacity <= 0) return;
         if (cache.containsKey(key)) {
@@ -53,6 +93,13 @@ public class LFUCache {
         freq.remove(evict);
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         LFUCache cache = new LFUCache(2);
         cache.put(1, 1);

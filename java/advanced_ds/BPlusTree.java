@@ -71,6 +71,13 @@ public class BPlusTree {
      * @param key Key to search
      * @return true if key exists
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean search(int key) {
         return search(root, key) != null;
     }
@@ -178,6 +185,13 @@ public class BPlusTree {
      * @param upper Upper bound
      * @return Keys in range
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public List<Integer> rangeSearch(int lower, int upper) {
         List<Integer> result = new ArrayList<>();
         Node leaf = findLeaf(root, lower);
@@ -232,6 +246,13 @@ public class BPlusTree {
         }
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Basic operations
         System.out.println("=== Example 1: Basic B+ Tree Operations ===");

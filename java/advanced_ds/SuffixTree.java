@@ -137,6 +137,13 @@ public class SuffixTree {
      * @param pattern Pattern to search
      * @return List of starting positions
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public List<Integer> search(String pattern) {
         List<Integer> positions = new ArrayList<>();
         Node node = root;
@@ -242,6 +249,13 @@ public class SuffixTree {
         return count;
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Pattern search
         System.out.println("=== Example 1: Pattern Search ===");

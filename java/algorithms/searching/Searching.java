@@ -44,6 +44,13 @@ public class Searching {
      * @param target value to find
      * @return index of {@code target} in {@code arr}, or {@code -1} if not present
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int binarySearch(int[] arr, int target) {
         if (arr == null) return -1;
         int lo = 0, hi = arr.length - 1;
@@ -74,6 +81,13 @@ public class Searching {
      * @param target value to find
      * @return index of {@code target} in {@code arr}, or {@code -1} if not present
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int binarySearchRecursive(int[] arr, int target) {
         if (arr == null) return -1;
         return bsRecHelper(arr, target, 0, arr.length - 1);
@@ -103,6 +117,13 @@ public class Searching {
      * @param arr    sorted array (may have duplicates)
      * @param target value to find
      * @return index of first occurrence, or {@code -1} if not present
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static int binarySearchFirst(int[] arr, int target) {
         if (arr == null) return -1;
@@ -137,6 +158,13 @@ public class Searching {
      * @param arr    sorted array (may have duplicates)
      * @param target value to find
      * @return index of last occurrence, or {@code -1} if not present
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static int binarySearchLast(int[] arr, int target) {
         if (arr == null) return -1;
@@ -176,6 +204,13 @@ public class Searching {
      * @param arr    rotated sorted array with distinct elements
      * @param target value to find
      * @return index of {@code target}, or {@code -1} if not present
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static int searchRotatedArray(int[] arr, int target) {
         if (arr == null) return -1;
@@ -219,6 +254,13 @@ public class Searching {
      * @param arr input array (need not be sorted)
      * @return index of a peak element, or {@code -1} for null/empty input
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int findPeak(int[] arr) {
         if (arr == null || arr.length == 0) return -1;
         int n = arr.length;
@@ -255,6 +297,13 @@ public class Searching {
      * @param arr    sorted array
      * @param target value to find
      * @return index of {@code target}, or {@code -1} if not present
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static int ternarySearch(int[] arr, int target) {
         if (arr == null) return -1;
@@ -294,6 +343,13 @@ public class Searching {
      * @param target value to find
      * @return index of {@code target}, or {@code -1} if not present
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int exponentialSearch(int[] arr, int target) {
         if (arr == null || arr.length == 0) return -1;
         if (arr[0] == target) return 0;
@@ -326,6 +382,13 @@ public class Searching {
      * @param arr    sorted array with uniformly distributed values
      * @param target value to find
      * @return index of {@code target}, or {@code -1} if not present
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static int interpolationSearch(int[] arr, int target) {
         if (arr == null) return -1;

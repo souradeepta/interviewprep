@@ -32,6 +32,13 @@ public class DP {
      * @param n non-negative index
      * @return F(n)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static long fibMemo(int n) {
         if (n <= 1) return n;
         if (fibMemo.containsKey(n)) return fibMemo.get(n);
@@ -48,6 +55,13 @@ public class DP {
      * @param n non-negative index
      * @return F(n)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static long fibTab(int n) {
         if (n <= 1) return n;
         long[] dp = new long[n + 1];
@@ -63,6 +77,13 @@ public class DP {
      *
      * @param n non-negative index
      * @return F(n)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static long fibSpaceOpt(int n) {
         if (n <= 1) return n;
@@ -113,6 +134,13 @@ public class DP {
      * @param capacity maximum weight capacity
      * @return int[] {maxValue, itemCount}
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int[] knapsack01(int[] weights, int[] values, int capacity) {
         int n = weights.length - 1; // items are 1..n
         int[][] dp = new int[n + 1][capacity + 1];
@@ -153,6 +181,13 @@ public class DP {
      * @param s1 first string
      * @param s2 second string
      * @return Object[] {Integer length, String lcsString}
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static Object[] lcs(String s1, String s2) {
         int m = s1.length(), n = s2.length();
@@ -196,6 +231,13 @@ public class DP {
      *
      * @param arr input array
      * @return Object[] {Integer length, int[] subsequence}
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static Object[] lis(int[] arr) {
         int n = arr.length;
@@ -270,6 +312,13 @@ public class DP {
      * @param s2 target string
      * @return edit distance (int)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static int editDistance(String s1, String s2) {
         int m = s1.length(), n = s2.length();
         int[][] dp = new int[m + 1][n + 1];
@@ -314,6 +363,13 @@ public class DP {
      * @param coins  available coin denominations
      * @param amount target amount
      * @return Object[] {Integer minCoins (-1 if impossible), List&lt;Integer&gt; coinsUsed}
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public static Object[] coinChange(int[] coins, int amount) {
         int[] dp = new int[amount + 1];
@@ -360,6 +416,13 @@ public class DP {
      *             Length must be n+1 for n matrices.
      * @return Object[] {Integer minOps, String parenthesization}
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static Object[] matrixChainMult(int[] dims) {
         int n = dims.length - 1; // number of matrices
         int[][] dp = new int[n][n];
@@ -396,6 +459,13 @@ public class DP {
     // Main demo
     // -----------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== Fibonacci ===");
         fibonacci(40);

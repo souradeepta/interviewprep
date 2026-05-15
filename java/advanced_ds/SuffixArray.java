@@ -105,6 +105,13 @@ public class SuffixArray {
      * @param pattern Pattern to find
      * @return List of starting positions (sorted)
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public List<Integer> findPattern(String pattern) {
         List<Integer> matches = new ArrayList<>();
 
@@ -170,6 +177,13 @@ public class SuffixArray {
         return lcp.clone();
     }
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         // Example 1: Basic suffix array
         System.out.println("=== Example 1: Suffix Array ===");

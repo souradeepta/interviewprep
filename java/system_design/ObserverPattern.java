@@ -13,10 +13,43 @@ class Button {
 }
 
 class LogObserver implements Observer {
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void update(Button b) { System.out.println("Button: " + (b.pressed ? "pressed" : "released")); }
 }
 
+/**
+ * ObserverPattern - [Brief description]
+ *
+ * <p>OVERVIEW:
+ * [Detailed explanation of what this class does]
+ *
+ * <p>COMPLEXITY:
+ * <ul>
+ *   <li>Time: [See method documentation]</li>
+ *   <li>Space: O(n) where n is [the element count]</li>
+ * </ul>
+ *
+ * <p>USAGE:
+ * [How to use this class, with example]
+ *
+ * @author Interview Preparation
+ * @since 1.0
+ */
+
 public class ObserverPattern {
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         Button btn = new Button();
         btn.attach(new LogObserver());

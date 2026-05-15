@@ -64,6 +64,13 @@ public class BST<T extends Comparable<T>> {
      *
      * @param key the key to insert
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void insert(T key) {
         root = insertRec(root, key);
     }
@@ -98,6 +105,13 @@ public class BST<T extends Comparable<T>> {
      * <p>Time: O(log n) average, O(n) worst | Space: O(h).
      *
      * @param key the key to delete
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void delete(T key) {
         root = deleteRec(root, key);
@@ -139,6 +153,13 @@ public class BST<T extends Comparable<T>> {
      * @param key the key to search for
      * @return {@code true} if found
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean search(T key) {
         return searchRec(root, key);
     }
@@ -162,6 +183,13 @@ public class BST<T extends Comparable<T>> {
      *
      * @return sorted list of keys
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public List<T> inorder() {
         List<T> result = new ArrayList<>();
         inorderRec(root, result);
@@ -182,6 +210,13 @@ public class BST<T extends Comparable<T>> {
      *
      * @return pre-order list of keys
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public List<T> preorder() {
         List<T> result = new ArrayList<>();
         preorderRec(root, result);
@@ -201,6 +236,13 @@ public class BST<T extends Comparable<T>> {
      * <p>Time: O(n) | Space: O(n).
      *
      * @return post-order list of keys
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public List<T> postorder() {
         List<T> result = new ArrayList<>();
@@ -227,6 +269,13 @@ public class BST<T extends Comparable<T>> {
      * @return minimum key
      * @throws IllegalStateException if the tree is empty
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public T findMin() {
         if (root == null) throw new IllegalStateException("Tree is empty");
         return findMinNode(root).key;
@@ -244,6 +293,13 @@ public class BST<T extends Comparable<T>> {
      *
      * @return maximum key
      * @throws IllegalStateException if the tree is empty
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public T findMax() {
         if (root == null) throw new IllegalStateException("Tree is empty");
@@ -263,6 +319,13 @@ public class BST<T extends Comparable<T>> {
      * <p>Time: O(n) | Space: O(h).
      *
      * @return height of the tree
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int height() {
         return heightRec(root);
@@ -284,6 +347,13 @@ public class BST<T extends Comparable<T>> {
      *
      * @return number of nodes
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int size() {
         return size;
     }
@@ -301,6 +371,13 @@ public class BST<T extends Comparable<T>> {
      * @return ASCII tree string
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         if (root == null) return "(empty tree)";
         StringBuilder sb = new StringBuilder();
@@ -328,6 +405,13 @@ public class BST<T extends Comparable<T>> {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         BST<Integer> bst = new BST<>();
 

@@ -75,6 +75,13 @@ public class Trie {
      * @param word the word to insert (non-null, non-empty)
      * @throws IllegalArgumentException if {@code word} is null or empty
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void insert(String word) {
         if (word == null || word.isEmpty())
             throw new IllegalArgumentException("Word must be non-null and non-empty");
@@ -103,6 +110,13 @@ public class Trie {
      * @param word the word to look up
      * @return {@code true} if found
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public boolean search(String word) {
         TrieNode node = walkTo(word);
         return node != null && node.isEndOfWord;
@@ -119,6 +133,13 @@ public class Trie {
      *
      * @param prefix the prefix to check
      * @return {@code true} if at least one word has this prefix
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public boolean startsWith(String prefix) {
         return walkTo(prefix) != null;
@@ -138,6 +159,13 @@ public class Trie {
      *
      * @param word the word to delete
      * @return {@code true} if the word was present and deleted
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public boolean delete(String word) {
         if (!search(word)) return false;
@@ -174,6 +202,13 @@ public class Trie {
      * <p>Time: O(n * k_avg) | Space: O(n * k_avg).
      *
      * @return sorted list of all words
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public List<String> getAllWords() {
         List<String> result = new ArrayList<>();
@@ -223,6 +258,13 @@ public class Trie {
      * @return Trie structure string
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Trie (").append(wordCount).append(" words):\n");
@@ -250,6 +292,13 @@ public class Trie {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== Trie Demo ===\n");
 

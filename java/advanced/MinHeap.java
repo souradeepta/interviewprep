@@ -78,6 +78,13 @@ public class MinHeap {
      *
      * @param val the value to insert
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void insert(int val) {
         if (size == heap.length) grow();
         heap[size] = val;
@@ -97,6 +104,13 @@ public class MinHeap {
      *
      * @param i the starting index
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public void heapifyUp(int i) {
         while (i > 0 && heap[parent(i)] > heap[i]) {
             swap(i, parent(i));
@@ -115,6 +129,13 @@ public class MinHeap {
      *
      * @return the minimum value
      * @throws IllegalStateException if the heap is empty
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int extractMin() {
         if (size == 0) throw new IllegalStateException("Heap is empty");
@@ -136,6 +157,13 @@ public class MinHeap {
      * <p>Time: O(log n) | Space: O(1).
      *
      * @param i the starting index
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void heapifyDown(int i) {
         int smallest = i;
@@ -163,6 +191,13 @@ public class MinHeap {
      * @return the minimum value
      * @throws IllegalStateException if the heap is empty
      */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public int peek() {
         if (size == 0) throw new IllegalStateException("Heap is empty");
         return heap[0];
@@ -182,6 +217,13 @@ public class MinHeap {
      * <p>Time: O(n) | Space: O(1) auxiliary (plus the array copy).
      *
      * @param arr the source array (not modified)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public void buildHeap(int[] arr) {
         heap = Arrays.copyOf(arr, Math.max(arr.length, DEFAULT_CAPACITY));
@@ -206,6 +248,13 @@ public class MinHeap {
      * <p>Time: O(n log n) | Space: O(n).
      *
      * @return sorted array (ascending)
+     */
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
      */
     public int[] heapSort() {
         // Work on a snapshot so this heap is unchanged
@@ -260,6 +309,13 @@ public class MinHeap {
      * @return multi-line heap representation
      */
     @Override
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public String toString() {
         if (size == 0) return "(empty heap)";
         StringBuilder sb = new StringBuilder();
@@ -295,6 +351,13 @@ public class MinHeap {
     // Main – demo
     // -------------------------------------------------------------------------
 
+    /**
+     * [Brief description]
+     *
+     * @param [param] [description]
+     * @return [description]
+     * @time O([complexity])
+     */
     public static void main(String[] args) {
         System.out.println("=== MinHeap Demo ===\n");
 
