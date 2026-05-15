@@ -160,6 +160,249 @@ Step 4: Regular vehicle exits
 - Available: R=3
 - Status: EMPTY, ready for next car
 
+
+### Python Implementation
+
+```python
+from enum import Enum
+from typing import Optional
+
+class VehicleSize(Enum):
+    COMPACT = 1
+    REGULAR = 2
+    LARGE = 3
+
+class ParkingSpot:
+    def __init__(self, spot_number: int, size: VehicleSize):
+        self.spot_number = spot_number
+        self.size = size
+        self.occupied = False
+        self.vehicle = None
+
+    def is_available(self) -> bool:
+        return not self.occupied
+
+    def park_vehicle(self, vehicle):
+        if self.occupied:
+            raise Exception("Spot already occupied")
+        self.occupied = True
+        self.vehicle = vehicle
+
+    def remove_vehicle(self):
+        self.occupied = False
+        self.vehicle = None
+
+class Level:
+    def __init__(self, level_number: int, num_spots: int):
+        self.level_number = level_number
+        self.spots = []
+        self.available_count = {size: 0 for size in VehicleSize}
+
+        # Create spots (30% compact, 50% regular, 20% large)
+        compact = int(num_spots * 0.3)
+        regular = int(num_spots * 0.5)
+        large = num_spots - compact - regular
+
+        spot_num = 0
+        for _ in range(compact):
+            self.spots.append(ParkingSpot(spot_num, VehicleSize.COMPACT))
+            spot_num += 1
+
+        for _ in range(regular):
+            self.spots.append(ParkingSpot(spot_num, VehicleSize.REGULAR))
+            spot_num += 1
+
+        for _ in range(large):
+            self.spots.append(ParkingSpot(spot_num, VehicleSize.LARGE))
+            spot_num += 1
+
+        self._update_available()
+
+    def find_available_spot(self, size: VehicleSize) -> Optional[ParkingSpot]:
+        for spot in self.spots:
+            if spot.is_available() and spot.size.value >= size.value:
+                return spot
+        return None
+
+    def park_vehicle(self, vehicle, size: VehicleSize) -> Optional[ParkingSpot]:
+        spot = self.find_available_spot(size)
+        if spot:
+            spot.park_vehicle(vehicle)
+            self._update_available()
+        return spot
+
+    def unpark_vehicle(self, spot: ParkingSpot):
+        spot.remove_vehicle()
+        self._update_available()
+
+    def _update_available(self):
+        for size in VehicleSize:
+            self.available_count[size] = sum(
+                1 for spot in self.spots
+                if spot.is_available() and spot.size == size
+            )
+
+    def get_available_count(self, size: VehicleSize) -> int:
+        return self.available_count.get(size, 0)
+
+class ParkingLot:
+    def __init__(self, num_levels: int, spots_per_level: int):
+        self.levels = [Level(i, spots_per_level) for i in range(num_levels)]
+
+    def park_vehicle(self, vehicle, size: VehicleSize) -> bool:
+        for level in self.levels:
+            if level.get_available_count(size) > 0:
+                spot = level.park_vehicle(vehicle, size)
+                if spot:
+                    print(f"Vehicle {vehicle} parked at L{level.level_number}:S{spot.spot_number}")
+                    return True
+        print("No available spot")
+        return False
+
+    def unpark_vehicle(self, level_num: int, spot_num: int):
+        level = self.levels[level_num]
+        spot = level.spots[spot_num]
+        level.unpark_vehicle(spot)
+        print(f"Vehicle {spot.vehicle} unparked")
+
+    def display_availability(self):
+        for level in self.levels:
+            print(f"Level {level.level_number}:")
+            for size in VehicleSize:
+                print(f"  {size.name}: {level.get_available_count(size)}")
+
+# Usage
+lot = ParkingLot(3, 10)
+lot.park_vehicle("CAR1", VehicleSize.COMPACT)
+lot.park_vehicle("CAR2", VehicleSize.REGULAR)
+lot.park_vehicle("TRUCK1", VehicleSize.LARGE)
+lot.display_availability()
+```
+
+### Java Implementation
+
+```java
+import java.util.*;
+
+enum VehicleSize {
+    COMPACT(1), REGULAR(2), LARGE(3);
+    private int value;
+    VehicleSize(int value) { this.value = value; }
+    public int getValue() { return value; }
+}
+
+class ParkingSpot {
+    private int spotNumber;
+    private VehicleSize size;
+    private String vehicle;
+
+    public ParkingSpot(int spotNumber, VehicleSize size) {
+        this.spotNumber = spotNumber;
+        this.size = size;
+        this.vehicle = null;
+    }
+
+    public boolean isAvailable() { return vehicle == null; }
+    public void parkVehicle(String vehicle) { this.vehicle = vehicle; }
+    public void removeVehicle() { this.vehicle = null; }
+    public boolean canFit(VehicleSize size) {
+        return this.size.getValue() >= size.getValue();
+    }
+}
+
+class Level {
+    private int levelNumber;
+    private List<ParkingSpot> spots;
+
+    public Level(int levelNumber, int numSpots) {
+        this.levelNumber = levelNumber;
+        this.spots = new ArrayList<>();
+
+        int compact = (int)(numSpots * 0.3);
+        int regular = (int)(numSpots * 0.5);
+        int large = numSpots - compact - regular;
+
+        int spotNum = 0;
+        for (int i = 0; i < compact; i++)
+            spots.add(new ParkingSpot(spotNum++, VehicleSize.COMPACT));
+        for (int i = 0; i < regular; i++)
+            spots.add(new ParkingSpot(spotNum++, VehicleSize.REGULAR));
+        for (int i = 0; i < large; i++)
+            spots.add(new ParkingSpot(spotNum++, VehicleSize.LARGE));
+    }
+
+    public ParkingSpot findAvailableSpot(VehicleSize size) {
+        for (ParkingSpot spot : spots) {
+            if (spot.isAvailable() && spot.canFit(size)) {
+                return spot;
+            }
+        }
+        return null;
+    }
+
+    public boolean parkVehicle(String vehicle, VehicleSize size) {
+        ParkingSpot spot = findAvailableSpot(size);
+        if (spot != null) {
+            spot.parkVehicle(vehicle);
+            return true;
+        }
+        return false;
+    }
+}
+
+class ParkingLot {
+    private List<Level> levels;
+
+    public ParkingLot(int numLevels, int spotsPerLevel) {
+        this.levels = new ArrayList<>();
+        for (int i = 0; i < numLevels; i++) {
+            levels.add(new Level(i, spotsPerLevel));
+        }
+    }
+
+    public boolean parkVehicle(String vehicle, VehicleSize size) {
+        for (Level level : levels) {
+            if (level.parkVehicle(vehicle, size)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+### Implementation Discussion
+
+**Design Choices:**
+- Separate spot size classes (avoids enum comparison issues)
+- Level abstraction for scalability
+- Available count tracking (O(1) lookup)
+
+**Optimization:**
+```python
+# Use heap for finding closest available spot
+import heapq
+
+class OptimizedLevel:
+    def __init__(self):
+        self.available_heaps = {
+            VehicleSize.COMPACT: [],
+            VehicleSize.REGULAR: [],
+            VehicleSize.LARGE: []
+        }
+
+    def find_closest_spot(self, size):
+        # O(log n) instead of O(n)
+        return heapq.heappop(self.available_heaps[size])
+```
+
+**Production Features:**
+- Payment tracking (entry/exit times)
+- Handicap spot priority
+- Reservation system
+- Analytics (occupancy rate)
+
+
 ## Complexity
 
 | Operation | Time | Space |

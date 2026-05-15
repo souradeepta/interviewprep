@@ -171,6 +171,43 @@ Each strategy encapsulated; PaymentProcessor doesn't know implementation details
 | Avoids conditionals | Context must know strategy interface |
 | Easy testing | Extra indirection |
 
+### Strategy Pattern - Python
+
+```python
+from abc import ABC, abstractmethod
+
+class PaymentStrategy(ABC):
+    @abstractmethod
+    def pay(self, amount):
+        pass
+
+class CreditCardPayment(PaymentStrategy):
+    def pay(self, amount):
+        print(f'Paying {amount} via Credit Card')
+        # Validate card, charge
+        return True
+
+class PayPalPayment(PaymentStrategy):
+    def pay(self, amount):
+        print(f'Paying {amount} via PayPal')
+        # OAuth, transfer funds
+        return True
+
+class PaymentProcessor:
+    def __init__(self, strategy: PaymentStrategy):
+        self.strategy = strategy
+    
+    def process(self, amount):
+        return self.strategy.pay(amount)
+
+# Usage
+processor = PaymentProcessor(CreditCardPayment())
+processor.process(100)  # Credit Card
+
+processor = PaymentProcessor(PayPalPayment())
+processor.process(100)  # PayPal
+```
+
 ## Complexity
 
 | Operation | Time |

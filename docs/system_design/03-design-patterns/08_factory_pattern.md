@@ -137,6 +137,49 @@ Step 5: Add new shape (Triangle) - factory modification
 | Easy to extend | More complex |
 | Follows OCP | Overhead for simple cases |
 
+### Factory Pattern - Python
+
+```python
+from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        pass
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+    
+    def area(self):
+        return 3.14 * self.radius ** 2
+
+class Square(Shape):
+    def __init__(self, side):
+        self.side = side
+    
+    def area(self):
+        return self.side ** 2
+
+class ShapeFactory:
+    @staticmethod
+    def create_shape(shape_type, **kwargs):
+        if shape_type == 'circle':
+            return Circle(kwargs['radius'])
+        elif shape_type == 'square':
+            return Square(kwargs['side'])
+        else:
+            raise ValueError(f'Unknown shape: {shape_type}')
+
+# Usage
+factory = ShapeFactory()
+shape1 = factory.create_shape('circle', radius=5)
+print(f'Circle area: {shape1.area()}')  # 78.5
+
+shape2 = factory.create_shape('square', side=10)
+print(f'Square area: {shape2.area()}')  # 100
+```
+
 ## Complexity
 
 | Operation | Time |

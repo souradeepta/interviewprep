@@ -157,6 +157,166 @@ Step 5: User clicks shortened URL
 | Distributed ID | Scalable, distributed | Complex, more state |
 | Hash + Random | No coordination | Collision handling |
 
+
+### Python Implementation
+
+```python
+import hashlib
+import time
+from typing import Optional
+
+class URLShortener:
+    def __init__(self):
+        self.counter = 0
+        self.url_map = {}  # short_code -> long_url
+        self.reverse_map = {}  # long_url -> short_code
+
+    def shorten(self, long_url: str) -> str:
+        # Check if already shortened
+        if long_url in self.reverse_map:
+            return self.reverse_map[long_url]
+
+        # Generate short code using counter + base62
+        self.counter += 1
+        short_code = self._to_base62(self.counter)
+
+        # Store mapping
+        self.url_map[short_code] = long_url
+        self.reverse_map[long_url] = short_code
+
+        return f"https://short.url/{short_code}"
+
+    def expand(self, short_code: str) -> Optional[str]:
+        return self.url_map.get(short_code)
+
+    def _to_base62(self, num: int) -> str:
+        """Convert number to base62 (0-9, a-z, A-Z)"""
+        if num == 0:
+            return '0'
+
+        chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        result = []
+
+        while num:
+            result.append(chars[num % 62])
+            num //= 62
+
+        return ''.join(reversed(result))
+
+class SnowflakeIDGenerator:
+    """
+    Distributed ID generator (simplified Snowflake)
+    64-bit: [timestamp(41) | machine_id(10) | sequence(12)]
+    """
+
+    def __init__(self, machine_id: int):
+        self.machine_id = machine_id
+        self.sequence = 0
+        self.last_timestamp = 0
+
+    def generate_id(self) -> int:
+        timestamp = int(time.time() * 1000)  # milliseconds
+
+        if timestamp == self.last_timestamp:
+            self.sequence += 1
+            if self.sequence >= (1 << 12):  # overflow
+                self.sequence = 0
+                timestamp += 1  # wait for next ms
+        else:
+            self.sequence = 0
+
+        self.last_timestamp = timestamp
+
+        # Combine: [timestamp(41) | machine_id(10) | sequence(12)]
+        return (timestamp << 22) | (self.machine_id << 12) | self.sequence
+
+# Usage
+shortener = URLShortener()
+long_url = "https://www.example.com/very/long/path?param=value"
+short = shortener.shorten(long_url)
+print(f"Short: {short}")
+print(f"Expand: {shortener.expand(short.split('/')[-1])}")
+```
+
+### Java Implementation
+
+```java
+import java.util.*;
+
+class URLShortener {
+    private long counter;
+    private Map<String, String> urlMap;
+    private Map<String, String> reverseMap;
+    private static final String BASE62 =
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    public URLShortener() {
+        this.counter = 0;
+        this.urlMap = new HashMap<>();
+        this.reverseMap = new HashMap<>();
+    }
+
+    public String shorten(String longUrl) {
+        if (reverseMap.containsKey(longUrl)) {
+            return reverseMap.get(longUrl);
+        }
+
+        String shortCode = toBase62(++counter);
+        urlMap.put(shortCode, longUrl);
+        reverseMap.put(longUrl, shortCode);
+
+        return "https://short.url/" + shortCode;
+    }
+
+    public String expand(String shortCode) {
+        return urlMap.get(shortCode);
+    }
+
+    private String toBase62(long num) {
+        if (num == 0) return "0";
+
+        StringBuilder result = new StringBuilder();
+        while (num > 0) {
+            result.insert(0, BASE62.charAt((int)(num % 62)));
+            num /= 62;
+        }
+        return result.toString();
+    }
+}
+```
+
+### Implementation Discussion
+
+**ID Generation Strategies:**
+
+1. **Counter-based (Simple):**
+   - Pros: simple, sequential
+   - Cons: central bottleneck, not distributed
+
+2. **Snowflake (Production):**
+   - Pros: distributed, no conflicts
+   - Cons: requires NTP sync, bit allocation
+
+3. **Hash-based (Alternative):**
+```python
+def hash_based_shorten(long_url: str) -> str:
+    hash_val = int(hashlib.md5(long_url.encode()).hexdigest(), 16)
+    short_code = to_base62(hash_val % (62**6))  # 6 chars
+    return short_code
+```
+
+**Deduplication:**
+- Store reverse mapping (long_url → short_code)
+- Check before generating new code
+- Saves storage, enables caching
+
+**Production Considerations:**
+- Store in DB with TTL (1 year default)
+- Cache in Redis (hot URLs)
+- Handle collisions gracefully
+- Track stats (creation time, expiry, access)
+
+
 ## Complexity
 
 | Operation | Time | Space |

@@ -58,7 +58,112 @@ Before: 1 <-> 2 <-> 4 <-> 3
 After:  2 <-> 4 <-> 3 <-> 5  (evict 1, add 5 at front)
 ```
 
-### Complexity
+#
+### Python Implementation
+
+```python
+from collections import OrderedDict
+from typing import Optional
+
+class LRUCache:
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = OrderedDict()
+
+    def get(self, key: int) -> int:
+        if key not in self.cache:
+            return -1
+
+        # Move to end (most recent)
+        self.cache.move_to_end(key)
+        return self.cache[key]
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.cache:
+            self.cache.move_to_end(key)
+
+        self.cache[key] = value
+
+        if len(self.cache) > self.capacity:
+            # Remove least recent (first item)
+            self.cache.popitem(last=False)
+
+# Usage
+cache = LRUCache(3)
+cache.put(1, 1)   # {1: 1}
+cache.put(2, 2)   # {1: 1, 2: 2}
+cache.put(3, 3)   # {1: 1, 2: 2, 3: 3}
+print(cache.get(1))  # 1 -> {2: 2, 3: 3, 1: 1}
+cache.put(4, 4)   # {3: 3, 1: 1, 4: 4} (evict 2)
+```
+
+### Java Implementation
+
+```java
+import java.util.*;
+
+class LRUCache {
+    private int capacity;
+    private LinkedHashMap<Integer, Integer> cache;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.cache = new LinkedHashMap<Integer, Integer>(capacity, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry eldest) {
+                return size() > capacity;
+            }
+        };
+    }
+
+    public int get(int key) {
+        return cache.getOrDefault(key, -1);
+    }
+
+    public void put(int key, int value) {
+        cache.put(key, value);
+    }
+}
+```
+
+### Implementation Discussion
+
+**Why OrderedDict/LinkedHashMap?**
+- Maintains insertion order + access order (when access_order=true)
+- O(1) get, put, remove operations
+- Built-in eviction policy via overriding removeEldestEntry
+
+**Thread Safety (Production):**
+```python
+from threading import RLock
+
+class ThreadSafeLRUCache:
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = OrderedDict()
+        self.lock = RLock()
+
+    def get(self, key: int) -> int:
+        with self.lock:
+            if key not in self.cache:
+                return -1
+            self.cache.move_to_end(key)
+            return self.cache[key]
+```
+
+**Edge Cases Handled:**
+- Negative keys/values: store as-is
+- Duplicate puts: update + move to end
+- Capacity=1: works correctly (always evict old)
+- Empty cache get: returns -1
+
+**Optimization Notes:**
+- OrderedDict: good for medium capacity (< 1M items)
+- For larger caches: consider sharded approach (shard by key % num_shards)
+- Cache warming: pre-load hot keys on startup
+
+
+## Complexity
 
 | Operation | Time | Space |
 |-----------|------|-------|

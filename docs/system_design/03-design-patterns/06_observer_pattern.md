@@ -158,6 +158,41 @@ Step 7: Observer detaches (cleanup)
 | Supports broadcast | Debugging can be harder |
 | Open/Closed principle | Observer must check what changed |
 
+### Observer Pattern - Python
+
+```python
+class Subject:
+    def __init__(self):
+        self.observers = []
+    
+    def attach(self, observer):
+        self.observers.append(observer)
+    
+    def notify(self, **kwargs):
+        for observer in self.observers:
+            observer.update(**kwargs)
+
+class Observer:
+    def update(self, **kwargs):
+        raise NotImplementedError
+
+class StockPrice(Subject):
+    def __init__(self):
+        super().__init__()
+        self._price = 0
+    
+    def set_price(self, price):
+        self._price = price
+        self.notify(price=price)
+
+class Trader(Observer):
+    def update(self, **kwargs):
+        price = kwargs['price']
+        print(f'Trader notified: price={price}')
+        if price > 150:
+            print('Sell signal!')
+```
+
 ## Complexity
 
 | Operation | Time |

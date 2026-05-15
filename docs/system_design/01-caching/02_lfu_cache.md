@@ -58,7 +58,171 @@ PUT(key, value):
   - Insert/update with freq=1, set min_freq=1
 ```
 
-### Complexity
+#
+### Python Implementation
+
+```python
+from collections import defaultdict
+from typing import Optional
+
+class LFUCache:
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.min_freq = 0
+        self.freq_map = defaultdict(list)      # freq -> [keys]
+        self.key_freq = {}                      # key -> freq
+        self.key_value = {}                     # key -> value
+
+    def get(self, key: int) -> int:
+        if key not in self.key_value:
+            return -1
+
+        self._increase_freq(key)
+        return self.key_value[key]
+
+    def put(self, key: int, value: int) -> None:
+        if self.capacity <= 0:
+            return
+
+        if key in self.key_value:
+            self.key_value[key] = value
+            self._increase_freq(key)
+            return
+
+        if len(self.key_value) >= self.capacity:
+            self._evict_lfu()
+
+        self.key_value[key] = value
+        self.key_freq[key] = 1
+        self.freq_map[1].append(key)
+        self.min_freq = 1
+
+    def _increase_freq(self, key: int) -> None:
+        freq = self.key_freq[key]
+        self.key_freq[key] = freq + 1
+
+        # Remove from old freq list
+        self.freq_map[freq].remove(key)
+
+        # Add to new freq list
+        self.freq_map[freq + 1].append(key)
+
+        # Update min_freq if needed
+        if len(self.freq_map[freq]) == 0 and freq == self.min_freq:
+            self.min_freq = freq + 1
+
+    def _evict_lfu(self) -> None:
+        # Evict LFU (first in list at min_freq)
+        lfu_key = self.freq_map[self.min_freq].pop(0)
+        del self.key_value[lfu_key]
+        del self.key_freq[lfu_key]
+
+# Usage
+cache = LFUCache(2)
+cache.put(1, 1)   # freq: {1: 1}
+cache.put(2, 2)   # freq: {1: [1,2]}
+cache.get(1)      # freq: {1: [2], 2: [1]}
+cache.put(3, 3)   # evict 2 (freq=1), freq: {2: [1], 1: [3]}
+```
+
+### Java Implementation
+
+```java
+import java.util.*;
+
+class LFUCache {
+    private int capacity;
+    private int minFreq;
+    private Map<Integer, Integer> keyValue;
+    private Map<Integer, Integer> keyFreq;
+    private Map<Integer, LinkedList<Integer>> freqList;
+
+    public LFUCache(int capacity) {
+        this.capacity = capacity;
+        this.minFreq = 0;
+        this.keyValue = new HashMap<>();
+        this.keyFreq = new HashMap<>();
+        this.freqList = new HashMap<>();
+    }
+
+    public int get(int key) {
+        if (!keyValue.containsKey(key)) return -1;
+        increaseFreq(key);
+        return keyValue.get(key);
+    }
+
+    public void put(int key, int value) {
+        if (capacity <= 0) return;
+
+        if (keyValue.containsKey(key)) {
+            keyValue.put(key, value);
+            increaseFreq(key);
+            return;
+        }
+
+        if (keyValue.size() >= capacity) {
+            evictLFU();
+        }
+
+        keyValue.put(key, value);
+        keyFreq.put(key, 1);
+        freqList.computeIfAbsent(1, k -> new LinkedList<>()).add(key);
+        minFreq = 1;
+    }
+
+    private void increaseFreq(int key) {
+        int freq = keyFreq.get(key);
+        keyFreq.put(key, freq + 1);
+
+        freqList.get(freq).remove(Integer.valueOf(key));
+        freqList.computeIfAbsent(freq + 1, k -> new LinkedList<>()).add(key);
+
+        if (freqList.get(freq).isEmpty() && freq == minFreq) {
+            minFreq = freq + 1;
+        }
+    }
+
+    private void evictLFU() {
+        int lfuKey = freqList.get(minFreq).removeFirst();
+        keyValue.remove(lfuKey);
+        keyFreq.remove(lfuKey);
+    }
+}
+```
+
+### Implementation Discussion
+
+**Why separate maps?**
+- keyValue: store actual data
+- keyFreq: track frequency for each key
+- freqList: quickly find all keys at a frequency
+
+**Tie-breaking (LRU within same frequency):**
+- LinkedList maintains insertion order
+- Oldest key at frequency F evicted first
+- Achieved via removeFirst() on LRU in freq list
+
+**Complexity Analysis:**
+- get/put: O(1) average, all operations on HashMap/LinkedList
+- Space: O(capacity + frequencies)
+
+**Optimization for Production:**
+```python
+class OptimizedLFUCache:
+    def __init__(self, capacity: int):
+        # Cache hot items (high frequency)
+        self.hot_cache = {}  # Direct access, no re-hashing
+        # Maintain freq separately for better cache locality
+        self.freqs = []      # Index by key for O(1) lookup
+```
+
+**Edge Cases:**
+- Frequency overflow: cap at max frequency or use sliding window
+- Capacity=1: works, always evict and add new item
+- Get on missing key: return -1, don't create entry
+
+
+## Complexity
 
 | Operation | Time | Space |
 |-----------|------|-------|

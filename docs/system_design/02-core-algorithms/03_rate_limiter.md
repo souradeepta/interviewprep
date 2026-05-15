@@ -154,6 +154,164 @@ Step 4: t=0.65s, User1 makes 15 requests
 | Sliding Window Log | Accurate | O(n) memory, O(n) per request |
 | Sliding Window Counter | Fast, O(1) | Less accurate than log |
 
+
+### Python Implementation (Token Bucket)
+
+```python
+import time
+from typing import Dict
+
+class TokenBucket:
+    def __init__(self, capacity: float, refill_rate: float):
+        """
+        capacity: max tokens in bucket
+        refill_rate: tokens per second
+        """
+        self.capacity = capacity
+        self.refill_rate = refill_rate
+        self.tokens = capacity
+        self.last_refill = time.time()
+
+    def is_allowed(self, tokens: float = 1.0) -> bool:
+        self._refill()
+
+        if self.tokens >= tokens:
+            self.tokens -= tokens
+            return True
+        return False
+
+    def _refill(self) -> None:
+        now = time.time()
+        elapsed = now - self.last_refill
+
+        # Add tokens based on elapsed time
+        self.tokens = min(
+            self.capacity,
+            self.tokens + elapsed * self.refill_rate
+        )
+        self.last_refill = now
+
+class RateLimiter:
+    def __init__(self):
+        self.buckets: Dict[str, TokenBucket] = {}
+
+    def is_allowed(self, user_id: str, limit: int = 10) -> bool:
+        """Check if request allowed, limit=10 req/sec"""
+        if user_id not in self.buckets:
+            # capacity=limit, refill_rate=limit req/sec
+            self.buckets[user_id] = TokenBucket(limit, limit)
+
+        return self.buckets[user_id].is_allowed(1)
+
+# Usage
+limiter = RateLimiter()
+for i in range(15):
+    allowed = limiter.is_allowed("user1")
+    print(f"Request {i+1}: {'allowed' if allowed else 'denied'}")
+    # First 10: allowed, 11-15: denied (need 0.1s per token)
+```
+
+### Java Implementation
+
+```java
+import java.util.*;
+
+class TokenBucket {
+    private double capacity;
+    private double refillRate;
+    private double tokens;
+    private long lastRefill;
+
+    public TokenBucket(double capacity, double refillRate) {
+        this.capacity = capacity;
+        this.refillRate = refillRate;
+        this.tokens = capacity;
+        this.lastRefill = System.currentTimeMillis();
+    }
+
+    public synchronized boolean isAllowed(double tokensRequired) {
+        refill();
+        if (tokens >= tokensRequired) {
+            tokens -= tokensRequired;
+            return true;
+        }
+        return false;
+    }
+
+    private void refill() {
+        long now = System.currentTimeMillis();
+        long elapsedMs = now - lastRefill;
+        double elapsedSec = elapsedMs / 1000.0;
+
+        tokens = Math.min(
+            capacity,
+            tokens + elapsedSec * refillRate
+        );
+        lastRefill = now;
+    }
+}
+
+class RateLimiter {
+    private Map<String, TokenBucket> buckets = new ConcurrentHashMap<>();
+
+    public boolean isAllowed(String userId, int limit) {
+        buckets.putIfAbsent(userId, new TokenBucket(limit, limit));
+        return buckets.get(userId).isAllowed(1);
+    }
+}
+```
+
+### Implementation Discussion
+
+**Token Bucket vs Sliding Window:**
+- Token Bucket: allows burst (refill mechanism)
+- Sliding Window: strict rate limiting
+- Token Bucket better for most APIs (allows natural bursts)
+
+**Distributed Rate Limiting (Redis):**
+```python
+import redis
+
+class DistributedRateLimiter:
+    def __init__(self, redis_host='localhost'):
+        self.redis = redis.Redis(host=redis_host)
+
+    def is_allowed(self, user_id: str, limit: int, window: int):
+        """
+        limit: max requests
+        window: time window in seconds
+        """
+        key = f"rate_limit:{user_id}"
+
+        # Lua script for atomic operation
+        script = """
+        local current = redis.call('get', KEYS[1])
+        if current == false then
+            redis.call('setex', KEYS[1], ARGV[2], 1)
+            return 1
+        elseif tonumber(current) < tonumber(ARGV[1]) then
+            redis.call('incr', KEYS[1])
+            return 1
+        else
+            return 0
+        end
+        """
+
+        return self.redis.eval(script, 1, key, limit, window)
+```
+
+**Production Considerations:**
+- Use Redis Sorted Set for distributed rate limiting
+- Track per-IP + per-user (prevent header spoofing)
+- Implement circuit breaker when rate limit exceeded
+- Monitor rate limit violations for abuse detection
+
+**Edge Cases:**
+- Clock skew: use NTP synchronization
+- Burst handling: capacity > limit allows initial burst
+- Timeout: don't store indefinitely (cleanup old entries)
+
+
 ## Complexity
 
 | Operation | Token Bucket | Sliding Log | Sliding Counter |
