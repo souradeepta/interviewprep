@@ -62,6 +62,20 @@ Ring with N nodes:
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Key Arrives"] --> B["Hash Key<br/>to ring position"]
+    B --> C["Find Server<br/>Clockwise from Hash"]
+    C --> D["Check if Server Up"]
+    D --> E{Server Healthy?}
+    E -->|Yes| F["Route to Server"]
+    E -->|No| G["Skip to Next<br/>Server on Ring"]
+    G --> D
+    F --> H["Store/Retrieve Data"]
+```
+
 ## Implementation
 
 ### Python Implementation

@@ -371,7 +371,23 @@ class ParkingLot {
 }
 ```
 
-### Implementation Discussion
+### Flow Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Entrance
+    Entrance --> CheckAvailability
+    CheckAvailability --> AvailableSpots
+    AvailableSpots --> GetTicket
+    GetTicket --> Park
+    Park --> Parked
+    Parked --> CheckOut
+    CheckOut --> Payment
+    Payment --> Exit
+    Exit --> [*]
+```
+
+## Implementation Discussion
 
 **Design Choices:**
 - Separate spot size classes (avoids enum comparison issues)

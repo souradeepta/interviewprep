@@ -67,6 +67,30 @@ Request span (100ms):
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API as API Gateway
+    participant AuthSvc as Auth Service
+    participant Cache
+    participant Collector as Collector
+
+    Client->>API: Request (trace_id=123)
+    Note over API: Span: API-1 (0-100ms)
+    par
+        API->>AuthSvc: Verify (parent=API-1)
+        Note over AuthSvc: Span: Auth-1 (10-40ms)
+        API->>Cache: Get Data (parent=API-1)
+        Note over Cache: Span: Cache-1 (50-80ms)
+    end
+    API-->>Client: Response
+    API->>Collector: Send Spans
+    AuthSvc->>Collector: Send Span
+    Cache->>Collector: Send Span
+```
+
 ## Implementation
 
 ### Python Implementation

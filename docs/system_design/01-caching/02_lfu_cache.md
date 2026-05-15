@@ -190,7 +190,23 @@ class LFUCache {
 }
 ```
 
-### Implementation Discussion
+### Flow Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> Request
+    Request --> CacheCheck
+    CacheCheck --> Hit: Found
+    CacheCheck --> Miss: Not Found
+    Hit --> UpdateFreq
+    UpdateFreq --> Return
+    Miss --> Fetch
+    Fetch --> Cache
+    Cache --> UpdateFreq
+    Return --> [*]
+```
+
+## Implementation Discussion
 
 **Why separate maps?**
 - keyValue: store actual data

@@ -56,6 +56,28 @@ User → App → OAuth provider → Login → Token → Access resource
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant App as Application
+    participant Provider as OAuth Provider
+
+    User->>App: Click Login
+    App->>Provider: Redirect with client_id
+    Provider->>User: Show Login
+    User->>Provider: Enter Credentials
+    Provider->>User: Request Permissions
+    User->>Provider: Grant
+    Provider->>App: Redirect with auth_code
+    App->>Provider: POST code + client_secret
+    Provider-->>App: access_token
+    App->>Provider: GET user_info
+    Provider-->>App: User Data
+    App-->>User: Logged In
+```
+
 ## Implementation
 
 ### Python Implementation

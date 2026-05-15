@@ -68,6 +68,20 @@ Alertmanager → Slack/PagerDuty
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Event Occurs"] --> B["Collect Metric"]
+    B --> C["Store in TSDB"]
+    C --> D["Query Metrics"]
+    D --> E["Evaluate Rules"]
+    E --> F{Threshold<br/>Exceeded?}
+    F -->|Yes| G["Create Alert"]
+    G --> H["Notify Team"]
+    H --> I["Incident Management"]
+```
+
 ## Implementation
 
 ### Python Implementation

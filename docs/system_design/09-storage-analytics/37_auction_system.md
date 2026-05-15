@@ -118,6 +118,32 @@ eBay: 10M concurrent auctions, 100K bids/sec. Bid validation O(1). State transit
 └────────────────────────┘
 ```
 
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant AuctionSvc as Auction Service
+    participant BidSvc as Bid Service
+    participant DB
+    participant Payment
+
+    User->>API: Create Auction
+    API->>AuctionSvc: Create
+    AuctionSvc->>DB: Store
+
+    User->>API: Place Bid
+    API->>BidSvc: Validate Bid
+    BidSvc->>DB: Check Current Highest
+    BidSvc->>DB: Store Bid
+
+    Note over User,Payment: At Auction End
+    AuctionSvc->>DB: Finalize
+    AuctionSvc->>Payment: Process Payment
+    Payment-->>User: Confirmation
+```
+
 ## Implementation
 
 ### Python Implementation

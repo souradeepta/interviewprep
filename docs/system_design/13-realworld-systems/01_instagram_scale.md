@@ -57,6 +57,36 @@ Search Index (ES) ← Photo metadata
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant PhotoSvc
+    participant S3
+    participant DB
+    participant Cache
+    participant ES
+
+    User->>API: Upload Photo
+    API->>PhotoSvc: Create Photo
+    PhotoSvc->>S3: Upload Image
+    PhotoSvc->>DB: Store Metadata
+    PhotoSvc->>ES: Index for Search
+
+    User->>API: Get Feed
+    API->>Cache: Check Cache
+    alt Cache Hit
+        Cache-->>API: Feed Data
+    else
+        API->>DB: Query Feed
+        DB-->>API: Results
+        API->>Cache: Update
+    end
+    API-->>User: Feed
+```
+
 ## Implementation
 
 ### Python Implementation

@@ -59,6 +59,21 @@ User-Item matrix:
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Training Data<br/>User-Item Matrix"] --> B["Factorize<br/>SVD"]
+    B --> C["Generate User<br/>& Item Vectors"]
+    C --> D["Store in Cache/<br/>Feature Store"]
+
+    E["New User Request"] --> F["Get User Vector"]
+    F --> G["Compute Similarity<br/>with All Items"]
+    G --> H["Top K Items"]
+    H --> I["Apply Business<br/>Logic/Filters"]
+    I --> J["Rank & Serve"]
+```
+
 ## Implementation
 
 ### Python Implementation

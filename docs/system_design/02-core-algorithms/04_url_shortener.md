@@ -285,7 +285,36 @@ class URLShortener {
 }
 ```
 
-### Implementation Discussion
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Service as URL Service
+    participant Encoder as Snowflake Encoder
+    participant DB as Database
+    participant Cache as Redis
+
+    Client->>Service: POST /shorten (long_url)
+    Service->>Encoder: Generate ID
+    Encoder-->>Service: short_id
+    Service->>DB: Store mapping
+    Service->>Cache: Cache mapping
+    Service-->>Client: short_url
+
+    Client->>Service: GET /redirect/short_id
+    Service->>Cache: Check
+    alt Cache Hit
+        Cache-->>Service: long_url
+    else Cache Miss
+        Service->>DB: Fetch
+        DB-->>Service: long_url
+        Service->>Cache: Update cache
+    end
+    Service-->>Client: 302 + long_url
+```
+
+## Implementation Discussion
 
 **ID Generation Strategies:**
 

@@ -58,6 +58,26 @@ Centralized registry with client polling or server-side discovery via LB.
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Service Starts"] --> B["Register with Registry<br/>name, host, port"]
+    B --> C["Health Check Loop"]
+    C --> D["Send Heartbeat"]
+    D --> E{Healthy?}
+    E -->|Yes| F["Update TTL"]
+    E -->|No| G["Deregister"]
+    F --> C
+
+    H["Client Needs Service"] --> I["Query Registry"]
+    I --> J["Get Service Instances"]
+    J --> K["Connect to Instance"]
+    K --> L{Instance Healthy?}
+    L -->|No| I
+    L -->|Yes| M["Use Service"]
+```
+
 ## Implementation
 
 ### Python Implementation

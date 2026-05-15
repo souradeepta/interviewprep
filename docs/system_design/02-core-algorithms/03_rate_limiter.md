@@ -261,7 +261,21 @@ class RateLimiter {
 }
 ```
 
-### Implementation Discussion
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Request Arrives"] --> B["Get Current Tokens"]
+    B --> C{"Tokens >= Cost?"}
+    C -->|Yes| D["Deduct Tokens"]
+    C -->|No| E["Queue Request"]
+    D --> F["Process Request"]
+    E --> G["Wait for Tokens"]
+    G --> B
+    F --> H["Return Response"]
+```
+
+## Implementation Discussion
 
 **Token Bucket vs Sliding Window:**
 - Token Bucket: allows burst (refill mechanism)

@@ -60,6 +60,19 @@ Root [1, 5, 10, 15]
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Search for Key"] --> B["Start at Root"]
+    B --> C["Find Range<br/>Using Comparisons"]
+    C --> D{Leaf Node?}
+    D -->|No| E["Go to Child"]
+    E --> C
+    D -->|Yes| F["Binary Search<br/>in Leaf"]
+    F --> G["Return Value<br/>or NULL"]
+```
+
 ## Implementation
 
 ### Python Implementation

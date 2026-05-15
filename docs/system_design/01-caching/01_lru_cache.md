@@ -126,7 +126,27 @@ class LRUCache {
 }
 ```
 
-### Implementation Discussion
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant Cache as LRU Cache
+    participant DB as Database
+
+    C->>Cache: Get Key
+    alt Hit
+        Cache-->>C: Return Value
+    else Miss
+        Cache->>DB: Query
+        DB-->>Cache: Return Data
+        Cache->>Cache: Update position to head
+        Cache->>Cache: Check if evict needed
+        Cache-->>C: Return Value
+    end
+```
+
+## Implementation Discussion
 
 **Why OrderedDict/LinkedHashMap?**
 - Maintains insertion order + access order (when access_order=true)

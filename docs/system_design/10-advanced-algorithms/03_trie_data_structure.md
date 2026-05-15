@@ -68,6 +68,23 @@ Trie for {cat, car, card, dog}:
 
 Scenario: [Concrete example with 5-10 steps showing system in action]
 
+## Flow Diagram
+
+```mermaid
+flowchart TD
+    A["Input String"] --> B["Start at Root"]
+    B --> C["For each Character"]
+    C --> D{Child Node<br/>Exists?}
+    D -->|Yes| E["Move to Child"]
+    D -->|No| F["Insert New Node"]
+    E --> C
+    F --> C
+    C --> G{More<br/>Characters?}
+    G -->|Yes| C
+    G -->|No| H["Mark as Word End"]
+    H --> I["Return"]
+```
+
 ## Implementation
 
 ### Python Implementation
