@@ -1,0 +1,2 @@
+import java.util.*;
+public class SearchEngine{Map<String,List<Integer>>idx=new HashMap<>();void indexDoc(int did,String txt){for(String w:txt.split(" "))idx.computeIfAbsent(w,k->new ArrayList<>()).add(did);}List<Integer>search(String q){return idx.getOrDefault(q,new ArrayList<>());}public static void main(String[]a){SearchEngine se=new SearchEngine();se.indexDoc(1,"python");System.out.println(se.search("python"));}}
