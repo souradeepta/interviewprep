@@ -192,6 +192,26 @@ Added comprehensive interview-focused algorithms with detailed documentation, de
 - **Test Coverage**: 29 unit tests covering all algorithms
 - **Interview Frequency**: Rated ★★★★★ (very common) to ★★☆☆☆ (less common) in technical interviews
 
+## System Design Problems
+
+For real-world design problems (caching, rate limiting, parking lot, design patterns, distributed systems), see [`docs/system_design/`](docs/system_design/README.md).
+
+| Problem | Category | Difficulty |
+|---------|----------|-----------|
+| LRU Cache | Caching | ★★★★☆ |
+| LFU Cache | Caching | ★★★★☆ |
+| Rate Limiter | Real-world Systems | ★★★★☆ |
+| URL Shortener | Real-world Systems | ★★★★☆ |
+| Parking Lot | OOP Design | ★★★★☆ |
+| Observer Pattern | Design Patterns | ★★★☆☆ |
+| Strategy Pattern | Design Patterns | ★★★☆☆ |
+| Factory Pattern | Design Patterns | ★★★☆☆ |
+| Decorator Pattern | Design Patterns | ★★★☆☆ |
+| Adapter Pattern | Design Patterns | ★★★☆☆ |
+| Pub-Sub System | Distributed Systems | ★★★★★ |
+| Thread Pool | Concurrency | ★★★★★ |
+| Load Balancer | Distributed Systems | ★★★★★ |
+
 ## Problem-Solving Guides
 
 This repository includes structured decision guides to help you select the right data structure or algorithm for any problem.
