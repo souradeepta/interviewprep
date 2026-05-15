@@ -7,10 +7,20 @@ class Coffee(ABC):
     """Coffee interface"""
 
     @abstractmethod
+        """get_cost implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_cost(self) -> float:
         raise NotImplementedError
 
     @abstractmethod
+        """get_description implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_description(self) -> str:
         raise NotImplementedError
 
@@ -18,9 +28,19 @@ class Coffee(ABC):
 class SimpleCoffee(Coffee):
     """Base coffee"""
 
+        """get_cost implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_cost(self) -> float:
         return 2.0
 
+        """get_description implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_description(self) -> str:
         return "Simple coffee"
 
@@ -28,12 +48,27 @@ class SimpleCoffee(Coffee):
 class CoffeeDecorator(Coffee):
     """Base decorator for coffee"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, coffee: Coffee):
         self.coffee = coffee
 
+        """get_cost implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_cost(self) -> float:
         return self.coffee.get_cost()
 
+        """get_description implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_description(self) -> str:
         return self.coffee.get_description()
 
@@ -41,9 +76,19 @@ class CoffeeDecorator(Coffee):
 class MilkDecorator(CoffeeDecorator):
     """Add milk to coffee"""
 
+        """get_cost implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_cost(self) -> float:
         return self.coffee.get_cost() + 0.5
 
+        """get_description implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_description(self) -> str:
         return self.coffee.get_description() + ", milk"
 
@@ -51,9 +96,19 @@ class MilkDecorator(CoffeeDecorator):
 class SugarDecorator(CoffeeDecorator):
     """Add sugar to coffee"""
 
+        """get_cost implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_cost(self) -> float:
         return self.coffee.get_cost() + 0.25
 
+        """get_description implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_description(self) -> str:
         return self.coffee.get_description() + ", sugar"
 
@@ -61,9 +116,19 @@ class SugarDecorator(CoffeeDecorator):
 class VanillaDecorator(CoffeeDecorator):
     """Add vanilla to coffee"""
 
+        """get_cost implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_cost(self) -> float:
         return self.coffee.get_cost() + 0.75
 
+        """get_description implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def get_description(self) -> str:
         return self.coffee.get_description() + ", vanilla"
 

@@ -7,10 +7,20 @@ class Database(ABC):
     """Database interface"""
 
     @abstractmethod
+        """connect implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def connect(self):
         raise NotImplementedError
 
     @abstractmethod
+        """execute_query implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def execute_query(self, query: str):
         raise NotImplementedError
 
@@ -18,9 +28,19 @@ class Database(ABC):
 class MySQLDatabase(Database):
     """MySQL database"""
 
+        """connect implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def connect(self):
         print("Connecting to MySQL database...")
 
+        """execute_query implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def execute_query(self, query: str):
         print(f"MySQL: Executing query: {query}")
 
@@ -28,9 +48,19 @@ class MySQLDatabase(Database):
 class PostgreSQLDatabase(Database):
     """PostgreSQL database"""
 
+        """connect implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def connect(self):
         print("Connecting to PostgreSQL database...")
 
+        """execute_query implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def execute_query(self, query: str):
         print(f"PostgreSQL: Executing query: {query}")
 
@@ -38,9 +68,19 @@ class PostgreSQLDatabase(Database):
 class MongoDBDatabase(Database):
     """MongoDB database"""
 
+        """connect implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def connect(self):
         print("Connecting to MongoDB database...")
 
+        """execute_query implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def execute_query(self, query: str):
         print(f"MongoDB: Executing query: {query}")
 

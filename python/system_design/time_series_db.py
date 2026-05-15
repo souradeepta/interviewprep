@@ -43,4 +43,6 @@ class TimeSeriesDB:
     Space: O([complexity])
     """
         return [(t,v) for t,v in self.data[metric] if start<=t<=end]
+
+
 if __name__ == "__main__": ts=TimeSeriesDB(); ts.write("cpu", 1000, 50); print(ts.query("cpu", 0, 2000))

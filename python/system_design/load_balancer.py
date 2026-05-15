@@ -8,6 +8,11 @@ import random
 class Server:
     """Backend server"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, server_id: int, ip: str, port: int):
         self.server_id = server_id
         self.ip = ip
@@ -33,6 +38,11 @@ class BalancingStrategy(ABC):
     """Load balancing strategy"""
 
     @abstractmethod
+        """select_server implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def select_server(self, servers: list) -> Server:
         raise NotImplementedError
 
@@ -40,9 +50,19 @@ class BalancingStrategy(ABC):
 class RoundRobinStrategy(BalancingStrategy):
     """Round robin - rotate through servers"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self):
         self.current_index = 0
 
+        """select_server implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def select_server(self, servers: list) -> Server:
         healthy_servers = [s for s in servers if s.is_healthy]
         if not healthy_servers:
@@ -55,6 +75,11 @@ class RoundRobinStrategy(BalancingStrategy):
 class LeastConnectionsStrategy(BalancingStrategy):
     """Least connections - route to server with fewest active connections"""
 
+        """select_server implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def select_server(self, servers: list) -> Server:
         healthy_servers = [s for s in servers if s.is_healthy]
         if not healthy_servers:
@@ -65,6 +90,11 @@ class LeastConnectionsStrategy(BalancingStrategy):
 class RandomStrategy(BalancingStrategy):
     """Random - pick random server"""
 
+        """select_server implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def select_server(self, servers: list) -> Server:
         healthy_servers = [s for s in servers if s.is_healthy]
         if not healthy_servers:
@@ -75,6 +105,11 @@ class RandomStrategy(BalancingStrategy):
 class LoadBalancer:
     """Load balancer"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, strategy: BalancingStrategy):
         self.strategy = strategy
         self.servers = []

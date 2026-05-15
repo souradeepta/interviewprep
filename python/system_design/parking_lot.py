@@ -12,6 +12,11 @@ class VehicleSize(Enum):
 class Spot:
     """Parking spot"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, spot_id: int, level: int, size: VehicleSize):
         self.spot_id = spot_id
         self.level = level
@@ -41,6 +46,11 @@ class Spot:
 class Level:
     """Parking lot level"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, level_num: int, num_compact: int, num_regular: int, num_large: int):
         self.level_num = level_num
         self.spots = []
@@ -84,6 +94,11 @@ class Level:
             return True
         return False
 
+        """_update_availability implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def _update_availability(self, delta: int, size: VehicleSize):
         if size == VehicleSize.COMPACT:
             self.available_compact += delta
@@ -100,6 +115,11 @@ class Level:
 class Vehicle:
     """Vehicle to park"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, license_plate: str, size: VehicleSize):
         self.license_plate = license_plate
         self.size = size
@@ -108,6 +128,11 @@ class Vehicle:
 class ParkingLot:
     """Parking lot with multiple levels"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, num_levels: int, num_compact: int, num_regular: int, num_large: int):
         self.levels = []
         for i in range(num_levels):

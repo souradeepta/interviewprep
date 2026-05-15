@@ -25,10 +25,53 @@ REFERENCES:
 - LeetCode and HackerRank problem patterns
 """
 
-class Cart: __init__(self): self.items={}
-class Order: __init__(self, user, items): self.user=user; self.items=items; self.status='pending'
-class Inventory: __init__(self): self.stock={}
+class Cart:
+    """Represents Cart."""
+
+    def __init__(self, ):
+        """Initialize Cart.
+
+
+        Time: O(1)
+        Space: O(1)
+        """
+        self.items={}
+
+class Order:
+    """Represents Order."""
+
+    def __init__(self, user, items):
+        """Initialize Order.
+
+        Args:
+            user: Parameter description
+        Args:
+            items: Parameter description
+
+        Time: O(1)
+        Space: O(1)
+        """
+        self.user=user
+        self.items=items
+        self.status='pending'
+
+class Inventory:
+    """Represents Inventory."""
+
+    def __init__(self, ):
+        """Initialize Inventory.
+
+
+        Time: O(1)
+        Space: O(1)
+        """
+        self.stock={}
     def reserve(self, p, q): self.stock[p] = self.stock.get(p,0)-q; return self.stock[p]>=0
+        """release implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def release(self, p, q): self.stock[p]+=q
 class ECommerce:
     def __init__(self): self.cart=Cart(); self.inv=Inventory(); self.orders=[]
@@ -46,4 +89,6 @@ class ECommerce:
     Space: O([complexity])
     """
         o = Order(user, items); self.orders.append(o); return o
+
+
 if __name__ == "__main__": e=ECommerce(); print(len(e.orders))

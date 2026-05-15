@@ -7,6 +7,11 @@ class Payment(ABC):
     """Target payment interface"""
 
     @abstractmethod
+        """pay implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def pay(self, amount: float) -> bool:
         raise NotImplementedError
 
@@ -23,6 +28,11 @@ class LegacyPaymentSystem:
 class PaymentAdapter(Payment):
     """Adapter to make legacy system compatible"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, legacy_system: LegacyPaymentSystem):
         self.legacy_system = legacy_system
 
@@ -35,6 +45,11 @@ class PaymentAdapter(Payment):
 class ModernPaymentGateway(Payment):
     """Modern payment system"""
 
+        """pay implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def pay(self, amount: float) -> bool:
         print(f"Modern gateway processing ${amount:.2f}")
         return True
@@ -43,10 +58,20 @@ class ModernPaymentGateway(Payment):
 class ShoppingCart:
     """Shopping cart using payment interface"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, payment: Payment):
         self.payment = payment
         self.total = 0.0
 
+        """add_item implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def add_item(self, price: float):
 
     """
@@ -71,6 +96,11 @@ class ShoppingCart:
     """
         self.total += price
 
+        """checkout implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def checkout(self) -> bool:
         return self.payment.pay(self.total)
 

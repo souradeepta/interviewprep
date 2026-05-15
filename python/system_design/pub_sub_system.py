@@ -7,6 +7,11 @@ from typing import Callable
 class PubSubSystem:
     """Publish-Subscribe message system"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self):
         self.topics = defaultdict(list)  # topic -> list of callbacks
         self.subscribers = defaultdict(set)  # subscriber_id -> set of topics
@@ -43,6 +48,11 @@ class PubSubSystem:
 class Subscriber:
     """Sample subscriber"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, name: str):
         self.name = name
 

@@ -1,9 +1,13 @@
 """Observer Pattern - Event publishing and subscription"""
 
-
 class Observer:
     """Observer interface"""
 
+        """update implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def update(self, subject):
         raise NotImplementedError
 
@@ -11,6 +15,11 @@ class Observer:
 class Subject:
     """Observable subject"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self):
         self._observers = []
 
@@ -33,6 +42,11 @@ class Subject:
 class Button(Subject):
     """Concrete subject - Button"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self):
         super().__init__()
         self._is_pressed = False
@@ -48,6 +62,11 @@ class Button(Subject):
         self.notify()
 
     @property
+        """is_pressed implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def is_pressed(self):
         return self._is_pressed
 
@@ -55,9 +74,19 @@ class Button(Subject):
 class LogObserver(Observer):
     """Concrete observer - Log events"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, name: str):
         self.name = name
 
+        """update implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def update(self, subject: Button):
         print(f"[{self.name}] Button is {'pressed' if subject.is_pressed else 'released'}")
 
@@ -65,9 +94,19 @@ class LogObserver(Observer):
 class DisplayObserver(Observer):
     """Concrete observer - Display status"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self):
         self.status = "released"
 
+        """update implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def update(self, subject: Button):
         self.status = "pressed" if subject.is_pressed else "released"
         print(f"[Display] Current status: {self.status}")

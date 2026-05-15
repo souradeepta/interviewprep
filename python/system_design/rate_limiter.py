@@ -38,6 +38,11 @@ class TokenBucketLimiter:
 class SlidingWindowLimiter:
     """Sliding window counter rate limiter"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, max_requests: int, window_seconds: int):
         self.max_requests = max_requests
         self.window = window_seconds

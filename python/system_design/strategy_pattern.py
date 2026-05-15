@@ -7,6 +7,11 @@ class PaymentStrategy(ABC):
     """Payment strategy interface"""
 
     @abstractmethod
+        """pay implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def pay(self, amount: float) -> bool:
         raise NotImplementedError
 
@@ -14,10 +19,20 @@ class PaymentStrategy(ABC):
 class CreditCardPayment(PaymentStrategy):
     """Credit card payment strategy"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, card_number: str, cvv: str):
         self.card_number = card_number
         self.cvv = cvv
 
+        """pay implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def pay(self, amount: float) -> bool:
         print(f"Processing credit card payment of ${amount}")
         print(f"  Card: {self.card_number[-4:]}")
@@ -27,9 +42,19 @@ class CreditCardPayment(PaymentStrategy):
 class PayPalPayment(PaymentStrategy):
     """PayPal payment strategy"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, email: str):
         self.email = email
 
+        """pay implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def pay(self, amount: float) -> bool:
         print(f"Processing PayPal payment of ${amount}")
         print(f"  Email: {self.email}")
@@ -39,9 +64,19 @@ class PayPalPayment(PaymentStrategy):
 class BitcoinPayment(PaymentStrategy):
     """Bitcoin payment strategy"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, address: str):
         self.address = address
 
+        """pay implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def pay(self, amount: float) -> bool:
         print(f"Processing Bitcoin payment of ${amount}")
         print(f"  Address: {self.address}")
@@ -51,13 +86,28 @@ class BitcoinPayment(PaymentStrategy):
 class ShoppingCart:
     """Context that uses payment strategy"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self):
         self.items = []
         self.payment_strategy = None
 
+        """add_item implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def add_item(self, price: float):
         self.items.append(price)
 
+        """set_payment_strategy implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def set_payment_strategy(self, strategy: PaymentStrategy):
 
     """
@@ -82,6 +132,11 @@ class ShoppingCart:
     """
         self.payment_strategy = strategy
 
+        """checkout implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def checkout(self) -> bool:
         total = sum(self.items)
         if not self.payment_strategy:

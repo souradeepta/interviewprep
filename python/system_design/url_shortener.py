@@ -8,6 +8,11 @@ class URLShortener:
 
     BASE62_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self):
         self.counter = 0
         self.url_map = {}  # short_code -> long_url

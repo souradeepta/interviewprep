@@ -8,6 +8,11 @@ from typing import Callable
 class ThreadPool:
     """Thread pool with fixed number of workers"""
 
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, num_workers: int):
         self.num_workers = num_workers
         self.task_queue = Queue()

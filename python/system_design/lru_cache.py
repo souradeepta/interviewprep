@@ -1,8 +1,12 @@
 """LRU Cache - Least Recently Used eviction policy"""
 
-
 class Node:
     """Doubly linked list node"""
+        """__init__ implementation.
+
+        Time: O(n)
+        Space: O(1)
+        """
     def __init__(self, key, value):
         self.key = key
         self.value = value

@@ -25,24 +25,76 @@ REFERENCES:
 - LeetCode and HackerRank problem patterns
 """
 
-class LedgerEntry: __init__(self, f, t, amt): self.frm=f; self.to=t; self.amt=amt
+class LedgerEntry:
+    """Represents a single transaction entry between two accounts."""
+
+    def __init__(self, from_account, to_account, amount):
+        """
+        Initialize a ledger entry with from, to, and amount.
+
+        Args:
+            from_account: Source account identifier
+            to_account: Destination account identifier
+            amount: Transaction amount
+
+        Time: O(1)
+        Space: O(1)
+        """
+        self.from_account = from_account
+        self.to_account = to_account
+        self.amount = amount
+
+
 class TransactionLedger:
-    def __init__(self): self.entries=[]
-    def append(self, f, t, amt): self.entries.append(LedgerEntry(f, t, amt))
-    def get_balance(self, acc): 
-    """
-    [Brief description of what this function does]
+    """Manages a collection of transaction entries and computes account balances."""
 
-    Args:
-        [param]: description
+    def __init__(self):
+        """Initialize empty ledger.
 
-    Returns:
-        [description of return value]
+        Time: O(1)
+        Space: O(1)
+        """
+        self.entries = []
 
-    Time: O([complexity])
-    Space: O([complexity])
-    """
-        debits=sum(e.amt for e in self.entries if e.frm==acc)
-        credits=sum(e.amt for e in self.entries if e.to==acc)
-        return credits-debits
-if __name__ == "__main__": tl=TransactionLedger(); tl.append(1, 2, 100); print(tl.get_balance(2))
+    def append(self, from_account, to_account, amount):
+        """
+        Add a new transaction to the ledger.
+
+        Args:
+            from_account: Source account identifier
+            to_account: Destination account identifier
+            amount: Transaction amount
+
+        Time: O(1)
+        Space: O(1)
+        """
+        entry = LedgerEntry(from_account, to_account, amount)
+        self.entries.append(entry)
+
+    def get_balance(self, account):
+        """
+        Calculate net balance for an account.
+
+        Sums all credits (where account is destination) minus debits (where
+        account is source). Net positive balance means account has received
+        more than it has sent.
+
+        Args:
+            account: Account identifier to calculate balance for
+
+        Returns:
+            Net balance (credits - debits)
+
+        Time: O(n) where n is number of transactions
+        Space: O(1)
+        """
+        debits = sum(e.amount for e in self.entries if e.from_account == account)
+        credits = sum(e.amount for e in self.entries if e.to_account == account)
+        return credits - debits
+
+
+if __name__ == "__main__":
+    # Example: Create ledger, add transaction, check balance
+    ledger = TransactionLedger()
+    ledger.append(1, 2, 100)  # Account 1 sends 100 to account 2
+    print(ledger.get_balance(2))  # Output: 100 (account 2 received 100)
