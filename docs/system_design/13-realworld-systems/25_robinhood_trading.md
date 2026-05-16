@@ -483,6 +483,195 @@
 | **Logging** | ELK/Loki | Centralized logs, structured, queryable |
 | **Tracing** | Jaeger/Zipkin | Distributed tracing, latency analysis |
 
+
+## Architecture & Flow Diagrams
+
+### System Architecture
+
+```mermaid
+graph TB
+    Client["Client/User"]
+    Gateway["API Gateway<br/>Rate Limit, Auth"]
+    LB["Load Balancer"]
+    Service["Service Tier<br/>Business Logic"]
+    Cache["Cache Layer<br/>Redis/Memcached"]
+    Primary["Primary DB<br/>ACID Guarantees"]
+    Replica["Read Replica<br/>Async Sync"]
+    Queue["Message Queue<br/>Kafka/RabbitMQ"]
+    Workers["Async Workers<br/>Background Jobs"]
+    Index["Search Index<br/>Elasticsearch"]
+    Lake["Data Lake<br/>S3/HDFS"]
+    Analytics["Analytics Pipeline<br/>Spark/Presto"]
+
+    Client -->|Request| Gateway
+    Gateway -->|Route| LB
+    LB -->|Distribute| Service
+    Service -->|Check Cache| Cache
+    Service -->|Query| Replica
+    Service -->|Write| Primary
+    Primary -->|Replicate| Replica
+    Service -->|Publish Event| Queue
+    Queue -->|Consume| Workers
+    Workers -->|Index| Index
+    Workers -->|Archive| Lake
+    Lake -->|Process| Analytics
+    Cache -->|Return| Service
+    Index -->|Search Results| Service
+    Service -->|Response| Gateway
+    Gateway -->|Return| Client
+
+    style Gateway fill:#ff9999
+    style LB fill:#ff9999
+    style Service fill:#99ccff
+    style Cache fill:#99ff99
+    style Primary fill:#ffcc99
+    style Replica fill:#ffcc99
+    style Queue fill:#cc99ff
+    style Workers fill:#cc99ff
+    style Index fill:#ffff99
+    style Lake fill:#99ffff
+    style Analytics fill:#99ffff
+```
+
+### Data Flow: Read vs Write
+
+```mermaid
+graph LR
+    subgraph Read["Read Operation (Fast Path)"]
+        R1["Request"] --> R2{"Cache Hit?"}
+        R2 -->|Yes| R3["Return from Cache<br/>P99 < 10ms"]
+        R2 -->|No| R4["Query Replica<br/>P99 < 50ms"]
+        R4 --> R5["Update Cache"]
+        R5 --> R3
+    end
+
+    subgraph Write["Write Operation (Consistency Path)"]
+        W1["Request"] --> W2["Validate & Auth"]
+        W2 --> W3["Write to Primary<br/>Sync Durability"]
+        W3 --> W4["Update Cache<br/>Write-Through"]
+        W4 --> W5["Publish Event"]
+        W5 --> W6["Acknowledge Client"]
+        W5 --> W7["Async Workers<br/>Background Processing"]
+    end
+
+    style Read fill:#e1f5e1
+    style Write fill:#fff4e1
+    style R3 fill:#90EE90
+    style W6 fill:#FFD700
+```
+
+### Failover & Recovery Flow
+
+```mermaid
+graph TD
+    Normal["System Operating Normally"]
+    Detect["Detect Primary Failure<br/>3 failed checks = 30-60s"]
+    Promote["Promote Read Replica<br/>to Primary<br/>10-20s"]
+    DNS["Update DNS<br/>Propagate<br/>30s-5min"]
+    Recovery["System Recovers<br/>RTO &lt; 2 minutes"]
+    Verify["Verify Data<br/>Consistency"]
+    Monitor["Monitor Catchup<br/>Apply WAL"]
+    Restore["Restore from Backup<br/>Point-in-time Recovery<br/>RTO &lt; 30min"]
+
+    Normal -->|Health Check Fails| Detect
+    Detect --> Promote
+    Promote --> DNS
+    DNS --> Recovery
+    Recovery --> Verify
+    Verify --> Monitor
+    Monitor --> Normal
+    Normal -->|Data Corruption| Restore
+    Restore --> Verify
+
+    style Normal fill:#90EE90
+    style Detect fill:#FFB6C1
+    style Promote fill:#FF69B4
+    style DNS fill:#FF69B4
+    style Recovery fill:#FFD700
+    style Verify fill:#87CEEB
+    style Monitor fill:#87CEEB
+    style Restore fill:#FF69B4
+```
+
+### Scaling Strategies
+
+```mermaid
+graph TD
+    Load["Increasing Load"]
+    CS1["Add Redis Nodes"]
+    CS2["Consistent Hashing"]
+    CS3["Replicate Hot Keys"]
+    SS1["Horizontal Scaling"]
+    SS2["Stateless Instances"]
+    SS3["Auto-scaling Groups"]
+    DS1["Read Replicas"]
+    DS2["Sharding by User ID"]
+    DS3["Split Hot Shards"]
+    ES1["Index Sharding"]
+    ES2["Multiple Nodes"]
+    ES3["Tiered Indexes"]
+    Scale["System Scales<br/>10x Capacity"]
+
+    Load -->|Cache Tier| CS1
+    CS1 --> CS2
+    CS2 --> CS3
+    Load -->|Service Tier| SS1
+    SS1 --> SS2
+    SS2 --> SS3
+    Load -->|Database Tier| DS1
+    DS1 --> DS2
+    DS2 --> DS3
+    Load -->|Search Tier| ES1
+    ES1 --> ES2
+    ES2 --> ES3
+    CS3 --> Scale
+    SS3 --> Scale
+    DS3 --> Scale
+    ES3 --> Scale
+
+    style Load fill:#FFB6C1
+    style Scale fill:#90EE90
+    style CS3 fill:#87CEEB
+    style SS3 fill:#87CEEB
+    style DS3 fill:#87CEEB
+    style ES3 fill:#87CEEB
+```
+
+### Data Consistency Patterns
+
+```mermaid
+graph TB
+    Write["Write to Primary Database<br/>Sync Durability Guarantee"]
+    Choice{"Consistency<br/>Level Needed?"}
+    Strong["Synchronous Replication<br/>Wait for all replicas<br/>Higher latency, higher reliability"]
+    Eventual["Asynchronous Replication<br/>Don't wait for replicas<br/>Low latency, temporary inconsistency"]
+    Causal["Track causal dependencies<br/>Causally related ops ordered<br/>Balance latency and consistency"]
+    Replicate["Replicate to All Nodes<br/>Confirm before ACK"]
+    ReplicateA["Replicate to All Nodes<br/>ACK immediately"]
+    ReplicateC["Replicate with Version Info<br/>Maintain causal order"]
+    Data["All replicas<br/>have latest data<br/>RPO = 0"]
+    DataA["Replicas lag<br/>behind primary<br/>RPO = seconds"]
+    DataC["Causally dependent<br/>operations ordered<br/>RPO = seconds"]
+
+    Write --> Choice
+    Choice -->|Strong| Strong
+    Choice -->|Eventual| Eventual
+    Choice -->|Causal| Causal
+    Strong --> Replicate
+    Eventual --> ReplicateA
+    Causal --> ReplicateC
+    Replicate --> Data
+    ReplicateA --> DataA
+    ReplicateC --> DataC
+
+    style Write fill:#FFD700
+    style Choice fill:#FFA500
+    style Strong fill:#FF6B6B
+    style Eventual fill:#4ECDC4
+    style Causal fill:#95E1D3
+```
+
+
 ## Capacity Planning
 
 ### Traffic Projection
