@@ -5,7 +5,7 @@ Add 20 distributed systems concepts to system design documentation.
 
 import os
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design/04-distributed-systems"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design/04-distributed-systems"
 
 # 20 New distributed systems concepts
 distributed_systems = {

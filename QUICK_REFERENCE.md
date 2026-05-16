@@ -249,13 +249,13 @@
 
 ### Python
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python3 python/algorithms/advanced/advanced_algorithms.py
 ```
 
 ### Java
 ```bash
-cd /home/sbisw/github/datastructures/java/algorithms/advanced
+cd /home/sbisw/github/interviewprep/java/algorithms/advanced
 javac AdvancedAlgorithms.java
 java AdvancedAlgorithms
 ```
@@ -295,7 +295,7 @@ java AdvancedAlgorithms
 ## File Structure
 
 ```
-/home/sbisw/github/datastructures/
+/home/sbisw/github/interviewprep/
 ├── python/algorithms/advanced/
 │   ├── __init__.py              (30 imports)
 │   └── advanced_algorithms.py   (1,868 lines)

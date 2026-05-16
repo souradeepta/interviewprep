@@ -282,7 +282,7 @@ def replace_prd_and_code(content):
 
 def process_all_files():
     """Process all markdown files"""
-    base_path = Path('/home/sbisw/github/datastructures/docs/system_design')
+    base_path = Path('/home/sbisw/github/interviewprep/docs/system_design')
 
     count = 0
     for md_file in sorted(base_path.rglob('*.md')):

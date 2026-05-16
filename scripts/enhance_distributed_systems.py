@@ -6,7 +6,7 @@ Enhance distributed systems concepts with detailed content and implementations.
 import os
 import re
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design/04-distributed-systems"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design/04-distributed-systems"
 
 enhancements = {
     "14_distributed_caching": (

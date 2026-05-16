@@ -24,7 +24,7 @@ Create `python/algorithms/dp/test_backtracking.py`:
 
 ```python
 import sys
-sys.path.insert(0, '/home/sbisw/github/datastructures/python/algorithms/dp')
+sys.path.insert(0, '/home/sbisw/github/interviewprep/python/algorithms/dp')
 
 from dp import solve_nqueens, solve_sudoku, word_search, permute, combine, \
     letter_combinations, subsets, generate_parentheses
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python python/algorithms/dp/test_backtracking.py
 ```
 
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python python/algorithms/dp/test_backtracking.py
 ```
 
@@ -139,7 +139,7 @@ Expected output: `✓ All N-Queens tests pass`
 - [ ] **Step 5: Commit N-Queens**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add python/algorithms/dp/dp.py python/algorithms/dp/test_backtracking.py
 git commit -m "feat: add N-Queens backtracking algorithm with tests
 
@@ -197,7 +197,7 @@ def test_sudoku_empty_cell():
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python python/algorithms/dp/test_backtracking.py
 ```
 
@@ -277,7 +277,7 @@ if __name__ == "__main__":
 - [ ] **Step 4: Run test to verify it passes**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python -m pytest python/algorithms/dp/test_backtracking.py::test_sudoku -v
 ```
 
@@ -286,7 +286,7 @@ Expected: `PASSED`
 - [ ] **Step 5: Commit Sudoku**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add python/algorithms/dp/dp.py python/algorithms/dp/test_backtracking.py
 git commit -m "feat: add Sudoku solver with backtracking
 
@@ -357,7 +357,7 @@ def test_generate_parentheses():
 - [ ] **Step 2: Run test to verify all fail**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python python/algorithms/dp/test_backtracking.py 2>&1 | head -20
 ```
 
@@ -552,7 +552,7 @@ def generate_parentheses(n: int) -> list[str]:
 - [ ] **Step 4: Run all backtracking tests**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python -m pytest python/algorithms/dp/test_backtracking.py -v
 ```
 
@@ -561,7 +561,7 @@ Expected: All tests PASSED
 - [ ] **Step 5: Commit all backtracking algorithms**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add python/algorithms/dp/dp.py python/algorithms/dp/test_backtracking.py
 git commit -m "feat: add complete backtracking algorithm suite (8 algorithms)
 
@@ -588,7 +588,7 @@ Create `python/algorithms/dp/test_grid_dp.py`:
 
 ```python
 import sys
-sys.path.insert(0, '/home/sbisw/github/datastructures/python/algorithms/dp')
+sys.path.insert(0, '/home/sbisw/github/interviewprep/python/algorithms/dp')
 
 from dp import unique_paths, bomb_enemy, max_island_area, dungeon_game, \
     trapping_rain_water_2d, word_ladder, word_pattern_match
@@ -645,7 +645,7 @@ def test_word_pattern():
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python python/algorithms/dp/test_grid_dp.py
 ```
 
@@ -935,7 +935,7 @@ def word_pattern_match(pattern: str, str_: str) -> bool:
 - [ ] **Step 4: Run grid DP tests**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python -m pytest python/algorithms/dp/test_grid_dp.py -v
 ```
 
@@ -944,7 +944,7 @@ Expected: All tests PASSED
 - [ ] **Step 5: Commit grid DP algorithms**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add python/algorithms/dp/dp.py python/algorithms/dp/test_grid_dp.py
 git commit -m "feat: add grid & 2D DP algorithm suite (7 algorithms)
 
@@ -972,7 +972,7 @@ Create `python/algorithms/graph/test_tree_graph_patterns.py`:
 
 ```python
 import sys
-sys.path.insert(0, '/home/sbisw/github/datastructures/python/algorithms/graph')
+sys.path.insert(0, '/home/sbisw/github/interviewprep/python/algorithms/graph')
 
 from graph_algorithms import TreeNode, lca, path_sum, all_paths_sum, tree_diameter, \
     rob_tree, reroot_tree, build_tree_preorder_inorder, serialize_tree, deserialize_tree, \
@@ -1072,7 +1072,7 @@ def test_has_cycle():
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python python/algorithms/graph/test_tree_graph_patterns.py
 ```
 
@@ -1512,7 +1512,7 @@ def has_cycle_undirected(n: int, edges: list[list[int]]) -> bool:
 - [ ] **Step 4: Run tree DP tests**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python -m pytest python/algorithms/graph/test_tree_graph_patterns.py::test_lca -v
 python -m pytest python/algorithms/graph/test_tree_graph_patterns.py::test_path_sum -v
 python -m pytest python/algorithms/graph/test_tree_graph_patterns.py -v
@@ -1523,7 +1523,7 @@ Expected: All tests PASSED
 - [ ] **Step 5: Commit tree DP and graph traversals**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add python/algorithms/graph/graph_algorithms.py python/algorithms/graph/test_tree_graph_patterns.py
 git commit -m "feat: add tree DP & advanced traversals (14 algorithms)
 
@@ -1649,7 +1649,7 @@ __all__ = [
 - [ ] **Step 3: Verify imports work**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python -c "from python.algorithms.dp import solve_nqueens, unique_paths, dungeon_game; print('✓ DP imports OK')"
 python -c "from python.algorithms.graph import TreeNode, lca, is_bipartite; print('✓ Graph imports OK')"
 ```
@@ -1659,7 +1659,7 @@ Expected: Both commands print OK
 - [ ] **Step 4: Commit __init__ updates**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add python/algorithms/dp/__init__.py python/algorithms/graph/__init__.py
 git commit -m "feat: update algorithm module exports for new implementations
 
@@ -2074,7 +2074,7 @@ def detect_cycle_dfs(graph):
 - [ ] **Step 6: Commit documentation**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add docs/algorithms/dp/backtracking_patterns.md \
          docs/algorithms/dp/grid_dp_patterns.md \
          docs/algorithms/dp/dp.md \
@@ -2552,7 +2552,7 @@ public class InterviewAlgorithmsTest {
 - [ ] **Step 4: Compile Java code**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 javac -d java/bin java/algorithms/dp/InterviewDP.java
 javac -d java/bin java/algorithms/graph/TreeGraphPatterns.java
 echo "✓ Java code compiles successfully"
@@ -2561,7 +2561,7 @@ echo "✓ Java code compiles successfully"
 - [ ] **Step 5: Commit Java implementations**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add java/algorithms/dp/InterviewDP.java \
          java/algorithms/graph/TreeGraphPatterns.java \
          java/algorithms/test/InterviewAlgorithmsTest.java
@@ -2705,7 +2705,7 @@ In `INDEX.md`, add new sections:
 - [ ] **Step 4: Commit documentation updates**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add README.md INDEX.md
 git commit -m "docs: update README and INDEX with interview algorithm additions
 
@@ -2726,7 +2726,7 @@ Changes:
 - [ ] **Step 1: Run all Python tests**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python -m pytest python/algorithms/dp/test_backtracking.py -v
 python -m pytest python/algorithms/dp/test_grid_dp.py -v
 python -m pytest python/algorithms/graph/test_tree_graph_patterns.py -v
@@ -2739,7 +2739,7 @@ Expected: All tests PASSED, 50+ test functions
 - [ ] **Step 2: Verify all imports work**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python3 << 'EOF'
 from python.algorithms.dp import (
     solve_nqueens, solve_sudoku, word_search, permute, combine,
@@ -2953,7 +2953,7 @@ python python/algorithms/graph/graph_algorithms.py  # Tree/Graph examples
 - [ ] **Step 4: Commit implementation summary**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add docs/superpowers/IMPLEMENTATION_SUMMARY.md
 git commit -m "docs: add implementation summary for interview algorithm expansion
 
@@ -2970,7 +2970,7 @@ Summary includes:
 - [ ] **Step 5: Final verification run**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 echo "=== Running Python Tests ==="
 python -m pytest python/algorithms/dp/test_backtracking.py python/algorithms/dp/test_grid_dp.py python/algorithms/graph/test_tree_graph_patterns.py -v --tb=short 2>&1 | tail -20
 
@@ -3002,7 +3002,7 @@ Expected output: All tests passing, all files verified, 9 commits
 - [ ] **Step 6: Create final commit tag**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 git add -A  # Stage any remaining changes
 git commit -m "chore: complete interview algorithms expansion phase
 

@@ -40,7 +40,7 @@ def infer_domain(filename):
 def scan_problems():
     """Scan all problem implementations in repo."""
     problems = []
-    repo_root = Path('/home/sbisw/github/datastructures')
+    repo_root = Path('/home/sbisw/github/interviewprep')
 
     # Scan Python implementations
     python_dir = repo_root / 'python'

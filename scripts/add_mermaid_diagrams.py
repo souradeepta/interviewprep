@@ -7,7 +7,7 @@ import os
 import glob
 import re
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 # Mermaid diagrams by concept type
 mermaid_diagrams = {

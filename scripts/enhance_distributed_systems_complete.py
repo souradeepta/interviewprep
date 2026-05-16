@@ -6,7 +6,7 @@ Complete enhancement of all 20 distributed systems concepts.
 import os
 import re
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design/04-distributed-systems"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design/04-distributed-systems"
 
 enhancements = {
     "33_gossip_failure_detection": {  # File named with wrong name, but it's actually accrual failure detector

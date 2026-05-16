@@ -1,36 +1,38 @@
-# 📚 Data Structures — Complete SDE Interview Prep
+# 📚 InterviewPrep — Complete SDE Interview Preparation
 
-A **comprehensive, production-ready** repository for software engineering interview preparation. Master data structures, algorithms, system design, and design patterns with **200+ curated problems, 9 learning paths, and 2 mock interview agents**.
+A **comprehensive, production-ready** repository for software engineering interview preparation covering **algorithms, system design, AI/ML/LLMs, behavioral interviews, and more**. Master with **100+ interview framework guides, 200+ curated problems, 9 learning paths, and 2 mock interview agents**.
 
 ---
 
 ## 🚀 Quick Start (Choose Your Path)
 
-### **🏃 In a Hurry?**
-→ [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md) — Get started in 2 minutes
+### **🏃 In a Hurry? (5 minutes)**
+→ [docs/STRUCTURE.md](docs/STRUCTURE.md) — Navigate the full repo with visual maps
 
 ### **⏱️ Have 2-8 Weeks?**
-→ [Learning Paths Navigator](learning-paths/index.md) — Choose by timeline, interview stage, or learning style
+→ [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md) — Choose by timeline, interview stage, or learning style
 
 ### **🤖 Want to Practice?**
 → [AGENTS.md](AGENTS.md) — Mock interviewer and candidate agents for practice
 
-### **📖 Want a Deep Dive?**
-→ [Complete README](docs/README.md) — Full repository documentation
+### **🎯 Know exactly what you want?**
+→ [docs/STRUCTURE.md](docs/STRUCTURE.md) — Jump to your topic
 
 ---
 
-## What's Included
+## 📦 What's Included
 
 | Component | Coverage | Status |
 |-----------|----------|--------|
-| **Data Structures** | 17 structures (basic → advanced) | ✅ Complete |
-| **Algorithms** | Sorting, searching, DP, graph algorithms | ✅ Complete |
-| **System Design** | 39+ problems with architecture diagrams | ✅ Complete |
-| **Design Patterns** | 23 Gang of Four patterns with examples | ✅ Complete |
+| **Interview Frameworks** | 42 comprehensive guides (coding, system design, behavioral) | ✅ Complete |
+| **Algorithms** | 11 mastery guides + patterns (DP, graph, string, etc.) | ✅ Complete |
+| **Data Structures** | 17 structures with implementations | ✅ Complete |
+| **System Design** | 39+ real-world systems with architecture | ✅ Complete |
+| **AI/ML/LLMs** | Fundamentals, LLM engineering, system design | 🚀 Expanding |
 | **Curated Problems** | 200+ organized by domain and difficulty | ✅ Complete |
 | **Learning Paths** | 9 different structured paths | ✅ Ready |
 | **Mock Interviews** | 2 AI agents for live practice | ✅ Ready |
+| **Code Examples** | Python + Java implementations | ✅ Complete |
 
 ---
 
@@ -55,90 +57,131 @@ A **comprehensive, production-ready** repository for software engineering interv
 ## 📂 Repository Structure
 
 ```
-datastructures/
-├── learning-paths/              # 📍 9 structured interview prep paths
-│   ├── sequential-tracks/       # Time-based learning (2/4/8 weeks)
-│   ├── interview-playbooks/     # Stage-specific preparation
-│   ├── domains/                 # 13 deep-dive topics
-│   └── skill-trees/             # Learning style options
+interviewprep/
+├── 📖 docs/                     # Complete documentation & guides
+│   ├── STRUCTURE.md             # 🗺️ Full navigation guide (READ THIS FIRST!)
+│   ├── 00-resources/            # Utilities and helper materials
+│   ├── 01-interview-frameworks/ # 42 comprehensive interview guides
+│   │   ├── coding-interview-framework.md
+│   │   ├── behavioral-interview-framework.md
+│   │   ├── system-design-interview-guide.md
+│   │   └── [38 mastery & pattern guides]
+│   ├── 02-algorithms/           # Algorithm patterns & data structures
+│   │   ├── *-mastery.md         # Deep dives (binary-search, DP, graph, etc.)
+│   │   ├── *-patterns.md        # Pattern guides (sliding-window, two-pointer, etc.)
+│   │   └── [subdirs: geometry, graph, math, searching, sorting, string, dp/]
+│   ├── 03-system-design/        # System design with real architecture
+│   │   ├── system-design-case-studies.md
+│   │   ├── 01-caching/          # Cache design, invalidation, patterns
+│   │   ├── 02-core-algorithms/  # Load balancing, consensus, sharding
+│   │   ├── 03-design-patterns/  # MVC, microservices, saga
+│   │   └── [06-data-systems, 07-social, 08-infrastructure, etc.]
+│   ├── 04-ai-ml-llms/           # 🤖 NEW! AI/ML/LLM systems (expanding)
+│   │   ├── fundamentals/        # ML concepts, neural networks
+│   │   ├── llm-engineering/     # Prompts, RAG, fine-tuning, agents
+│   │   └── system-design/       # ML platforms, serving, MLOps
+│   └── 05-learning-paths/       # Structured learning tracks
+│       ├── sequential-tracks/   # Time-based (2/4/8 weeks)
+│       ├── interview-playbooks/ # Stage-specific paths
+│       ├── domains/             # 13 deep-dive specializations
+│       └── skill-trees/         # Learning style options
 │
-├── docs/                        # Complete documentation
-│   ├── basic/                   # Array, LinkedList, Stack, Queue, HashMap
-│   ├── advanced/                # BST, AVL, Heap, Trie, Graph, etc.
-│   ├── new_ds/                  # Red-Black Tree, Bloom Filter, etc.
-│   ├── algorithms/              # Sorting, DP, Graph algorithms
-│   ├── patterns/                # Problem patterns and solutions
-│   ├── system_design/           # 39 system design problems
-│   └── new_problems/            # 58 curated new problems (roadmap)
+├── 💻 code/                     # Language implementations
+│   ├── python/                  # Python implementations
+│   │   ├── algorithms/
+│   │   ├── data-structures/
+│   │   └── system-design/
+│   ├── java/                    # Java implementations
+│   │   ├── algorithms/
+│   │   ├── data-structures/
+│   │   └── system-design/
+│   └── README.md
 │
-├── python/                      # Python implementations
-│   ├── basic/                   # Basic data structures
-│   ├── advanced/                # Advanced data structures
-│   ├── new_ds/                  # Specialized structures
-│   ├── algorithms/              # Algorithm implementations
-│   └── new_problems/            # New problem solutions
+├── 🎓 learning-paths/           # Interactive learning paths
+│   ├── index.md
+│   ├── sequential-tracks/
+│   ├── interview-playbooks/
+│   ├── domains/
+│   └── skill-trees/
 │
-├── java/                        # Java implementations (mirrors python/)
+├── 🛠️ scripts/                  # Automation & utility scripts
+│   └── [enhancement & generation scripts]
+│
+├── 🧪 tests/                    # Test suites
+│   └── system_design/
 │
 ├── .claude/                     # 🔧 Internal Claude Code config
 │   ├── agents/                  # Mock interview agents
 │   ├── scripts/                 # Internal utility scripts
-│   └── superpowers/             # Planning & design docs
+│   └── memory/                  # Project memory and context
 │
-├── LEARNING_PATHS_QUICK_START.md    # 🎯 User entry point
-├── AGENTS.md                        # 🤖 How to use mock interviewers
-├── INDEX.md                         # 📑 Complete index
-└── README.md                        # This file
+├── 🚀 QUICK_START.md            # Get started in 2 minutes
+├── 🎯 LEARNING_PATHS_QUICK_START.md
+├── 🤖 AGENTS.md                 # How to use mock interviewers
+├── 📑 INDEX.md                  # Complete index of all content
+└── 📄 README.md                 # This file
 ```
 
 ---
 
 ## 📊 Coverage
 
-### Data Structures
-✅ 17 structures with **Python + Java** implementations  
-✅ Complexity analysis (time, space, Big-O)  
-✅ ASCII diagrams and visual explanations  
+### Interview Frameworks (42 guides)
+✅ Coding interview framework (5-phase approach)
+✅ System design interview guide (4-phase approach)
+✅ Behavioral interview framework (STAR method + 20+ examples)
+✅ 39 algorithm & system design mastery guides with edge cases, mistakes, real examples
 
-**Covered:** Arrays, Linked Lists, Stacks, Queues, Hash Tables, Trees (BST, AVL, RB-Tree), Heaps, Graphs, Tries, Segment Trees, Fenwick Trees, Union-Find, LRU/LFU Caches, and more.
+### Algorithms & Data Structures
+✅ 11 algorithm mastery guides (DP, graphs, strings, sorting, binary search, etc.)
+✅ 15+ pattern guides (sliding window, two pointers, greedy, recursion, bit manipulation)
+✅ 17 data structures with implementations
+✅ Complexity analysis and trade-off discussions
 
-### Algorithms
-✅ Sorting, searching, dynamic programming  
-✅ Graph algorithms (DFS, BFS, Dijkstra)  
-✅ String manipulation, bit manipulation, math  
+### System Design
+✅ 39+ real-world system designs with architecture
+✅ Complete case studies (URL shortener, video streaming, chat, payments, recommendations)
+✅ Scaling strategies and bottleneck analysis
+✅ Interview follow-up questions & answers
 
-### Problems & Patterns
-✅ 200+ curated problems organized by domain  
-✅ 50+ problem patterns with solution approaches  
-✅ 23 Gang of Four design patterns  
-✅ 39 system design interview problems  
+### AI/ML/LLMs
+✅ Foundation guides (expanding with LLM engineering, RAG, system design)
+✅ Real coding examples
+✅ Interview scenarios and design problems
 
-### Interview Practice
-✅ Mock interviewer agent (SDE2 level)  
-✅ Mock candidate agent (for interviewer practice)  
-✅ 3 playbooks for different interview stages  
+### Learning & Practice
+✅ 200+ curated problems by domain
+✅ 9 learning paths (time-based, stage-based, style-based)
+✅ 2 mock interview agents (interviewer & candidate)
+✅ 4 interview playbooks (phone screen, technical, system design, behavioral)  
 
 ---
 
 ## 🎓 How to Use This Repo
 
-### **For Interview Prep**
-1. Read [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md)
-2. Choose a learning path from [learning-paths/index.md](learning-paths/index.md)
-3. Follow the weekly structure
-4. Solve problems using curated sequences
-5. Practice with [mock interviewers](AGENTS.md)
+### **Interview in 2 Weeks?**
+1. Go to [docs/STRUCTURE.md](docs/STRUCTURE.md) and find your interview type
+2. Read the relevant framework (e.g., `coding-interview-framework.md`)
+3. Study 3-5 algorithm patterns from `docs/02-algorithms/`
+4. Practice with mock interviews: `AGENTS.md`
 
-### **For Reference**
-- Browse [data structures](docs/basic/) and [algorithms](docs/algorithms/)
-- Check [complexity tables](docs/README.md#complexity-reference)
-- Use [problem patterns](docs/patterns/) to recognize problem types
-- Deep dive [system design](docs/system_design/) concepts
+### **Want Comprehensive Prep?**
+1. Start: [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md)
+2. Choose: Path from [learning-paths/](learning-paths/)
+3. Study: Follow weekly structure with frameworks & algorithms
+4. Practice: 1-2 mock interviews per week
+5. Refine: Review weak areas with deep-dive guides
 
-### **For Teaching**
-- Use [design patterns](docs/patterns/design-patterns-guide.md) as lecture material
-- Reference [algorithm explanations](docs/algorithms/) with complexity analysis
-- Show students [problem-solving approaches](docs/patterns/problem-to-pattern-matcher.md)
+### **Need Quick Reference?**
+- **Algorithm pattern?** → [docs/02-algorithms/](docs/02-algorithms/) 
+- **System design concept?** → [docs/03-system-design/](docs/03-system-design/)
+- **Interview framework?** → [docs/01-interview-frameworks/](docs/01-interview-frameworks/)
+- **AI/ML question?** → [docs/04-ai-ml-llms/](docs/04-ai-ml-llms/)
+
+### **For Teaching/Learning**
+- Use interview frameworks as curriculum
+- Reference algorithm guides with complexity analysis
+- Practice with mock interview agents
 
 ---
 
@@ -169,27 +212,30 @@ datastructures/
 
 | Resource | Purpose | Link |
 |----------|---------|------|
-| Quick Start | Get going in 2 min | [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md) |
-| Choose Path | Pick by timeline/style | [learning-paths/index.md](learning-paths/index.md) |
-| Full Guide | Complete documentation | [Complete README](docs/README.md) |
-| Problem Patterns | Recognize problem types | [Problem-to-Pattern Matcher](docs/patterns/problem-to-pattern-matcher.md) |
-| System Design | 39 system design problems | [System Design Guide](docs/system_design/README.md) |
-| Design Patterns | 23 Gang of Four patterns | [Design Patterns](docs/patterns/design-patterns-guide.md) |
-| Mock Interviews | Practice with AI agents | [AGENTS.md](AGENTS.md) |
+| **🗺️ Repo Navigation** | Understand the full structure | [docs/STRUCTURE.md](docs/STRUCTURE.md) |
+| **🚀 Quick Start** | Get going in 2 min | [QUICK_START.md](QUICK_START.md) |
+| **📖 Learning Paths** | Pick by timeline/style/goal | [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md) |
+| **📋 Interview Frameworks** | 42 comprehensive guides | [docs/01-interview-frameworks/](docs/01-interview-frameworks/) |
+| **🧮 Algorithm Mastery** | Deep dives with examples | [docs/02-algorithms/](docs/02-algorithms/) |
+| **🏗️ System Design** | Real-world architectures | [docs/03-system-design/](docs/03-system-design/) |
+| **🤖 AI/ML/LLMs** | NEW expanding section | [docs/04-ai-ml-llms/](docs/04-ai-ml-llms/) |
+| **🤖 Mock Interviews** | Practice with AI agents | [AGENTS.md](AGENTS.md) |
 
 ---
 
 ## 📈 Statistics
 
+- **42** comprehensive interview framework guides
+- **11** algorithm mastery guides (with 3-5x expanded content)
+- **15+** algorithm pattern guides
 - **17** data structures
-- **23** design patterns
-- **39** system design problems
+- **39+** system design problems
 - **200+** curated interview problems
-- **58** new problems defined (2 implemented, 56 ready to implement)
 - **9** learning paths
 - **2** mock interview agents
 - **13** problem domains
-- **Python + Java** solutions for every problem
+- **Python + Java** code examples throughout
+- **100+** total guides and resources
 
 ---
 
@@ -217,11 +263,12 @@ All content, implementations, and problem solutions are provided for educational
 
 ## 🚀 Get Started Now
 
-**First time?** → [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md)  
-**Know what you want?** → [learning-paths/index.md](learning-paths/index.md)  
-**Want to practice?** → [AGENTS.md](AGENTS.md)  
-**Need reference?** → [docs/README.md](docs/README.md)  
+**First time here?** → [docs/STRUCTURE.md](docs/STRUCTURE.md) (5 min navigation guide)  
+**Have limited time?** → [QUICK_START.md](QUICK_START.md) (2 minutes)  
+**Planning long prep?** → [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md)  
+**Want to practice now?** → [AGENTS.md](AGENTS.md)  
+**Need specific topic?** → Use [docs/STRUCTURE.md](docs/STRUCTURE.md) to find it  
 
 ---
 
-**Made for SDE interview prep. Good luck! 🎓**
+**Made for SDE interview prep — covering algorithms, system design, AI/ML/LLMs, and behavioral interviews. Good luck! 🎓**

@@ -73,7 +73,7 @@ def check_file_structure(root_path):
     return missing
 
 if __name__ == '__main__':
-    root = '/home/sbisw/github/datastructures'
+    root = '/home/sbisw/github/interviewprep'
 
     print("🔍 Validating Learning Paths...")
     print("=" * 60)

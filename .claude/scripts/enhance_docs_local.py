@@ -26,7 +26,7 @@ class DocEnhancer:
     def __init__(self, dry_run=False, verbose=False):
         self.dry_run = dry_run
         self.verbose = verbose
-        self.base_path = Path("/home/sbisw/github/datastructures")
+        self.base_path = Path("/home/sbisw/github/interviewprep")
         self.stats = {"enhanced": 0, "skipped": 0, "failed": 0}
         self.report = []
 

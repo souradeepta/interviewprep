@@ -283,7 +283,7 @@ def replace_qa_sections(content):
 
 def process_all_files():
     """Process all markdown files"""
-    base_path = Path('/home/sbisw/github/datastructures/docs/system_design')
+    base_path = Path('/home/sbisw/github/interviewprep/docs/system_design')
 
     count = 0
     for md_file in base_path.rglob('*.md'):

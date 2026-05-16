@@ -8,7 +8,7 @@ import re
 import glob
 import time
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 # Templates by concept category
 generic_templates = {

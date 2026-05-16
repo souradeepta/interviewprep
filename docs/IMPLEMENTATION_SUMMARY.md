@@ -7,14 +7,14 @@ All 31 advanced algorithms have been successfully implemented across both Python
 ## Deliverables
 
 ### 1. Python Implementation
-- **Location**: `/home/sbisw/github/datastructures/python/algorithms/advanced/`
+- **Location**: `/home/sbisw/github/interviewprep/python/algorithms/advanced/`
 - **Files Created**:
   - `__init__.py` (1.9 KB) - Module exports with all 30 algorithms
   - `advanced_algorithms.py` (56 KB, 1,868 lines) - Full implementation
 - **Status**: ✓ Tested and working - demo runs successfully
 
 ### 2. Java Implementation
-- **Location**: `/home/sbisw/github/datastructures/java/algorithms/advanced/`
+- **Location**: `/home/sbisw/github/interviewprep/java/algorithms/advanced/`
 - **Files Created**:
   - `AdvancedAlgorithms.java` (39 KB, 1,237 lines) - Full implementation
 - **Status**: ✓ Syntax valid and ready for compilation
@@ -160,7 +160,7 @@ All 31 advanced algorithms have been successfully implemented across both Python
 
 ### Run Python Demo
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python3 python/algorithms/advanced/advanced_algorithms.py
 ```
 
@@ -176,7 +176,7 @@ result = flow.max_flow(0, 5)
 
 ### Compile and Run Java
 ```bash
-cd /home/sbisw/github/datastructures/java/algorithms/advanced
+cd /home/sbisw/github/interviewprep/java/algorithms/advanced
 javac AdvancedAlgorithms.java
 java AdvancedAlgorithms
 ```
@@ -184,13 +184,13 @@ java AdvancedAlgorithms
 ## Files Modification Summary
 
 ### New Files Created (2)
-1. `/home/sbisw/github/datastructures/python/algorithms/advanced/__init__.py`
-2. `/home/sbisw/github/datastructures/python/algorithms/advanced/advanced_algorithms.py`
-3. `/home/sbisw/github/datastructures/java/algorithms/advanced/AdvancedAlgorithms.java`
+1. `/home/sbisw/github/interviewprep/python/algorithms/advanced/__init__.py`
+2. `/home/sbisw/github/interviewprep/python/algorithms/advanced/advanced_algorithms.py`
+3. `/home/sbisw/github/interviewprep/java/algorithms/advanced/AdvancedAlgorithms.java`
 
 ### Documentation Created (2)
-1. `/home/sbisw/github/datastructures/ADVANCED_ALGORITHMS.md`
-2. `/home/sbisw/github/datastructures/IMPLEMENTATION_SUMMARY.md`
+1. `/home/sbisw/github/interviewprep/ADVANCED_ALGORITHMS.md`
+2. `/home/sbisw/github/interviewprep/IMPLEMENTATION_SUMMARY.md`
 
 ## Statistics
 

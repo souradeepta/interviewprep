@@ -240,7 +240,7 @@ c4301cf Add 30 new networking concepts (16-45 total)
 ## Repository Structure
 
 ```
-datastructures/
+interviewprep/
 ├── docs/
 │   ├── system_design/
 │   │   ├── 13-realworld-systems/      # 36 systems (1.9MB)

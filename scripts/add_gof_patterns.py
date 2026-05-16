@@ -2149,7 +2149,7 @@ Behavior changes based on state
 
 def create_pattern_files():
     """Create all pattern documentation files"""
-    base_path = Path('/home/sbisw/github/datastructures/docs/system_design/03-design-patterns')
+    base_path = Path('/home/sbisw/github/interviewprep/docs/system_design/03-design-patterns')
 
     count = 0
     for filename, data in sorted(patterns.items()):

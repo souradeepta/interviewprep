@@ -312,7 +312,7 @@ Complex algorithms combining multiple techniques.
 ## File Organization
 
 ```
-datastructures/
+interviewprep/
 ├── python/
 │   ├── basic/              (7 implementations)
 │   ├── advanced/           (11 implementations)

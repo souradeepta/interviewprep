@@ -57,7 +57,7 @@ import anthropic
 # CONFIGURATION
 # ============================================================================
 
-DATASTRUCTURES_ROOT = Path("/home/sbisw/github/datastructures")
+DATASTRUCTURES_ROOT = Path("/home/sbisw/github/interviewprep")
 SCAN_DIRS = [
     DATASTRUCTURES_ROOT / "python",
     DATASTRUCTURES_ROOT / "java",

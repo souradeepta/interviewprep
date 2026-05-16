@@ -6,7 +6,7 @@ Add implementation code and discussion for all 39 system design docs.
 import os
 import re
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 # Implementation content for each doc
 implementations = {
@@ -1033,7 +1033,7 @@ def insert_implementation(filepath, implementation_content):
         f.write(content)
 
 # Process all docs
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 for filename, impl_content in implementations.items():
     filepath = os.path.join(base_path, f"{filename}.md")

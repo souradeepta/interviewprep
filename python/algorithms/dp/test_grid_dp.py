@@ -26,7 +26,7 @@ REFERENCES:
 """
 
 import sys
-sys.path.insert(0, '/home/sbisw/github/datastructures/python/algorithms/dp')
+sys.path.insert(0, '/home/sbisw/github/interviewprep/python/algorithms/dp')
 
 from dp import unique_paths, bomb_enemy, max_island_area, dungeon_game, \
     trapping_rain_water_2d, word_ladder, word_pattern_match

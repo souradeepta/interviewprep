@@ -5,7 +5,7 @@ Add 30 new system design concepts.
 
 import os
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 # 30 new concept categories and specific concepts
 new_concepts = {

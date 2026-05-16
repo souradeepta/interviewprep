@@ -808,7 +808,7 @@ A: Identify affected keys (between old & new server positions). Transfer asynchr
 }
 
 # File path
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 # Update each doc
 for doc_num, content in docs_content.items():

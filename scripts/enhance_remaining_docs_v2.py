@@ -146,7 +146,7 @@ docs_content = {
     ),
 }
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 # Process each doc
 for filename, (name, arch, qa, calc, comparison, followups) in docs_content.items():

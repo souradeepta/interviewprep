@@ -185,7 +185,7 @@ __all__ = [
 
 - [ ] **Step 3: Update main README to reference system_design**
 
-Read `/home/sbisw/github/datastructures/README.md` and add section after "Problem-Solving Guides":
+Read `/home/sbisw/github/interviewprep/README.md` and add section after "Problem-Solving Guides":
 
 ```markdown
 ### System Design Problems
@@ -457,7 +457,7 @@ if __name__ == "__main__":
 - [ ] **Step 3: Run tests**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python -m pytest tests/system_design/test_lru_cache.py -v
 ```
 
@@ -575,7 +575,7 @@ public class LRUCache {
 - [ ] **Step 2: Compile and run**
 
 ```bash
-cd /home/sbisw/github/datastructures/java/system_design
+cd /home/sbisw/github/interviewprep/java/system_design
 javac LRUCache.java
 java LRUCache
 ```

@@ -7,7 +7,7 @@ import os
 import re
 import glob
 
-base_path = "/home/sbisw/github/datastructures/docs/system_design"
+base_path = "/home/sbisw/github/interviewprep/docs/system_design"
 
 # Comprehensive diagram templates for all concept types
 universal_diagrams = {

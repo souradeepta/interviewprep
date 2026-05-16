@@ -20,7 +20,7 @@
 
 - [ ] **Step 1: Write script to scan existing problems**
 
-Create `/home/sbisw/github/datastructures/scripts/audit_problems.py`:
+Create `/home/sbisw/github/interviewprep/scripts/audit_problems.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -65,7 +65,7 @@ def infer_domain(filename):
 def scan_problems():
     """Scan all problem implementations in repo."""
     problems = []
-    repo_root = Path('/home/sbisw/github/datastructures')
+    repo_root = Path('/home/sbisw/github/interviewprep')
     
     # Scan Python implementations
     python_dir = repo_root / 'python'
@@ -133,7 +133,7 @@ if __name__ == '__main__':
 - [ ] **Step 2: Run audit script**
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python3 scripts/audit_problems.py
 head -20 _problem_map.csv
 ```
@@ -169,7 +169,7 @@ git commit -m "tools: add problem audit script for mapping and gap analysis"
 Run Python to count problems per domain:
 
 ```bash
-cd /home/sbisw/github/datastructures
+cd /home/sbisw/github/interviewprep
 python3 << 'EOF'
 import csv
 domains = {}
@@ -263,8 +263,8 @@ git commit -m "tools: problem gap analysis - identify missing coverage"
 - [ ] **Step 1: Create learning-paths directory**
 
 ```bash
-mkdir -p /home/sbisw/github/datastructures/learning-paths
-touch /home/sbisw/github/datastructures/learning-paths/.gitkeep
+mkdir -p /home/sbisw/github/interviewprep/learning-paths
+touch /home/sbisw/github/interviewprep/learning-paths/.gitkeep
 ```
 
 - [ ] **Step 2: Write README.md (master guide)**
@@ -877,7 +877,7 @@ You'll be ready for:
 - [ ] **Step 4: Commit sequential tracks**
 
 ```bash
-mkdir -p /home/sbisw/github/datastructures/learning-paths/sequential-tracks
+mkdir -p /home/sbisw/github/interviewprep/learning-paths/sequential-tracks
 git add learning-paths/sequential-tracks/
 git commit -m "docs: add sequential learning tracks (2-week, 4-week, 8-week)"
 ```
@@ -1528,7 +1528,7 @@ And [Full System Design Guide](../../system_design/) for 39+ problems.
 - [ ] **Step 4: Commit interview playbooks**
 
 ```bash
-mkdir -p /home/sbisw/github/datastructures/learning-paths/interview-playbooks
+mkdir -p /home/sbisw/github/interviewprep/learning-paths/interview-playbooks
 git add learning-paths/interview-playbooks/
 git commit -m "docs: add interview-phase playbooks (phone-screen, technical, system-design)"
 ```
@@ -1693,7 +1693,7 @@ Arrays are the most fundamental data structure in interviews. Master them first 
 - [ ] **Step 2: Commit Arrays domain**
 
 ```bash
-mkdir -p /home/sbisw/github/datastructures/learning-paths/domains
+mkdir -p /home/sbisw/github/interviewprep/learning-paths/domains
 git add learning-paths/domains/arrays.md
 git commit -m "docs: add arrays domain with 7 curated problems"
 ```
@@ -1997,7 +1997,7 @@ For even deeper prep: Switch to [depth-first.md](depth-first.md).
 - [ ] **Step 3: Commit skill trees**
 
 ```bash
-mkdir -p /home/sbisw/github/datastructures/learning-paths/skill-trees
+mkdir -p /home/sbisw/github/interviewprep/learning-paths/skill-trees
 git add learning-paths/skill-trees/
 git commit -m "docs: add skill trees (depth-first, breadth-first learning paths)"
 ```
@@ -2024,9 +2024,9 @@ Due to length constraints, I'll outline the process:
 - [ ] **Step 1: Create directory structure**
 
 ```bash
-mkdir -p /home/sbisw/github/datastructures/python/new_problems
-mkdir -p /home/sbisw/github/datastructures/java/new_problems
-mkdir -p /home/sbisw/github/datastructures/docs/new_problems
+mkdir -p /home/sbisw/github/interviewprep/python/new_problems
+mkdir -p /home/sbisw/github/interviewprep/java/new_problems
+mkdir -p /home/sbisw/github/interviewprep/docs/new_problems
 ```
 
 - [ ] **Step 2-51: Add 50 high-priority problems**
@@ -2092,7 +2092,7 @@ All problems include Python and Java solutions."
 
 - [ ] **Step 1: Write link validation script**
 
-Create `/home/sbisw/github/datastructures/scripts/validate_learning_paths.py`:
+Create `/home/sbisw/github/interviewprep/scripts/validate_learning_paths.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -2162,7 +2162,7 @@ def check_file_structure(root_path):
     return missing
 
 if __name__ == '__main__':
-    root = '/home/sbisw/github/datastructures'
+    root = '/home/sbisw/github/interviewprep'
     
     print("Validating learning paths...")
     
@@ -2223,7 +2223,7 @@ git commit -m "tools: add learning paths validation script"
 
 - [ ] **Step 1: Update root README with learning paths link**
 
-Edit `/home/sbisw/github/datastructures/README.md` and add after the "Interview Prep Resources" section:
+Edit `/home/sbisw/github/interviewprep/README.md` and add after the "Interview Prep Resources" section:
 
 ```markdown
 ## 🎯 Structured Learning Paths
@@ -2241,7 +2241,7 @@ Edit `/home/sbisw/github/datastructures/README.md` and add after the "Interview 
 
 - [ ] **Step 2: Update INDEX.md**
 
-Add to `/home/sbisw/github/datastructures/INDEX.md`:
+Add to `/home/sbisw/github/interviewprep/INDEX.md`:
 
 ```markdown
 ## Learning Paths Directory
@@ -2272,7 +2272,7 @@ git commit -m "docs: integrate learning paths into main README and INDEX"
 
 - [ ] **Step 1: Write quick start guide**
 
-Create `/home/sbisw/github/datastructures/LEARNING_PATHS_QUICK_START.md`:
+Create `/home/sbisw/github/interviewprep/LEARNING_PATHS_QUICK_START.md`:
 
 ```markdown
 # 🚀 Learning Paths Quick Start
@@ -2407,7 +2407,7 @@ git commit -m "docs: add quick-start guide for learning paths"
 
 - [ ] **Step 1: Create completion checklist**
 
-Create `/home/sbisw/github/datastructures/LEARNING_PATHS_COMPLETION_CHECKLIST.md`:
+Create `/home/sbisw/github/interviewprep/LEARNING_PATHS_COMPLETION_CHECKLIST.md`:
 
 ```markdown
 # Learning Paths Implementation Checklist

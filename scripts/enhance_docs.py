@@ -186,7 +186,7 @@ def add_sections_if_missing(filepath, content):
 
 def process_all_files():
     """Process all markdown files in system_design folder"""
-    base_path = Path('/home/sbisw/github/datastructures/docs/system_design')
+    base_path = Path('/home/sbisw/github/interviewprep/docs/system_design')
 
     count = 0
     for md_file in base_path.rglob('*.md'):

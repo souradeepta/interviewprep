@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/home/sbisw/github/datastructures/python/algorithms/dp')
+sys.path.insert(0, '/home/sbisw/github/interviewprep/python/algorithms/dp')
 
 from dp import solve_nqueens, solve_sudoku, word_search, permute, combine, \
     letter_combinations, subsets, generate_parentheses
