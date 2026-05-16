@@ -1,399 +1,292 @@
-# Pub-Sub System
+## System Overview
+
+**Scale Metrics:**
+- **Scale:** Variable based on topic
+- **Key Components:** Distributed nodes, coordination, state management
+- **Primary Use Case:** Distributed systems, reliability, consistency
 
 ## Problem Statement
 
-Implement a publish-subscribe messaging system where publishers send messages to topics and subscribers receive them asynchronously.
-
-**Requirements:**
-- Topics (channels for messages)
-- Publish messages to topics
-- Subscribe to topics
-- Async message delivery
-- Multiple subscribers per topic
-
-
-## Code Explanation (Detailed)
-
-### Implementation Approach
-The code demonstrates core patterns and trade-offs.
-
-### Key Operations
-Each operation shows algorithm and performance characteristics.
-
-### Concurrency and Atomicity
-Locking strategies, race condition prevention.
-
-### Edge Cases
-Boundary conditions and error handling.
-
-### Performance Optimization
-Techniques for reducing latency and throughput.
-
-## Design
-
-### Architecture
-
-```
-Publisher ---→ Topic ---→ Subscriber1
-                  │    ---→ Subscriber2
-                  └-------→ Subscriber3
-```
-
-### Key Components
-
-```
-Topic: Channel holding subscribers and message queue
-Publisher: Publishes messages to topics
-Subscriber: Receives messages from subscribed topics
-Message: Data being published
-```
-
-### Data Structure
-
-```
-topics: {topic_name -> [subscribers, message_queue]}
-subscribers: {subscriber_id -> subscribed_topics[]}
-```
-
-### Operations
-
-```
-subscribe(subscriber, topic):
-  topics[topic].subscribers.add(subscriber)
-
-publish(topic, message):
-  for each subscriber in topics[topic].subscribers:
-    subscriber.receive(message)
-
-receive(subscriber, message):
-  subscriber.onMessage(message)
-```
-
-
-## Scenario
-
-Pub-Sub System is a critical component in modern distributed systems. In real-world applications, handling complex business logic at scale with high reliability. For example, major tech companies like Netflix, Uber, and Airbnb rely on similar solutions to handle millions of concurrent users and requests. The challenge is achieving this while maintaining sub-100ms latency, 99.99% availability, and gracefully handling 10x traffic spikes during peak demand. This component provides the foundational capability to solve these challenges reliably and efficiently at global scale.
-
-## Users
-
-- **Backend Engineers**: Responsible for implementing and maintaining this system component in production environments. They need to understand the architecture, trade-offs, failure modes, and operational considerations.
-- **DevOps/SRE Teams**: Monitor system health, manage scaling policies, handle incidents, and ensure reliability SLAs are met. They need insights into performance characteristics, bottlenecks, and failure recovery mechanisms.
-- **Data Engineers**: Design data pipelines and analytics around this system, requiring deep understanding of data flow, consistency guarantees, and throughput characteristics.
-- **System Architects**: Make high-level architectural decisions that impact company infrastructure, requiring comprehensive understanding of capabilities, limitations, and scalability boundaries.
-- **Security Teams**: Understand security implications, potential vulnerabilities, and compliance requirements for this component.
-
-## PRD
-
 ### Functional Requirements
-- Core operations work correctly
-- Explicit error handling
-- Consistency guarantees defined
-- Monitoring and observability
+- [Core requirement 1]
+- [Core requirement 2]
+- [Core requirement 3]
+- [Core requirement 4]
+- [Core requirement 5]
 
 ### Non-Functional Requirements
-- Performance targets met
-- Availability SLA achieved
-- Scalability headroom
-- Cost efficient
+- **Correctness:** Guarantees under failure conditions
+- **Availability:** Tolerance for node failures
+- **Consistency:** Data consistency guarantees
+- **Scalability:** Handle millions of nodes/requests
+- **Latency:** Response time under normal and failure conditions
 
-### Success Metrics
-- Benchmarks met
-- Uptime targets met
-- Resource budgets
-- No data loss
+## Architecture
 
-
-## Flow
-
-The typical operational flow for this system involves these key phases:
-
-1. **Request Arrival**: Client/upstream system sends request with required parameters and context
-2. **Validation & Routing**: System validates request format, authentication, and routes to correct handler/shard/instance
-3. **Core Processing**: Execute the main algorithm, database query, or business logic on the data/state
-4. **State Management**: Update internal state (caches, indexes, counters, logs) with proper atomicity and locking
-5. **Response Generation**: Format results and return to requester with relevant metadata (timing, version info)
-6. **Observability**: Record metrics (latency, throughput, errors), logs (for debugging), and traces (for performance analysis)
-
-This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
-
-## Architecture Diagram
-
-```
-┌──────────────────────────────────────────┐
-│      Pub-Sub Broker (Central Hub)        │
-│  ┌──────────────────────────────────────┐│
-│  │  Topics: {topic → [sub1, sub2, ...]}  ││
-│  │  Message Queue: [msg1, msg2, ...]    ││
-│  │  Subscriptions: {subscriber → topics} ││
-│  └──────────────────────────────────────┘│
-└──────────────────────────────────────────┘
-        ↑ publish       ↓ subscribe/notify
-┌───────┴──────┐      ┌──────┴────────┐
-│              │      │               │
-▼              ▼      ▼               ▼
-Pub1    Pub2   Sub1   Sub2   Sub3   Sub4
-(writes)       (reads)
-```
-
-## Back-of-Envelope Calculations
-
-For typical pub-sub (10 topics, 100 publishers, 1000 subscribers, 100K msg/sec):
-- Storage: 1000 topics × 100 subscribers = 100K subscriptions × 16 bytes = 1.6MB registry
-- Message queue: 100K msg/sec × 100 bytes = 10MB/sec, need 10-100GB buffer for 10s-100s latency
-- Throughput: 100K msg/sec per broker, scale via sharding by topic
-- Latency: Push ~1-10ms, Pull ~100ms (polling interval)
-
-Network: ~10Gbps for 100K msg/sec × 100 bytes. Need clustering/sharding.
-
-## Design Choice Comparison
-
-| Approach | Pros | Cons |
-|----------|------|------|
-| In-Memory Hash | Simple, fast O(1) | All data in RAM, no persistence |
-| Message Queue (Redis) | Persistent, scalable | Adds external dependency, latency |
-| Kafka/Event Bus | Massively scalable, replay | Complex, high operational overhead |
-
-## Follow-up Interview Questions
-
-1. How would you persist messages for replay? Use Kafka-like append-only log.
-2. What if a subscriber crashes? Track offset, resume from checkpoint.
-3. How to monitor topic lag (subscriber behind publisher)?
-4. What's the bottleneck at 10x scale (1M msg/sec)? Broker I/O; need Kafka cluster.
-5. How to implement ordering guarantees (messages in order per topic)?
-
-## Example Scenario Walkthrough
-
-Scenario: Real-time stock price updates
-
-Initial state:
-- Topics: {"stocks.AAPL", "stocks.GOOG"}
-- Publishers: StockDataProvider
-- Subscribers: PortfolioManager, Trader, Logger
-
-Step 1: Portfolio Manager subscribes
-- pubsub.subscribe("stocks.AAPL", portfolioMgr)
-- topic = "stocks.AAPL"
-- subscribers = [portfolioMgr]
-
-Step 2: Trader subscribes to same topic
-- pubsub.subscribe("stocks.AAPL", trader)
-- topic = "stocks.AAPL"
-- subscribers = [portfolioMgr, trader]
-
-Step 3: Logger subscribes to all stocks
-- pubsub.subscribe("stocks.*", logger)
-- subscribers for "stocks.*" = [logger]
-
-Step 4: Stock price publisher publishes
-- pubsub.publish("stocks.AAPL", {price: 150.0})
-- Message added to queue
-
-Step 5: Broker notifies all subscribers
-- for sub in subscribers["stocks.AAPL"]:
--     sub.onMessage({price: 150.0})
-- Calls: portfolioMgr.onMessage(), trader.onMessage()
-
-Step 6: Subscribers process independently
-- PortfolioManager: recalculate portfolio value
-- Trader: check if price triggers trade rule
-- Logger: log price to analytics DB
-
-Step 7: Subscriber unsubscribes (cleanup)
-- pubsub.unsubscribe("stocks.AAPL", portfolioMgr)
-- subscribers = [trader]
-- Future prices only notify trader
-
-## Trade-offs
-
-| Async | Sync |
-|-------|------|
-| Non-blocking, scalable | Simpler, immediate |
-| Ordering challenges | Blocking calls |
-| Decoupled publishers/subs | Tight coupling |
-
-### Architecture Diagram
+### High-Level Design
 
 ```mermaid
 graph TB
-    Publisher["Publisher"]
-    Broker["Message Broker<br/>Topic/Queue"]
-    Consumer1["Consumer 1"]
-    Consumer2["Consumer 2"]
-    Consumer3["Consumer 3"]
+    Client["Client Requests"]
+    Coordinator["Coordinator/Leader"]
+    Nodes["Distributed Nodes<br/>Replicas, Followers"]
+    Storage["Persistent Storage<br/>State, Logs"]
+    Network["Network Communication<br/>Messages, Replication"]
+    Monitor["Monitoring<br/>Health, Metrics"]
 
-    Publisher -->|Publish| Broker
-    Broker -->|Deliver| Consumer1
-    Broker -->|Deliver| Consumer2
-    Broker -->|Deliver| Consumer3
+    Client -->|Request| Coordinator
+    Coordinator -->|Command| Nodes
+    Coordinator -->|Log| Storage
+    Nodes -->|Sync State| Nodes
+    Nodes -->|Persist| Storage
+    Network -->|Messages| Coordinator
+    Nodes -->|Metrics| Monitor
+    Coordinator -->|Metrics| Monitor
+
+    style Coordinator fill:#ff9999
+    style Nodes fill:#99ccff
+    style Storage fill:#99ff99
+    style Network fill:#ffcc99
+    style Monitor fill:#cc99ff
 ```
 
-### Flow Diagram
+### Core Concepts
 
-```mermaid
-sequenceDiagram
-    participant Pub as Publisher
-    participant B as Broker
-    participant C1 as Consumer 1
-    participant C2 as Consumer 2
+#### Node Roles
+- **Coordinator/Leader:** Authoritative decision maker
+- **Followers/Replicas:** State replication
+- **Learners:** Receiving updates without voting
 
-    Pub->>B: Send Message
-    B->>B: Store in Topic
-    B->>C1: Deliver
-    B->>C2: Deliver
-    C1->>C1: Process
-    C2->>C2: Process
-    C1-->>B: ACK
-    C2-->>B: ACK
-```
+#### Communication Patterns
+- **Synchronous:** Wait for acknowledgments
+- **Asynchronous:** Proceed without waiting
+- **Quorum:** Majority agreement
 
-## Complexity
+#### Failure Models
+- **Fail-stop:** Node simply crashes
+- **Byzantine:** Node acts maliciously
+- **Partition:** Network splits isolate nodes
 
-| Operation | Time |
-|-----------|------|
-| subscribe | O(1) |
-| unsubscribe | O(1) |
-| publish | O(n) where n=subscribers |
-| Space | O(t+s+m) where t=topics, s=subscribers, m=messages |
+## Data Flow Scenarios
 
-## Python Implementation
+### Scenario 1: Normal Operation
+1. Client sends request to coordinator
+2. Coordinator receives request
+3. Coordinator logs request durably
+4. Coordinator broadcasts to replicas
+5. Replicas acknowledge receipt
+6. Coordinator responds to client
+7. Replicas apply to state machine
 
-```python
-from collections import defaultdict
-from typing import Callable, Any
+### Scenario 2: Node Failure
+1. Node stops sending heartbeats
+2. Detection timeout expires
+3. Leader triggers election or failover
+4. New leader elected by quorum
+5. New leader catches up on logs
+6. System resumes normal operation
 
-class EventBroker:
-    def __init__(self):
-        self._subscribers: dict[str, list[Callable]] = defaultdict(list)
+### Scenario 3: Network Partition
+1. Network splits into partitions
+2. One partition has majority (leader)
+3. Minority partition cannot operate
+4. Majority continues with degraded set
+5. Partition heals
+6. Minority catches up on missed updates
 
-    def subscribe(self, topic: str, handler: Callable[[Any], None]):
-        self._subscribers[topic].append(handler)
+## Scalability Considerations
 
-    def unsubscribe(self, topic: str, handler: Callable):
-        self._subscribers[topic].remove(handler)
+### Horizontal Scaling
+- Adding more nodes increases availability
+- Increases communication overhead
+- Quorum size grows
+- Decision latency increases
 
-    def publish(self, topic: str, message: Any):
-        for handler in self._subscribers[topic]:
-            handler(message)
+### Consistency vs Scalability
+- **Strong consistency:** Requires coordination (slower)
+- **Eventual consistency:** Allows divergence (faster)
+- Trade-offs based on use case
 
-# Usage
-broker = EventBroker()
+### Network Topology
+- **Star:** Central coordinator (single point of failure)
+- **Mesh:** Full connectivity (high overhead)
+- **Ring:** Limited connections (failure propagation)
 
-def email_handler(msg): print(f"Email: {msg}")
-def sms_handler(msg): print(f"SMS: {msg}")
+## High Availability & Reliability
 
-broker.subscribe("order.placed", email_handler)
-broker.subscribe("order.placed", sms_handler)
-broker.publish("order.placed", {"order_id": 42, "total": 99.99})
-```
+### Fault Tolerance
+- **Single node failure:** System continues with n-1 nodes
+- **Multiple node failures:** Quorum ensures consistency
+- **Network partition:** Majority partition continues
+- **Byzantine failures:** Need f+2 replicas for f faulty nodes
 
-## Java Implementation
+### Recovery Mechanisms
+- **Log replay:** Reconstruct state from logs
+- **Snapshots:** Checkpoint state periodically
+- **Catch-up:** Lagging nodes apply missed operations
+- **Rebuilding:** Full replication from leader
 
-```java
-import java.util.*;
-import java.util.function.Consumer;
+### Failure Detection
+- **Heartbeat:** Periodic signals from leaders
+- **Timeout:** Detect failure when signals stop
+- **Confirmation:** Multiple failure confirmations before action
+- **Distributed:** Gossip-based failure detection
 
-public class EventBroker {
-    private Map<String, List<Consumer<Object>>> subscribers = new HashMap<>();
+## Data Consistency
 
-    public void subscribe(String topic, Consumer<Object> handler) {
-        subscribers.computeIfAbsent(topic, k -> new ArrayList<>()).add(handler);
-    }
+### Consistency Models
 
-    public void publish(String topic, Object message) {
-        subscribers.getOrDefault(topic, Collections.emptyList())
-                   .forEach(h -> h.accept(message));
-    }
+**Strong Consistency:**
+- All reads see latest write
+- Requires synchronous replication
+- Higher latency, lower availability
 
-    public static void main(String[] args) {
-        EventBroker broker = new EventBroker();
-        broker.subscribe("user.signup", msg -> System.out.println("Email: " + msg));
-        broker.subscribe("user.signup", msg -> System.out.println("SMS: " + msg));
-        broker.publish("user.signup", "New user joined");
-    }
-}
-```
+**Eventual Consistency:**
+- Reads may see stale data
+- Asynchronous replication
+- Lower latency, higher availability
 
-## Common Questions & Answers
+**Causal Consistency:**
+- Causally related operations ordered
+- Uncommitted operations visible only to originator
+- Balance between strong and eventual
 
-**Q: What is caching and why do we need it?**
+### Ordering Guarantees
+- **Total order:** Single serial order for all operations
+- **Partial order:** Operations without dependencies are unordered
+- **Causal order:** Preserve dependency ordering
 
-A: Caching stores frequently accessed data in fast storage (memory) to reduce latency and load on slower backends (database). Trade space (cache) for speed (latency). Critical for systems serving millions of requests per second.
+## Performance Optimization
 
-**Q: What are the main cache eviction policies?**
+### Latency Reduction
+- **Batching:** Combine multiple operations
+- **Pipelining:** Multiple in-flight requests
+- **Caching:** Store frequently accessed data
+- **Async:** Non-blocking operations
 
-A: LRU (least recently used), LFU (least frequently used), FIFO (first in first out), TTL (time-based), Random, and ARC (adaptive replacement). Choose based on access patterns: LRU for temporal, LFU for frequency, TTL for time-sensitive data.
+### Throughput Optimization
+- **Replication factor:** Balance durability vs overhead
+- **Batching size:** Larger batches = higher overhead but better amortization
+- **Parallelism:** Process independent operations concurrently
+- **Connection pooling:** Reuse connections
 
-**Q: What is cache hit rate and cache miss rate?**
+### Resource Efficiency
+- **Message compression:** Reduce network bandwidth
+- **Incremental updates:** Send only changes
+- **Tiered storage:** Hot/cold data management
+- **Garbage collection:** Remove old logs/snapshots
 
-A: Hit rate = successful_finds / total_accesses. Miss rate = 1 - hit rate. P(hit) = hits / (hits + misses). Target 80%+ hit rates for effective caching. Too-small cache gives low hit rate (wasted resources). Too-large cache uses more memory than needed.
+## Security Considerations
 
-**Q: How do you handle cache invalidation when backend data changes?**
+### Authentication
+- Verify node identity
+- Prevent unauthorized participation
+- Mutual TLS for inter-node communication
 
-A: Use TTL (time-based expiration), active invalidation (notify cache on write), cache-aside pattern (client checks backend), or write-through (update both). Active invalidation is fastest but complex. TTL is simplest but has stale data window.
+### Encryption
+- Encrypt data in transit
+- Encrypt sensitive data at rest
+- Key management and rotation
 
-**Q: What is the cache-aside pattern?**
+### Byzantine Resilience
+- Verify all messages
+- Use cryptographic signatures
+- Tolerate f faulty nodes with 3f+1 replicas
 
-A: Application checks cache first. On miss, fetch from backend, update cache, then return. Simple to implement. Risk: race condition where multiple threads fetch same miss simultaneously (thundering herd problem).
+## Monitoring & Observability
 
-**Q: What is write-through caching?**
+### Key Metrics
+- **Latency:** Request processing time
+- **Throughput:** Operations per second
+- **Availability:** Uptime percentage
+- **Consistency:** Staleness of replicas
+- **Replication lag:** How far behind followers are
 
-A: Writes go to both cache and backend simultaneously (synchronously). Ensures consistency: read always gets latest. Cost: write latency includes backend write. Safer than write-back but slower.
+### Failure Scenarios to Monitor
+- Node failures
+- Network partitions
+- Cascading failures
+- Leader election events
+- Replication lag spikes
 
-**Q: What is write-back (write-behind) caching?**
+## Common Patterns
 
-A: Writes go to cache only; backend updated asynchronously later (batch or periodic). Fast writes. Risk: data loss if cache fails before flushing. Need durability guarantees (persistence, replication).
+### Quorum Reads/Writes
+- Ensure consistency with subset of replicas
+- Read from quorum: n/2 + 1
+- Write to quorum: n/2 + 1
 
-**Q: How do you choose cache size?**
+### Linearizability
+- All operations appear in a total order
+- Reads return most recent write
+- Achieved through leader election
 
-A: Estimate working set (frequently accessed data volume). Add 20-30% buffer for margin. Monitor hit rate: if < 80%, increase size. If > 95%, might be oversized (waste). Use tools like cachegrind to profile.
+### Atomic Broadcast
+- All nodes deliver messages in same order
+- Tolerance for failures
+- Used in consensus protocols
 
-**Q: What's the difference between client-side and server-side caching?**
+## Technology Stack Comparison
 
-A: Client cache (browser): reduces network round-trips, entirely controlled by client. Server cache (memory, Redis): shared across clients, controlled by server. Multi-level caching often best.
+| Aspect | Raft | Paxos | Gossip | CRDT |
+|--------|------|-------|--------|------|
+| **Consistency** | Strong | Strong | Eventual | CvRDT |
+| **Latency** | Low | Medium | High | Very Low |
+| **Complexity** | Medium | High | Low | Low |
+| **Partition Tolerance** | Yes | Yes | Yes | Yes |
+| **Byzantine Safety** | No | Yes | No | No |
 
-**Q: How do you measure cache effectiveness?**
+## Lessons Learned
 
-A: Hit rate (primary metric), latency reduction (P99 latency with vs. without cache), backend load reduction, and memory cost per cache entry. Calculate ROI: cost of cache vs. benefit (reduced latency, backend load).
+1. **Consensus is Hard:** Multiple rounds of communication needed for safety
+2. **Partition Tolerance:** Network failures are inevitable, plan for them
+3. **Failure Detection:** Timeouts are imprecise, expect false positives
+4. **Replication Lag:** Always present, impacts consistency guarantees
+5. **Byzantine Failures:** Rare but catastrophic, require stronger protocols
 
-## Follow-up Questions & Answers
+## Common Interview Questions
 
-**Q: How do you prevent the thundering herd problem in caches?**
+1. **Design a distributed lock service**
+   - Leader election mechanism
+   - Failure handling and timeouts
+   - Deadlock prevention
 
-A: When popular key expires, many threads fetch from backend simultaneously causing spike. Solutions: probabilistic early expiration (refresh before TTL), request coalescing (single thread rebuilds, others wait), or bloom filters (detect non-existent keys fast).
+2. **How would you handle network partitions?**
+   - Quorum-based decisions
+   - Majority partition continues
+   - Minority partition waits
 
-**Q: How would you implement multi-level cache hierarchy?**
+3. **What's the difference between Raft and Paxos?**
+   - Complexity vs safety tradeoffs
+   - When to use each
+   - Real-world implementations
 
-A: Use L1 (fast, small, in-process), L2 (medium, local machine), L3 (large, remote, Redis). Check L1, miss→L2, miss→L3, miss→backend. On write: update all levels. Trade space for speed across levels.
+4. **How do you detect failures?**
+   - Heartbeat mechanisms
+   - Timeout tuning
+   - False positive handling
 
-**Q: Can you implement read-through caching (automatic population)?**
+5. **Explain eventual consistency**
+   - What it guarantees and doesn't
+   - When to use it
+   - Convergence properties
 
-A: Yes, cache loader/resolver called on miss. Transparent to application. Backend automatically uses cache layer. More complex than cache-aside but cleaner separation.
+6. **Design a system that tolerates f Byzantine failures**
+   - Need 3f+1 nodes
+   - Message authentication
+   - Safety and liveness proofs
 
-**Q: How do you handle hot keys in distributed caches?**
+## Related Systems
 
-A: Hot key = key accessed by many threads/clients. Replicate hot keys on multiple cache nodes. Use local in-process caches for very hot keys. Monitor and detect hot keys automatically.
+- **Consensus:** Raft, Paxos, Zookeeper, Etcd
+- **Replication:** Master-slave, Multi-master
+- **Failure Detection:** Gossip protocols, Heartbeats
+- **Consistency:** Strong, Eventual, Causal
+- **Coordination:** Leader election, Distributed locks
 
-**Q: What's the difference between warm and cold cache startup?**
+---
 
-A: Cold cache: empty at start, misses until populated (slow ramp-up). Warm cache: pre-loaded from previous state (RDB/snapshot). Warm startup is critical for production (instant performance).
-
-**Q: How would you measure cache effectiveness for business metrics?**
-
-A: Track hit rate, P99 latency (with/without cache), backend QPS reduction, revenue impact. Calculate cache size vs. cost savings. A/B test to prove business value.
-
-**Q: What happens when cache size is insufficient for working set?**
-
-A: Constant evictions = high miss rate = ineffective cache. Solution: increase cache size, improve eviction policy, reduce working set, or use better hardware (faster storage).
-
-**Q: How do you debug cache issues in production?**
-
-A: Monitor hit rate continuously. Profile cache keys (which keys are accessed). Check for cache stampedes (sudden miss spike). Use distributed tracing to see cache path.
-
-**Q: How would you implement a persistent cache?**
-
-A: Combine memory cache (fast) with persistent backend (database, RocksDB, LevelDB). Write-back pattern: batch updates to persistent store. Trade latency for durability.
-
-**Q: Can you use caching for write-heavy workloads?**
-
-A: Write caching is risky (consistency issues). Use carefully: write-through for safety, write-back for speed. Good for batch writes (aggregate before writing). Monitor durability guarantees.
-
+**Difficulty:** Advanced
+**Time to Master:** 3-4 weeks
+**Prerequisite Knowledge:** Distributed systems fundamentals, networking
+**Common in Interviews:** Yes - Hard problems requiring deep understanding
