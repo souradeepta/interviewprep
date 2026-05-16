@@ -1,549 +1,409 @@
-# Kafka Connect
+## System Overview
+
+**Scale Metrics:**
+- **Throughput:** 100+ source/sink connectors, high-throughput data pipelines
+- **Key Components:** Source connectors, Sink connectors, Workers, Offset storage
+- **Primary Use Case:** Database replication, data integration, ETL
 
 ## Problem Statement
 
-Design a data integration pipeline using Kafka Connect to stream data between Kafka and external systems (databases, S3, Elasticsearch) without writing custom producer/consumer code.
-
-## Scenario
-
-Kafka Connect is a critical component in modern distributed systems. In real-world applications, streaming billions of events with strong durability guarantees. For example, major tech companies like Netflix, Uber, and Airbnb rely on similar solutions to handle millions of concurrent users and requests. The challenge is achieving this while maintaining sub-100ms latency, 99.99% availability, and gracefully handling 10x traffic spikes during peak demand. This component provides the foundational capability to solve these challenges reliably and efficiently at global scale.
-
-## Users
-
-- **Backend Engineers**: Responsible for implementing and maintaining this system component in production environments. They need to understand the architecture, trade-offs, failure modes, and operational considerations.
-- **DevOps/SRE Teams**: Monitor system health, manage scaling policies, handle incidents, and ensure reliability SLAs are met. They need insights into performance characteristics, bottlenecks, and failure recovery mechanisms.
-- **Data Engineers**: Design data pipelines and analytics around this system, requiring deep understanding of data flow, consistency guarantees, and throughput characteristics.
-- **System Architects**: Make high-level architectural decisions that impact company infrastructure, requiring comprehensive understanding of capabilities, limitations, and scalability boundaries.
-- **Security Teams**: Understand security implications, potential vulnerabilities, and compliance requirements for this component.
-
-## PRD
-
 ### Functional Requirements
-- Publish messages with optional key
-- Consume in order within partition
-- Support consumer groups (parallel processing)
-- Replicate to ISR (in-sync replicas)
-- Configurable retention (time/size based)
+- [Core operation 1: description]
+- [Core operation 2: description]
+- [Core operation 3: description]
+- [Core operation 4: description]
+- [Core operation 5: description]
 
 ### Non-Functional Requirements
-- Throughput: millions msgs/sec
-- Latency: < 10ms publish, < 100ms delivery
-- Availability: 99.99% uptime
-- Durability: survive broker failures
-- Optional: exactly-once semantics
+- **Latency:** P99 < 100ms (depends on system type)
+- **Throughput:** 1M+ messages/sec (variable by system)
+- **Availability:** 99.99% uptime
+- **Consistency:** Exactly-once or at-least-once (configurable)
+- **Scalability:** Handle 10x growth seamlessly
 
-### Success Metrics
-- Replication latency < 100ms
-- Consumer lag < 1000
-- Zero message loss
-- Broker recovery < 30s
+## Architecture
 
-
-## Flow
-
-The typical operational flow for this system involves these key phases:
-
-1. **Request Arrival**: Client/upstream system sends request with required parameters and context
-2. **Validation & Routing**: System validates request format, authentication, and routes to correct handler/shard/instance
-3. **Core Processing**: Execute the main algorithm, database query, or business logic on the data/state
-4. **State Management**: Update internal state (caches, indexes, counters, logs) with proper atomicity and locking
-5. **Response Generation**: Format results and return to requester with relevant metadata (timing, version info)
-6. **Observability**: Record metrics (latency, throughput, errors), logs (for debugging), and traces (for performance analysis)
-
-This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
-
-
-## Code Explanation (Detailed)
-
-### Producer Patterns
-**Fire-and-forget**: Send and ignore response (risky)
-**Async**: Send with callback (recommended)
-**Sync**: Wait for ack (safest, slowest)
-
-Acks setting:
-- acks=0: No confirmation (data loss risk)
-- acks=1: Leader ack (good balance)
-- acks=all: All replicas (safest, high latency)
-
-### Consumer Patterns
-**Simple**: Single consumer, reads all messages
-**Consumer Group**: Multiple consumers, auto-assign partitions
-**Manual Offset**: Control where to read from
-
-Key pattern: Same key → same partition → ordered
-
-## Architecture Diagram
+### High-Level Design
 
 ```mermaid
-graph LR
-    subgraph Sources["Source Systems"]
-        PG["PostgreSQL\n(orders table)"]
-        MYSQL["MySQL\n(users table)"]
-        S3IN["S3 Bucket\n(raw logs)"]
-    end
+graph TB
+    Producers["Producers<br/>Apps, Services"]
+    Brokers["Message Brokers<br/>Kafka, RabbitMQ, Redis"]
+    Consumers["Consumers<br/>Processors, Services"]
+    Storage["Persistent Storage<br/>Disk, Replication"]
+    Cache["Cache Layer<br/>In-memory"]
+    Monitor["Monitoring<br/>Metrics, Alerts"]
 
-    subgraph Connect["Kafka Connect Cluster"]
-        W1["Worker 1\nJDBC Source\nDebezium CDC"]
-        W2["Worker 2\nS3 Source\nHTTP Sink"]
-        CFG["Connect REST API\nPOST /connectors"]
-    end
+    Producers -->|Send Messages| Brokers
+    Brokers -->|Store| Storage
+    Brokers -->|Cache| Cache
+    Brokers -->|Consume| Consumers
+    Brokers -->|Metrics| Monitor
+    Consumers -->|Acknowledge| Brokers
+    Storage -->|Replicate| Storage
 
-    subgraph Kafka["Kafka"]
-        T1["db.orders\n(CDC events)"]
-        T2["db.users\n(JDBC poll)"]
-        T3["raw.logs"]
-    end
-
-    subgraph Sinks["Sink Systems"]
-        ES["Elasticsearch\n(search index)"]
-        S3OUT["S3\n(data lake)"]
-        BQ["BigQuery\n(analytics)"]
-    end
-
-    PG -->|CDC via Debezium| W1
-    MYSQL -->|JDBC poll| W1
-    S3IN -->|S3 source| W2
-    W1 --> T1
-    W1 --> T2
-    W2 --> T3
-    T1 --> W2
-    T2 --> W2
-    W2 --> ES
-    W2 --> S3OUT
-    W2 --> BQ
+    style Producers fill:#99ccff
+    style Brokers fill:#ffcc99
+    style Consumers fill:#99ff99
+    style Storage fill:#ff99cc
+    style Cache fill:#ffff99
+    style Monitor fill:#cc99ff
 ```
 
-## Flow Diagram
-
-```mermaid
-sequenceDiagram
-    participant API as Connect REST API
-    participant W as Connect Worker
-    participant DB as PostgreSQL
-    participant K as Kafka
-    participant ES as Elasticsearch
-
-    API->>W: POST /connectors {debezium jdbc config}
-    W->>W: Load connector class, create tasks
-
-    loop CDC polling
-        W->>DB: Read WAL changes (Debezium)
-        DB-->>W: {op=INSERT, table=orders, row={id=42, amount=99}}
-        W->>W: Transform: unwrap CDC envelope
-        W->>K: Produce to db.orders
-    end
-
-    loop Sink processing
-        W->>K: Consume from db.orders
-        K-->>W: {id=42, amount=99, status=created}
-        W->>W: SMT: route to index by date
-        W->>ES: PUT /orders-2024-01/_doc/42
-        ES-->>W: 200 OK
-        W->>K: Commit offset
-    end
-```
-
-## Design
-
-### Connector Types
-
-```
-Source Connector: External system -> Kafka
-  Examples:
-    Debezium PostgreSQL: CDC via WAL replication slot
-    JDBC Source: Poll table with incrementing/timestamp column
-    S3 Source: Read files from S3, stream to Kafka
-    HTTP Source: Poll REST APIs
-    Filestream Source: Tail log files
-
-Sink Connector: Kafka -> External system
-  Examples:
-    S3 Sink: Partition Kafka data to S3 by date/hour
-    Elasticsearch Sink: Index records for search
-    JDBC Sink: Upsert records to database tables
-    HTTP Sink: POST events to webhook endpoints
-    BigQuery Sink: Stream to data warehouse
-
-Task parallelism:
-  tasks.max=4 -> connector creates up to 4 parallel tasks
-  Each task handles a subset of partitions or tables
-  Tasks distributed across workers in the cluster
-```
-
-### Single Message Transforms (SMT)
-
-```
-Built-in transforms:
-  ReplaceField: drop/whitelist fields
-  MaskField: mask sensitive data (PII)
-  ValueToKey: copy field from value to record key
-  TimestampRouter: route topic by timestamp (e.g., orders-2024-01)
-  ExtractField: extract nested field
-  Flatten: flatten nested structs
-  HoistField: wrap value in a struct
-
-Chain:
-  transforms=addTimestamp,removeSSN
-  transforms.addTimestamp.type=InsertField$Value
-  transforms.addTimestamp.offset.field=ingest_timestamp
-  transforms.removeSSN.type=ReplaceField$Value
-  transforms.removeSSN.blacklist=ssn,credit_card
-```
-
-### Debezium CDC
-
-```
-Debezium reads PostgreSQL WAL (Write-Ahead Log):
-  1. Creates replication slot in PostgreSQL
-  2. Reads logical replication stream (pgoutput)
-  3. Emits row-level change events: INSERT/UPDATE/DELETE
-
-Event structure:
-  {
-    "before": null,           // null for INSERT
-    "after": {"id": 42, "amount": 99, "status": "created"},
-    "op": "c",                // c=create, u=update, d=delete
-    "ts_ms": 1705312200000,   // change timestamp
-    "source": {"table": "orders", "lsn": 12345678}
-  }
-
-Benefit: Capture changes at DB level, not application level
-  No missed updates, no polling overhead
-  Includes DELETEs (can't do with timestamp polling)
-```
-
-## Back-of-Envelope Calculations
-
-```
-CDC throughput:
-  PostgreSQL WAL: 100MB/s typical workload
-  Debezium can process at ~50K events/s
-  Batch inserts spike: 500K events/s (needs tasks.max > 1)
-
-S3 sink partitioning:
-  10K events/s, 1KB each = 10MB/s to S3
-  S3 object size ideal: 128MB-1GB
-  Flush every: 128MB/10MB = 12.8s -> rotate.schedule.interval.ms=15000
-
-Elasticsearch sink:
-  ES bulk insert: 5K docs/s per shard
-  With 10 shards: 50K docs/s
-  Connect tasks.max=10: 100K events/s
-
-JDBC sink upsert:
-  Postgres: 10K upserts/s per connection
-  With 4 tasks, 4 connections: 40K upserts/s
-  Use INSERT ... ON CONFLICT DO UPDATE (idempotent)
-
-Connect cluster sizing:
-  4 worker nodes, 8 cores each = 32 cores total
-  Each worker: 10-50 tasks typical
-  4 workers x 50 tasks = 200 concurrent connector tasks
-```
-
-## Design Choices
-
-| Integration | Latency | Complexity | Handles DELETEs |
-|---|---|---|---|
-| Debezium CDC | <100ms | High | Yes |
-| JDBC Source (polling) | 1-60s | Low | No |
-| Application publish | <10ms | Medium | Yes |
-| Kafka Connect S3 Sink | N/A | Low | Yes |
-| Stream API (custom) | <10ms | High | Yes |
-
-## Python Implementation
-
-```python
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
-import time
-import json
-import uuid
-
-@dataclass
-class ChangeEvent:
-    table: str
-    operation: str  # c=create, u=update, d=delete
-    before: Optional[Dict] = None
-    after: Optional[Dict] = None
-    lsn: int = 0
-    ts_ms: float = field(default_factory=lambda: time.time() * 1000)
-
-@dataclass
-class ConnectorConfig:
-    name: str
-    connector_class: str
-    tasks_max: int = 1
-    config: Dict[str, str] = field(default_factory=dict)
-
-class SMT:
-    def __init__(self, transforms: List[str]):
-        self._transforms = transforms
-
-    def apply(self, record: dict) -> Optional[dict]:
-        result = dict(record)
-        for transform in self._transforms:
-            if transform == "mask_pii":
-                result = {k: "***" if k in ("ssn", "credit_card", "password") else v
-                          for k, v in result.items()}
-            elif transform == "drop_delete":
-                if result.get("op") == "d":
-                    return None  # Drop deletes
-            elif transform == "add_timestamp":
-                result["ingest_ts"] = int(time.time() * 1000)
-            elif transform == "unwrap_cdc":
-                # Unwrap Debezium envelope to just the row data
-                if "after" in result:
-                    row = result.get("after") or {}
-                    row["_op"] = result.get("op")
-                    return row
-        return result
-
-class DebeziumSimulator:
-    def __init__(self, tables: List[str]):
-        self._wal: List[ChangeEvent] = []
-        self._lsn = 0
-        self.tables = tables
-
-    def simulate_insert(self, table: str, row: dict):
-        self._lsn += 1
-        self._wal.append(ChangeEvent(table=table, operation="c", after=row, lsn=self._lsn))
-
-    def simulate_update(self, table: str, before: dict, after: dict):
-        self._lsn += 1
-        self._wal.append(ChangeEvent(table=table, operation="u", before=before, after=after, lsn=self._lsn))
-
-    def simulate_delete(self, table: str, row: dict):
-        self._lsn += 1
-        self._wal.append(ChangeEvent(table=table, operation="d", before=row, lsn=self._lsn))
-
-    def poll(self, from_lsn: int = 0) -> List[ChangeEvent]:
-        return [e for e in self._wal if e.lsn > from_lsn]
-
-class KafkaConnectWorker:
-    def __init__(self, worker_id: str):
-        self.worker_id = worker_id
-        self._connectors: Dict[str, dict] = {}
-        self._offsets: Dict[str, Any] = {}
-        self._output: Dict[str, List[dict]] = {}  # topic -> records
-
-    def create_connector(self, config: ConnectorConfig):
-        self._connectors[config.name] = {"config": config, "status": "RUNNING", "tasks": []}
-        self._output[config.name] = []
-        print(f"[Worker {self.worker_id}] Connector '{config.name}' created")
-
-    def run_source(self, connector_name: str, source: DebeziumSimulator,
-                   smt: Optional[SMT] = None):
-        config = self._connectors.get(connector_name)
-        if not config:
-            return
-        last_lsn = self._offsets.get(connector_name, 0)
-        events = source.poll(from_lsn=last_lsn)
-
-        for event in events:
-            record = {
-                "table": event.table,
-                "op": event.operation,
-                "before": event.before,
-                "after": event.after,
-                "lsn": event.lsn,
-                "ts_ms": event.ts_ms,
-            }
-            if smt:
-                record = smt.apply(record)
-                if record is None:
-                    continue
-
-            topic = f"db.{event.table}"
-            if topic not in self._output:
-                self._output[topic] = []
-            self._output[topic].append(record)
-            self._offsets[connector_name] = event.lsn
-
-        print(f"[Worker {self.worker_id}] Processed {len(events)} CDC events")
-
-    def run_sink(self, source_topic: str, sink_fn: Callable[[dict], None]):
-        records = self._output.get(source_topic, [])
-        for record in records:
-            sink_fn(record)
-        self._output[source_topic] = []
-
-    def status(self) -> dict:
-        return {name: {"status": c["status"], "offset": self._offsets.get(name)}
-                for name, c in self._connectors.items()}
-
-# Demo
-db = DebeziumSimulator(["orders", "users"])
-db.simulate_insert("orders", {"id": 1, "amount": 99.99, "ssn": "123-45-6789"})
-db.simulate_update("orders", {"id": 1, "status": "pending"}, {"id": 1, "status": "paid"})
-db.simulate_insert("users", {"id": 42, "email": "alice@example.com", "credit_card": "4111..."})
-db.simulate_delete("orders", {"id": 0, "amount": 50})
-
-worker = KafkaConnectWorker("worker-1")
-
-# Debezium source connector
-worker.create_connector(ConnectorConfig(
-    name="debezium-postgres",
-    connector_class="io.debezium.connector.postgresql.PostgresConnector",
-    tasks_max=2,
-    config={"database.hostname": "localhost", "table.include.list": "public.orders"},
-))
-
-# Apply SMT: mask PII, drop deletes, add ingest timestamp
-smt = SMT(["mask_pii", "drop_delete", "add_timestamp"])
-worker.run_source("debezium-postgres", db, smt=smt)
-
-# Elasticsearch sink
-es_index: List[dict] = []
-worker.run_sink("db.orders", lambda r: es_index.append(r))
-
-print(f"\nElasticsearch index ({len(es_index)} docs):")
-for doc in es_index:
-    print(f"  {json.dumps(doc, indent=2, default=str)}")
-```
-
-## Java Implementation
-
-```java
-import java.util.*;
-import java.util.function.*;
-
-public class KafkaConnectSimulator {
-    record ChangeEvent(String table, String op, Map<String, Object> after) {}
-
-    static class DebeziumSource {
-        List<ChangeEvent> wal = new ArrayList<>();
-
-        void insert(String table, Map<String, Object> row) { wal.add(new ChangeEvent(table, "c", row)); }
-        void update(String table, Map<String, Object> row) { wal.add(new ChangeEvent(table, "u", row)); }
-
-        List<ChangeEvent> poll() { return new ArrayList<>(wal); }
-    }
-
-    static class ConnectWorker {
-        Map<String, List<Map<String, Object>>> topics = new HashMap<>();
-
-        void runSource(DebeziumSource source, Consumer<Map<String, Object>> smt) {
-            for (ChangeEvent e : source.poll()) {
-                Map<String, Object> record = new HashMap<>(e.after());
-                record.put("_op", e.op()); record.put("_table", e.table());
-                smt.accept(record);
-                topics.computeIfAbsent("db." + e.table(), k -> new ArrayList<>()).add(record);
-            }
-        }
+### Core Components
+
+#### Message Broker
+- **Function:** Store, manage, and distribute messages
+- **Implementations:** Kafka, RabbitMQ, Redis, AWS SQS, GCP Pub/Sub
+- **Key Features:** Persistence, replication, partitioning, consumer groups
+
+#### Producers
+- **Function:** Send messages to broker
+- **Patterns:** Synchronous, asynchronous, batched
+- **Concerns:** Acknowledgments, retries, compression
+
+#### Consumers
+- **Function:** Receive and process messages
+- **Patterns:** Pull vs push, concurrent processing, batch consumption
+- **Concerns:** Offset management, lag, ordering, error handling
+
+#### State Management
+- **Function:** Track consumer progress and processed messages
+- **Approaches:** Offset storage, deduplication cache, exactly-once semantics
+- **Storage:** External databases, broker-internal stores
+
+## Data Flow Scenarios
+
+### Scenario 1: Message Publishing
+1. Producer sends message with optional key
+2. Broker receives and writes to disk
+3. Broker replicates to replica nodes
+4. Broker acknowledges to producer
+5. Message available to consumers
+
+### Scenario 2: Message Consumption
+1. Consumer requests messages (pull) or receives (push)
+2. Broker delivers batch of messages
+3. Consumer processes message
+4. Consumer sends acknowledgment
+5. Broker updates offset
+
+### Scenario 3: Consumer Group Rebalancing
+1. New consumer joins group
+2. Broker triggers rebalancing
+3. Partitions reassigned to consumers
+4. Consumers reset offsets
+5. Processing resumes with new distribution
+
+## Scalability Strategies
+
+### Broker Scaling
+
+**Horizontal Scaling:**
+- Add broker nodes to cluster
+- Distribute partitions across nodes
+- Automatic rebalancing
+- Increases throughput and fault tolerance
+
+**Vertical Scaling:**
+- Increase CPU, memory, disk
+- Better compression, faster processing
+- Limited by single-node hardware
+
+### Partition Strategy
+
+**Key Selection:**
+- Hash-based: Distribute evenly across partitions
+- Range-based: Ordered partitions for range queries
+- Custom: Domain-specific partitioning logic
+
+**Rebalancing:**
+- Add partitions when single partition becomes hot
+- Split hot partitions across multiple nodes
+- Monitor per-partition throughput
+
+### Consumer Scaling
+
+**Parallel Consumption:**
+- One consumer per partition (max)
+- Multiple threads per consumer
+- Consumer groups distribute load
+
+**Handling Slow Consumers:**
+- Increase consumer instances
+- Optimize processing logic
+- Use faster hardware
+- Implement timeout and skip
+
+## High Availability & Reliability
+
+### Replication Strategy
+
+**In-Broker Replication:**
+- Multiple copies per partition
+- Leader handles writes
+- Followers handle reads
+- Automatic failover on leader failure
+
+**Cross-Datacenter Replication:**
+- Async replication to backup region
+- RTO/RPO tradeoffs
+- Active-active or active-passive
+
+### Failure Scenarios
+
+**Broker Failure:**
+- Detection: Health checks, heartbeats
+- Recovery: Replica promotion, partition rebalancing
+- Time: 10-30 seconds
+
+**Network Partition:**
+- Split-brain scenarios
+- Quorum-based decisions
+- Consistency vs availability tradeoffs
 
-        void runSink(String topic, Consumer<Map<String, Object>> sinkFn) {
-            topics.getOrDefault(topic, List.of()).forEach(sinkFn);
-        }
-    }
+**Message Loss Prevention:**
+- Ack=all (all replicas)
+- Min.insync.replicas = 2+
+- Periodic backups
+- Point-in-time recovery
+
+## Data Consistency
 
-    public static void main(String[] args) {
-        DebeziumSource db = new DebeziumSource();
-        db.insert("orders", Map.of("id", 1, "amount", 99.99, "ssn", "123-45-6789"));
-        db.update("orders", Map.of("id", 1, "status", "paid"));
+### Delivery Semantics
+
+**At-Most-Once:**
+- No duplicates, possible message loss
+- Fastest, least reliable
+- Use: Non-critical events
+
+**At-Least-Once:**
+- No message loss, possible duplicates
+- Requires idempotency
+- Use: Most applications
 
-        ConnectWorker worker = new ConnectWorker();
-        // SMT: mask SSN
-        worker.runSource(db, record -> record.put("ssn", "***"));
+**Exactly-Once:**
+- No loss, no duplicates
+- Slowest, most reliable
+- Use: Financial, critical operations
 
-        List<Map<String, Object>> esIndex = new ArrayList<>();
-        worker.runSink("db.orders", esIndex::add);
-        System.out.println("ES index: " + esIndex);
-    }
-}
-```
+### Ordering Guarantees
 
-## Complexity
+**Per-Partition:**
+- Single partition = strict ordering
+- Trade-off: Limited parallelism
 
-| Operation | Time |
-|---|---|
-| Source connector poll | O(events since offset) |
-| SMT transform | O(transforms x record fields) |
-| Sink write (batched) | O(batch size) |
-| Connector rebalance | O(tasks x workers) |
-| CDC WAL read | O(1) streaming |
+**Per-Key:**
+- Hash key to partition
+- All messages for key go to same partition
+- Enables parallel processing with ordering
 
-## Common Questions & Answers
+**Global Ordering:**
+- Single partition (no parallelism)
+- Very expensive to maintain
+- Usually not needed
 
-**Q: What is Apache Kafka?**
+## Performance Optimization
 
-A: Distributed event streaming platform (publish-subscribe messaging system). Stores event streams durable in log-based architecture. Supports multiple subscribers reading same data, replay capability, distributed processing. Critical infrastructure for real-time systems.
+### Throughput Optimization
 
-**Q: How is Kafka different from traditional message queues?**
+**Batching:**
+- Linger time: Wait up to X ms for batch
+- Batch size: Send when batch reaches N messages
+- Compression: Reduce network bandwidth
+- Impact: 10-100x throughput improvement
 
-A: Kafka persists all messages in ordered append-only log. Queues delete after consumption. Kafka supports multiple independent subscribers of same data. Enables replay, reprocessing, multiple consumers. Trade-off: different API, operational complexity.
+**Connection Pooling:**
+- Reuse connections (don't create per request)
+- Reduces overhead, improves latency
+- Improves CPU efficiency
 
-**Q: What is a Kafka topic and partition?**
+**Async Processing:**
+- Non-blocking sends
+- Pipelining: Multiple in-flight requests
+- Callbacks for acknowledgments
 
-A: Topic: named event stream (orders, clicks, logs). Partition: ordered, immutable log within topic. Messages with same key go to same partition (order guarantee). Multiple partitions enable parallelism.
+### Latency Optimization
 
-**Q: What is a consumer group?**
+**Local Caching:**
+- Cache hot messages in memory
+- Reduces broker round trips
+- Configurable TTL
 
-A: Set of consumers reading same topic collaboratively. Each partition assigned to one consumer in group. Enable parallel processing and scaling. If consumer dies, partition reassigned to other consumer.
+**Network Optimization:**
+- Co-locate producers/brokers
+- Reduce network hops
+- Multiple broker replicas per region
 
-**Q: How does Kafka guarantee ordering?**
+**Codec Selection:**
+- No compression: Fastest
+- Snappy: Good compression ratio, fast
+- GZIP: Best compression, slower
+- LZ4: Fast, moderate compression
 
-A: Messages in single partition ordered by offset. Messages with same key always go to same partition (key routing). Therefore: same-key messages processed in order. Different keys can process out-of-order (parallel).
+## Security
 
-**Q: What does acks setting do?**
+### Authentication & Authorization
 
-A: acks=0: producer doesn't wait (fire-and-forget). acks=1: wait for leader ack (fast). acks=all: wait for all replicas ack (safest, slowest). Choose: reliability vs. latency trade-off.
+**SASL/SSL:**
+- Username/password authentication
+- Mutual TLS for transport security
+- ACLs for topic access control
 
-**Q: What is at-least-once delivery guarantee?**
+**OAuth2:**
+- Token-based authentication
+- Integration with identity providers
+- Fine-grained authorization
 
-A: Messages guaranteed delivered but may be duplicated. If producer retries on timeout, message could appear twice. Consumer must be idempotent (handle duplicates safely).
+### Encryption
 
-**Q: How do you scale Kafka?**
+**In Transit:**
+- TLS 1.3 for all connections
+- Certificate pinning for sensitive clients
 
-A: Add more partitions (parallelism), add more consumer replicas (throughput), add more brokers (storage/availability). Monitor lag, rebalance. Orchestrate with Kubernetes.
+**At Rest:**
+- Disk encryption
+- Key management (KMS)
+- Per-message encryption
 
-**Q: What is consumer lag?**
+### Compliance
 
-A: Difference between latest message offset and consumer's current offset. High lag = consumer falling behind. Monitor continuously, alert if lag growing. Indicates consumer too slow or too few consumers.
+**GDPR:**
+- Message retention policies
+- Right to deletion
+- Data residency requirements
 
-**Q: How do you monitor Kafka health?**
+**PCI-DSS:**
+- Encryption for payment data
+- Access controls
+- Audit logging
 
-A: Track broker metrics (CPU, disk, network), consumer lag, in-sync replicas (ISR), partition distribution. Use tools like Burrow, LinkedIn monitoring. Alert on anomalies.
+## Monitoring & Observability
 
-## Follow-up Questions & Answers
+### Key Metrics
 
-**Q: How would you implement exactly-once semantics in Kafka?**
+**Throughput:**
+- Messages/sec
+- Bytes/sec
+- Partition lag
 
-A: Use Kafka transactions (producer idempotency + atomic writes). Consumer must track processed message IDs. Or use idempotent producer + idempotent consumer. Trade: performance for correctness. Requires Kafka 0.11+.
+**Latency:**
+- End-to-end latency
+- Broker latency
+- Consumer processing time
 
-**Q: How do you handle backpressure (producer faster than consumer)?**
+**Reliability:**
+- Replication lag
+- Broker availability
+- Message loss events
 
-A: Consumer lags behind (offset < latest). Use monitoring to detect. Scaling options: add more consumer threads, optimize consumer code, reduce producer rate, or buffer in queue. Choose based on SLA.
+### Alerting
 
-**Q: How would you implement Kafka in multi-region setup?**
+- Alert on consumer lag > threshold
+- Alert on broker latency > P99 target
+- Alert on replication lag
+- Alert on broker unavailability
 
-A: Use MirrorMaker to replicate topics across regions. Choose consistency model (strong = sync, eventual = async). Handle failover (which region is primary). Complex operational model.
+### Tracing
 
-**Q: What is Kafka Streams?**
+- Distributed tracing per message
+- Correlation IDs
+- Performance bottleneck identification
 
-A: Library for stream processing on Kafka. Stateless (map, filter, flatMap), stateful (aggregate, join, window). Good for simple transformations. Alternative to Spark/Flink for JVM applications.
+## Technology Stack
 
-**Q: How do you debug Kafka performance issues?**
+| Component | Options | Recommendation |
+|-----------|---------|-----------------|
+| **Broker** | Kafka, RabbitMQ, Redis, Pulsar, NATS | Kafka for scalability, RabbitMQ for reliability |
+| **Storage** | Disk, Cloud Object Storage | Local disk (fast), S3 for cold storage |
+| **Serialization** | Avro, Protobuf, JSON | Avro/Protobuf (schema, compression) |
+| **Client Library** | Producer, Consumer SDKs | Official language-specific SDKs |
+| **Schema Registry** | Confluent, AWS Glue | Confluent (mature, widely adopted) |
+| **Monitoring** | Prometheus, Grafana, DataDog | Prometheus + Grafana (open source) |
+| **Orchestration** | Kubernetes, Docker Compose | Kubernetes (production scale) |
 
-A: Monitor broker metrics (CPU, disk utilization), network latency, GC pauses. Check consumer lag, partition skew. Profile producer/consumer code. Check network bandwidth between brokers.
+## Capacity Planning
 
-**Q: How would you handle late-arriving messages?**
+### Resource Estimation
 
-A: Kafka preserves order within partition. Late messages appear out of order w.r.t. other partitions. Application must handle. Use timestamps for processing time logic. Consider grace period for windowed aggregations.
+**Broker Resources (per 1M msg/sec):**
+- CPU: 8+ cores
+- Memory: 32GB+ (depends on cache)
+- Disk: Depends on retention (100GB+ per day)
+- Network: 1+ Gbps
 
-**Q: How do you implement message ordering guarantees?**
+**Consumer Resources (processing 1M msg/sec):**
+- CPU: 4-8 cores
+- Memory: 16GB+
+- Throughput: Process 100K-1M msg/sec per instance
 
-A: Send messages with same key (routes to same partition). Consumer reads single partition (ordered). Tradeoff: single partition limits throughput. Use multiple partitions + key if you need both.
+### Cost Calculation
 
-**Q: Can you compact Kafka topics?**
+**Broker Costs:**
+- Infrastructure: $5K-20K/month for 1M msg/sec
+- Storage: $0.10/GB/month (AWS S3 pricing)
+- Network egress: $0.12/GB
 
-A: Yes, log compaction mode: keeps latest value per key. Useful for state topics (user profiles). Trade: smaller storage but must maintain keys. Different from default delete mode.
+**Total Monthly Cost:**
+- Typical: $10K-50K for mid-scale system
+- Large scale: $100K-1M+ per month
 
-**Q: How would you implement Kafka with transactions?**
+## Lessons Learned
 
-A: Atomic multi-partition writes (Kafka 0.11+). Transactional producer: multiple puts before commit. Isolation level: read_committed (default) vs. read_uncommitted. Producer and consumer transaction APIs.
+1. **Consumer Groups are Powerful:** Use them for scalability and fault tolerance, not just load balancing
 
-**Q: How do you handle Kafka rebalancing?**
+2. **Exactly-Once is Expensive:** Use at-least-once with idempotency for most use cases
 
-A: When consumer joins/leaves, partitions reassigned. Brief unavailability during rebalance. Minimize with heartbeat tuning, larger batches, optimize consumer code. Monitor rebalance frequency and duration.
+3. **Consumer Lag is Critical:** Monitor it religiously—it's your early warning system
 
+4. **Partitioning Strategy Matters:** Poor key selection creates hot partitions and limits scalability
+
+5. **Monitoring is Non-Optional:** Without visibility, operational issues become crises
+
+## Common Interview Questions
+
+1. **Design a scalable message queue for 1M messages/sec**
+   - Discuss partitioning, replication, consumer groups
+   - Address failure scenarios and recovery
+   - Explain consistency tradeoffs
+
+2. **How would you handle exactly-once delivery?**
+   - Idempotency keys, deduplication, transactions
+   - Cost vs benefit analysis
+   - Real-world examples (payment systems)
+
+3. **What happens when a consumer fails?**
+   - Rebalancing, offset management
+   - Recovery procedures
+   - Time to recovery
+
+4. **How do you scale a slow consumer?**
+   - Add more instances
+   - Optimize processing logic
+   - Consider batching or windowing
+   - Monitor and alert on lag
+
+5. **Design a system with per-message ordering**
+   - Key selection, partition strategy
+   - Tradeoffs with throughput
+   - Alternative approaches
+
+6. **How would you migrate from one broker to another?**
+   - Dual writes, validation, cutover
+   - Downtime minimization
+   - Rollback strategy
+
+## Related Systems
+
+- **Kafka** → For high-throughput, scalable event streaming
+- **RabbitMQ** → For reliable, complex message routing
+- **Redis Streams** → For fast, simple event streaming
+- **AWS Kinesis** → For managed, AWS-integrated streaming
+- **GCP Pub/Sub** → For serverless, GCP-integrated messaging
+
+---
+
+**Difficulty:** Intermediate
+**Time to Master:** 2-4 weeks
+**Prerequisite Knowledge:** Distributed systems, message queues
+**Common in Interviews:** Yes - Medium to Hard

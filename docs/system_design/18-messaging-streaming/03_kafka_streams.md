@@ -1,562 +1,409 @@
-# Kafka Streams
+## System Overview
+
+**Scale Metrics:**
+- **Throughput:** 1M+ events/sec, sub-second processing latency
+- **Key Components:** Topology, State stores, Windows, Interactive queries
+- **Primary Use Case:** Stream processing, real-time transformations, aggregations
 
 ## Problem Statement
 
-Design stateful stream processing applications using Kafka Streams — a client library for building real-time data processing pipelines that read from and write to Kafka topics.
-
-## Scenario
-
-Kafka Streams is a critical component in modern distributed systems. In real-world applications, streaming billions of events with strong durability guarantees. For example, major tech companies like Netflix, Uber, and Airbnb rely on similar solutions to handle millions of concurrent users and requests. The challenge is achieving this while maintaining sub-100ms latency, 99.99% availability, and gracefully handling 10x traffic spikes during peak demand. This component provides the foundational capability to solve these challenges reliably and efficiently at global scale.
-
-## Users
-
-- **Backend Engineers**: Responsible for implementing and maintaining this system component in production environments. They need to understand the architecture, trade-offs, failure modes, and operational considerations.
-- **DevOps/SRE Teams**: Monitor system health, manage scaling policies, handle incidents, and ensure reliability SLAs are met. They need insights into performance characteristics, bottlenecks, and failure recovery mechanisms.
-- **Data Engineers**: Design data pipelines and analytics around this system, requiring deep understanding of data flow, consistency guarantees, and throughput characteristics.
-- **System Architects**: Make high-level architectural decisions that impact company infrastructure, requiring comprehensive understanding of capabilities, limitations, and scalability boundaries.
-- **Security Teams**: Understand security implications, potential vulnerabilities, and compliance requirements for this component.
-
-## PRD
-
 ### Functional Requirements
-- Publish messages with optional key
-- Consume in order within partition
-- Support consumer groups (parallel processing)
-- Replicate to ISR (in-sync replicas)
-- Configurable retention (time/size based)
+- [Core operation 1: description]
+- [Core operation 2: description]
+- [Core operation 3: description]
+- [Core operation 4: description]
+- [Core operation 5: description]
 
 ### Non-Functional Requirements
-- Throughput: millions msgs/sec
-- Latency: < 10ms publish, < 100ms delivery
-- Availability: 99.99% uptime
-- Durability: survive broker failures
-- Optional: exactly-once semantics
+- **Latency:** P99 < 100ms (depends on system type)
+- **Throughput:** 1M+ messages/sec (variable by system)
+- **Availability:** 99.99% uptime
+- **Consistency:** Exactly-once or at-least-once (configurable)
+- **Scalability:** Handle 10x growth seamlessly
 
-### Success Metrics
-- Replication latency < 100ms
-- Consumer lag < 1000
-- Zero message loss
-- Broker recovery < 30s
+## Architecture
 
-
-## Flow
-
-The typical operational flow for this system involves these key phases:
-
-1. **Request Arrival**: Client/upstream system sends request with required parameters and context
-2. **Validation & Routing**: System validates request format, authentication, and routes to correct handler/shard/instance
-3. **Core Processing**: Execute the main algorithm, database query, or business logic on the data/state
-4. **State Management**: Update internal state (caches, indexes, counters, logs) with proper atomicity and locking
-5. **Response Generation**: Format results and return to requester with relevant metadata (timing, version info)
-6. **Observability**: Record metrics (latency, throughput, errors), logs (for debugging), and traces (for performance analysis)
-
-This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
-
-
-## Code Explanation (Detailed)
-
-### Producer Patterns
-**Fire-and-forget**: Send and ignore response (risky)
-**Async**: Send with callback (recommended)
-**Sync**: Wait for ack (safest, slowest)
-
-Acks setting:
-- acks=0: No confirmation (data loss risk)
-- acks=1: Leader ack (good balance)
-- acks=all: All replicas (safest, high latency)
-
-### Consumer Patterns
-**Simple**: Single consumer, reads all messages
-**Consumer Group**: Multiple consumers, auto-assign partitions
-**Manual Offset**: Control where to read from
-
-Key pattern: Same key → same partition → ordered
-
-## Architecture Diagram
+### High-Level Design
 
 ```mermaid
-graph LR
-    subgraph Input["Input Topics"]
-        T1["orders\n(key=userId)"]
-        T2["payments\n(key=orderId)"]
-    end
+graph TB
+    Producers["Producers<br/>Apps, Services"]
+    Brokers["Message Brokers<br/>Kafka, RabbitMQ, Redis"]
+    Consumers["Consumers<br/>Processors, Services"]
+    Storage["Persistent Storage<br/>Disk, Replication"]
+    Cache["Cache Layer<br/>In-memory"]
+    Monitor["Monitoring<br/>Metrics, Alerts"]
 
-    subgraph KStreams["Kafka Streams App"]
-        ST1["KStream: orders\nfilter + map"]
-        TB1["KTable: payments\naggregated state"]
-        JOIN["Stream-Table Join"]
-        AGG["Aggregate\nwindow 5min"]
-        OUT["KStream: enriched-orders"]
-    end
+    Producers -->|Send Messages| Brokers
+    Brokers -->|Store| Storage
+    Brokers -->|Cache| Cache
+    Brokers -->|Consume| Consumers
+    Brokers -->|Metrics| Monitor
+    Consumers -->|Acknowledge| Brokers
+    Storage -->|Replicate| Storage
 
-    subgraph StateStore["State Stores"]
-        RK["RocksDB\nlocal state"]
-        CL["Changelog topic\n(backup)"]
-    end
-
-    subgraph Output["Output Topics"]
-        T3["enriched-orders"]
-        T4["order-stats"]
-    end
-
-    T1 --> ST1
-    T2 --> TB1
-    ST1 --> JOIN
-    TB1 --> JOIN
-    JOIN --> AGG
-    AGG -->|windowed state| RK
-    RK -.->|changelog| CL
-    AGG --> OUT
-    OUT --> T3
-    AGG --> T4
+    style Producers fill:#99ccff
+    style Brokers fill:#ffcc99
+    style Consumers fill:#99ff99
+    style Storage fill:#ff99cc
+    style Cache fill:#ffff99
+    style Monitor fill:#cc99ff
 ```
 
-## Flow Diagram
-
-```mermaid
-sequenceDiagram
-    participant K as Kafka Topic
-    participant ST as Stream Thread
-    participant SS as State Store (RocksDB)
-    participant CH as Changelog Topic
-
-    K->>ST: Poll records (orders partition 0)
-    ST->>ST: filter: amount > 0
-    ST->>ST: mapValues: enrich with timestamp
-    ST->>SS: StateStore.get(userId) for aggregation
-    SS-->>ST: Previous count for userId
-    ST->>ST: compute new count
-    ST->>SS: StateStore.put(userId, newCount)
-    ST->>CH: Changelog: (userId, newCount) [async backup]
-    ST->>K: Produce to output topic
-    ST->>K: Commit source offsets (atomic with output)
-```
-
-## Design
-
-### Processing Topologies
-
-```
-KStream: Unbounded stream of records
-  - Each record processed independently
-  - Stateless: filter, map, flatMap
-  - Stateful: aggregate, count, join
-
-KTable: Changelog stream (latest value per key)
-  - Represents current state (like a table)
-  - Backed by RocksDB state store
-  - Compacted topic as source
-
-GlobalKTable: Full copy on every instance
-  - Used for joins with broadcast data (lookup tables)
-  - All instances hold all data
-  - Use for small reference data (<100MB)
-
-Operations:
-  filter(predicate)           - drop records
-  map(keyValueMapper)         - transform key + value
-  flatMap(keyValueMapper)     - 1 -> N records
-  groupByKey().count()        - stateful count per key
-  groupByKey().aggregate()    - stateful custom aggregation
-  join(otherStream, ...)      - stream-stream join (windowed)
-  join(ktable, ...)           - stream-table join (no window)
-```
-
-### State Management
-
-```
-Local state (RocksDB):
-  Fast local reads/writes
-  Survives process restarts via changelog topic
-
-Changelog topic:
-  Kafka topic mirroring state store changes
-  On app restart: replay changelog to restore state
-  Rebalance: new task owner rebuilds from changelog
-
-Standby replicas (num.standby.replicas=1):
-  Another instance maintains hot standby
-  Failover in seconds (no full rebuild needed)
-  Cost: 2x state storage
-
-State store types:
-  Persistent (RocksDB): survives restart
-  In-memory: faster, lost on restart
-  Versioned: point-in-time queries
-```
-
-### Windowing
-
-```
-Tumbling window (fixed, non-overlapping):
-  5-minute windows: [0-5), [5-10), [10-15)
-  Count orders per user per 5-minute window
-
-Hopping window (fixed, overlapping):
-  Size=10min, advance=5min
-  [0-10), [5-15), [10-20)
-
-Session window (activity-based):
-  Gap=5min: events < 5min apart in same session
-  User session tracking
-
-Window grace period:
-  Late-arriving records accepted up to grace period
-  After grace: records dropped (or forwarded to late stream)
-```
-
-## Back-of-Envelope Calculations
-
-```
-Processing throughput:
-  Single stream thread: ~500K records/sec (simple stateless)
-  With RocksDB lookup: ~100-200K records/sec
-  With windowed aggregation: ~50-100K records/sec
-
-State store restoration time:
-  State size: 1GB, changelog throughput: 100MB/s
-  Restoration: 1GB / 100MB/s = 10 seconds
-  With standby replica: near-instant (< 1s switchover)
-
-Memory requirements:
-  RocksDB block cache: 512MB per instance (tuneable)
-  JVM heap: 512MB-2GB (for streams + state)
-  Total: ~2-3GB per instance
-
-Windowed state cleanup:
-  5-min window + 1-day retention: 1 day / 5 min = 288 windows
-  Per-key: 288 * 8 bytes = 2.3KB
-  100K keys: 230MB window state
-
-Commit interval:
-  commit.interval.ms: 100ms (default)
-  At 100ms: 10 commits/s per partition
-  Adds 100ms latency (records not visible until committed)
-```
-
-## Design Choices
-
-| Approach | Pros | Cons |
-|---|---|---|
-| Kafka Streams | Library, no cluster | JVM only, Kafka-only source |
-| Apache Flink | Exact time, any source | Cluster ops, complex |
-| Spark Streaming | Micro-batch, batch+stream | High latency (micro-batch) |
-| Faust (Python) | Python-native | Less performant than Streams |
-| KSQL/ksqlDB | SQL interface | Limited to Kafka, another service |
-
-## Python Implementation
-
-```python
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
-from collections import defaultdict
-import time
-
-@dataclass
-class StreamRecord:
-    key: str
-    value: Any
-    topic: str
-    partition: int = 0
-    offset: int = 0
-    timestamp: float = field(default_factory=time.time)
-
-class StateStore:
-    def __init__(self, name: str):
-        self.name = name
-        self._data: Dict[str, Any] = {}
-        self._changelog: List[Tuple[str, Any]] = []
-
-    def get(self, key: str, default: Any = None) -> Any:
-        return self._data.get(key, default)
-
-    def put(self, key: str, value: Any):
-        self._data[key] = value
-        self._changelog.append((key, value))
-
-    def all(self) -> Iterable[Tuple[str, Any]]:
-        return self._data.items()
-
-    def restore(self, changelog: List[Tuple[str, Any]]):
-        for key, value in changelog:
-            self._data[key] = value
-        print(f"[StateStore {self.name}] Restored {len(changelog)} entries")
-
-class KStream:
-    def __init__(self, topic: str, records: List[StreamRecord] = None):
-        self.topic = topic
-        self._records = records or []
-        self._state_stores: Dict[str, StateStore] = {}
-
-    def filter(self, predicate: Callable[[StreamRecord], bool]) -> "KStream":
-        filtered = [r for r in self._records if predicate(r)]
-        return KStream(self.topic, filtered)
-
-    def map_values(self, mapper: Callable[[Any], Any]) -> "KStream":
-        mapped = [StreamRecord(r.key, mapper(r.value), r.topic, r.timestamp) for r in self._records]
-        return KStream(self.topic, mapped)
-
-    def group_by_key(self) -> "KGroupedStream":
-        return KGroupedStream(self._records)
-
-    def join_table(self, ktable: "KTable", value_joiner: Callable) -> "KStream":
-        result = []
-        for r in self._records:
-            table_val = ktable.get(r.key)
-            if table_val is not None:
-                joined = value_joiner(r.value, table_val)
-                result.append(StreamRecord(r.key, joined, r.topic, r.timestamp))
-        return KStream(self.topic, result)
-
-    def to(self, output_topic: str) -> List[StreamRecord]:
-        for r in self._records:
-            r.topic = output_topic
-        return self._records
-
-class KTable:
-    def __init__(self, topic: str, records: List[StreamRecord]):
-        self._store: Dict[str, Any] = {}
-        for r in records:
-            self._store[r.key] = r.value  # Latest value per key
-
-    def get(self, key: str) -> Optional[Any]:
-        return self._store.get(key)
-
-    def all(self) -> Dict[str, Any]:
-        return dict(self._store)
-
-class KGroupedStream:
-    def __init__(self, records: List[StreamRecord]):
-        self._records = records
-
-    def count(self) -> Dict[str, int]:
-        counts: Dict[str, int] = defaultdict(int)
-        for r in self._records:
-            counts[r.key] += 1
-        return dict(counts)
-
-    def aggregate(self, initializer: Callable, aggregator: Callable,
-                  store: Optional[StateStore] = None) -> Dict[str, Any]:
-        result: Dict[str, Any] = {}
-        if store:
-            result = {k: v for k, v in store.all()}
-
-        for r in self._records:
-            current = result.get(r.key, initializer())
-            result[r.key] = aggregator(r.key, r.value, current)
-            if store:
-                store.put(r.key, result[r.key])
-        return result
-
-class TumblingWindow:
-    def __init__(self, size_ms: int):
-        self.size_ms = size_ms
-
-    def window_for(self, timestamp_ms: float) -> Tuple[float, float]:
-        window_start = int(timestamp_ms / self.size_ms) * self.size_ms
-        return window_start, window_start + self.size_ms
-
-class WindowedStream:
-    def __init__(self, records: List[StreamRecord], window: TumblingWindow):
-        self._records = records
-        self._window = window
-
-    def count(self) -> Dict[Tuple[str, Tuple], int]:
-        counts: Dict[Tuple, int] = defaultdict(int)
-        for r in self._records:
-            w = self._window.window_for(r.timestamp * 1000)
-            counts[(r.key, w)] += 1
-        return dict(counts)
-
-# Demo: order processing topology
-base_time = time.time()
-order_records = [
-    StreamRecord("user1", {"amount": 99.99, "item": "laptop"}, "orders", timestamp=base_time),
-    StreamRecord("user2", {"amount": 0, "item": "free"},        "orders", timestamp=base_time),
-    StreamRecord("user1", {"amount": 49.99, "item": "mouse"},   "orders", timestamp=base_time + 60),
-    StreamRecord("user3", {"amount": 199.99, "item": "phone"},  "orders", timestamp=base_time + 90),
-]
-
-payment_records = [
-    StreamRecord("user1", {"status": "paid"}, "payments"),
-    StreamRecord("user3", {"status": "paid"}, "payments"),
-]
-
-print("=== Kafka Streams Topology ===")
-
-# Build KTable from payments
-payment_table = KTable("payments", payment_records)
-print(f"Payment table: {payment_table.all()}")
-
-# Build KStream from orders
-orders_stream = KStream("orders", order_records)
-
-# Filter: only positive amounts
-orders_stream = orders_stream.filter(lambda r: r.value["amount"] > 0)
-
-# Enrich with payment status
-enriched = orders_stream.join_table(
-    payment_table,
-    lambda order, payment: {**order, "payment_status": payment["status"]}
-)
-
-print("\nEnriched orders (joined with payments):")
-for r in enriched._records:
-    print(f"  {r.key}: {r.value}")
-
-# Count orders per user
-order_counts = orders_stream.group_by_key().count()
-print(f"\nOrder counts per user: {order_counts}")
-
-# Windowed count (1-minute windows)
-window = TumblingWindow(size_ms=60_000)
-windowed = WindowedStream(orders_stream._records, window)
-windowed_counts = windowed.count()
-print(f"\nWindowed counts:")
-for (key, (start, end)), count in windowed_counts.items():
-    print(f"  {key} [{start:.0f}-{end:.0f}]: {count} orders")
-```
-
-## Java Implementation
-
-```java
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
-
-public class KafkaStreamsSimulator {
-    record SR(String key, Object value) {}
-
-    static class KS {
-        List<SR> records;
-        KS(List<SR> r) { records = r; }
+### Core Components
+
+#### Message Broker
+- **Function:** Store, manage, and distribute messages
+- **Implementations:** Kafka, RabbitMQ, Redis, AWS SQS, GCP Pub/Sub
+- **Key Features:** Persistence, replication, partitioning, consumer groups
+
+#### Producers
+- **Function:** Send messages to broker
+- **Patterns:** Synchronous, asynchronous, batched
+- **Concerns:** Acknowledgments, retries, compression
+
+#### Consumers
+- **Function:** Receive and process messages
+- **Patterns:** Pull vs push, concurrent processing, batch consumption
+- **Concerns:** Offset management, lag, ordering, error handling
+
+#### State Management
+- **Function:** Track consumer progress and processed messages
+- **Approaches:** Offset storage, deduplication cache, exactly-once semantics
+- **Storage:** External databases, broker-internal stores
+
+## Data Flow Scenarios
+
+### Scenario 1: Message Publishing
+1. Producer sends message with optional key
+2. Broker receives and writes to disk
+3. Broker replicates to replica nodes
+4. Broker acknowledges to producer
+5. Message available to consumers
+
+### Scenario 2: Message Consumption
+1. Consumer requests messages (pull) or receives (push)
+2. Broker delivers batch of messages
+3. Consumer processes message
+4. Consumer sends acknowledgment
+5. Broker updates offset
+
+### Scenario 3: Consumer Group Rebalancing
+1. New consumer joins group
+2. Broker triggers rebalancing
+3. Partitions reassigned to consumers
+4. Consumers reset offsets
+5. Processing resumes with new distribution
+
+## Scalability Strategies
+
+### Broker Scaling
+
+**Horizontal Scaling:**
+- Add broker nodes to cluster
+- Distribute partitions across nodes
+- Automatic rebalancing
+- Increases throughput and fault tolerance
+
+**Vertical Scaling:**
+- Increase CPU, memory, disk
+- Better compression, faster processing
+- Limited by single-node hardware
+
+### Partition Strategy
+
+**Key Selection:**
+- Hash-based: Distribute evenly across partitions
+- Range-based: Ordered partitions for range queries
+- Custom: Domain-specific partitioning logic
+
+**Rebalancing:**
+- Add partitions when single partition becomes hot
+- Split hot partitions across multiple nodes
+- Monitor per-partition throughput
+
+### Consumer Scaling
+
+**Parallel Consumption:**
+- One consumer per partition (max)
+- Multiple threads per consumer
+- Consumer groups distribute load
+
+**Handling Slow Consumers:**
+- Increase consumer instances
+- Optimize processing logic
+- Use faster hardware
+- Implement timeout and skip
+
+## High Availability & Reliability
+
+### Replication Strategy
+
+**In-Broker Replication:**
+- Multiple copies per partition
+- Leader handles writes
+- Followers handle reads
+- Automatic failover on leader failure
+
+**Cross-Datacenter Replication:**
+- Async replication to backup region
+- RTO/RPO tradeoffs
+- Active-active or active-passive
+
+### Failure Scenarios
+
+**Broker Failure:**
+- Detection: Health checks, heartbeats
+- Recovery: Replica promotion, partition rebalancing
+- Time: 10-30 seconds
+
+**Network Partition:**
+- Split-brain scenarios
+- Quorum-based decisions
+- Consistency vs availability tradeoffs
 
-        KS filter(Predicate<SR> p) { return new KS(records.stream().filter(p).collect(Collectors.toList())); }
-        KS mapValues(Function<Object, Object> f) {
-            return new KS(records.stream().map(r -> new SR(r.key(), f.apply(r.value()))).collect(Collectors.toList()));
-        }
-        Map<String, Long> groupAndCount() {
-            return records.stream().collect(Collectors.groupingBy(SR::key, Collectors.counting()));
-        }
-    }
+**Message Loss Prevention:**
+- Ack=all (all replicas)
+- Min.insync.replicas = 2+
+- Periodic backups
+- Point-in-time recovery
+
+## Data Consistency
 
-    static class KT {
-        Map<String, Object> store;
-        KT(List<SR> records) { store = records.stream().collect(Collectors.toMap(SR::key, SR::value, (a,b) -> b)); }
-        Optional<Object> get(String key) { return Optional.ofNullable(store.get(key)); }
-    }
+### Delivery Semantics
+
+**At-Most-Once:**
+- No duplicates, possible message loss
+- Fastest, least reliable
+- Use: Non-critical events
+
+**At-Least-Once:**
+- No message loss, possible duplicates
+- Requires idempotency
+- Use: Most applications
 
-    public static void main(String[] args) {
-        var orders = new KS(List.of(
-            new SR("u1", Map.of("amount", 100)),
-            new SR("u2", Map.of("amount", 0)),
-            new SR("u1", Map.of("amount", 50))
-        ));
-        var payments = new KT(List.of(new SR("u1", "paid"), new SR("u3", "paid")));
+**Exactly-Once:**
+- No loss, no duplicates
+- Slowest, most reliable
+- Use: Financial, critical operations
 
-        var filtered = orders.filter(r -> ((Map<?,?>)r.value()).get("amount").equals(0) == false);
-        System.out.println("Counts: " + filtered.groupAndCount());
+### Ordering Guarantees
 
-        // Join
-        filtered.records.stream()
-            .filter(r -> payments.get(r.key()).isPresent())
-            .forEach(r -> System.out.printf("%s: order=%s payment=%s%n",
-                r.key(), r.value(), payments.get(r.key()).get()));
-    }
-}
-```
+**Per-Partition:**
+- Single partition = strict ordering
+- Trade-off: Limited parallelism
 
-## Complexity
+**Per-Key:**
+- Hash key to partition
+- All messages for key go to same partition
+- Enables parallel processing with ordering
 
-| Operation | Time |
-|---|---|
-| Stateless transform (filter/map) | O(records) |
-| State store get/put | O(log n) RocksDB |
-| Windowed aggregation | O(records) amortized |
-| Stream-table join | O(records) |
-| State restoration | O(changelog size) |
+**Global Ordering:**
+- Single partition (no parallelism)
+- Very expensive to maintain
+- Usually not needed
 
-## Common Questions & Answers
+## Performance Optimization
 
-**Q: What is Apache Kafka?**
+### Throughput Optimization
 
-A: Distributed event streaming platform (publish-subscribe messaging system). Stores event streams durable in log-based architecture. Supports multiple subscribers reading same data, replay capability, distributed processing. Critical infrastructure for real-time systems.
+**Batching:**
+- Linger time: Wait up to X ms for batch
+- Batch size: Send when batch reaches N messages
+- Compression: Reduce network bandwidth
+- Impact: 10-100x throughput improvement
 
-**Q: How is Kafka different from traditional message queues?**
+**Connection Pooling:**
+- Reuse connections (don't create per request)
+- Reduces overhead, improves latency
+- Improves CPU efficiency
 
-A: Kafka persists all messages in ordered append-only log. Queues delete after consumption. Kafka supports multiple independent subscribers of same data. Enables replay, reprocessing, multiple consumers. Trade-off: different API, operational complexity.
+**Async Processing:**
+- Non-blocking sends
+- Pipelining: Multiple in-flight requests
+- Callbacks for acknowledgments
 
-**Q: What is a Kafka topic and partition?**
+### Latency Optimization
 
-A: Topic: named event stream (orders, clicks, logs). Partition: ordered, immutable log within topic. Messages with same key go to same partition (order guarantee). Multiple partitions enable parallelism.
+**Local Caching:**
+- Cache hot messages in memory
+- Reduces broker round trips
+- Configurable TTL
 
-**Q: What is a consumer group?**
+**Network Optimization:**
+- Co-locate producers/brokers
+- Reduce network hops
+- Multiple broker replicas per region
 
-A: Set of consumers reading same topic collaboratively. Each partition assigned to one consumer in group. Enable parallel processing and scaling. If consumer dies, partition reassigned to other consumer.
+**Codec Selection:**
+- No compression: Fastest
+- Snappy: Good compression ratio, fast
+- GZIP: Best compression, slower
+- LZ4: Fast, moderate compression
 
-**Q: How does Kafka guarantee ordering?**
+## Security
 
-A: Messages in single partition ordered by offset. Messages with same key always go to same partition (key routing). Therefore: same-key messages processed in order. Different keys can process out-of-order (parallel).
+### Authentication & Authorization
 
-**Q: What does acks setting do?**
+**SASL/SSL:**
+- Username/password authentication
+- Mutual TLS for transport security
+- ACLs for topic access control
 
-A: acks=0: producer doesn't wait (fire-and-forget). acks=1: wait for leader ack (fast). acks=all: wait for all replicas ack (safest, slowest). Choose: reliability vs. latency trade-off.
+**OAuth2:**
+- Token-based authentication
+- Integration with identity providers
+- Fine-grained authorization
 
-**Q: What is at-least-once delivery guarantee?**
+### Encryption
 
-A: Messages guaranteed delivered but may be duplicated. If producer retries on timeout, message could appear twice. Consumer must be idempotent (handle duplicates safely).
+**In Transit:**
+- TLS 1.3 for all connections
+- Certificate pinning for sensitive clients
 
-**Q: How do you scale Kafka?**
+**At Rest:**
+- Disk encryption
+- Key management (KMS)
+- Per-message encryption
 
-A: Add more partitions (parallelism), add more consumer replicas (throughput), add more brokers (storage/availability). Monitor lag, rebalance. Orchestrate with Kubernetes.
+### Compliance
 
-**Q: What is consumer lag?**
+**GDPR:**
+- Message retention policies
+- Right to deletion
+- Data residency requirements
 
-A: Difference between latest message offset and consumer's current offset. High lag = consumer falling behind. Monitor continuously, alert if lag growing. Indicates consumer too slow or too few consumers.
+**PCI-DSS:**
+- Encryption for payment data
+- Access controls
+- Audit logging
 
-**Q: How do you monitor Kafka health?**
+## Monitoring & Observability
 
-A: Track broker metrics (CPU, disk, network), consumer lag, in-sync replicas (ISR), partition distribution. Use tools like Burrow, LinkedIn monitoring. Alert on anomalies.
+### Key Metrics
 
-## Follow-up Questions & Answers
+**Throughput:**
+- Messages/sec
+- Bytes/sec
+- Partition lag
 
-**Q: How would you implement exactly-once semantics in Kafka?**
+**Latency:**
+- End-to-end latency
+- Broker latency
+- Consumer processing time
 
-A: Use Kafka transactions (producer idempotency + atomic writes). Consumer must track processed message IDs. Or use idempotent producer + idempotent consumer. Trade: performance for correctness. Requires Kafka 0.11+.
+**Reliability:**
+- Replication lag
+- Broker availability
+- Message loss events
 
-**Q: How do you handle backpressure (producer faster than consumer)?**
+### Alerting
 
-A: Consumer lags behind (offset < latest). Use monitoring to detect. Scaling options: add more consumer threads, optimize consumer code, reduce producer rate, or buffer in queue. Choose based on SLA.
+- Alert on consumer lag > threshold
+- Alert on broker latency > P99 target
+- Alert on replication lag
+- Alert on broker unavailability
 
-**Q: How would you implement Kafka in multi-region setup?**
+### Tracing
 
-A: Use MirrorMaker to replicate topics across regions. Choose consistency model (strong = sync, eventual = async). Handle failover (which region is primary). Complex operational model.
+- Distributed tracing per message
+- Correlation IDs
+- Performance bottleneck identification
 
-**Q: What is Kafka Streams?**
+## Technology Stack
 
-A: Library for stream processing on Kafka. Stateless (map, filter, flatMap), stateful (aggregate, join, window). Good for simple transformations. Alternative to Spark/Flink for JVM applications.
+| Component | Options | Recommendation |
+|-----------|---------|-----------------|
+| **Broker** | Kafka, RabbitMQ, Redis, Pulsar, NATS | Kafka for scalability, RabbitMQ for reliability |
+| **Storage** | Disk, Cloud Object Storage | Local disk (fast), S3 for cold storage |
+| **Serialization** | Avro, Protobuf, JSON | Avro/Protobuf (schema, compression) |
+| **Client Library** | Producer, Consumer SDKs | Official language-specific SDKs |
+| **Schema Registry** | Confluent, AWS Glue | Confluent (mature, widely adopted) |
+| **Monitoring** | Prometheus, Grafana, DataDog | Prometheus + Grafana (open source) |
+| **Orchestration** | Kubernetes, Docker Compose | Kubernetes (production scale) |
 
-**Q: How do you debug Kafka performance issues?**
+## Capacity Planning
 
-A: Monitor broker metrics (CPU, disk utilization), network latency, GC pauses. Check consumer lag, partition skew. Profile producer/consumer code. Check network bandwidth between brokers.
+### Resource Estimation
 
-**Q: How would you handle late-arriving messages?**
+**Broker Resources (per 1M msg/sec):**
+- CPU: 8+ cores
+- Memory: 32GB+ (depends on cache)
+- Disk: Depends on retention (100GB+ per day)
+- Network: 1+ Gbps
 
-A: Kafka preserves order within partition. Late messages appear out of order w.r.t. other partitions. Application must handle. Use timestamps for processing time logic. Consider grace period for windowed aggregations.
+**Consumer Resources (processing 1M msg/sec):**
+- CPU: 4-8 cores
+- Memory: 16GB+
+- Throughput: Process 100K-1M msg/sec per instance
 
-**Q: How do you implement message ordering guarantees?**
+### Cost Calculation
 
-A: Send messages with same key (routes to same partition). Consumer reads single partition (ordered). Tradeoff: single partition limits throughput. Use multiple partitions + key if you need both.
+**Broker Costs:**
+- Infrastructure: $5K-20K/month for 1M msg/sec
+- Storage: $0.10/GB/month (AWS S3 pricing)
+- Network egress: $0.12/GB
 
-**Q: Can you compact Kafka topics?**
+**Total Monthly Cost:**
+- Typical: $10K-50K for mid-scale system
+- Large scale: $100K-1M+ per month
 
-A: Yes, log compaction mode: keeps latest value per key. Useful for state topics (user profiles). Trade: smaller storage but must maintain keys. Different from default delete mode.
+## Lessons Learned
 
-**Q: How would you implement Kafka with transactions?**
+1. **Consumer Groups are Powerful:** Use them for scalability and fault tolerance, not just load balancing
 
-A: Atomic multi-partition writes (Kafka 0.11+). Transactional producer: multiple puts before commit. Isolation level: read_committed (default) vs. read_uncommitted. Producer and consumer transaction APIs.
+2. **Exactly-Once is Expensive:** Use at-least-once with idempotency for most use cases
 
-**Q: How do you handle Kafka rebalancing?**
+3. **Consumer Lag is Critical:** Monitor it religiously—it's your early warning system
 
-A: When consumer joins/leaves, partitions reassigned. Brief unavailability during rebalance. Minimize with heartbeat tuning, larger batches, optimize consumer code. Monitor rebalance frequency and duration.
+4. **Partitioning Strategy Matters:** Poor key selection creates hot partitions and limits scalability
 
+5. **Monitoring is Non-Optional:** Without visibility, operational issues become crises
+
+## Common Interview Questions
+
+1. **Design a scalable message queue for 1M messages/sec**
+   - Discuss partitioning, replication, consumer groups
+   - Address failure scenarios and recovery
+   - Explain consistency tradeoffs
+
+2. **How would you handle exactly-once delivery?**
+   - Idempotency keys, deduplication, transactions
+   - Cost vs benefit analysis
+   - Real-world examples (payment systems)
+
+3. **What happens when a consumer fails?**
+   - Rebalancing, offset management
+   - Recovery procedures
+   - Time to recovery
+
+4. **How do you scale a slow consumer?**
+   - Add more instances
+   - Optimize processing logic
+   - Consider batching or windowing
+   - Monitor and alert on lag
+
+5. **Design a system with per-message ordering**
+   - Key selection, partition strategy
+   - Tradeoffs with throughput
+   - Alternative approaches
+
+6. **How would you migrate from one broker to another?**
+   - Dual writes, validation, cutover
+   - Downtime minimization
+   - Rollback strategy
+
+## Related Systems
+
+- **Kafka** → For high-throughput, scalable event streaming
+- **RabbitMQ** → For reliable, complex message routing
+- **Redis Streams** → For fast, simple event streaming
+- **AWS Kinesis** → For managed, AWS-integrated streaming
+- **GCP Pub/Sub** → For serverless, GCP-integrated messaging
+
+---
+
+**Difficulty:** Intermediate
+**Time to Master:** 2-4 weeks
+**Prerequisite Knowledge:** Distributed systems, message queues
+**Common in Interviews:** Yes - Medium to Hard

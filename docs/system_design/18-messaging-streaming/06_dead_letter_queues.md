@@ -1,565 +1,409 @@
-# Dead Letter Queues (DLQ)
+## System Overview
+
+**Scale Metrics:**
+- **Throughput:** Handling millions of failed messages
+- **Key Components:** DLQ topics, Retry logic, Error tracking
+- **Primary Use Case:** Error handling, debugging, monitoring
 
 ## Problem Statement
 
-Design a dead letter queue system for capturing, retrying, and handling messages that fail processing — ensuring no messages are permanently lost while preventing poison pills from blocking the queue.
-
-## Scenario
-
-Dead Letter Queues (DLQ) is a critical component in modern distributed systems. In real-world applications, handling complex business logic at scale with high reliability. For example, major tech companies like Netflix, Uber, and Airbnb rely on similar solutions to handle millions of concurrent users and requests. The challenge is achieving this while maintaining sub-100ms latency, 99.99% availability, and gracefully handling 10x traffic spikes during peak demand. This component provides the foundational capability to solve these challenges reliably and efficiently at global scale.
-
-## Users
-
-- **Backend Engineers**: Responsible for implementing and maintaining this system component in production environments. They need to understand the architecture, trade-offs, failure modes, and operational considerations.
-- **DevOps/SRE Teams**: Monitor system health, manage scaling policies, handle incidents, and ensure reliability SLAs are met. They need insights into performance characteristics, bottlenecks, and failure recovery mechanisms.
-- **Data Engineers**: Design data pipelines and analytics around this system, requiring deep understanding of data flow, consistency guarantees, and throughput characteristics.
-- **System Architects**: Make high-level architectural decisions that impact company infrastructure, requiring comprehensive understanding of capabilities, limitations, and scalability boundaries.
-- **Security Teams**: Understand security implications, potential vulnerabilities, and compliance requirements for this component.
-
-## PRD
-
 ### Functional Requirements
-- Core operations work correctly
-- Explicit error handling
-- Consistency guarantees defined
-- Monitoring and observability
+- [Core operation 1: description]
+- [Core operation 2: description]
+- [Core operation 3: description]
+- [Core operation 4: description]
+- [Core operation 5: description]
 
 ### Non-Functional Requirements
-- Performance targets met
-- Availability SLA achieved
-- Scalability headroom
-- Cost efficient
+- **Latency:** P99 < 100ms (depends on system type)
+- **Throughput:** 1M+ messages/sec (variable by system)
+- **Availability:** 99.99% uptime
+- **Consistency:** Exactly-once or at-least-once (configurable)
+- **Scalability:** Handle 10x growth seamlessly
 
-### Success Metrics
-- Benchmarks met
-- Uptime targets met
-- Resource budgets
-- No data loss
+## Architecture
 
-
-## Flow
-
-The typical operational flow for this system involves these key phases:
-
-1. **Request Arrival**: Client/upstream system sends request with required parameters and context
-2. **Validation & Routing**: System validates request format, authentication, and routes to correct handler/shard/instance
-3. **Core Processing**: Execute the main algorithm, database query, or business logic on the data/state
-4. **State Management**: Update internal state (caches, indexes, counters, logs) with proper atomicity and locking
-5. **Response Generation**: Format results and return to requester with relevant metadata (timing, version info)
-6. **Observability**: Record metrics (latency, throughput, errors), logs (for debugging), and traces (for performance analysis)
-
-This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
-
-
-## Code Explanation (Detailed)
-
-### Implementation Approach
-The code demonstrates core patterns and trade-offs.
-
-### Key Operations
-Each operation shows algorithm and performance characteristics.
-
-### Concurrency and Atomicity
-Locking strategies, race condition prevention.
-
-### Edge Cases
-Boundary conditions and error handling.
-
-### Performance Optimization
-Techniques for reducing latency and throughput.
-
-## Architecture Diagram
+### High-Level Design
 
 ```mermaid
-graph LR
-    P["Producer"] --> Q["Main Queue\norders.process"]
-    Q --> C["Consumer"]
+graph TB
+    Producers["Producers<br/>Apps, Services"]
+    Brokers["Message Brokers<br/>Kafka, RabbitMQ, Redis"]
+    Consumers["Consumers<br/>Processors, Services"]
+    Storage["Persistent Storage<br/>Disk, Replication"]
+    Cache["Cache Layer<br/>In-memory"]
+    Monitor["Monitoring<br/>Metrics, Alerts"]
 
-    C -->|success| ACK["ACK\n(message deleted)"]
-    C -->|failure| NACK["NACK\n(requeue=false)"]
+    Producers -->|Send Messages| Brokers
+    Brokers -->|Store| Storage
+    Brokers -->|Cache| Cache
+    Brokers -->|Consume| Consumers
+    Brokers -->|Metrics| Monitor
+    Consumers -->|Acknowledge| Brokers
+    Storage -->|Replicate| Storage
 
-    subgraph DLQ["Dead Letter System"]
-        DLX["DLX Exchange\norders.dlx"]
-        DQ["DLQ\norders.dead"]
-        RETRY["Retry Queue\norders.retry\nTTL=60s"]
-    end
-
-    NACK --> DLX
-    DLX --> DQ
-    DQ -->|inspect/fix| OPS["Ops Team\nManual Review"]
-    DQ -->|automated retry| RETRY
-    RETRY -->|after TTL expires| Q
+    style Producers fill:#99ccff
+    style Brokers fill:#ffcc99
+    style Consumers fill:#99ff99
+    style Storage fill:#ff99cc
+    style Cache fill:#ffff99
+    style Monitor fill:#cc99ff
 ```
 
-## Flow Diagram
-
-```mermaid
-sequenceDiagram
-    participant Q as Main Queue
-    participant C as Consumer
-    participant DQ as Dead Letter Queue
-    participant RQ as Retry Queue
-
-    Q->>C: Deliver message (attempt 1)
-    C->>C: Process -> Exception
-    C->>Q: NACK (retry_count=1)
-    Q->>RQ: Route to retry queue (TTL=5s)
-    
-    Note over RQ: Wait TTL=5s
-    RQ->>Q: Message expires -> republish
-    
-    Q->>C: Deliver message (attempt 2)
-    C->>C: Process -> Exception
-    C->>Q: NACK (retry_count=2)
-    Q->>RQ: Route to retry queue (TTL=30s)
-
-    Q->>C: Deliver message (attempt 3)
-    C->>C: Process -> Exception (max retries exceeded)
-    C->>DQ: Publish to DLQ with error metadata
-    
-    Note over DQ: Alert ops team
-    DQ->>DQ: Store for investigation
-```
-
-## Design
-
-### Retry Strategies
-
-```
-Immediate retry (bad):
-  Message fails -> immediately requeue
-  Risk: tight retry loop, overwhelms downstream
-  Bad pattern: while True: try process() except: requeue()
-
-Exponential backoff (good):
-  Attempt 1: delay 1s
-  Attempt 2: delay 2s
-  Attempt 3: delay 4s
-  Attempt 4: delay 8s (max_retries=3 -> DLQ)
-  
-  Implementation in RabbitMQ:
-    Retry queue with x-message-ttl = delay
-    TTL expires -> message republished to main queue
-
-Fixed delay via Kafka:
-  Dedicated retry topics: retry.5s, retry.30s, retry.5m
-  Consumer reads retry topics, checks publish_time + delay
-  If ready: process; else: re-enqueue to same retry topic
-
-Circuit breaker + DLQ:
-  After N consecutive failures: open circuit
-  All new messages -> DLQ immediately (no retry flood)
-  Reset after cool-down period
-```
-
-### DLQ Design
-
-```
-DLQ metadata enrichment (before DLQ):
-  {
-    "original_queue": "orders.process",
-    "original_exchange": "orders",
-    "routing_key": "process",
-    "failure_reason": "NullPointerException: line 42",
-    "failure_timestamp": "2024-01-15T10:30:00Z",
-    "retry_count": 3,
-    "original_payload": {...}
-  }
-
-DLQ handling strategies:
-  1. Alert + manual review (critical systems)
-  2. Automated replay after fix (most common)
-  3. Discard with audit log (non-critical)
-  4. Route to fallback processor
-
-DLQ replay:
-  Fix the code/configuration
-  Consume DLQ and re-publish to main queue
-  Monitor DLQ drain rate vs main queue
-  Use rate limiter to avoid replay storm
-```
-
-### Poison Pill Detection
-
-```
-A poison pill = message that will always fail (bad data, bug)
-  Without DLQ: blocks queue forever (or infinite retry loop)
-  With DLQ: isolated after max_retries, queue unblocked
-
-Detection:
-  max_retries: 3-5 (not too few, not infinite)
-  Different errors: retry transient (network), DLQ immediately for data errors
-  Error categorization:
-    Retryable: TimeoutError, ConnectionRefused, HTTP 503
-    Non-retryable: ValidationError, ParseError, HTTP 400
-
-Per-error DLQ:
-  parsing-errors.dlq  -> data issues
-  timeout-errors.dlq  -> infrastructure issues
-  business-errors.dlq -> business logic failures
-```
-
-## Back-of-Envelope Calculations
-
-```
-DLQ accumulation rate:
-  Main queue: 10K msg/s
-  Error rate: 0.1% -> 10 msg/s to DLQ
-  After 1 hour: 36K messages in DLQ
-  Alert threshold: 1000 messages in DLQ
-
-Retry delay impact:
-  max_retries=3, delays=[1s, 5s, 30s]
-  Total time before DLQ: 36 seconds
-  During outage: messages delayed 36s, acceptable
-
-Replay throughput:
-  DLQ has 100K messages after outage fix
-  Replay rate: 1000 msg/s (10% of normal)
-  Drain time: 100K / 1000 = 100 seconds
-  Monitor consumer lag returns to 0
-
-Storage:
-  DLQ with full metadata: 2KB per message
-  100K messages: 200MB
-  Retention 7 days: 200MB (trivial, DLQ should be small)
-
-Retry storm prevention:
-  10K services, each retries 3x on startup
-  Without jitter: 30K simultaneous retries -> thundering herd
-  With jitter: distributed over 0-30s -> 1K/s (manageable)
-```
-
-## Design Choices
-
-| Retry Strategy | Latency | Throughput Impact | Complexity |
-|---|---|---|---|
-| Immediate requeue | Low | High (retry storm) | Low |
-| Fixed delay (TTL) | Medium | Low | Low |
-| Exponential backoff | High (first fail) | None | Medium |
-| Dedicated retry topics (Kafka) | Configurable | None | Medium |
-| Circuit breaker + DLQ | None (fail fast) | None | High |
-
-## Python Implementation
-
-```python
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional
-from collections import deque
-import time
-import math
-import random
-
-@dataclass
-class DeadMessage:
-    msg_id: str
-    payload: Any
-    original_queue: str
-    error: str
-    retry_count: int
-    failed_at: float = field(default_factory=time.time)
-    headers: Dict[str, str] = field(default_factory=dict)
-
-@dataclass
-class RetryableMessage:
-    msg_id: str
-    payload: Any
-    retry_count: int = 0
-    scheduled_at: float = field(default_factory=time.time)
-    max_retries: int = 3
-
-class BackoffStrategy:
-    def __init__(self, base_delay_s: float = 1.0, max_delay_s: float = 60.0,
-                 jitter: bool = True):
-        self.base = base_delay_s
-        self.max_delay = max_delay_s
-        self.jitter = jitter
-
-    def delay_for(self, retry_count: int) -> float:
-        delay = min(self.base * (2 ** retry_count), self.max_delay)
-        if self.jitter:
-            delay *= (0.5 + random.random() * 0.5)  # 50-100% of calculated delay
-        return delay
-
-class DeadLetterQueue:
-    def __init__(self, name: str):
-        self.name = name
-        self._messages: List[DeadMessage] = []
-        self._alerts: List[str] = []
-
-    def receive(self, msg: DeadMessage):
-        self._messages.append(msg)
-        if len(self._messages) % 10 == 0:
-            self._alerts.append(f"DLQ {self.name}: {len(self._messages)} messages")
-        print(f"  [DLQ {self.name}] Received {msg.msg_id}: {msg.error} (retry#{msg.retry_count})")
-
-    def replay(self, target_queue: "Queue", rate_per_second: int = 100) -> int:
-        replayed = 0
-        interval = 1.0 / rate_per_second
-        while self._messages and replayed < rate_per_second:
-            msg = self._messages.pop(0)
-            dm = RetryableMessage(msg.msg_id, msg.payload, retry_count=0)
-            target_queue.enqueue(dm)
-            replayed += 1
-            time.sleep(interval * 0.001)  # Scale for demo
-        print(f"  [DLQ {self.name}] Replayed {replayed} messages to {target_queue.name}")
-        return replayed
-
-    def depth(self) -> int:
-        return len(self._messages)
-
-class Queue:
-    def __init__(self, name: str, dlq: Optional[DeadLetterQueue] = None,
-                 max_retries: int = 3):
-        self.name = name
-        self.dlq = dlq
-        self.max_retries = max_retries
-        self._messages: deque = deque()
-        self._retry_queue: deque = deque()  # (scheduled_at, message)
-        self._backoff = BackoffStrategy()
-
-    def enqueue(self, msg: RetryableMessage):
-        self._messages.append(msg)
-
-    def _flush_retry_queue(self):
-        now = time.time()
-        while self._retry_queue:
-            scheduled_at, msg = self._retry_queue[0]
-            if scheduled_at <= now:
-                self._retry_queue.popleft()
-                self._messages.append(msg)
-            else:
-                break
-
-    def consume_one(self, processor: Callable[[Any], bool]) -> Optional[bool]:
-        self._flush_retry_queue()
-        if not self._messages:
-            return None
-        msg = self._messages.popleft()
-
-        try:
-            success = processor(msg.payload)
-            if success:
-                print(f"  [Queue {self.name}] Processed {msg.msg_id} successfully")
-                return True
-            else:
-                raise RuntimeError("Processing returned False")
-        except Exception as e:
-            msg.retry_count += 1
-            if msg.retry_count >= self.max_retries:
-                if self.dlq:
-                    self.dlq.receive(DeadMessage(
-                        msg_id=msg.msg_id,
-                        payload=msg.payload,
-                        original_queue=self.name,
-                        error=str(e),
-                        retry_count=msg.retry_count,
-                    ))
-                else:
-                    print(f"  [Queue {self.name}] DROPPED {msg.msg_id} (no DLQ configured)")
-                return False
-            else:
-                delay = self._backoff.delay_for(msg.retry_count)
-                scheduled = time.time() + delay
-                msg.scheduled_at = scheduled
-                # Insert in sorted order
-                inserted = False
-                for i, (t, _) in enumerate(self._retry_queue):
-                    if scheduled < t:
-                        self._retry_queue.insert(i, (scheduled, msg))
-                        inserted = True
-                        break
-                if not inserted:
-                    self._retry_queue.append((scheduled, msg))
-                print(f"  [Queue {self.name}] Retry #{msg.retry_count} for {msg.msg_id} in {delay:.2f}s")
-                return None
-
-# Setup
-dlq = DeadLetterQueue("orders.dlq")
-main_queue = Queue("orders.process", dlq=dlq, max_retries=3)
-
-# Produce messages
-for i in range(5):
-    main_queue.enqueue(RetryableMessage(f"msg-{i}", {"order_id": i, "amount": 10 * (i+1)}))
-
-# Processor that fails on certain messages
-fail_ids = {"msg-2", "msg-3"}
-def processor(payload: dict) -> bool:
-    if f"msg-{payload['order_id']}" in fail_ids:
-        raise ValueError(f"Invalid order data for order {payload['order_id']}")
-    return True
-
-print("=== Processing messages ===")
-for _ in range(5):
-    main_queue.consume_one(processor)
-
-# Simulate time passing and retry
-print("\n=== Processing retries (simulated time) ===")
-# Flush retry queue manually by draining it with delay=0
-for item in list(main_queue._retry_queue):
-    main_queue._messages.append(item[1])
-main_queue._retry_queue.clear()
-
-for _ in range(10):
-    result = main_queue.consume_one(processor)
-    if result is None and not main_queue._messages:
-        break
-
-print(f"\nDLQ depth: {dlq.depth()}")
-
-print("\n=== DLQ Replay ===")
-dlq.replay(main_queue, rate_per_second=10)
-```
-
-## Java Implementation
-
-```java
-import java.util.*;
-import java.util.function.*;
-
-public class DeadLetterSystem {
-    record Msg(String id, Object payload, int retries) {}
-    record DeadMsg(String id, Object payload, String error, int retries) {}
-
-    static class DLQ {
-        List<DeadMsg> messages = new ArrayList<>();
-        void receive(DeadMsg m) {
-            messages.add(m);
-            System.out.printf("[DLQ] %s failed after %d retries: %s%n", m.id(), m.retries(), m.error());
-        }
-        int size() { return messages.size(); }
-    }
-
-    static class Queue {
-        String name; DLQ dlq; int maxRetries;
-        Deque<Msg> q = new ArrayDeque<>();
-
-        Queue(String n, DLQ d, int max) { name = n; dlq = d; maxRetries = max; }
-
-        void enqueue(Msg m) { q.addLast(m); }
-
-        void processAll(Predicate<Object> processor) {
-            while (!q.isEmpty()) {
-                Msg msg = q.pollFirst();
-                try {
-                    if (!processor.test(msg.payload())) throw new RuntimeException("Failed");
-                    System.out.printf("[Queue] Processed %s%n", msg.id());
-                } catch (Exception e) {
-                    int retries = msg.retries() + 1;
-                    if (retries >= maxRetries) {
-                        dlq.receive(new DeadMsg(msg.id(), msg.payload(), e.getMessage(), retries));
-                    } else {
-                        q.addLast(new Msg(msg.id(), msg.payload(), retries));
-                        System.out.printf("[Queue] Retry %d for %s%n", retries, msg.id());
-                    }
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        DLQ dlq = new DLQ();
-        Queue q = new Queue("orders", dlq, 2);
-        Set<String> failSet = Set.of("msg-1", "msg-2");
-
-        for (int i = 0; i < 4; i++) q.enqueue(new Msg("msg-" + i, "order-" + i, 0));
-        q.processAll(p -> !failSet.contains(((String)p).replace("order", "msg")));
-        System.out.println("DLQ size: " + dlq.size());
-    }
-}
-```
-
-## Complexity
-
-| Operation | Time |
-|---|---|
-| Enqueue to DLQ | O(1) |
-| Retry queue insert (sorted) | O(log n) |
-| Retry queue flush | O(k) ready messages |
-| DLQ replay | O(n) |
-| Backoff calculation | O(1) |
-
-## Common Questions & Answers
-
-**Q: What is caching and why do we need it?**
-
-A: Caching stores frequently accessed data in fast storage (memory) to reduce latency and load on slower backends (database). Trade space (cache) for speed (latency). Critical for systems serving millions of requests per second.
-
-**Q: What are the main cache eviction policies?**
-
-A: LRU (least recently used), LFU (least frequently used), FIFO (first in first out), TTL (time-based), Random, and ARC (adaptive replacement). Choose based on access patterns: LRU for temporal, LFU for frequency, TTL for time-sensitive data.
-
-**Q: What is cache hit rate and cache miss rate?**
-
-A: Hit rate = successful_finds / total_accesses. Miss rate = 1 - hit rate. P(hit) = hits / (hits + misses). Target 80%+ hit rates for effective caching. Too-small cache gives low hit rate (wasted resources). Too-large cache uses more memory than needed.
-
-**Q: How do you handle cache invalidation when backend data changes?**
-
-A: Use TTL (time-based expiration), active invalidation (notify cache on write), cache-aside pattern (client checks backend), or write-through (update both). Active invalidation is fastest but complex. TTL is simplest but has stale data window.
-
-**Q: What is the cache-aside pattern?**
-
-A: Application checks cache first. On miss, fetch from backend, update cache, then return. Simple to implement. Risk: race condition where multiple threads fetch same miss simultaneously (thundering herd problem).
-
-**Q: What is write-through caching?**
-
-A: Writes go to both cache and backend simultaneously (synchronously). Ensures consistency: read always gets latest. Cost: write latency includes backend write. Safer than write-back but slower.
-
-**Q: What is write-back (write-behind) caching?**
-
-A: Writes go to cache only; backend updated asynchronously later (batch or periodic). Fast writes. Risk: data loss if cache fails before flushing. Need durability guarantees (persistence, replication).
-
-**Q: How do you choose cache size?**
-
-A: Estimate working set (frequently accessed data volume). Add 20-30% buffer for margin. Monitor hit rate: if < 80%, increase size. If > 95%, might be oversized (waste). Use tools like cachegrind to profile.
-
-**Q: What's the difference between client-side and server-side caching?**
-
-A: Client cache (browser): reduces network round-trips, entirely controlled by client. Server cache (memory, Redis): shared across clients, controlled by server. Multi-level caching often best.
-
-**Q: How do you measure cache effectiveness?**
-
-A: Hit rate (primary metric), latency reduction (P99 latency with vs. without cache), backend load reduction, and memory cost per cache entry. Calculate ROI: cost of cache vs. benefit (reduced latency, backend load).
-
-## Follow-up Questions & Answers
-
-**Q: How do you prevent the thundering herd problem in caches?**
-
-A: When popular key expires, many threads fetch from backend simultaneously causing spike. Solutions: probabilistic early expiration (refresh before TTL), request coalescing (single thread rebuilds, others wait), or bloom filters (detect non-existent keys fast).
-
-**Q: How would you implement multi-level cache hierarchy?**
-
-A: Use L1 (fast, small, in-process), L2 (medium, local machine), L3 (large, remote, Redis). Check L1, miss→L2, miss→L3, miss→backend. On write: update all levels. Trade space for speed across levels.
-
-**Q: Can you implement read-through caching (automatic population)?**
-
-A: Yes, cache loader/resolver called on miss. Transparent to application. Backend automatically uses cache layer. More complex than cache-aside but cleaner separation.
-
-**Q: How do you handle hot keys in distributed caches?**
-
-A: Hot key = key accessed by many threads/clients. Replicate hot keys on multiple cache nodes. Use local in-process caches for very hot keys. Monitor and detect hot keys automatically.
-
-**Q: What's the difference between warm and cold cache startup?**
-
-A: Cold cache: empty at start, misses until populated (slow ramp-up). Warm cache: pre-loaded from previous state (RDB/snapshot). Warm startup is critical for production (instant performance).
-
-**Q: How would you measure cache effectiveness for business metrics?**
-
-A: Track hit rate, P99 latency (with/without cache), backend QPS reduction, revenue impact. Calculate cache size vs. cost savings. A/B test to prove business value.
-
-**Q: What happens when cache size is insufficient for working set?**
-
-A: Constant evictions = high miss rate = ineffective cache. Solution: increase cache size, improve eviction policy, reduce working set, or use better hardware (faster storage).
-
-**Q: How do you debug cache issues in production?**
-
-A: Monitor hit rate continuously. Profile cache keys (which keys are accessed). Check for cache stampedes (sudden miss spike). Use distributed tracing to see cache path.
-
-**Q: How would you implement a persistent cache?**
-
-A: Combine memory cache (fast) with persistent backend (database, RocksDB, LevelDB). Write-back pattern: batch updates to persistent store. Trade latency for durability.
-
-**Q: Can you use caching for write-heavy workloads?**
-
-A: Write caching is risky (consistency issues). Use carefully: write-through for safety, write-back for speed. Good for batch writes (aggregate before writing). Monitor durability guarantees.
+### Core Components
+
+#### Message Broker
+- **Function:** Store, manage, and distribute messages
+- **Implementations:** Kafka, RabbitMQ, Redis, AWS SQS, GCP Pub/Sub
+- **Key Features:** Persistence, replication, partitioning, consumer groups
+
+#### Producers
+- **Function:** Send messages to broker
+- **Patterns:** Synchronous, asynchronous, batched
+- **Concerns:** Acknowledgments, retries, compression
+
+#### Consumers
+- **Function:** Receive and process messages
+- **Patterns:** Pull vs push, concurrent processing, batch consumption
+- **Concerns:** Offset management, lag, ordering, error handling
+
+#### State Management
+- **Function:** Track consumer progress and processed messages
+- **Approaches:** Offset storage, deduplication cache, exactly-once semantics
+- **Storage:** External databases, broker-internal stores
+
+## Data Flow Scenarios
+
+### Scenario 1: Message Publishing
+1. Producer sends message with optional key
+2. Broker receives and writes to disk
+3. Broker replicates to replica nodes
+4. Broker acknowledges to producer
+5. Message available to consumers
+
+### Scenario 2: Message Consumption
+1. Consumer requests messages (pull) or receives (push)
+2. Broker delivers batch of messages
+3. Consumer processes message
+4. Consumer sends acknowledgment
+5. Broker updates offset
+
+### Scenario 3: Consumer Group Rebalancing
+1. New consumer joins group
+2. Broker triggers rebalancing
+3. Partitions reassigned to consumers
+4. Consumers reset offsets
+5. Processing resumes with new distribution
+
+## Scalability Strategies
+
+### Broker Scaling
+
+**Horizontal Scaling:**
+- Add broker nodes to cluster
+- Distribute partitions across nodes
+- Automatic rebalancing
+- Increases throughput and fault tolerance
+
+**Vertical Scaling:**
+- Increase CPU, memory, disk
+- Better compression, faster processing
+- Limited by single-node hardware
+
+### Partition Strategy
+
+**Key Selection:**
+- Hash-based: Distribute evenly across partitions
+- Range-based: Ordered partitions for range queries
+- Custom: Domain-specific partitioning logic
+
+**Rebalancing:**
+- Add partitions when single partition becomes hot
+- Split hot partitions across multiple nodes
+- Monitor per-partition throughput
+
+### Consumer Scaling
+
+**Parallel Consumption:**
+- One consumer per partition (max)
+- Multiple threads per consumer
+- Consumer groups distribute load
+
+**Handling Slow Consumers:**
+- Increase consumer instances
+- Optimize processing logic
+- Use faster hardware
+- Implement timeout and skip
+
+## High Availability & Reliability
+
+### Replication Strategy
+
+**In-Broker Replication:**
+- Multiple copies per partition
+- Leader handles writes
+- Followers handle reads
+- Automatic failover on leader failure
+
+**Cross-Datacenter Replication:**
+- Async replication to backup region
+- RTO/RPO tradeoffs
+- Active-active or active-passive
+
+### Failure Scenarios
+
+**Broker Failure:**
+- Detection: Health checks, heartbeats
+- Recovery: Replica promotion, partition rebalancing
+- Time: 10-30 seconds
+
+**Network Partition:**
+- Split-brain scenarios
+- Quorum-based decisions
+- Consistency vs availability tradeoffs
 
+**Message Loss Prevention:**
+- Ack=all (all replicas)
+- Min.insync.replicas = 2+
+- Periodic backups
+- Point-in-time recovery
+
+## Data Consistency
+
+### Delivery Semantics
+
+**At-Most-Once:**
+- No duplicates, possible message loss
+- Fastest, least reliable
+- Use: Non-critical events
+
+**At-Least-Once:**
+- No message loss, possible duplicates
+- Requires idempotency
+- Use: Most applications
+
+**Exactly-Once:**
+- No loss, no duplicates
+- Slowest, most reliable
+- Use: Financial, critical operations
+
+### Ordering Guarantees
+
+**Per-Partition:**
+- Single partition = strict ordering
+- Trade-off: Limited parallelism
+
+**Per-Key:**
+- Hash key to partition
+- All messages for key go to same partition
+- Enables parallel processing with ordering
+
+**Global Ordering:**
+- Single partition (no parallelism)
+- Very expensive to maintain
+- Usually not needed
+
+## Performance Optimization
+
+### Throughput Optimization
+
+**Batching:**
+- Linger time: Wait up to X ms for batch
+- Batch size: Send when batch reaches N messages
+- Compression: Reduce network bandwidth
+- Impact: 10-100x throughput improvement
+
+**Connection Pooling:**
+- Reuse connections (don't create per request)
+- Reduces overhead, improves latency
+- Improves CPU efficiency
+
+**Async Processing:**
+- Non-blocking sends
+- Pipelining: Multiple in-flight requests
+- Callbacks for acknowledgments
+
+### Latency Optimization
+
+**Local Caching:**
+- Cache hot messages in memory
+- Reduces broker round trips
+- Configurable TTL
+
+**Network Optimization:**
+- Co-locate producers/brokers
+- Reduce network hops
+- Multiple broker replicas per region
+
+**Codec Selection:**
+- No compression: Fastest
+- Snappy: Good compression ratio, fast
+- GZIP: Best compression, slower
+- LZ4: Fast, moderate compression
+
+## Security
+
+### Authentication & Authorization
+
+**SASL/SSL:**
+- Username/password authentication
+- Mutual TLS for transport security
+- ACLs for topic access control
+
+**OAuth2:**
+- Token-based authentication
+- Integration with identity providers
+- Fine-grained authorization
+
+### Encryption
+
+**In Transit:**
+- TLS 1.3 for all connections
+- Certificate pinning for sensitive clients
+
+**At Rest:**
+- Disk encryption
+- Key management (KMS)
+- Per-message encryption
+
+### Compliance
+
+**GDPR:**
+- Message retention policies
+- Right to deletion
+- Data residency requirements
+
+**PCI-DSS:**
+- Encryption for payment data
+- Access controls
+- Audit logging
+
+## Monitoring & Observability
+
+### Key Metrics
+
+**Throughput:**
+- Messages/sec
+- Bytes/sec
+- Partition lag
+
+**Latency:**
+- End-to-end latency
+- Broker latency
+- Consumer processing time
+
+**Reliability:**
+- Replication lag
+- Broker availability
+- Message loss events
+
+### Alerting
+
+- Alert on consumer lag > threshold
+- Alert on broker latency > P99 target
+- Alert on replication lag
+- Alert on broker unavailability
+
+### Tracing
+
+- Distributed tracing per message
+- Correlation IDs
+- Performance bottleneck identification
+
+## Technology Stack
+
+| Component | Options | Recommendation |
+|-----------|---------|-----------------|
+| **Broker** | Kafka, RabbitMQ, Redis, Pulsar, NATS | Kafka for scalability, RabbitMQ for reliability |
+| **Storage** | Disk, Cloud Object Storage | Local disk (fast), S3 for cold storage |
+| **Serialization** | Avro, Protobuf, JSON | Avro/Protobuf (schema, compression) |
+| **Client Library** | Producer, Consumer SDKs | Official language-specific SDKs |
+| **Schema Registry** | Confluent, AWS Glue | Confluent (mature, widely adopted) |
+| **Monitoring** | Prometheus, Grafana, DataDog | Prometheus + Grafana (open source) |
+| **Orchestration** | Kubernetes, Docker Compose | Kubernetes (production scale) |
+
+## Capacity Planning
+
+### Resource Estimation
+
+**Broker Resources (per 1M msg/sec):**
+- CPU: 8+ cores
+- Memory: 32GB+ (depends on cache)
+- Disk: Depends on retention (100GB+ per day)
+- Network: 1+ Gbps
+
+**Consumer Resources (processing 1M msg/sec):**
+- CPU: 4-8 cores
+- Memory: 16GB+
+- Throughput: Process 100K-1M msg/sec per instance
+
+### Cost Calculation
+
+**Broker Costs:**
+- Infrastructure: $5K-20K/month for 1M msg/sec
+- Storage: $0.10/GB/month (AWS S3 pricing)
+- Network egress: $0.12/GB
+
+**Total Monthly Cost:**
+- Typical: $10K-50K for mid-scale system
+- Large scale: $100K-1M+ per month
+
+## Lessons Learned
+
+1. **Consumer Groups are Powerful:** Use them for scalability and fault tolerance, not just load balancing
+
+2. **Exactly-Once is Expensive:** Use at-least-once with idempotency for most use cases
+
+3. **Consumer Lag is Critical:** Monitor it religiously—it's your early warning system
+
+4. **Partitioning Strategy Matters:** Poor key selection creates hot partitions and limits scalability
+
+5. **Monitoring is Non-Optional:** Without visibility, operational issues become crises
+
+## Common Interview Questions
+
+1. **Design a scalable message queue for 1M messages/sec**
+   - Discuss partitioning, replication, consumer groups
+   - Address failure scenarios and recovery
+   - Explain consistency tradeoffs
+
+2. **How would you handle exactly-once delivery?**
+   - Idempotency keys, deduplication, transactions
+   - Cost vs benefit analysis
+   - Real-world examples (payment systems)
+
+3. **What happens when a consumer fails?**
+   - Rebalancing, offset management
+   - Recovery procedures
+   - Time to recovery
+
+4. **How do you scale a slow consumer?**
+   - Add more instances
+   - Optimize processing logic
+   - Consider batching or windowing
+   - Monitor and alert on lag
+
+5. **Design a system with per-message ordering**
+   - Key selection, partition strategy
+   - Tradeoffs with throughput
+   - Alternative approaches
+
+6. **How would you migrate from one broker to another?**
+   - Dual writes, validation, cutover
+   - Downtime minimization
+   - Rollback strategy
+
+## Related Systems
+
+- **Kafka** → For high-throughput, scalable event streaming
+- **RabbitMQ** → For reliable, complex message routing
+- **Redis Streams** → For fast, simple event streaming
+- **AWS Kinesis** → For managed, AWS-integrated streaming
+- **GCP Pub/Sub** → For serverless, GCP-integrated messaging
+
+---
+
+**Difficulty:** Intermediate
+**Time to Master:** 2-4 weeks
+**Prerequisite Knowledge:** Distributed systems, message queues
+**Common in Interviews:** Yes - Medium to Hard

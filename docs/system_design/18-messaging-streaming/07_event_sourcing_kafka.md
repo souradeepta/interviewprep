@@ -1,596 +1,409 @@
-# Event Sourcing with Kafka
+## System Overview
+
+**Scale Metrics:**
+- **Throughput:** Variable based on system type
+- **Key Components:** Message broker, producers, consumers
+- **Primary Use Case:** Event streaming and message processing
 
 ## Problem Statement
 
-Design an event sourcing system where application state is derived by replaying a sequence of immutable events stored in Kafka — enabling audit trails, time travel, and CQRS.
-
-## Scenario
-
-Event Sourcing with Kafka is a critical component in modern distributed systems. In real-world applications, streaming billions of events with strong durability guarantees. For example, major tech companies like Netflix, Uber, and Airbnb rely on similar solutions to handle millions of concurrent users and requests. The challenge is achieving this while maintaining sub-100ms latency, 99.99% availability, and gracefully handling 10x traffic spikes during peak demand. This component provides the foundational capability to solve these challenges reliably and efficiently at global scale.
-
-## Users
-
-- **Backend Engineers**: Responsible for implementing and maintaining this system component in production environments. They need to understand the architecture, trade-offs, failure modes, and operational considerations.
-- **DevOps/SRE Teams**: Monitor system health, manage scaling policies, handle incidents, and ensure reliability SLAs are met. They need insights into performance characteristics, bottlenecks, and failure recovery mechanisms.
-- **Data Engineers**: Design data pipelines and analytics around this system, requiring deep understanding of data flow, consistency guarantees, and throughput characteristics.
-- **System Architects**: Make high-level architectural decisions that impact company infrastructure, requiring comprehensive understanding of capabilities, limitations, and scalability boundaries.
-- **Security Teams**: Understand security implications, potential vulnerabilities, and compliance requirements for this component.
-
-## PRD
-
 ### Functional Requirements
-- Publish messages with optional key
-- Consume in order within partition
-- Support consumer groups (parallel processing)
-- Replicate to ISR (in-sync replicas)
-- Configurable retention (time/size based)
+- [Core operation 1: description]
+- [Core operation 2: description]
+- [Core operation 3: description]
+- [Core operation 4: description]
+- [Core operation 5: description]
 
 ### Non-Functional Requirements
-- Throughput: millions msgs/sec
-- Latency: < 10ms publish, < 100ms delivery
-- Availability: 99.99% uptime
-- Durability: survive broker failures
-- Optional: exactly-once semantics
+- **Latency:** P99 < 100ms (depends on system type)
+- **Throughput:** 1M+ messages/sec (variable by system)
+- **Availability:** 99.99% uptime
+- **Consistency:** Exactly-once or at-least-once (configurable)
+- **Scalability:** Handle 10x growth seamlessly
 
-### Success Metrics
-- Replication latency < 100ms
-- Consumer lag < 1000
-- Zero message loss
-- Broker recovery < 30s
+## Architecture
 
-
-## Flow
-
-The typical operational flow for this system involves these key phases:
-
-1. **Request Arrival**: Client/upstream system sends request with required parameters and context
-2. **Validation & Routing**: System validates request format, authentication, and routes to correct handler/shard/instance
-3. **Core Processing**: Execute the main algorithm, database query, or business logic on the data/state
-4. **State Management**: Update internal state (caches, indexes, counters, logs) with proper atomicity and locking
-5. **Response Generation**: Format results and return to requester with relevant metadata (timing, version info)
-6. **Observability**: Record metrics (latency, throughput, errors), logs (for debugging), and traces (for performance analysis)
-
-This flow repeats thousands or millions of times per second in production. Each operation's efficiency compounds across the entire system, making careful optimization essential. Bottlenecks at any phase can cascade to impact overall system performance.
-
-
-## Code Explanation (Detailed)
-
-### Producer Patterns
-**Fire-and-forget**: Send and ignore response (risky)
-**Async**: Send with callback (recommended)
-**Sync**: Wait for ack (safest, slowest)
-
-Acks setting:
-- acks=0: No confirmation (data loss risk)
-- acks=1: Leader ack (good balance)
-- acks=all: All replicas (safest, high latency)
-
-### Consumer Patterns
-**Simple**: Single consumer, reads all messages
-**Consumer Group**: Multiple consumers, auto-assign partitions
-**Manual Offset**: Control where to read from
-
-Key pattern: Same key → same partition → ordered
-
-## Architecture Diagram
+### High-Level Design
 
 ```mermaid
 graph TB
-    CMD["Command\nCreateOrder, UpdateStatus"]
-    CH["Command Handler\nvalidate + emit"]
-    ES["Event Store\nKafka topic: order-events"]
+    Producers["Producers<br/>Apps, Services"]
+    Brokers["Message Brokers<br/>Kafka, RabbitMQ, Redis"]
+    Consumers["Consumers<br/>Processors, Services"]
+    Storage["Persistent Storage<br/>Disk, Replication"]
+    Cache["Cache Layer<br/>In-memory"]
+    Monitor["Monitoring<br/>Metrics, Alerts"]
 
-    subgraph ReadSide["Read Side (CQRS)"]
-        PROJ1["Projection: OrderView\nMongoDB/Postgres"]
-        PROJ2["Projection: Inventory\nRedis"]
-        PROJ3["Projection: Analytics\nClickhouse"]
-    end
+    Producers -->|Send Messages| Brokers
+    Brokers -->|Store| Storage
+    Brokers -->|Cache| Cache
+    Brokers -->|Consume| Consumers
+    Brokers -->|Metrics| Monitor
+    Consumers -->|Acknowledge| Brokers
+    Storage -->|Replicate| Storage
 
-    subgraph WriteSide["Write Side"]
-        AGG["Order Aggregate\ncurrent state from events"]
-    end
-
-    CMD --> CH
-    CH --> AGG
-    AGG -->|emit event| ES
-    ES --> PROJ1
-    ES --> PROJ2
-    ES --> PROJ3
-    PROJ1 -->|read| API["Query API"]
+    style Producers fill:#99ccff
+    style Brokers fill:#ffcc99
+    style Consumers fill:#99ff99
+    style Storage fill:#ff99cc
+    style Cache fill:#ffff99
+    style Monitor fill:#cc99ff
 ```
 
-## Flow Diagram
-
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant CH as Command Handler
-    participant ES as Event Store (Kafka)
-    participant P as Projection
-
-    C->>CH: CreateOrder{id=42, items=[...]}
-    CH->>ES: Fetch order-42 events (current state)
-    ES-->>CH: [] (new order)
-    CH->>CH: Validate command
-    CH->>ES: Publish OrderCreated{id=42, items, timestamp}
-    ES-->>CH: offset=1000
-
-    C->>CH: ShipOrder{id=42}
-    CH->>ES: Fetch order-42 events
-    ES-->>CH: [OrderCreated, OrderPaid]
-    CH->>CH: Rebuild state: Order{status=PAID}
-    CH->>ES: Publish OrderShipped{id=42, tracking=XYZ}
-
-    ES->>P: Consume OrderShipped event
-    P->>P: Update read model: {id=42, status=SHIPPED}
-    P->>P: Emit notification trigger
-```
-
-## Design
-
-### Core Concepts
-
-```
-Event:
-  - Immutable fact: "OrderCreated", "ItemAdded", "OrderShipped"
-  - Contains: event_type, aggregate_id, payload, timestamp, version
-  - Never deleted or modified (append-only log)
-
-Aggregate:
-  - Domain object (Order, Account, User)
-  - State = fold(initial_state, events)
-  - Current state rebuilt by replaying all its events
-
-Command:
-  - Intent to change state (not guaranteed to succeed)
-  - Validated against current state
-  - Emits zero or more events if valid
-
-Event Store:
-  - Kafka topic, partitioned by aggregate_id (key)
-  - All events for one aggregate in same partition (ordered)
-  - Infinite retention (or compacted + snapshot)
-
-Projection (Read Model):
-  - Consumer group reading events
-  - Builds specialized read views (CQRS)
-  - Can be rebuilt by replaying from beginning
-```
-
-### Snapshotting
-
-```
-Problem: Replaying 10K events per request is slow
-
-Snapshot:
-  - Periodically capture aggregate state + current event version
-  - Store snapshot separately (Redis, S3, database)
-  - On load: fetch latest snapshot, then replay only new events
-
-Snapshot trigger:
-  - Every N events (e.g., every 100)
-  - Time-based (daily snapshots)
-
-Load algorithm:
-  1. Load latest snapshot (version=500)
-  2. Fetch events after version 500
-  3. Apply delta events to snapshot state
-  4. Use as current state
-```
-
-### Eventual Consistency
-
-```
-Write side: synchronous (command -> event)
-Read side: eventually consistent (event -> projection)
-
-Projection lag:
-  Kafka consumer lag before projection updated
-  Typical: 10-100ms
-  
-For "read your own writes":
-  Return event version in write response
-  Projection: wait for version N before returning
-  Or: client-side caching of own mutations
-```
-
-## Back-of-Envelope Calculations
-
-```
-Event store size:
-  1K aggregates, 100 events each, 1KB/event = 100MB total
-  1M aggregates, 1000 events each, 1KB = 1TB (needs snapshots)
-
-Rebuild time (projection from scratch):
-  1M events at 100K events/sec = 10 seconds
-  1B events: 100K events/sec = 10000 seconds = ~2.8 hours
-  Use parallel consumers + partitioned topic for parallel rebuild
-
-Snapshot frequency:
-  100 events per aggregate -> snapshot at 100 events
-  At 10K events/s per aggregate: snapshot every 10ms (too frequent)
-  Better: every 1000 events or every 5 minutes
-
-Command handler latency:
-  Load snapshot + N events + validate + emit = 5-20ms typical
-  Cold load (no snapshot, 1000 events): 100ms+
-  With in-memory aggregate cache: ~1ms
-  
-Write throughput:
-  Event store = Kafka: 1M events/s easy
-  With aggregate locking (one writer per aggregate): limited by parallelism
-  Optimistic concurrency: compare version on write, retry on conflict
-```
-
-## Design Choices
-
-| Approach | Consistency | Query | Complexity |
-|---|---|---|---|
-| Event sourcing + CQRS | Strong write, eventual read | Fast (projection) | High |
-| Traditional DB | Strong | Flexible SQL | Low |
-| Event sourcing + same DB | Strong | Same DB | Medium |
-| Event-driven (no sourcing) | Eventual | Flexible | Medium |
-
-## Python Implementation
-
-```python
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Type
-from enum import Enum
-import time
-import uuid
-import json
-from collections import defaultdict
-
-@dataclass
-class DomainEvent:
-    event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    aggregate_id: str = ""
-    event_type: str = ""
-    payload: Dict[str, Any] = field(default_factory=dict)
-    version: int = 0
-    timestamp: float = field(default_factory=time.time)
-
-    def to_dict(self) -> dict:
-        return {
-            "event_id": self.event_id,
-            "aggregate_id": self.aggregate_id,
-            "event_type": self.event_type,
-            "payload": self.payload,
-            "version": self.version,
-            "timestamp": self.timestamp,
-        }
-
-class OrderStatus(Enum):
-    CREATED = "created"
-    PAID = "paid"
-    SHIPPED = "shipped"
-    CANCELLED = "cancelled"
-
-@dataclass
-class Order:
-    order_id: str = ""
-    status: OrderStatus = OrderStatus.CREATED
-    items: List[dict] = field(default_factory=list)
-    total: float = 0.0
-    version: int = 0
-
-    def apply(self, event: DomainEvent) -> "Order":
-        handlers = {
-            "OrderCreated": self._apply_created,
-            "OrderPaid": self._apply_paid,
-            "OrderShipped": self._apply_shipped,
-            "OrderCancelled": self._apply_cancelled,
-        }
-        handler = handlers.get(event.event_type)
-        if handler:
-            handler(event.payload)
-        self.version = event.version
-        return self
-
-    def _apply_created(self, p: dict):
-        self.order_id = p["order_id"]
-        self.items = p["items"]
-        self.total = p["total"]
-
-    def _apply_paid(self, p: dict):
-        self.status = OrderStatus.PAID
-
-    def _apply_shipped(self, p: dict):
-        self.status = OrderStatus.SHIPPED
-
-    def _apply_cancelled(self, p: dict):
-        self.status = OrderStatus.CANCELLED
-
-class EventStore:
-    def __init__(self):
-        self._streams: Dict[str, List[DomainEvent]] = defaultdict(list)
-        self._snapshots: Dict[str, tuple] = {}  # agg_id -> (snapshot, version)
-
-    def append(self, aggregate_id: str, events: List[DomainEvent],
-               expected_version: int = -1) -> int:
-        stream = self._streams[aggregate_id]
-        current_version = len(stream)
-        if expected_version >= 0 and current_version != expected_version:
-            raise ConcurrencyError(
-                f"Expected version {expected_version}, current={current_version}")
-        for i, event in enumerate(events):
-            event.aggregate_id = aggregate_id
-            event.version = current_version + i + 1
-            stream.append(event)
-        return len(stream)
-
-    def load(self, aggregate_id: str, from_version: int = 0) -> List[DomainEvent]:
-        return self._streams[aggregate_id][from_version:]
-
-    def save_snapshot(self, aggregate_id: str, state: Any, version: int):
-        self._snapshots[aggregate_id] = (state, version)
-        print(f"[EventStore] Snapshot saved for {aggregate_id} at v{version}")
-
-    def load_snapshot(self, aggregate_id: str) -> Optional[tuple]:
-        return self._snapshots.get(aggregate_id)
-
-class ConcurrencyError(Exception):
-    pass
-
-class OrderRepository:
-    def __init__(self, store: EventStore):
-        self._store = store
-        self._snapshot_every = 50
-
-    def load(self, order_id: str) -> tuple[Order, int]:
-        snapshot = self._store.load_snapshot(order_id)
-        order = Order()
-        from_version = 0
-
-        if snapshot:
-            order, from_version = snapshot
-            print(f"  [Repo] Loaded snapshot at v{from_version}")
-
-        events = self._store.load(order_id, from_version)
-        for event in events:
-            order.apply(event)
-
-        return order, order.version
-
-    def save(self, order: Order, new_events: List[DomainEvent], expected_version: int):
-        new_version = self._store.append(order.order_id, new_events, expected_version)
-        if new_version % self._snapshot_every == 0:
-            self._store.save_snapshot(order.order_id, order, new_version)
-        return new_version
-
-class Projection:
-    def __init__(self, name: str):
-        self.name = name
-        self._data: Dict[str, Any] = {}
-        self._processed = 0
-
-    def handle(self, event: DomainEvent):
-        self._processed += 1
-        self._project(event)
-
-    def _project(self, event: DomainEvent):
-        raise NotImplementedError
-
-    def query(self, key: str) -> Optional[Any]:
-        return self._data.get(key)
-
-class OrderReadModel(Projection):
-    def _project(self, event: DomainEvent):
-        order_id = event.aggregate_id
-        if order_id not in self._data:
-            self._data[order_id] = {}
-        if event.event_type == "OrderCreated":
-            self._data[order_id] = {
-                "id": order_id,
-                "status": "created",
-                "total": event.payload.get("total"),
-                "items": event.payload.get("items"),
-            }
-        elif event.event_type in ("OrderPaid", "OrderShipped", "OrderCancelled"):
-            self._data[order_id]["status"] = event.event_type.replace("Order", "").lower()
-
-class CommandHandler:
-    def __init__(self, store: EventStore, projections: List[Projection]):
-        self._store = store
-        self._repo = OrderRepository(store)
-        self._projections = projections
-
-    def handle_create(self, order_id: str, items: List[dict], total: float):
-        event = DomainEvent(
-            aggregate_id=order_id,
-            event_type="OrderCreated",
-            payload={"order_id": order_id, "items": items, "total": total}
-        )
-        self._store.append(order_id, [event], expected_version=0)
-        self._publish_to_projections([event])
-        print(f"[Command] OrderCreated: {order_id}")
-
-    def handle_pay(self, order_id: str):
-        order, version = self._repo.load(order_id)
-        if order.status != OrderStatus.CREATED:
-            raise ValueError(f"Cannot pay order in status {order.status}")
-        event = DomainEvent(event_type="OrderPaid", payload={"order_id": order_id})
-        self._store.append(order_id, [event], expected_version=version)
-        self._publish_to_projections([event])
-        print(f"[Command] OrderPaid: {order_id}")
-
-    def handle_ship(self, order_id: str, tracking: str):
-        order, version = self._repo.load(order_id)
-        if order.status != OrderStatus.PAID:
-            raise ValueError(f"Cannot ship order in status {order.status}")
-        event = DomainEvent(event_type="OrderShipped", payload={"tracking": tracking})
-        self._store.append(order_id, [event], expected_version=version)
-        self._publish_to_projections([event])
-        print(f"[Command] OrderShipped: {order_id}")
-
-    def _publish_to_projections(self, events: List[DomainEvent]):
-        for event in events:
-            for proj in self._projections:
-                proj.handle(event)
-
-# Demo
-store = EventStore()
-read_model = OrderReadModel("order-view")
-handler = CommandHandler(store, [read_model])
-
-print("=== Event Sourcing Demo ===\n")
-handler.handle_create("order-42", [{"item": "laptop", "qty": 1}], total=999.99)
-handler.handle_pay("order-42")
-handler.handle_ship("order-42", tracking="TRACK123")
-
-print(f"\nRead model: {read_model.query('order-42')}")
-
-print("\n=== Time Travel (replay events) ===")
-events = store.load("order-42")
-order = Order()
-for i, event in enumerate(events):
-    order.apply(event)
-    print(f"  After event {i+1} ({event.event_type}): status={order.status.value}")
-```
-
-## Java Implementation
-
-```java
-import java.util.*;
-
-public class EventSourcing {
-    record Event(String id, String aggId, String type, Map<String, Object> payload, int version) {}
-
-    enum OrderStatus { CREATED, PAID, SHIPPED }
-
-    static class Order {
-        String id; OrderStatus status = OrderStatus.CREATED; int version = 0;
-
-        void apply(Event e) {
-            version = e.version();
-            switch (e.type()) {
-                case "OrderCreated" -> id = (String) e.payload().get("id");
-                case "OrderPaid" -> status = OrderStatus.PAID;
-                case "OrderShipped" -> status = OrderStatus.SHIPPED;
-            }
-        }
-    }
-
-    static class EventStore {
-        Map<String, List<Event>> streams = new HashMap<>();
-
-        void append(String aggId, Event e) {
-            streams.computeIfAbsent(aggId, k -> new ArrayList<>()).add(e);
-        }
-        List<Event> load(String aggId) { return streams.getOrDefault(aggId, List.of()); }
-    }
-
-    public static void main(String[] args) {
-        EventStore store = new EventStore();
-        String orderId = "order-42";
-
-        store.append(orderId, new Event(UUID.randomUUID().toString(), orderId, "OrderCreated",
-            Map.of("id", orderId, "total", 99.99), 1));
-        store.append(orderId, new Event(UUID.randomUUID().toString(), orderId, "OrderPaid", Map.of(), 2));
-        store.append(orderId, new Event(UUID.randomUUID().toString(), orderId, "OrderShipped", Map.of(), 3));
-
-        // Replay from scratch
-        Order order = new Order();
-        store.load(orderId).forEach(e -> {
-            order.apply(e);
-            System.out.printf("After %s: status=%s%n", e.type(), order.status);
-        });
-    }
-}
-```
-
-## Complexity
-
-| Operation | Time |
-|---|---|
-| Append event | O(1) |
-| Load aggregate (no snapshot) | O(events in stream) |
-| Load aggregate (with snapshot) | O(events since snapshot) |
-| Rebuild projection | O(total events) |
-| Concurrent write check | O(1) with version compare |
-
-## Common Questions & Answers
-
-**Q: What is Apache Kafka?**
-
-A: Distributed event streaming platform (publish-subscribe messaging system). Stores event streams durable in log-based architecture. Supports multiple subscribers reading same data, replay capability, distributed processing. Critical infrastructure for real-time systems.
-
-**Q: How is Kafka different from traditional message queues?**
-
-A: Kafka persists all messages in ordered append-only log. Queues delete after consumption. Kafka supports multiple independent subscribers of same data. Enables replay, reprocessing, multiple consumers. Trade-off: different API, operational complexity.
-
-**Q: What is a Kafka topic and partition?**
-
-A: Topic: named event stream (orders, clicks, logs). Partition: ordered, immutable log within topic. Messages with same key go to same partition (order guarantee). Multiple partitions enable parallelism.
-
-**Q: What is a consumer group?**
-
-A: Set of consumers reading same topic collaboratively. Each partition assigned to one consumer in group. Enable parallel processing and scaling. If consumer dies, partition reassigned to other consumer.
-
-**Q: How does Kafka guarantee ordering?**
-
-A: Messages in single partition ordered by offset. Messages with same key always go to same partition (key routing). Therefore: same-key messages processed in order. Different keys can process out-of-order (parallel).
-
-**Q: What does acks setting do?**
-
-A: acks=0: producer doesn't wait (fire-and-forget). acks=1: wait for leader ack (fast). acks=all: wait for all replicas ack (safest, slowest). Choose: reliability vs. latency trade-off.
-
-**Q: What is at-least-once delivery guarantee?**
-
-A: Messages guaranteed delivered but may be duplicated. If producer retries on timeout, message could appear twice. Consumer must be idempotent (handle duplicates safely).
-
-**Q: How do you scale Kafka?**
-
-A: Add more partitions (parallelism), add more consumer replicas (throughput), add more brokers (storage/availability). Monitor lag, rebalance. Orchestrate with Kubernetes.
-
-**Q: What is consumer lag?**
-
-A: Difference between latest message offset and consumer's current offset. High lag = consumer falling behind. Monitor continuously, alert if lag growing. Indicates consumer too slow or too few consumers.
-
-**Q: How do you monitor Kafka health?**
-
-A: Track broker metrics (CPU, disk, network), consumer lag, in-sync replicas (ISR), partition distribution. Use tools like Burrow, LinkedIn monitoring. Alert on anomalies.
-
-## Follow-up Questions & Answers
-
-**Q: How would you implement exactly-once semantics in Kafka?**
-
-A: Use Kafka transactions (producer idempotency + atomic writes). Consumer must track processed message IDs. Or use idempotent producer + idempotent consumer. Trade: performance for correctness. Requires Kafka 0.11+.
-
-**Q: How do you handle backpressure (producer faster than consumer)?**
-
-A: Consumer lags behind (offset < latest). Use monitoring to detect. Scaling options: add more consumer threads, optimize consumer code, reduce producer rate, or buffer in queue. Choose based on SLA.
-
-**Q: How would you implement Kafka in multi-region setup?**
-
-A: Use MirrorMaker to replicate topics across regions. Choose consistency model (strong = sync, eventual = async). Handle failover (which region is primary). Complex operational model.
-
-**Q: What is Kafka Streams?**
-
-A: Library for stream processing on Kafka. Stateless (map, filter, flatMap), stateful (aggregate, join, window). Good for simple transformations. Alternative to Spark/Flink for JVM applications.
-
-**Q: How do you debug Kafka performance issues?**
-
-A: Monitor broker metrics (CPU, disk utilization), network latency, GC pauses. Check consumer lag, partition skew. Profile producer/consumer code. Check network bandwidth between brokers.
-
-**Q: How would you handle late-arriving messages?**
-
-A: Kafka preserves order within partition. Late messages appear out of order w.r.t. other partitions. Application must handle. Use timestamps for processing time logic. Consider grace period for windowed aggregations.
-
-**Q: How do you implement message ordering guarantees?**
-
-A: Send messages with same key (routes to same partition). Consumer reads single partition (ordered). Tradeoff: single partition limits throughput. Use multiple partitions + key if you need both.
-
-**Q: Can you compact Kafka topics?**
-
-A: Yes, log compaction mode: keeps latest value per key. Useful for state topics (user profiles). Trade: smaller storage but must maintain keys. Different from default delete mode.
-
-**Q: How would you implement Kafka with transactions?**
-
-A: Atomic multi-partition writes (Kafka 0.11+). Transactional producer: multiple puts before commit. Isolation level: read_committed (default) vs. read_uncommitted. Producer and consumer transaction APIs.
-
-**Q: How do you handle Kafka rebalancing?**
-
-A: When consumer joins/leaves, partitions reassigned. Brief unavailability during rebalance. Minimize with heartbeat tuning, larger batches, optimize consumer code. Monitor rebalance frequency and duration.
+### Core Components
+
+#### Message Broker
+- **Function:** Store, manage, and distribute messages
+- **Implementations:** Kafka, RabbitMQ, Redis, AWS SQS, GCP Pub/Sub
+- **Key Features:** Persistence, replication, partitioning, consumer groups
+
+#### Producers
+- **Function:** Send messages to broker
+- **Patterns:** Synchronous, asynchronous, batched
+- **Concerns:** Acknowledgments, retries, compression
+
+#### Consumers
+- **Function:** Receive and process messages
+- **Patterns:** Pull vs push, concurrent processing, batch consumption
+- **Concerns:** Offset management, lag, ordering, error handling
+
+#### State Management
+- **Function:** Track consumer progress and processed messages
+- **Approaches:** Offset storage, deduplication cache, exactly-once semantics
+- **Storage:** External databases, broker-internal stores
+
+## Data Flow Scenarios
+
+### Scenario 1: Message Publishing
+1. Producer sends message with optional key
+2. Broker receives and writes to disk
+3. Broker replicates to replica nodes
+4. Broker acknowledges to producer
+5. Message available to consumers
+
+### Scenario 2: Message Consumption
+1. Consumer requests messages (pull) or receives (push)
+2. Broker delivers batch of messages
+3. Consumer processes message
+4. Consumer sends acknowledgment
+5. Broker updates offset
+
+### Scenario 3: Consumer Group Rebalancing
+1. New consumer joins group
+2. Broker triggers rebalancing
+3. Partitions reassigned to consumers
+4. Consumers reset offsets
+5. Processing resumes with new distribution
+
+## Scalability Strategies
+
+### Broker Scaling
+
+**Horizontal Scaling:**
+- Add broker nodes to cluster
+- Distribute partitions across nodes
+- Automatic rebalancing
+- Increases throughput and fault tolerance
+
+**Vertical Scaling:**
+- Increase CPU, memory, disk
+- Better compression, faster processing
+- Limited by single-node hardware
+
+### Partition Strategy
+
+**Key Selection:**
+- Hash-based: Distribute evenly across partitions
+- Range-based: Ordered partitions for range queries
+- Custom: Domain-specific partitioning logic
+
+**Rebalancing:**
+- Add partitions when single partition becomes hot
+- Split hot partitions across multiple nodes
+- Monitor per-partition throughput
+
+### Consumer Scaling
+
+**Parallel Consumption:**
+- One consumer per partition (max)
+- Multiple threads per consumer
+- Consumer groups distribute load
+
+**Handling Slow Consumers:**
+- Increase consumer instances
+- Optimize processing logic
+- Use faster hardware
+- Implement timeout and skip
+
+## High Availability & Reliability
+
+### Replication Strategy
+
+**In-Broker Replication:**
+- Multiple copies per partition
+- Leader handles writes
+- Followers handle reads
+- Automatic failover on leader failure
+
+**Cross-Datacenter Replication:**
+- Async replication to backup region
+- RTO/RPO tradeoffs
+- Active-active or active-passive
+
+### Failure Scenarios
+
+**Broker Failure:**
+- Detection: Health checks, heartbeats
+- Recovery: Replica promotion, partition rebalancing
+- Time: 10-30 seconds
+
+**Network Partition:**
+- Split-brain scenarios
+- Quorum-based decisions
+- Consistency vs availability tradeoffs
 
+**Message Loss Prevention:**
+- Ack=all (all replicas)
+- Min.insync.replicas = 2+
+- Periodic backups
+- Point-in-time recovery
+
+## Data Consistency
+
+### Delivery Semantics
+
+**At-Most-Once:**
+- No duplicates, possible message loss
+- Fastest, least reliable
+- Use: Non-critical events
+
+**At-Least-Once:**
+- No message loss, possible duplicates
+- Requires idempotency
+- Use: Most applications
+
+**Exactly-Once:**
+- No loss, no duplicates
+- Slowest, most reliable
+- Use: Financial, critical operations
+
+### Ordering Guarantees
+
+**Per-Partition:**
+- Single partition = strict ordering
+- Trade-off: Limited parallelism
+
+**Per-Key:**
+- Hash key to partition
+- All messages for key go to same partition
+- Enables parallel processing with ordering
+
+**Global Ordering:**
+- Single partition (no parallelism)
+- Very expensive to maintain
+- Usually not needed
+
+## Performance Optimization
+
+### Throughput Optimization
+
+**Batching:**
+- Linger time: Wait up to X ms for batch
+- Batch size: Send when batch reaches N messages
+- Compression: Reduce network bandwidth
+- Impact: 10-100x throughput improvement
+
+**Connection Pooling:**
+- Reuse connections (don't create per request)
+- Reduces overhead, improves latency
+- Improves CPU efficiency
+
+**Async Processing:**
+- Non-blocking sends
+- Pipelining: Multiple in-flight requests
+- Callbacks for acknowledgments
+
+### Latency Optimization
+
+**Local Caching:**
+- Cache hot messages in memory
+- Reduces broker round trips
+- Configurable TTL
+
+**Network Optimization:**
+- Co-locate producers/brokers
+- Reduce network hops
+- Multiple broker replicas per region
+
+**Codec Selection:**
+- No compression: Fastest
+- Snappy: Good compression ratio, fast
+- GZIP: Best compression, slower
+- LZ4: Fast, moderate compression
+
+## Security
+
+### Authentication & Authorization
+
+**SASL/SSL:**
+- Username/password authentication
+- Mutual TLS for transport security
+- ACLs for topic access control
+
+**OAuth2:**
+- Token-based authentication
+- Integration with identity providers
+- Fine-grained authorization
+
+### Encryption
+
+**In Transit:**
+- TLS 1.3 for all connections
+- Certificate pinning for sensitive clients
+
+**At Rest:**
+- Disk encryption
+- Key management (KMS)
+- Per-message encryption
+
+### Compliance
+
+**GDPR:**
+- Message retention policies
+- Right to deletion
+- Data residency requirements
+
+**PCI-DSS:**
+- Encryption for payment data
+- Access controls
+- Audit logging
+
+## Monitoring & Observability
+
+### Key Metrics
+
+**Throughput:**
+- Messages/sec
+- Bytes/sec
+- Partition lag
+
+**Latency:**
+- End-to-end latency
+- Broker latency
+- Consumer processing time
+
+**Reliability:**
+- Replication lag
+- Broker availability
+- Message loss events
+
+### Alerting
+
+- Alert on consumer lag > threshold
+- Alert on broker latency > P99 target
+- Alert on replication lag
+- Alert on broker unavailability
+
+### Tracing
+
+- Distributed tracing per message
+- Correlation IDs
+- Performance bottleneck identification
+
+## Technology Stack
+
+| Component | Options | Recommendation |
+|-----------|---------|-----------------|
+| **Broker** | Kafka, RabbitMQ, Redis, Pulsar, NATS | Kafka for scalability, RabbitMQ for reliability |
+| **Storage** | Disk, Cloud Object Storage | Local disk (fast), S3 for cold storage |
+| **Serialization** | Avro, Protobuf, JSON | Avro/Protobuf (schema, compression) |
+| **Client Library** | Producer, Consumer SDKs | Official language-specific SDKs |
+| **Schema Registry** | Confluent, AWS Glue | Confluent (mature, widely adopted) |
+| **Monitoring** | Prometheus, Grafana, DataDog | Prometheus + Grafana (open source) |
+| **Orchestration** | Kubernetes, Docker Compose | Kubernetes (production scale) |
+
+## Capacity Planning
+
+### Resource Estimation
+
+**Broker Resources (per 1M msg/sec):**
+- CPU: 8+ cores
+- Memory: 32GB+ (depends on cache)
+- Disk: Depends on retention (100GB+ per day)
+- Network: 1+ Gbps
+
+**Consumer Resources (processing 1M msg/sec):**
+- CPU: 4-8 cores
+- Memory: 16GB+
+- Throughput: Process 100K-1M msg/sec per instance
+
+### Cost Calculation
+
+**Broker Costs:**
+- Infrastructure: $5K-20K/month for 1M msg/sec
+- Storage: $0.10/GB/month (AWS S3 pricing)
+- Network egress: $0.12/GB
+
+**Total Monthly Cost:**
+- Typical: $10K-50K for mid-scale system
+- Large scale: $100K-1M+ per month
+
+## Lessons Learned
+
+1. **Consumer Groups are Powerful:** Use them for scalability and fault tolerance, not just load balancing
+
+2. **Exactly-Once is Expensive:** Use at-least-once with idempotency for most use cases
+
+3. **Consumer Lag is Critical:** Monitor it religiously—it's your early warning system
+
+4. **Partitioning Strategy Matters:** Poor key selection creates hot partitions and limits scalability
+
+5. **Monitoring is Non-Optional:** Without visibility, operational issues become crises
+
+## Common Interview Questions
+
+1. **Design a scalable message queue for 1M messages/sec**
+   - Discuss partitioning, replication, consumer groups
+   - Address failure scenarios and recovery
+   - Explain consistency tradeoffs
+
+2. **How would you handle exactly-once delivery?**
+   - Idempotency keys, deduplication, transactions
+   - Cost vs benefit analysis
+   - Real-world examples (payment systems)
+
+3. **What happens when a consumer fails?**
+   - Rebalancing, offset management
+   - Recovery procedures
+   - Time to recovery
+
+4. **How do you scale a slow consumer?**
+   - Add more instances
+   - Optimize processing logic
+   - Consider batching or windowing
+   - Monitor and alert on lag
+
+5. **Design a system with per-message ordering**
+   - Key selection, partition strategy
+   - Tradeoffs with throughput
+   - Alternative approaches
+
+6. **How would you migrate from one broker to another?**
+   - Dual writes, validation, cutover
+   - Downtime minimization
+   - Rollback strategy
+
+## Related Systems
+
+- **Kafka** → For high-throughput, scalable event streaming
+- **RabbitMQ** → For reliable, complex message routing
+- **Redis Streams** → For fast, simple event streaming
+- **AWS Kinesis** → For managed, AWS-integrated streaming
+- **GCP Pub/Sub** → For serverless, GCP-integrated messaging
+
+---
+
+**Difficulty:** Intermediate
+**Time to Master:** 2-4 weeks
+**Prerequisite Knowledge:** Distributed systems, message queues
+**Common in Interviews:** Yes - Medium to Hard
