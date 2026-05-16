@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Persist every state change as an immutable event in an append-only log
+- Rebuild current state by replaying the event log from any offset
+- Support multiple projections/views derived from the same event stream
+- Enable time-travel queries by replaying events up to a given timestamp
+- Produce commands and publish resulting events transactionally
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

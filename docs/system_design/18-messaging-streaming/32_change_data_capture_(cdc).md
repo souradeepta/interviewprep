@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Capture row-level INSERT, UPDATE, and DELETE events from database transaction logs
+- Stream CDC events to Kafka topics with schema information via Debezium
+- Preserve transaction boundaries and ordering within the changelog stream
+- Enable downstream consumers to maintain eventually consistent read models
+- Support initial snapshot bootstrapping for new consumers
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

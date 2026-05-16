@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Store and version Avro, JSON Schema, or Protobuf schemas with unique IDs
+- Enforce backward, forward, or full schema compatibility on schema registration
+- Embed schema ID in every message to enable schema-on-read deserialization
+- Allow adding optional fields (backward-compatible) without breaking consumers
+- Support schema deletion with configurable soft-delete retention
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Route messages from producers to queues via configurable exchanges
+- Support multiple routing patterns: direct, topic, fanout, and headers
+- Persist messages to disk for durability across broker restarts
+- Deliver messages to competing consumers with acknowledgment tracking
+- Implement dead-letter exchange routing for failed or expired messages
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

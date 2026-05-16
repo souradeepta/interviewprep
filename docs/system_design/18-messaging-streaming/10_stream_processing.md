@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Ingest continuous event streams from multiple sources in real time
+- Apply stateless transformations (filter, map, project) with sub-millisecond latency
+- Perform stateful aggregations (count, sum, join) over time windows
+- Emit results downstream as new streams or to sink systems
+- Recover state and resume processing automatically after failures
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

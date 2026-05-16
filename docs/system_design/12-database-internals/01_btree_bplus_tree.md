@@ -109,8 +109,8 @@ Root [1, 5, 10, 15]
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the page-aligned tree node fails?
+3. How to ensure O(log N) I/O for point and range queries in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -158,9 +158,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Point lookup | O(log N) | Traverse root-to-leaf in log_B(N) I/Os |
+| Range scan | O(log N + K) | Find start; scan K leaf pointers |
+| Insert/split | O(log N) | Traverse down; split on full nodes back up |
 
 ## Real-world Applications
 

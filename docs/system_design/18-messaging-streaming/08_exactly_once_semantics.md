@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Assign each producer a unique producer ID and track epoch to detect zombies
+- Sequence messages with monotonically increasing sequence numbers per partition
+- Atomically commit offsets and output records in a single transaction
+- Abort in-flight transactions and fence zombie producers on failover
+- Provide idempotent producer guarantees with exactly-once end-to-end
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Inject trace context (trace ID, span ID) into message headers on publish
+- Extract and propagate trace context on consume to link spans across services
+- Record producer and consumer spans with latency, queue depth, and lag metadata
+- Visualize end-to-end message latency from produce to consumer acknowledgment
+- Support W3C TraceContext and B3 propagation formats
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

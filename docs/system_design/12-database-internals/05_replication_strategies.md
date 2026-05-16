@@ -117,8 +117,8 @@ Async: Master → Client ACK → replicate to Slaves
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the replication log (WAL/binlog) fails?
+3. How to ensure data durability with minimal replication lag in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -166,9 +166,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Write to primary | O(1) | Write WAL entry; send to replicas |
+| Replica apply | O(1) per op | Replay WAL entry on replica state |
+| Leader failover | O(R log R) | Elect leader from R replicas by log position |
 
 ## Real-world Applications
 

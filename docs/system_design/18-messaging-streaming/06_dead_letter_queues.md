@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Capture messages that fail processing after configurable retry attempts
+- Preserve original message metadata (source queue, error reason, retry count)
+- Route expired messages (TTL exceeded) to dead-letter destinations
+- Allow manual inspection, replay, or discard of dead-letter messages
+- Alert operations teams when dead-letter queue depth exceeds thresholds
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

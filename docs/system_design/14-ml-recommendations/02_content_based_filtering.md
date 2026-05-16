@@ -107,8 +107,8 @@ Score = similarity(item, profile)
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the item feature extractor fails?
+3. How to ensure explainable recommendations in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -159,9 +159,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Feature extract | O(W) | TF-IDF or embedding over W words/tags |
+| Profile similarity | O(F) | Cosine similarity on F-dimensional vectors |
+| Top-N score | O(I) | Score I candidate items; partial sort for top-N |
 
 ## Real-world Applications
 

@@ -105,8 +105,8 @@ Item features → LTR model (LambdaMART) → score → rank → user
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the learning-to-rank model fails?
+3. How to ensure optimized NDCG on held-out eval set in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -157,9 +157,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Score candidates | O(k × F) | Model inference on k items with F features |
+| Sort ranked list | O(k log k) | Partial sort for top-N from k candidates |
+| Diversity rerank | O(k²) | MMR or DPP diversity enforcement on k items |
 
 ## Real-world Applications
 

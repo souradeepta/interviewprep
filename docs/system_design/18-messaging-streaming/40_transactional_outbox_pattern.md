@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Write domain events to an outbox table in the same database transaction as business data
+- Poll or tail the outbox table to relay events to the message broker reliably
+- Guarantee at-least-once event delivery even if the relay process crashes mid-publish
+- De-duplicate events on the consumer side using event IDs
+- Archive or delete successfully relayed outbox rows to prevent unbounded growth
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

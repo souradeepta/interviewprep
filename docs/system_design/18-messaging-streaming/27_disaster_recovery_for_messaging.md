@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Replicate topics across geographically separated clusters (MirrorMaker, Confluent Replicator)
+- Maintain consumer offset mappings between primary and DR clusters
+- Detect primary cluster failure and trigger controlled failover within RTO
+- Resume consumer groups from translated offsets with minimal data loss (RPO)
+- Validate DR readiness with automated failover drills
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

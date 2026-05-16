@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Replicate message streams across geographically separated data centers
+- Route producer writes to the nearest regional cluster to minimize latency
+- Enable consumers in each region to read from a local replica
+- Resolve cross-region write conflicts using vector clocks or last-writer-wins
+- Ensure global ordering within partitions using a designated primary region
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Ingest high-volume event streams into a streaming analytics engine
+- Compute real-time aggregates (counts, sums, percentiles) over sliding windows
+- Join streaming data with static reference tables for enrichment
+- Persist aggregated results to OLAP stores for dashboard queries
+- Emit alerts when streaming metrics breach configurable thresholds
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

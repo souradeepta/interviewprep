@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Guarantee FIFO ordering within a single partition or queue
+- Provide per-key ordering for messages sharing the same routing key
+- Detect and handle out-of-order message delivery via sequence numbers
+- Support redelivery without breaking ordering for failed consumers
+- Enable ordering across partitions via global sequence coordinators
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

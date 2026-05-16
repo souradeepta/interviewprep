@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Ingest real-time streaming data from multiple producer sources at scale
+- Partition data across shards for parallel ingestion and processing
+- Deliver records to consumers with configurable retention (24h–365 days)
+- Support enhanced fan-out for dedicated throughput per consumer
+- Enable server-side encryption (KMS) for data at rest in shards
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

@@ -107,8 +107,8 @@ SELECT * FROM users WHERE age > 20 AND city='NYC'
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the cost-based optimizer fails?
+3. How to ensure near-optimal plan selection in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -156,9 +156,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Parse + analyze | O(T) | Tokenize and validate T SQL tokens |
+| Plan enumeration | O(3^N) | Dynamic programming join order for N tables |
+| Stats estimation | O(1) per predicate | Histogram-based row count estimate |
 
 ## Real-world Applications
 

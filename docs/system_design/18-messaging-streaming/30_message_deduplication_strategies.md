@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Assign deterministic deduplication keys to messages at the producer side
+- Store seen message IDs in a fast lookup store (Redis Bloom filter or SET)
+- Reject duplicate messages within a configurable deduplication window
+- Handle deduplication across consumer restarts using persistent ID store
+- Expire deduplication records after window to bound storage consumption
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

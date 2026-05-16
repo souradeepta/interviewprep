@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Apply stateless transformations (filter, map, enrich) to message content
+- Convert message formats between schemas (Avro, JSON, Protobuf) on-the-fly
+- Enrich messages with external data from lookup tables or APIs
+- Split compound messages into individual records for downstream processing
+- Route transformed messages to different topics based on content rules
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

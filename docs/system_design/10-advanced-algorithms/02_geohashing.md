@@ -109,8 +109,8 @@ Geohash encoding:
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the geohash index fails?
+3. How to ensure spatial locality preservation in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -242,9 +242,9 @@ class GeoHash {
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Encode lat/lon | O(P) | P = precision bits; interleave coordinates |
+| Neighbor lookup | O(1) | Return 8 adjacent cells for given geohash |
+| Radius search | O(k log n) | Query k cells; n = indexed points |
 
 ## Real-world Applications
 

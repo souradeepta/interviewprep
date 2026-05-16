@@ -115,8 +115,8 @@ Trie for {cat, car, card, dog}:
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the trie node fails?
+3. How to ensure O(m) operations independent of corpus size in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -251,9 +251,9 @@ class Trie {
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Insert word | O(m) | m = word length; create m nodes if absent |
+| Search exact | O(m) | Traverse m edges; check is_end flag |
+| Prefix autocomplete | O(m + k) | Traverse m; enumerate k matching words |
 
 ## Real-world Applications
 

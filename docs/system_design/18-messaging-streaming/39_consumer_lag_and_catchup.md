@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Measure consumer lag as difference between log-end-offset and committed offset
+- Alert when lag exceeds configurable thresholds or grows continuously
+- Scale consumer group horizontally by adding partitions and consumer instances
+- Implement catch-up replay mode using increased fetch size and parallelism
+- Prioritize fresh messages over catching up when lag is within acceptable bounds
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

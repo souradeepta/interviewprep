@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Establish authenticated, encrypted AMQP connections with virtual host isolation
+- Declare exchanges and queues with durability, exclusive, and auto-delete flags
+- Route messages from exchanges to queues via configurable binding rules
+- Support transactional message publishing with rollback on failure
+- Enable consumer flow control via channel prefetch (basic.qos)
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

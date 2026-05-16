@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Guarantee per-key ordering by routing same-key messages to the same partition
+- Assign monotonically increasing sequence numbers within each partition
+- Buffer out-of-order arrivals and release them in order via reorder buffers
+- Handle producer retries without reordering (idempotent producer with sequence numbers)
+- Support global ordering when required via a single-partition topic or sequencer service
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

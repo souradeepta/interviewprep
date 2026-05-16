@@ -105,8 +105,8 @@ Search → Filter by price, dates → Check availability → Book → Payment
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the inventory availability calendar fails?
+3. How to ensure double-booking prevention in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -154,9 +154,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Search listings | O(log N + K) | Geospatial + availability filter on N listings |
+| Reserve dates | O(1) | Optimistic lock on calendar rows for chosen dates |
+| Payment process | O(1) | Stripe API call; async host payout |
 
 ## Real-world Applications
 

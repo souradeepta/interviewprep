@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Send messages to Kafka topics with optional key-based partitioning
+- Configure acknowledgment levels (acks=0/1/all) per durability requirement
+- Subscribe to topics via consumer groups with automatic partition assignment
+- Track and commit consumer offsets for at-least-once or exactly-once delivery
+- Handle rebalancing when consumers join or leave a consumer group
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

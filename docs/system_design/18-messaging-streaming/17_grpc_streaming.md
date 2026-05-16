@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Define service contracts in Protocol Buffers with strongly-typed messages
+- Support four communication patterns: unary, server-streaming, client-streaming, bidirectional
+- Multiplex multiple RPC calls over a single HTTP/2 connection
+- Propagate deadlines and cancellation signals across service boundaries
+- Apply per-RPC and per-connection interceptors for auth, logging, and tracing
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

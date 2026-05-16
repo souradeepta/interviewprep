@@ -105,8 +105,8 @@ User → App → OAuth provider → Login → Token → Access resource
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the authorization server (IdP) fails?
+3. How to ensure delegated access without sharing passwords in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -163,9 +163,9 @@ sequenceDiagram
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Authorization code exchange | O(1) | Code for token pair at token endpoint |
+| Token introspection | O(1) | Cache JWT signature verification result |
+| Token revocation | O(1) | Mark token ID invalid in revocation store |
 
 ## Real-world Applications
 

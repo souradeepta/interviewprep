@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Ingest data from external systems (databases, files, APIs) into Kafka topics
+- Export data from Kafka topics to external sinks (databases, object storage)
+- Run connectors in distributed mode across a Connect worker cluster
+- Track source offsets and sink positions for exactly-once or at-least-once delivery
+- Provide REST API for connector lifecycle management (create, pause, restart, delete)
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

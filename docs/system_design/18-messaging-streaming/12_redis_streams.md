@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Append time-ordered entries to named streams with auto-generated IDs
+- Support consumer groups with per-consumer message tracking and acknowledgment
+- Allow range and reverse-range queries over stream entries by ID or time
+- Trim streams by length or age to bound memory usage
+- Replay unacknowledged messages (PEL — Pending Entry List) on consumer failure
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

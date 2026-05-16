@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Publish messages from producer applications to partitioned topics
+- Store message streams durably on disk with configurable retention (hours to forever)
+- Enable multiple independent consumer groups to read at different offsets
+- Replicate partitions across brokers for fault tolerance
+- Support horizontal scaling by adding brokers and re-balancing partitions
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

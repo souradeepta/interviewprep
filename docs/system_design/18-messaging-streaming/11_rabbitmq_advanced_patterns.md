@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Implement topic-based routing with wildcard exchange bindings
+- Support priority queues where high-priority messages preempt lower-priority ones
+- Enable delayed messaging using TTL and dead-letter exchange chaining
+- Provide message deduplication using idempotency keys
+- Support publish-subscribe fan-out to multiple independent consumers
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Deploy source connectors to stream CDC events from relational databases to Kafka
+- Deploy sink connectors to write Kafka topic data to data warehouses or object stores
+- Manage connector lifecycle (create, pause, resume, delete) via REST API
+- Handle schema evolution automatically when upstream database schemas change
+- Scale connector tasks horizontally across Connect worker nodes
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

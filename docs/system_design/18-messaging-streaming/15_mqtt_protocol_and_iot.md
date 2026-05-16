@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Connect millions of IoT devices over low-bandwidth, unreliable networks
+- Support three QoS levels: fire-and-forget, at-least-once, exactly-once
+- Route telemetry messages from devices to topic-based subscribers
+- Persist last-known-value messages (retained) for new subscribers
+- Notify subscribers of device disconnection via Last Will and Testament (LWT)
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

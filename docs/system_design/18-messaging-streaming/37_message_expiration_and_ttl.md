@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Set per-message or per-queue TTL to automatically expire stale messages
+- Route expired messages to dead-letter exchange/topic for inspection
+- Compact log-based topics by time (retention.ms) or size (retention.bytes)
+- Prevent expired messages from being delivered to consumers
+- Notify producers when their messages have been discarded due to TTL
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

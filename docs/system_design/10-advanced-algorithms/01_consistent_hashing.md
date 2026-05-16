@@ -109,8 +109,8 @@ Ring with N nodes:
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the hash ring fails?
+3. How to ensure minimal remapping on topology change in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -217,9 +217,9 @@ class ConsistentHash {
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Key lookup | O(log N) | Binary search on sorted ring of N virtual nodes |
+| Node add | O(K/N + log N) | Rehash K/N keys; insert N virtual nodes |
+| Node remove | O(K/N + log N) | Reassign K/N keys to successor node |
 
 ## Real-world Applications
 

@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Maintain per-key state (counters, aggregates, joins) across message streams
+- Checkpoint state to durable storage for fault-tolerant recovery
+- Support windowed state with configurable eviction policies
+- Handle late-arriving events with configurable grace periods
+- Provide consistent exactly-once state updates across failures and restarts
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

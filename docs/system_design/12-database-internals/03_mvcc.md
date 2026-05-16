@@ -109,8 +109,8 @@ Tx2 commits V1
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the version chain per row fails?
+3. How to ensure readers never block writers in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -158,9 +158,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Snapshot read | O(V) | Walk version chain of V versions; return latest visible |
+| Write new version | O(1) | Append new version; mark old version's xmax |
+| Vacuum/GC | O(D) | Remove D versions with xmax < oldest active txn |
 
 ## Real-world Applications
 

@@ -106,8 +106,8 @@ Search Index (ES) ← Photo metadata
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the CDN and object storage fails?
+3. How to ensure high read throughput with global distribution in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -172,9 +172,9 @@ sequenceDiagram
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Photo upload | O(1) | S3 upload + async transcoding job enqueue |
+| Feed generation | O(F log F) | Merge and rank F followings' recent posts |
+| Story delivery | O(1) | CDN-cached; short TTL for real-time updates |
 
 ## Real-world Applications
 

@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Tune producer batch size and linger time to maximize throughput
+- Configure optimal number of partitions to parallelize both produce and consume
+- Size broker JVM heap and off-heap (page cache) for optimal I/O performance
+- Apply OS-level tuning (tcp_rmem/wmem, vm.dirty_ratio, noatime mounts)
+- Benchmark and profile broker under realistic workloads with different codec settings
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

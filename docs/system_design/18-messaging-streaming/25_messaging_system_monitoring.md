@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Track consumer group lag (messages behind head) per topic and partition
+- Expose broker throughput, CPU, disk I/O, and network metrics via JMX/Prometheus
+- Alert on sustained consumer lag growth, under-replicated partitions, or leader election storms
+- Provide end-to-end message latency tracing from produce to consume
+- Visualize message flow, partition distribution, and replication health in dashboards
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

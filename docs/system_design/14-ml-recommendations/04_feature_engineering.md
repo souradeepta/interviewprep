@@ -106,8 +106,8 @@ Low latency access: <100ms
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the feature store fails?
+3. How to ensure training-serving feature consistency in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -155,9 +155,9 @@ flowchart TD
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Online feature fetch | O(1) | Redis lookup by entity key |
+| Batch feature compute | O(N × F) | Compute F features for N entities |
+| Feature join | O(N log N) | Join N user records with N item feature rows |
 
 ## Real-world Applications
 

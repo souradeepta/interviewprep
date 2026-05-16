@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Monitor downstream consumer error rates and latency per messaging endpoint
+- Open circuit when error threshold is breached, fast-failing new messages
+- Allow periodic probe requests in half-open state to test recovery
+- Close circuit and resume full traffic when probes succeed consistently
+- Emit circuit state change events for observability and alerting
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

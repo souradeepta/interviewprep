@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Retain only the latest value per key by compacting older records with same key
+- Emit changelog events to downstream consumers before and after state changes
+- Enable efficient bootstrapping of state stores by replaying compacted topics
+- Support tombstone records (null value) to signal key deletion in compacted logs
+- Configure compaction frequency and minimum compaction ratio per topic
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

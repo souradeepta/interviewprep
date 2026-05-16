@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Process and transform real-time streams using stateless and stateful operations
+- Maintain local state stores (RocksDB) co-located with stream partitions
+- Support windowed aggregations with tumbling, hopping, and sliding windows
+- Handle out-of-order events using event-time semantics and watermarks
+- Provide exactly-once processing guarantees end-to-end
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

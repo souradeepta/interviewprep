@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Isolate tenant data via namespace-scoped topics with separate ACLs
+- Enforce per-tenant quotas on producer throughput, consumer rate, and storage
+- Provide tenant-level encryption with separate key hierarchies
+- Bill tenants based on messages produced, consumed, and bytes stored
+- Support tenant onboarding and offboarding without cluster downtime
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

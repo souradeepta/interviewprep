@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Assign globally unique idempotency keys to each message or request
+- Store processed message IDs in a deduplication store (Redis, DB) with TTL
+- Detect duplicate deliveries and return cached responses without reprocessing
+- Ensure idempotency across retries caused by network failures or timeouts
+- Clear expired deduplication keys to bound storage growth
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

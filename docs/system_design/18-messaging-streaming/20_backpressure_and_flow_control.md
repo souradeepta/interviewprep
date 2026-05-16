@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Signal upstream producers to slow down when consumer queues are full
+- Implement credit-based flow control to match producer rate to consumer capacity
+- Apply back-pressure at each stage in a processing pipeline automatically
+- Drop or reject messages with configurable policies (drop-oldest, reject-latest)
+- Monitor queue depths and emit alerts when back-pressure is sustained
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

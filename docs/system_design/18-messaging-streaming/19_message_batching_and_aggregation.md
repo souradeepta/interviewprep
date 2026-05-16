@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Buffer individual messages into batches to reduce network round-trips
+- Flush batches based on configurable size (bytes) and time (linger_ms) thresholds
+- Compress batches using LZ4, Snappy, or ZSTD before network transmission
+- Aggregate stream records into micro-batches for downstream processing
+- Track per-batch delivery status and retry failed batches atomically
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

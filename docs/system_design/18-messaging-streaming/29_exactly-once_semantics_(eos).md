@@ -8,11 +8,11 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core operation 1: description]
-- [Core operation 2: description]
-- [Core operation 3: description]
-- [Core operation 4: description]
-- [Core operation 5: description]
+- Guarantee no duplicate records in output even with producer retries or broker failover
+- Use idempotent producer (PID + sequence number) to deduplicate at broker level
+- Wrap consume-transform-produce in Kafka transactions for atomic delivery
+- Fence zombie producer instances using epoch-based fencing
+- Validate end-to-end exactly-once using record count reconciliation
 
 ### Non-Functional Requirements
 - **Latency:** P99 < 100ms (depends on system type)

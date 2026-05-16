@@ -105,8 +105,8 @@ User → geohash(location) → nearby drivers (Redis) → scorer → dispatch
 ## Follow-up Interview Questions
 
 1. How would you implement this at scale (1M+ operations/sec)?
-2. What happens if the [key component] fails?
-3. How to ensure [important property] in this system?
+2. What happens if the geospatial driver index (S2/geohash) fails?
+3. How to ensure sub-5-second matching latency in this system?
 4. What's the bottleneck at 10x current scale?
 5. How would you monitor and debug [specific aspect]?
 
@@ -163,9 +163,9 @@ sequenceDiagram
 
 | Operation | Complexity | Notes |
 |-----------|-----------|-------|
-| [Key Op 1] | O(n) | [Explanation] |
-| [Key Op 2] | O(log n) | [Explanation] |
-| [Key Op 3] | O(1) | [Explanation] |
+| Driver location update | O(log N) | Geospatial index update for N active drivers |
+| Nearest driver search | O(k log N) | kNN query in geospatial index |
+| ETA calculation | O(E) | Dijkstra on road graph with E edges |
 
 ## Real-world Applications
 
