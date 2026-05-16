@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Register new service instances and their metadata
+- Deregister instances gracefully or on failure
+- Query services by name and get healthy instances
+- Support health checks and automatic removal of unhealthy nodes
+- Propagate service changes to all clients in real-time
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Availability: 99.99% service registry uptime
+- Latency: < 100ms for service discovery queries
+- Consistency: Eventual consistency across replicas
+- Scalability: Support 10K+ services and 100K+ instances
+- Durability: Persist service registry data
 
 ## Architecture
 

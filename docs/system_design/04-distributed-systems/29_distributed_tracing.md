@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Trace request flow across microservices
+- Correlate logs using trace IDs
+- Identify performance bottlenecks
+- Visualize service dependencies
+- Support sampling to reduce overhead
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Overhead: < 5% performance impact
+- Latency: Tracing information available within 5 seconds
+- Storage: 1KB per trace event
+- Throughput: Support 1M+ trace events/sec
+- Queryability: Support complex trace queries
 
 ## Architecture
 

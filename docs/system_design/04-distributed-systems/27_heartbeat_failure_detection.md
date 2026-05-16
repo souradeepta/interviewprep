@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Periodic heartbeats from nodes to detector
+- Detect failure when heartbeats stop
+- Reduce false positives with adaptive timeouts
+- Support different failure models (fail-stop, crash)
+- Report failure to monitoring and recovery systems
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Detection latency: 3-5 heartbeat intervals
+- False positive rate: < 0.1% under normal conditions
+- Overhead: Minimal heartbeat bandwidth
+- Scalability: O(n) messages for n nodes
+- Accuracy: Tolerate network jitter and delays
 
 ## Architecture
 

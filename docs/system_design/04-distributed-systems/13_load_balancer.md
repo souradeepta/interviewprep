@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Distribute incoming requests across multiple backend servers
+- Support multiple load balancing algorithms (RR, LB, consistent hash)
+- Health check backends and remove unhealthy ones
+- Route requests based on path, hostname, or protocol
+- Maintain persistent connections (sticky sessions when needed)
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Throughput: 1M+ RPS per load balancer
+- Latency: < 5ms p99 routing decision
+- Availability: 99.999% uptime across regions
+- Scalability: Support 10K+ backend servers
+- Consistency: No request loss during failover
 
 ## Architecture
 

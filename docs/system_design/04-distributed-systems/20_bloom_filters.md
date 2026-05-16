@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Check set membership with small false positive rate
+- Add elements to the filter structure
+- Support multiple hash functions for distributed data
+- Count approximate set cardinality (HyperLogLog)
+- Merge filters from different partitions
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Space: O(n) bits for n elements
+- Time: O(k) hash computations per lookup
+- False positives: Configurable p < 1%
+- Accuracy: Deterministic membership guarantee
+- Distribution: Partition filters across nodes
 
 ## Architecture
 

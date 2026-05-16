@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Verify data integrity across partitions
+- Efficiently reconcile divergent replicas
+- Identify specific corrupted data blocks
+- Support incremental synchronization
+- Detect unauthorized data modification
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Verification: O(log n) hashes to verify n items
+- Sync: Minimize data transfer during reconciliation
+- Storage: 2n hashes for n leaf nodes
+- Computation: O(n log n) to build tree
+- Throughput: Constant time updates with caching
 
 ## Architecture
 

@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Reject low-priority requests when overloaded
+- Queue high-priority requests for later processing
+- Provide graceful degradation under surge
+- Support priority-based or cost-aware shedding
+- Return proper error codes to clients
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Response time: Maintain p99 < 500ms under 2x traffic
+- Fairness: Prevent starvation of important requests
+- Recovery: Resume normal operation within 5 minutes
+- Overhead: < 1% performance impact
+- Accuracy: Shedding threshold auto-tuning
 
 ## Architecture
 

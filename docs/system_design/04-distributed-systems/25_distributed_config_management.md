@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Centralized configuration for all services
+- Push configuration updates in real-time
+- Support versioning and rollback
+- Environment-specific configuration overrides
+- Audit trail of all configuration changes
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Availability: 99.99% config service uptime
+- Latency: < 10ms to fetch config
+- Consistency: Read-after-write within service
+- Scalability: Support 10K+ services
+- Security: Encrypt sensitive values
 
 ## Architecture
 

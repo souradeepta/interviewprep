@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Store hints for data destined to failed nodes
+- Replay hints when failed node recovers
+- Cleanup hint storage after successful replay
+- Prevent write loss during node failure
+- Support cleanup of abandoned hints
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Overhead: < 10% extra storage for hints
+- Latency: Hint storage adds < 1ms to write
+- Durability: Hints stored durably
+- Completeness: All hints eventually delivered
+- Cleanup: Hints deleted after 3x replication time
 
 ## Architecture
 

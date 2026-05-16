@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Accept tasks and execute asynchronously
+- Maintain configurable number of worker threads
+- Queue tasks when all workers are busy
+- Support task cancellation and timeout
+- Provide work-stealing for load balancing
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Throughput: Handle 100K+ tasks/sec
+- Latency: Queue/dequeue in microseconds
+- Memory: Bounded queue to prevent OOM
+- Scalability: CPU cores × 2-4 workers
+- Fairness: No thread starvation or deadlock
 
 ## Architecture
 

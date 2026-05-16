@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Detect stale values during read operations
+- Automatically update stale replicas in background
+- Merge replica values using vector clocks
+- Return latest value to client immediately
+- Repair consistency without user intervention
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Latency: Read operation unaffected by repair
+- Consistency: Eventual consistency achieved asynchronously
+- Throughput: Background repairs don't impact reads
+- Overhead: Extra network requests to lagging replicas
+- Scalability: Works with many replicas
 
 ## Architecture
 

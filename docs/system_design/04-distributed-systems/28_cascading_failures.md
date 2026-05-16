@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Detect when single failure triggers chain reaction
+- Isolate failed component using circuit breaker
+- Shed load to prevent system overload
+- Graceful degradation with reduced capacity
+- Automatic recovery when conditions improve
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Detection: < 10 seconds to identify cascade
+- Recovery: Restart failed service in < 30 seconds
+- Availability: Partial availability maintained
+- Impact: Limit blast radius to single component
+- Automation: Minimal manual intervention needed
 
 ## Architecture
 

@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Track causality relationships between events
+- Determine partial order of events across processes
+- Detect concurrent events (no causality relationship)
+- Merge clocks for information flow analysis
+- Reconstruct event ordering for debugging
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Storage: O(n) space per event (n = number of processes)
+- Comparison: O(n) time for causality check
+- Scalability: Feasible for < 100 processes
+- Accuracy: Correct causality detection
+- Overhead: Minimal impact on system performance
 
 ## Architecture
 

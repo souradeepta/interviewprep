@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Acquire exclusive locks on shared resources
+- Support lock timeout and automatic release
+- Enable multiple readers with exclusive writer (RWLock)
+- Prevent deadlocks with timeout and detection
+- Reentrant locks for same client multiple acquisitions
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Lock acquisition latency: < 10ms p99
+- Throughput: 100K+ lock operations/sec
+- Fairness: FIFO ordering prevents starvation
+- Durability: Survive coordinator restarts
+- Scalability: Support millions of locks
 
 ## Architecture
 

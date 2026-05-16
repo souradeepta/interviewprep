@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Elect single leader among distributed nodes
+- Detect leader failure and trigger re-election
+- Provide leaderless operations during transition
+- Support safe leader stepdown
+- Guarantee only one active leader at a time
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Latency: Complete election in < 5 seconds
+- Safety: No split-brain or multiple leaders
+- Liveness: Leader elected eventually
+- Consistency: State consistent across replicas
+- Scalability: O(log n) election complexity
 
 ## Architecture
 

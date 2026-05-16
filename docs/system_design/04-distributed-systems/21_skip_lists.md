@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Store sorted elements with efficient search
+- Insert/delete/search in O(log n) average time
+- Range queries on consecutive elements
+- Iterate elements in sorted order
+- Support concurrent access with fine-grained locks
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Complexity: O(log n) expected for operations
+- Space: O(n) with small constant factors
+- Concurrency: Lock-free or fine-grained locking
+- Cache locality: Better than balanced trees
+- Simplicity: Easier to implement than AVL/RB trees
 
 ## Architecture
 

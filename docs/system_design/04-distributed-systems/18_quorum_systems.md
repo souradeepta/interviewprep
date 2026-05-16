@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Read from quorum of replicas for consistency
+- Write to quorum of replicas for durability
+- Support variable quorum sizes (W + R > N)
+- Handle read repair to update stale replicas
+- Consistent read-after-write within session
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Consistency: Strong consistency with quorum reads/writes
+- Availability: Tolerate up to N - ceil(N/2) failures
+- Latency: p99 latency = max(quorum response times)
+- Throughput: Quorum parallelism vs serialization
+- Network: Reduce replica count to save bandwidth
 
 ## Architecture
 

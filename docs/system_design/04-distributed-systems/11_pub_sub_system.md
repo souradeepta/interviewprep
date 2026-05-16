@@ -8,18 +8,18 @@
 ## Problem Statement
 
 ### Functional Requirements
-- [Core requirement 1]
-- [Core requirement 2]
-- [Core requirement 3]
-- [Core requirement 4]
-- [Core requirement 5]
+- Publish messages to topics with multiple subscribers
+- Guarantee message delivery to all active subscribers
+- Support topic filtering and pattern-based subscriptions
+- Handle subscription/unsubscription dynamically
+- Maintain message ordering within a topic partition
 
 ### Non-Functional Requirements
-- **Correctness:** Guarantees under failure conditions
-- **Availability:** Tolerance for node failures
-- **Consistency:** Data consistency guarantees
-- **Scalability:** Handle millions of nodes/requests
-- **Latency:** Response time under normal and failure conditions
+- Throughput: 1M+ messages/sec per broker
+- Latency: < 10ms p99 message delivery
+- Durability: At-least-once delivery guarantee
+- Scalability: Support millions of subscribers globally
+- Availability: 99.99% uptime with automatic failover
 
 ## Architecture
 
