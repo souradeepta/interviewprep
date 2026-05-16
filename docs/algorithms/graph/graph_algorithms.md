@@ -809,3 +809,509 @@ Cost: 8 steps
 - **How do you reconstruct the shortest path from Dijkstra's output?** During relaxation, store a predecessor map `pred[v] = u` whenever `dist[u] + w < dist[v]`. To reconstruct the path to a destination, walk backwards: `dest → pred[dest] → pred[pred[dest]] → ... → start`, then reverse.
 - **When would you choose Floyd-Warshall over running Dijkstra from each source?** Floyd-Warshall has O(V³) time and is simpler to implement. For dense graphs (E ~ V²), running Dijkstra from each source costs O(V · (V+E) log V) = O(V³ log V) — worse. Floyd-Warshall wins for small dense graphs. For large sparse graphs (E ~ V), per-source Dijkstra at O(V · (V+E) log V) = O(V² log V) wins.
 - **How does Kahn's algorithm detect cycles?** If a cycle exists, all nodes in the cycle maintain in-degree >= 1 throughout the algorithm — they can never enter the BFS queue. After the queue empties, `len(order) < len(total_nodes)` indicates that some nodes were never processed, proving a cycle exists. The unprocessed nodes are exactly those in or downstream of cycles.
+- **How do you detect negative cycles with Bellman-Ford?** Run V-1 relaxation rounds normally. Then perform one additional (Vth) relaxation pass. If any edge `(u, v, w)` still satisfies `dist[u] + w < dist[v]`, a negative cycle is reachable from the source. The node v updated in the Vth pass is on or reachable from a negative cycle.
+- **When should you use Prim's vs Kruskal's?** Choose Kruskal's when edges are provided as a list and the graph is sparse (E ~ V). Choose Prim's when the graph is dense (E ~ V²) or given as an adjacency list from a known start vertex. Kruskal's dominates when sorting edges is cheap; Prim's is better for dense graphs where sorting all edges would be expensive (E log E can be large when E ~ V²).
+- **How does topological sort relate to cycle detection?** Kahn's topological sort naturally detects cycles: if the output ordering has fewer nodes than the total node count, a cycle exists. Nodes in cycles can never have their in-degree reduced to 0 (because their cycle predecessor always maintains in-degree ≥ 1). DFS-based topological sort detects cycles by identifying back edges (reaching a gray/visiting node).
+- **Difference between Kahn's BFS and DFS approaches for topological sort?** Kahn's (BFS): iterative, processes nodes in in-degree order, naturally detects cycles via output length check. DFS-based: recursive, post-order finish times reversed give topological order, detects cycles via back edges (gray node encountered). Both are O(V+E). Kahn's is preferred for cycle detection; DFS post-order is useful when you also need SCC analysis.
+- **How does A* guarantee optimality?** A* is optimal when the heuristic is admissible (h(n) ≤ true cost to goal) and consistent (h(n) ≤ cost(n→n') + h(n')). Consistency implies that when a node is first popped from the heap, its g-score is optimal (similar to Dijkstra's invariant). An admissible but inconsistent heuristic may still find the optimal path but may re-expand nodes.
+- **Find all bridges in a graph (Tarjan's bridge finding).** A bridge is an edge whose removal disconnects the graph. Use DFS with discovery times and low-link values. Edge (u, v) is a bridge if `low[v] > disc[u]` (the subtree rooted at v cannot reach u or any ancestor of u via a back-edge). This differs from SCC: for bridges, use `low[v] > disc[u]` (strict); for articulation points use `low[v] >= disc[u]`.
+- **Explain Tarjan's SCC algorithm with a concrete example.** Maintain a stack of nodes and two arrays: `disc[v]` (discovery time) and `low[v]` (lowest disc reachable from v's subtree). DFS assigns disc[v]=low[v]=counter++, pushes v on stack. For each neighbor w: if unvisited, recurse and update `low[v] = min(low[v], low[w])`; if w is on stack (back-edge), `low[v] = min(low[v], disc[w])`. After all neighbors, if `low[v]==disc[v]`, pop the stack until v — all popped nodes form one SCC.
+
+---
+
+## Java Implementations
+
+### Dijkstra (Java)
+```java
+import java.util.*;
+
+public class Dijkstra {
+    public int[] dijkstra(Map<Integer, List<int[]>> graph, int src, int V) {
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+        // PriorityQueue: [distance, node]
+        PriorityQueue<int[]> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+        heap.offer(new int[]{0, src});
+        while (!heap.isEmpty()) {
+            int[] top = heap.poll();
+            int d = top[0], u = top[1];
+            if (d > dist[u]) continue;  // stale entry
+            for (int[] edge : graph.getOrDefault(u, List.of())) {
+                int v = edge[0], w = edge[1];
+                if (dist[u] + w < dist[v]) {
+                    dist[v] = dist[u] + w;
+                    heap.offer(new int[]{dist[v], v});
+                }
+            }
+        }
+        return dist;
+    }
+}
+```
+
+### Bellman-Ford (Java)
+```java
+public class BellmanFord {
+    public int[] bellmanFord(int V, int[][] edges, int src) {
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+        for (int round = 0; round < V - 1; round++) {
+            boolean updated = false;
+            for (int[] e : edges) {
+                int u = e[0], v = e[1], w = e[2];
+                if (dist[u] != Integer.MAX_VALUE && dist[u] + w < dist[v]) {
+                    dist[v] = dist[u] + w;
+                    updated = true;
+                }
+            }
+            if (!updated) break;  // early exit
+        }
+        // Negative cycle detection
+        for (int[] e : edges) {
+            if (dist[e[0]] != Integer.MAX_VALUE && dist[e[0]] + e[2] < dist[e[1]])
+                throw new IllegalStateException("Negative cycle detected");
+        }
+        return dist;
+    }
+}
+```
+
+### Floyd-Warshall (Java)
+```java
+public class FloydWarshall {
+    public int[][] floydWarshall(int[][] dist, int V) {
+        int[][] d = new int[V][V];
+        for (int i = 0; i < V; i++) d[i] = dist[i].clone();
+        for (int k = 0; k < V; k++)
+            for (int i = 0; i < V; i++)
+                for (int j = 0; j < V; j++)
+                    if (d[i][k] != Integer.MAX_VALUE && d[k][j] != Integer.MAX_VALUE)
+                        d[i][j] = Math.min(d[i][j], d[i][k] + d[k][j]);
+        // Negative cycle: d[i][i] < 0
+        return d;
+    }
+}
+```
+
+### Kruskal's MST (Java)
+```java
+public class Kruskal {
+    int[] parent, rank;
+    int find(int x) {
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    boolean union(int x, int y) {
+        int px = find(x), py = find(y);
+        if (px == py) return false;
+        if (rank[px] < rank[py]) { int t = px; px = py; py = t; }
+        parent[py] = px;
+        if (rank[px] == rank[py]) rank[px]++;
+        return true;
+    }
+    public int kruskal(int V, int[][] edges) {
+        Arrays.sort(edges, Comparator.comparingInt(e -> e[2]));
+        parent = new int[V]; rank = new int[V];
+        for (int i = 0; i < V; i++) parent[i] = i;
+        int cost = 0, count = 0;
+        for (int[] e : edges) {
+            if (union(e[0], e[1])) {
+                cost += e[2];
+                if (++count == V - 1) break;
+            }
+        }
+        return cost;
+    }
+}
+```
+
+### Prim's MST (Java)
+```java
+public class Prim {
+    public int prim(Map<Integer, List<int[]>> graph, int V) {
+        boolean[] visited = new boolean[V];
+        PriorityQueue<int[]> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+        heap.offer(new int[]{0, 0, 0});  // weight, from, to
+        int total = 0;
+        while (!heap.isEmpty()) {
+            int[] e = heap.poll();
+            int w = e[0], v = e[2];
+            if (visited[v]) continue;
+            visited[v] = true;
+            total += w;
+            for (int[] next : graph.getOrDefault(v, List.of())) {
+                if (!visited[next[0]]) heap.offer(new int[]{next[1], v, next[0]});
+            }
+        }
+        return total;
+    }
+}
+```
+
+### Tarjan's SCC (Java)
+```java
+public class TarjanSCC {
+    int[] disc, low;
+    boolean[] onStack;
+    Deque<Integer> stack;
+    List<List<Integer>> sccs;
+    int timer;
+
+    public List<List<Integer>> tarjan(Map<Integer, List<Integer>> graph, int V) {
+        disc = new int[V]; low = new int[V];
+        Arrays.fill(disc, -1);
+        onStack = new boolean[V];
+        stack = new ArrayDeque<>();
+        sccs = new ArrayList<>();
+        timer = 0;
+        for (int v = 0; v < V; v++)
+            if (disc[v] == -1) dfs(graph, v);
+        return sccs;
+    }
+
+    private void dfs(Map<Integer, List<Integer>> graph, int v) {
+        disc[v] = low[v] = timer++;
+        stack.push(v); onStack[v] = true;
+        for (int w : graph.getOrDefault(v, List.of())) {
+            if (disc[w] == -1) {
+                dfs(graph, w);
+                low[v] = Math.min(low[v], low[w]);
+            } else if (onStack[w]) {
+                low[v] = Math.min(low[v], disc[w]);
+            }
+        }
+        if (low[v] == disc[v]) {
+            List<Integer> scc = new ArrayList<>();
+            while (true) {
+                int w = stack.pop(); onStack[w] = false; scc.add(w);
+                if (w == v) break;
+            }
+            sccs.add(scc);
+        }
+    }
+}
+```
+
+### Topological Sort / Kahn's (Java)
+```java
+public class TopologicalSort {
+    public List<Integer> kahnSort(Map<Integer, List<Integer>> graph, int V) {
+        int[] inDeg = new int[V];
+        for (int u = 0; u < V; u++)
+            for (int v : graph.getOrDefault(u, List.of())) inDeg[v]++;
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < V; i++) if (inDeg[i] == 0) queue.offer(i);
+        List<Integer> order = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            int u = queue.poll(); order.add(u);
+            for (int v : graph.getOrDefault(u, List.of()))
+                if (--inDeg[v] == 0) queue.offer(v);
+        }
+        return order.size() == V ? order : Collections.emptyList(); // empty = cycle
+    }
+}
+```
+
+### A* Search (Java)
+```java
+public class AStar {
+    int[] dr = {-1,1,0,0}, dc = {0,0,-1,1};
+
+    public int astar(int[][] grid, int[] start, int[] goal) {
+        int m = grid.length, n = grid[0].length;
+        int[][] g = new int[m][n];
+        for (int[] row : g) Arrays.fill(row, Integer.MAX_VALUE);
+        g[start[0]][start[1]] = 0;
+        PriorityQueue<int[]> heap = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+        heap.offer(new int[]{heuristic(start, goal), start[0], start[1]});
+        while (!heap.isEmpty()) {
+            int[] curr = heap.poll();
+            int r = curr[1], c = curr[2];
+            if (r == goal[0] && c == goal[1]) return g[r][c];
+            if (curr[0] - heuristic(new int[]{r,c}, goal) > g[r][c]) continue;
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d], nc = c + dc[d];
+                if (nr < 0 || nr >= m || nc < 0 || nc >= n || grid[nr][nc] == 1) continue;
+                int ng = g[r][c] + 1;
+                if (ng < g[nr][nc]) {
+                    g[nr][nc] = ng;
+                    heap.offer(new int[]{ng + heuristic(new int[]{nr,nc}, goal), nr, nc});
+                }
+            }
+        }
+        return -1;
+    }
+
+    private int heuristic(int[] a, int[] b) {
+        return Math.abs(a[0]-b[0]) + Math.abs(a[1]-b[1]);
+    }
+}
+```
+
+---
+
+## Additional Algorithms
+
+### Bipartite Check (BFS Coloring)
+
+A graph is bipartite if nodes can be 2-colored such that no adjacent nodes share a color. Equivalent to containing no odd-length cycles.
+
+```mermaid
+graph TD
+    A["Start BFS from unvisited node<br/>Assign color 0"] --> B["For each neighbor<br/>assign opposite color"]
+    B --> C{"Neighbor already<br/>same color?"}
+    C -->|Yes| D["Not bipartite!"]
+    C -->|No| E["Continue BFS"]
+    E --> F["If all components pass:<br/>Graph is bipartite"]
+
+    style C fill:#ff9800,color:#000
+    style D fill:#ff3333,color:#fff
+    style F fill:#42c742,color:#fff
+```
+
+```python
+from collections import deque
+
+def is_bipartite(graph: dict, V: int) -> bool:
+    """BFS 2-coloring check for bipartite. O(V+E)."""
+    color = [-1] * V
+    for start in range(V):
+        if color[start] != -1:
+            continue
+        color[start] = 0
+        queue = deque([start])
+        while queue:
+            u = queue.popleft()
+            for v in graph.get(u, []):
+                if color[v] == -1:
+                    color[v] = 1 - color[u]
+                    queue.append(v)
+                elif color[v] == color[u]:
+                    return False  # conflict: not bipartite
+    return True
+```
+
+```java
+public boolean isBipartite(Map<Integer, List<Integer>> graph, int V) {
+    int[] color = new int[V];
+    Arrays.fill(color, -1);
+    for (int start = 0; start < V; start++) {
+        if (color[start] != -1) continue;
+        color[start] = 0;
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(start);
+        while (!queue.isEmpty()) {
+            int u = queue.poll();
+            for (int v : graph.getOrDefault(u, List.of())) {
+                if (color[v] == -1) { color[v] = 1 - color[u]; queue.offer(v); }
+                else if (color[v] == color[u]) return false;
+            }
+        }
+    }
+    return true;
+}
+```
+
+**When to use:** Matching algorithms (Hungarian, Hopcroft-Karp), scheduling with two groups, conflict detection. A graph with an odd cycle is not bipartite.
+
+---
+
+### Johnson's Algorithm (All-Pairs Shortest Paths, Sparse Graphs)
+
+Johnson's algorithm efficiently computes all-pairs shortest paths on sparse graphs with possibly negative edges (but no negative cycles). It uses Bellman-Ford once to reweight edges (making all non-negative), then runs Dijkstra from each vertex.
+
+```mermaid
+graph TD
+    A["Input: sparse graph<br/>may have negative edges"] --> B["Add virtual node q<br/>q→every node with weight 0"]
+    B --> C["Run Bellman-Ford from q<br/>Get h[v] for each v"]
+    C --> D{"Negative cycle?"}
+    D -->|Yes| E["No solution"]
+    D -->|No| F["Reweight: w'(u,v) = w(u,v) + h[u] - h[v]<br/>All w' >= 0 now"]
+    F --> G["Run Dijkstra from each vertex<br/>Using reweighted edges"]
+    G --> H["Recover true distances:<br/>dist(u,v) = dijkstra_dist(u,v) - h[u] + h[v]"]
+
+    style D fill:#ff9800,color:#000
+    style F fill:#4287f5,color:#fff
+    style H fill:#42c742,color:#fff
+```
+
+```python
+import heapq
+
+def johnson(V: int, edges: list) -> list:
+    """Johnson's all-pairs shortest paths. O(V² log V + VE) time."""
+    INF = float('inf')
+    # Add virtual source q = V
+    augmented = edges + [(V, v, 0) for v in range(V)]
+
+    # Bellman-Ford from virtual source
+    h = [INF] * (V + 1)
+    h[V] = 0
+    for _ in range(V):
+        for u, v, w in augmented:
+            if h[u] + w < h[v]:
+                h[v] = h[u] + w
+
+    # Check negative cycle
+    for u, v, w in augmented:
+        if h[u] + w < h[v]:
+            raise ValueError("Negative cycle detected")
+
+    # Build reweighted adjacency list
+    graph = {i: [] for i in range(V)}
+    for u, v, w in edges:
+        graph[u].append((v, w + h[u] - h[v]))
+
+    # Dijkstra from each source
+    def dijkstra(src):
+        dist = [INF] * V
+        dist[src] = 0
+        heap = [(0, src)]
+        while heap:
+            d, u = heapq.heappop(heap)
+            if d > dist[u]:
+                continue
+            for v, w in graph[u]:
+                if dist[u] + w < dist[v]:
+                    dist[v] = dist[u] + w
+                    heapq.heappush(heap, (dist[v], v))
+        return dist
+
+    result = []
+    for u in range(V):
+        dist = dijkstra(u)
+        result.append([dist[v] - h[u] + h[v] if dist[v] < INF else INF
+                       for v in range(V)])
+    return result
+```
+
+**Key insight:** Reweighting via `w'(u,v) = w(u,v) + h[u] - h[v]` preserves path optimality while eliminating negative edges. Since `h[v]` is the shortest distance from virtual source q to v, the reweighting satisfies the reduced cost property. Total complexity: O(V·E + V² log V) — better than Floyd-Warshall's O(V³) for sparse graphs.
+
+---
+
+### Euler Path / Circuit Detection
+
+An Euler path visits every edge exactly once. An Euler circuit is an Euler path that starts and ends at the same vertex.
+
+```mermaid
+graph TD
+    A["Undirected or Directed Graph"] --> B{"Directed or Undirected?"}
+    B -->|Undirected| C{"Degree conditions?"}
+    B -->|Directed| D{"In/Out-degree conditions?"}
+    C -->|All even degrees| E["Euler Circuit exists"]
+    C -->|Exactly 2 odd degrees| F["Euler Path exists<br/>start/end at odd-degree nodes"]
+    C -->|Otherwise| G["No Euler path/circuit"]
+    D -->|All in-deg == out-deg| H["Euler Circuit exists"]
+    D -->|Exactly one node: out-deg=in-deg+1 (start)<br/>one node: in-deg=out-deg+1 (end)| I["Euler Path exists"]
+    D -->|Otherwise| G
+
+    style E fill:#42c742,color:#fff
+    style F fill:#42c742,color:#fff
+    style H fill:#42c742,color:#fff
+    style I fill:#42c742,color:#fff
+    style G fill:#ff3333,color:#fff
+```
+
+```python
+from collections import defaultdict, deque
+
+def has_euler_circuit(adj: dict, V: int, directed: bool = False) -> bool:
+    """Check if Euler circuit exists."""
+    if directed:
+        in_deg = defaultdict(int)
+        out_deg = defaultdict(int)
+        for u in adj:
+            out_deg[u] += len(adj[u])
+            for v in adj[u]:
+                in_deg[v] += 1
+        return all(in_deg[u] == out_deg[u] for u in range(V))
+    else:
+        return all(len(adj[u]) % 2 == 0 for u in range(V))
+
+def hierholzer_euler_circuit(adj: dict, start: int) -> list:
+    """Find Euler circuit using Hierholzer's algorithm. O(E)."""
+    stack = [start]
+    path = []
+    adj_copy = {u: list(vs) for u, vs in adj.items()}
+    while stack:
+        v = stack[-1]
+        if adj_copy.get(v):
+            u = adj_copy[v].pop()
+            stack.append(u)
+        else:
+            path.append(stack.pop())
+    return path[::-1]
+```
+
+```java
+public boolean hasEulerCircuit(int[] degree, int V) {
+    for (int i = 0; i < V; i++)
+        if (degree[i] % 2 != 0) return false;
+    return true;
+}
+```
+
+**Key insight:** Euler circuit requires all vertices to have even degree (undirected) or equal in/out-degree (directed). Hierholzer's algorithm finds the circuit in O(E) by iteratively building a path and splicing in circuits found along the way.
+
+**When to use:** Chinese postman problem, route inspection, DNA fragment assembly, drawing puzzles without lifting pen.
+
+---
+
+### Tarjan's Bridge Finding
+
+A bridge is an edge whose removal disconnects the graph. Uses DFS with discovery and low-link values.
+
+```python
+def find_bridges(graph: dict, V: int) -> list:
+    """Find all bridges using Tarjan's bridge algorithm. O(V+E)."""
+    disc = [-1] * V
+    low = [-1] * V
+    bridges = []
+    timer = [0]
+
+    def dfs(u, parent):
+        disc[u] = low[u] = timer[0]
+        timer[0] += 1
+        for v in graph.get(u, []):
+            if disc[v] == -1:
+                dfs(v, u)
+                low[u] = min(low[u], low[v])
+                if low[v] > disc[u]:  # bridge condition (strict >)
+                    bridges.append((u, v))
+            elif v != parent:
+                low[u] = min(low[u], disc[v])
+
+    for i in range(V):
+        if disc[i] == -1:
+            dfs(i, -1)
+    return bridges
+```
+
+```java
+public List<int[]> findBridges(Map<Integer, List<Integer>> graph, int V) {
+    int[] disc = new int[V], low = new int[V];
+    Arrays.fill(disc, -1);
+    List<int[]> bridges = new ArrayList<>();
+    int[] timer = {0};
+    for (int i = 0; i < V; i++)
+        if (disc[i] == -1) dfs(graph, i, -1, disc, low, timer, bridges);
+    return bridges;
+}
+private void dfs(Map<Integer,List<Integer>> graph, int u, int parent,
+                  int[] disc, int[] low, int[] timer, List<int[]> bridges) {
+    disc[u] = low[u] = timer[0]++;
+    for (int v : graph.getOrDefault(u, List.of())) {
+        if (disc[v] == -1) {
+            dfs(graph, v, u, disc, low, timer, bridges);
+            low[u] = Math.min(low[u], low[v]);
+            if (low[v] > disc[u]) bridges.add(new int[]{u, v});
+        } else if (v != parent) {
+            low[u] = Math.min(low[u], disc[v]);
+        }
+    }
+}
+```
+
+**Bridge vs Articulation Point:** Bridge condition: `low[v] > disc[u]` (strict). Articulation point condition: `low[v] >= disc[u]` (non-strict, except root which needs ≥ 2 children in DFS tree).

@@ -1,6 +1,14 @@
-# Dynamic Programming
+# Dynamic Programming — Index
 
-A collection of eight foundational DP algorithms covering the core patterns — memoization vs. tabulation, 1-D and 2-D state spaces, string DP, sequence DP, and interval DP — with time and space complexities and step-by-step visualizations of the recurrences.
+This index covers all DP patterns across three specialized files. The master decision tree below routes you to the right file for any DP problem category.
+
+## Sub-Files
+
+| File | Topics |
+|------|--------|
+| [dp_fundamentals.md](dp_fundamentals.md) | Fibonacci, Coin Change, LIS (O(n²) and O(n log n)), 0/1 Knapsack variants, House Robber, Kadane's, Jump Game |
+| [dp_strings.md](dp_strings.md) | LCS, Edit Distance, Longest Palindromic Substring, Palindromic Substrings, Distinct Subsequences, Interleaving String, Wildcard/Regex Matching |
+| [dp_interval_advanced.md](dp_interval_advanced.md) | Matrix Chain Multiplication, Burst Balloons, Strange Printer, Merge Stones, Zuma Game, Bitmask DP (TSP), Digit DP |
 
 ---
 

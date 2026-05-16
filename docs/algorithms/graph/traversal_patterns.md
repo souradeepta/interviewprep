@@ -766,3 +766,449 @@ A: Yes. Run BFS/DFS from each unvisited node. If any component fails 2-coloring 
 - BFS for shortest path (guarantees optimal)
 - DFS for topological sort and all paths
 - Kahn's algorithm for topological sort if you prefer iteration over recursion
+
+---
+
+## Java Implementations
+
+### DFS (Recursive + Iterative) — Java
+```java
+import java.util.*;
+
+public class GraphTraversals {
+
+    // Recursive DFS
+    public Set<Integer> dfsRecursive(Map<Integer, List<Integer>> graph, int start) {
+        Set<Integer> visited = new HashSet<>();
+        dfsHelper(graph, start, visited);
+        return visited;
+    }
+    private void dfsHelper(Map<Integer, List<Integer>> graph, int node, Set<Integer> visited) {
+        visited.add(node);
+        for (int neighbor : graph.getOrDefault(node, List.of())) {
+            if (!visited.contains(neighbor)) dfsHelper(graph, neighbor, visited);
+        }
+    }
+
+    // Iterative DFS
+    public Set<Integer> dfsIterative(Map<Integer, List<Integer>> graph, int start) {
+        Set<Integer> visited = new HashSet<>();
+        Deque<Integer> stack = new ArrayDeque<>();
+        stack.push(start);
+        while (!stack.isEmpty()) {
+            int node = stack.pop();
+            if (visited.contains(node)) continue;
+            visited.add(node);
+            List<Integer> neighbors = graph.getOrDefault(node, List.of());
+            for (int i = neighbors.size() - 1; i >= 0; i--)
+                if (!visited.contains(neighbors.get(i))) stack.push(neighbors.get(i));
+        }
+        return visited;
+    }
+
+    // BFS with distance tracking
+    public Map<Integer, Integer> bfs(Map<Integer, List<Integer>> graph, int start) {
+        Map<Integer, Integer> distances = new HashMap<>();
+        distances.put(start, 0);
+        Queue<Integer> queue = new LinkedList<>();
+        queue.offer(start);
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            for (int neighbor : graph.getOrDefault(node, List.of())) {
+                if (!distances.containsKey(neighbor)) {
+                    distances.put(neighbor, distances.get(node) + 1);
+                    queue.offer(neighbor);
+                }
+            }
+        }
+        return distances;
+    }
+}
+```
+
+### Cycle Detection (Directed + Undirected) — Java
+```java
+public class CycleDetection {
+
+    // Directed: 3-coloring (0=white, 1=gray, 2=black)
+    public boolean hasCycleDirected(Map<Integer, List<Integer>> graph, int V) {
+        int[] color = new int[V];
+        for (int i = 0; i < V; i++)
+            if (color[i] == 0 && dfsCycle(graph, i, color)) return true;
+        return false;
+    }
+    private boolean dfsCycle(Map<Integer, List<Integer>> graph, int node, int[] color) {
+        color[node] = 1;  // gray: currently visiting
+        for (int neighbor : graph.getOrDefault(node, List.of())) {
+            if (color[neighbor] == 1) return true;  // back edge = cycle
+            if (color[neighbor] == 0 && dfsCycle(graph, neighbor, color)) return true;
+        }
+        color[node] = 2;  // black: fully processed
+        return false;
+    }
+
+    // Undirected: parent tracking
+    public boolean hasCycleUndirected(Map<Integer, List<Integer>> graph, int V) {
+        Set<Integer> visited = new HashSet<>();
+        for (int i = 0; i < V; i++) {
+            if (!visited.contains(i) && dfsUndirected(graph, i, -1, visited)) return true;
+        }
+        return false;
+    }
+    private boolean dfsUndirected(Map<Integer, List<Integer>> graph,
+                                   int node, int parent, Set<Integer> visited) {
+        visited.add(node);
+        for (int neighbor : graph.getOrDefault(node, List.of())) {
+            if (neighbor == parent) continue;
+            if (visited.contains(neighbor)) return true;
+            if (dfsUndirected(graph, neighbor, node, visited)) return true;
+        }
+        return false;
+    }
+}
+```
+
+### Union-Find — Java
+```java
+public class UnionFind {
+    private int[] parent, rank;
+    private int components;
+
+    public UnionFind(int n) {
+        parent = new int[n]; rank = new int[n];
+        components = n;
+        for (int i = 0; i < n; i++) parent[i] = i;
+    }
+    public int find(int x) {
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    public boolean union(int x, int y) {
+        int px = find(x), py = find(y);
+        if (px == py) return false;
+        if (rank[px] < rank[py]) { int t = px; px = py; py = t; }
+        parent[py] = px;
+        if (rank[px] == rank[py]) rank[px]++;
+        components--;
+        return true;
+    }
+    public boolean connected(int x, int y) { return find(x) == find(y); }
+    public int getComponents() { return components; }
+}
+```
+
+---
+
+## Additional Patterns
+
+### Finding All Connected Components
+
+```mermaid
+graph TD
+    A["For each unvisited node"] --> B["Run DFS/BFS<br/>from that node"]
+    B --> C["All nodes reached<br/>= one component"]
+    C --> D["Increment component count"]
+    D --> E["Mark all visited"]
+    E --> F["Move to next<br/>unvisited node"]
+
+    style B fill:#4287f5,color:#fff
+    style D fill:#42c742,color:#fff
+```
+
+```python
+def count_components(graph: dict, V: int) -> int:
+    """Count connected components via DFS. O(V+E)."""
+    visited = set()
+    count = 0
+
+    def dfs(node):
+        visited.add(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                dfs(neighbor)
+
+    for node in range(V):
+        if node not in visited:
+            dfs(node)
+            count += 1
+    return count
+
+def get_all_components(graph: dict, V: int) -> list:
+    """Return list of lists, each is one connected component."""
+    visited = set()
+    components = []
+
+    def dfs(node, comp):
+        visited.add(node)
+        comp.append(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                dfs(neighbor, comp)
+
+    for node in range(V):
+        if node not in visited:
+            comp = []
+            dfs(node, comp)
+            components.append(comp)
+    return components
+```
+
+```java
+public int countComponents(Map<Integer, List<Integer>> graph, int V) {
+    boolean[] visited = new boolean[V];
+    int count = 0;
+    for (int i = 0; i < V; i++) {
+        if (!visited[i]) { dfsCount(graph, i, visited); count++; }
+    }
+    return count;
+}
+private void dfsCount(Map<Integer, List<Integer>> graph, int node, boolean[] visited) {
+    visited[node] = true;
+    for (int neighbor : graph.getOrDefault(node, List.of()))
+        if (!visited[neighbor]) dfsCount(graph, neighbor, visited);
+}
+```
+
+---
+
+### Transitive Closure
+
+Compute for all pairs (i, j) whether there is a path from i to j. Uses Floyd-Warshall-style DP or repeated DFS/BFS.
+
+```python
+def transitive_closure(graph: dict, V: int) -> list:
+    """Compute transitive closure using DFS from each node. O(V*(V+E))."""
+    reach = [[False] * V for _ in range(V)]
+
+    def dfs(src, curr):
+        reach[src][curr] = True
+        for neighbor in graph.get(curr, []):
+            if not reach[src][neighbor]:
+                dfs(src, neighbor)
+
+    for node in range(V):
+        reach[node][node] = True  # reflexive
+        dfs(node, node)
+    return reach
+
+def transitive_closure_fw(adj: list) -> list:
+    """Floyd-Warshall transitive closure. O(V³)."""
+    V = len(adj)
+    reach = [row[:] for row in adj]
+    for i in range(V):
+        reach[i][i] = 1
+    for k in range(V):
+        for i in range(V):
+            for j in range(V):
+                reach[i][j] = reach[i][j] or (reach[i][k] and reach[k][j])
+    return reach
+```
+
+```java
+public boolean[][] transitiveClosure(boolean[][] adj, int V) {
+    boolean[][] reach = new boolean[V][V];
+    for (int i = 0; i < V; i++) {
+        reach[i] = adj[i].clone();
+        reach[i][i] = true;
+    }
+    for (int k = 0; k < V; k++)
+        for (int i = 0; i < V; i++)
+            for (int j = 0; j < V; j++)
+                reach[i][j] = reach[i][j] || (reach[i][k] && reach[k][j]);
+    return reach;
+}
+```
+
+---
+
+### Multi-Source BFS
+
+Start BFS from multiple sources simultaneously. Used when you need shortest distance from any of several sources to all other nodes.
+
+```mermaid
+graph TD
+    A["Add ALL source nodes<br/>to queue at once<br/>with distance 0"] --> B["Run standard BFS"]
+    B --> C["Each node's distance =<br/>min distance to nearest source"]
+    C --> D["Works because BFS<br/>processes level-by-level<br/>across all sources simultaneously"]
+
+    style A fill:#ff9800,color:#000
+    style D fill:#42c742,color:#fff
+```
+
+```python
+from collections import deque
+
+def multi_source_bfs(grid: list, sources: list) -> list:
+    """
+    Multi-source BFS on a grid.
+    Returns distance grid where each cell = dist to nearest source.
+    O(m*n) time and space.
+    """
+    m, n = len(grid), len(grid[0])
+    dist = [[-1] * n for _ in range(m)]
+    queue = deque()
+
+    # Initialize all sources with distance 0
+    for r, c in sources:
+        dist[r][c] = 0
+        queue.append((r, c, 0))
+
+    directions = [(0,1),(0,-1),(1,0),(-1,0)]
+    while queue:
+        r, c, d = queue.popleft()
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < m and 0 <= nc < n and dist[nr][nc] == -1:
+                dist[nr][nc] = d + 1
+                queue.append((nr, nc, d + 1))
+    return dist
+```
+
+```java
+public int[][] multiSourceBFS(int[][] grid, List<int[]> sources) {
+    int m = grid.length, n = grid[0].length;
+    int[][] dist = new int[m][n];
+    for (int[] row : dist) Arrays.fill(row, -1);
+    Queue<int[]> queue = new LinkedList<>();
+    for (int[] src : sources) {
+        dist[src[0]][src[1]] = 0;
+        queue.offer(new int[]{src[0], src[1]});
+    }
+    int[][] dirs = {{0,1},{0,-1},{1,0},{-1,0}};
+    while (!queue.isEmpty()) {
+        int[] curr = queue.poll();
+        int r = curr[0], c = curr[1];
+        for (int[] d : dirs) {
+            int nr = r + d[0], nc = c + d[1];
+            if (nr >= 0 && nr < m && nc >= 0 && nc < n && dist[nr][nc] == -1) {
+                dist[nr][nc] = dist[r][c] + 1;
+                queue.offer(new int[]{nr, nc});
+            }
+        }
+    }
+    return dist;
+}
+```
+
+**When to use:** 0-1 matrix distance (LC 542), walls and gates (LC 286), rotting oranges (LC 994). Multi-source BFS is O(m·n) — the same as running BFS once, because the simultaneous initialization means the wavefront expands from all sources in parallel.
+
+---
+
+### 0/1 BFS (Deque-Based for 0-1 Edge Weights)
+
+When edges have weight 0 or 1 only, use a double-ended queue (deque). Edges with weight 0 push to the front; edges with weight 1 push to the back. Achieves O(V+E) — faster than Dijkstra's O((V+E) log V).
+
+```mermaid
+graph TD
+    A["Edge weight 0 or 1?<br/>Use 0/1 BFS"] --> B["Initialize deque<br/>with source, dist=0"]
+    B --> C["Pop from front: node, dist"]
+    C --> D{"Weight of edge?"}
+    D -->|0| E["Push to FRONT<br/>of deque<br/>dist unchanged"]
+    D -->|1| F["Push to BACK<br/>of deque<br/>dist+1"]
+    E --> G["Standard BFS-Dijkstra<br/>guarantees optimal"]
+    F --> G
+
+    style D fill:#ff9800,color:#000
+    style E fill:#4287f5,color:#fff
+    style F fill:#4287f5,color:#fff
+    style G fill:#42c742,color:#fff
+```
+
+```python
+from collections import deque
+
+def zero_one_bfs(graph: dict, V: int, src: int) -> list:
+    """
+    0/1 BFS for graphs with edge weights 0 or 1.
+    O(V+E) time — better than Dijkstra's O((V+E) log V).
+    graph: {node: [(neighbor, weight), ...]} where weight is 0 or 1
+    """
+    dist = [float('inf')] * V
+    dist[src] = 0
+    dq = deque([(0, src)])
+
+    while dq:
+        d, u = dq.popleft()
+        if d > dist[u]:
+            continue
+        for v, w in graph.get(u, []):
+            new_dist = dist[u] + w
+            if new_dist < dist[v]:
+                dist[v] = new_dist
+                if w == 0:
+                    dq.appendleft((new_dist, v))  # 0-weight: front
+                else:
+                    dq.append((new_dist, v))      # 1-weight: back
+    return dist
+```
+
+```java
+public int[] zeroOneBFS(Map<Integer, List<int[]>> graph, int V, int src) {
+    int[] dist = new int[V];
+    Arrays.fill(dist, Integer.MAX_VALUE);
+    dist[src] = 0;
+    Deque<int[]> deque = new ArrayDeque<>();
+    deque.offerFirst(new int[]{src, 0});
+    while (!deque.isEmpty()) {
+        int[] curr = deque.pollFirst();
+        int u = curr[0], d = curr[1];
+        if (d > dist[u]) continue;
+        for (int[] edge : graph.getOrDefault(u, List.of())) {
+            int v = edge[0], w = edge[1];
+            if (dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+                if (w == 0) deque.offerFirst(new int[]{v, dist[v]});
+                else        deque.offerLast(new int[]{v, dist[v]});
+            }
+        }
+    }
+    return dist;
+}
+```
+
+**Key insight:** 0/1 BFS generalizes BFS (all weights 0) and standard BFS-on-unweighted (all weights 1). The deque maintains the invariant that the front always has the minimum distance — front for 0-weight (distance unchanged) and back for 1-weight (distance +1). This replaces the priority queue of Dijkstra with O(1) push operations.
+
+**When to use:** Minimum path with teleporters (weight 0) and roads (weight 1), minimum flips to reach a goal, minimum number of turns in a maze. LC 1368, 1066, 2290.
+
+---
+
+## Additional Interview Questions
+
+**Q: How do you find all connected components in an undirected graph?**
+A: Iterate through all nodes. For each unvisited node, run DFS/BFS — all nodes reachable from it form one component. Mark them visited. Increment component counter. Total time O(V+E). Alternatively, use Union-Find: process all edges, call `union(u,v)` for each — the number of distinct roots is the component count.
+
+**Q: What is transitive closure and how do you compute it efficiently?**
+A: Transitive closure is the matrix `T[i][j] = True` if there is any directed path from i to j. Use Floyd-Warshall variant: `T[i][j] |= T[i][k] & T[k][j]` for each intermediate k. O(V³) time, O(V²) space. Alternative: DFS from each node — O(V·(V+E)) time, better for sparse graphs.
+
+**Q: When do you use multi-source BFS over standard BFS?**
+A: Multi-source BFS is used when you need the shortest distance from the nearest of multiple sources to every other node. Running standard BFS from each source would be O(S·(V+E)) where S is the source count. Multi-source BFS achieves O(V+E) by initializing all sources simultaneously at distance 0. Example: distance to nearest gate in a maze.
+
+**Q: Why is 0/1 BFS faster than Dijkstra for 0-1 weighted graphs?**
+A: Dijkstra uses a min-heap which has O(log V) per operation. 0/1 BFS uses a deque with O(1) push/pop. Both are correct, but 0/1 BFS's total time is O(V+E) vs Dijkstra's O((V+E) log V). The deque works because with only two distinct weights (0 and 1), the deque invariant (front = minimum) is always maintainable with simple front/back pushes — no comparison-based sorting needed.
+
+**Q: How does cycle detection differ in directed vs undirected graphs?**
+A: Directed: use DFS 3-coloring (white/gray/black). A gray neighbor found during DFS is a back edge = cycle. Undirected: track parent node. An already-visited neighbor that is not the parent = cycle. Cannot use the directed approach on undirected graphs — every undirected edge (u,v) would look like a back-edge from v to u, giving false cycle reports. Cannot use undirected approach on directed graphs — cross-edges would be missed.
+
+**Q: Explain bipartite graphs — what property makes BFS 2-coloring correct?**
+A: A graph is bipartite iff it has no odd-length cycle. BFS 2-coloring attempts to color alternately: neighbor gets opposite color. If a conflict (two adjacent nodes same color) arises, an odd cycle exists — the path from one node to itself through the edge is odd-length. BFS guarantees we assign the correct color layer by layer, so any conflict is genuine. If no conflict exists in any connected component, the graph is bipartite.
+
+**Q: How do you handle disconnected graphs in DFS/BFS?**
+A: Wrap the traversal in an outer loop over all nodes. If a node hasn't been visited, start a new DFS/BFS from it. This covers all connected components. Without this outer loop, isolated nodes or disconnected components will be missed. Union-Find automatically handles disconnected graphs by maintaining separate component roots.
+
+---
+
+## Extended Complexity Reference
+
+| Algorithm | Time | Space | Use Case |
+|-----------|------|-------|----------|
+| DFS (recursive) | O(V+E) | O(h) call stack | Paths, cycles, components |
+| DFS (iterative) | O(V+E) | O(V) explicit stack | Large graphs, no stack overflow |
+| BFS | O(V+E) | O(V) queue | Shortest hops, level order |
+| Cycle detect (directed) | O(V+E) | O(V) color array | DAG validation |
+| Cycle detect (undirected) | O(V+E) | O(V) visited+parent | Tree validation |
+| Union-Find | O(α(V)) per op | O(V) | Component queries, Kruskal |
+| All components | O(V+E) | O(V) | Component enumeration |
+| Transitive closure (DFS) | O(V·(V+E)) | O(V²) | Sparse graphs |
+| Transitive closure (FW) | O(V³) | O(V²) | Dense graphs |
+| Multi-source BFS | O(V+E) | O(V+E) | Nearest source distances |
+| 0/1 BFS | O(V+E) | O(V) | 0-1 weighted shortest path |
