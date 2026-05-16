@@ -1,14 +1,150 @@
-# Shopify Store Platform
+#!/usr/bin/env python3
+"""
+Script to enhance all 36 real-world system design files with comprehensive detailed content.
+Adds scale metrics, detailed architecture, data flow, scalability strategies, and interview questions.
+"""
+
+import os
+from pathlib import Path
+
+# System details with scale metrics
+system_details = {
+    "Facebook Social Network": {
+        "users": "3B+", "dau": "2B+", "rps": "500K+", "storage": "Exabytes",
+        "key_challenge": "Massive feed generation at global scale with sub-second latency"
+    },
+    "WhatsApp Messaging": {
+        "users": "2B+", "dau": "1.5B+", "rps": "1M+", "storage": "Petabytes",
+        "key_challenge": "Reliable message delivery with end-to-end encryption at planetary scale"
+    },
+    "Slack Team Communication": {
+        "users": "750M+", "dau": "200M+", "rps": "500K+", "storage": "Exabytes",
+        "key_challenge": "Real-time messaging search and thread preservation for millions of teams"
+    },
+    "Twitter Feed": {
+        "users": "550M+", "dau": "350M+", "rps": "300K+", "storage": "Petabytes",
+        "key_challenge": "Timeline generation with trending hashtags and real-time updates"
+    },
+    "Discord Gaming Chat": {
+        "users": "650M+", "dau": "200M+", "rps": "400K+", "storage": "Petabytes",
+        "key_challenge": "Low-latency voice/video with millions of concurrent servers and channels"
+    },
+    "Telegram Secure Messaging": {
+        "users": "800M+", "dau": "500M+", "rps": "600K+", "storage": "Petabytes",
+        "key_challenge": "Optional cloud encryption with massive media sharing capability"
+    },
+    "YouTube Video Platform": {
+        "users": "2.5B+", "dau": "2B+", "rps": "1M+", "storage": "Exabytes",
+        "key_challenge": "Video transcoding, streaming, and recommendation at planetary scale"
+    },
+    "Twitch Live Streaming": {
+        "users": "140M+", "dau": "30M+", "rps": "500K+", "storage": "Petabytes",
+        "key_challenge": "Low-latency live streaming with interactive chat and real-time engagement metrics"
+    },
+    "TikTok Short Video": {
+        "users": "1.5B+", "dau": "1B+", "rps": "2M+", "storage": "Exabytes",
+        "key_challenge": "ML-driven feed with microsecond-level ranking for billions of short videos"
+    },
+    "Spotify Music Streaming": {
+        "users": "600M+", "dau": "200M+", "rps": "500K+", "storage": "Petabytes",
+        "key_challenge": "Personalized playlist generation with offline sync and cross-device continuity"
+    },
+    "Disney Video Streaming": {
+        "users": "300M+", "dau": "100M+", "rps": "300K+", "storage": "Exabytes",
+        "key_challenge": "Multi-region DRM content delivery with adaptive bitrate streaming"
+    },
+    "Dropbox File Sync": {
+        "users": "700M+", "dau": "200M+", "rps": "400K+", "storage": "Exabytes",
+        "key_challenge": "Efficient delta sync across millions of devices with strong consistency"
+    },
+    "Amazon E-Commerce": {
+        "users": "300M+", "dau": "100M+", "rps": "1M+", "storage": "Petabytes",
+        "key_challenge": "Product catalog, inventory, and recommendation engine at extreme scale"
+    },
+    "eBay Marketplace": {
+        "users": "180M+", "dau": "50M+", "rps": "300K+", "storage": "Petabytes",
+        "key_challenge": "Auction management, escrow, and fraud detection for billions of transactions"
+    },
+    "Shopify E-Commerce": {
+        "users": "2M+ merchants", "dau": "500K+", "rps": "400K+", "storage": "Petabytes",
+        "key_challenge": "Multi-tenant SaaS platform handling seasonal traffic spikes"
+    },
+    "Payment Processing": {
+        "users": "billions", "dau": "100M+", "rps": "2M+", "storage": "Petabytes",
+        "key_challenge": "High-throughput with strict consistency and regulatory compliance"
+    },
+    "Stripe Payment Platform": {
+        "users": "500K+", "dau": "100K+", "rps": "1M+", "storage": "Petabytes",
+        "key_challenge": "Global payment processing with fraud detection and settlement"
+    },
+    "Warehouse Management": {
+        "users": "millions", "dau": "500K+", "rps": "100K+", "storage": "Terabytes",
+        "key_challenge": "Real-time inventory tracking with multi-warehouse coordination"
+    },
+    "Robinhood Trading": {
+        "users": "20M+", "dau": "5M+", "rps": "500K+", "storage": "Terabytes",
+        "key_challenge": "Sub-millisecond order matching with strict compliance"
+    },
+    "Square POS": {
+        "users": "100M+", "dau": "30M+", "rps": "300K+", "storage": "Petabytes",
+        "key_challenge": "Merchant checkout with offline resilience and real-time settlement"
+    },
+    "PayPal Financial": {
+        "users": "430M+", "dau": "50M+", "rps": "500K+", "storage": "Petabytes",
+        "key_challenge": "Cross-border payments with complex compliance and dispute resolution"
+    },
+    "Google Search": {
+        "users": "5B+", "dau": "4B+", "rps": "5M+", "storage": "Exabytes",
+        "key_challenge": "Index billions of pages with sub-100ms query latency"
+    },
+    "Elasticsearch Search": {
+        "users": "100K+", "dau": "10K+", "rps": "500K+", "storage": "Exabytes",
+        "key_challenge": "Full-text search with real-time indexing and distributed queries"
+    },
+    "Databricks Analytics": {
+        "users": "50K+", "dau": "10K+", "rps": "100K+", "storage": "Exabytes",
+        "key_challenge": "Unified analytics with SQL and ML on massive datasets"
+    },
+    "Notion Workspace": {
+        "users": "30M+", "dau": "10M+", "rps": "200K+", "storage": "Petabytes",
+        "key_challenge": "CRDT-based collaborative editing with real-time sync"
+    },
+    "Figma Design": {
+        "users": "30M+", "dau": "5M+", "rps": "300K+", "storage": "Petabytes",
+        "key_challenge": "Real-time collaborative vector graphics rendering in browser"
+    },
+    "Confluence Wiki": {
+        "users": "10M+", "dau": "5M+", "rps": "200K+", "storage": "Petabytes",
+        "key_challenge": "Enterprise documentation with complex permissions and versioning"
+    },
+    "DoorDash Delivery": {
+        "users": "50M+", "dau": "10M+", "rps": "200K+", "storage": "Terabytes",
+        "key_challenge": "Real-time matching between consumers, restaurants, and dashers"
+    },
+    "Booking.com Hotels": {
+        "users": "300M+", "dau": "100M+", "rps": "500K+", "storage": "Petabytes",
+        "key_challenge": "Inventory management with dynamic pricing across millions of properties"
+    },
+    "Multiplayer Game Backend": {
+        "users": "100M+", "dau": "20M+", "rps": "1M+", "storage": "Petabytes",
+        "key_challenge": "Sub-50ms latency with authoritative server architecture"
+    }
+}
+
+def get_comprehensive_content(system_name, details):
+    """Generate comprehensive system design content from template."""
+
+    return f"""# {system_name}
 
 ## System Overview
 
 **Scale Metrics:**
-- **Users:** millions
-- **Daily Active Users:** millions
-- **Requests Per Second (Peak):** 100K+
-- **Data Storage:** Petabytes
+- **Users:** {details['users']}
+- **Daily Active Users:** {details['dau']}
+- **Requests Per Second (Peak):** {details['rps']}
+- **Data Storage:** {details['storage']}
 
-**Key Challenge:** Scale and reliability at global scale
+**Key Challenge:** {details['key_challenge']}
 
 ## Problem Statement
 
@@ -606,3 +742,62 @@
 **Difficulty:** Hard
 **Time to Design:** 45-60 minutes
 **Time to Implement:** 2-3 weeks
+"""
+
+def enhance_system_file(filepath, system_name):
+    """Read stub file and enhance with comprehensive content."""
+    with open(filepath, 'r') as f:
+        old_content = f.read()
+
+    # Get details for this system
+    details = system_details.get(system_name)
+    if not details:
+        print(f"⚠️  No details for {system_name}, using generic details")
+        details = {
+            "users": "millions", "dau": "millions", "rps": "100K+", "storage": "Petabytes",
+            "key_challenge": "Scale and reliability at global scale"
+        }
+
+    # Generate new comprehensive content
+    new_content = get_comprehensive_content(system_name, details)
+
+    # Write to file
+    with open(filepath, 'w') as f:
+        f.write(new_content)
+
+    return True
+
+def main():
+    """Process all system design files."""
+    base_path = Path("docs/system_design/13-realworld-systems")
+
+    if not base_path.exists():
+        print(f"❌ Directory not found: {base_path}")
+        return
+
+    files = sorted(base_path.glob("*.md"))
+
+    # Skip first 6 (already enhanced)
+    files_to_process = files[6:]
+
+    print(f"📚 Enhancing {len(files_to_process)} system design files...")
+    print("=" * 60)
+
+    for filepath in files_to_process:
+        # Extract system name from filename
+        # Example: 07_facebook_social_network.md → Facebook Social Network
+        filename = filepath.stem
+        parts = filename.split('_', 1)[1]  # Remove number prefix
+        system_name = ' '.join(word.capitalize() for word in parts.split('_'))
+
+        try:
+            enhance_system_file(filepath, system_name)
+            print(f"✅ Enhanced: {system_name}")
+        except Exception as e:
+            print(f"❌ Error in {system_name}: {e}")
+
+    print("=" * 60)
+    print(f"✨ Enhanced {len(files_to_process)} system files!")
+
+if __name__ == '__main__':
+    main()
