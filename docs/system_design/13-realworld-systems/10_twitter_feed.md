@@ -581,6 +581,529 @@ Budget breakdown:
 - Automated failover < 2 minutes RTO
 - RPO < 1 minute for critical data
 
+
+## Sample Code & API Specifications
+
+### API Endpoints
+
+- POST /2/tweets - Create tweet
+- GET /2/tweets/{id} - Get tweet
+- GET /2/tweets/search/recent - Search tweets
+- POST /2/tweets/{id}/liking_by - Like tweet
+- GET /2/users/{id}/following - Get following
+- POST /2/users/{id}/following - Follow user
+
+### Rate Limits
+
+450 requests/15min for endpoints, 300 for tweets/15min
+
+### Authentication
+
+OAuth2 or Bearer token
+
+### Sample Request/Response
+
+```
+// Create Tweet
+POST /2/tweets
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "text": "Hello Twitter!",
+  "reply": {
+    "in_reply_to_tweet_id": "1234567890"
+  }
+}
+
+Response (201 Created):
+{
+  "data": {
+    "id": "1234567890",
+    "text": "Hello Twitter!"
+  }
+}
+
+// Search Recent Tweets
+GET /2/tweets/search/recent?query=python&max_results=10
+
+Response (200 OK):
+{
+  "data": [
+    {
+      "id": "1234567890",
+      "text": "Learning Python",
+      "public_metrics": {
+        "retweet_count": 5,
+        "reply_count": 2,
+        "like_count": 10,
+        "quote_count": 1
+      }
+    }
+  ],
+  "meta": {
+    "result_count": 10,
+    "newest_id": "1234567890"
+  }
+}
+```
+
+
+## AWS Architecture
+
+### AWS Architecture Diagram
+
+```mermaid
+graph TB
+    Users["End Users"]
+    CloudFront["CloudFront<br/>CDN"]
+    ALB["Application Load Balancer<br/>Auto Scaling"]
+    ECS["ECS Fargate<br/>Service Instances"]
+    RDS[("RDS Aurora<br/>Primary + Replicas")]
+    RDSRead[("RDS Read Replica<br/>Multi-AZ")]
+    ElastiCache["ElastiCache<br/>Redis Cluster"]
+    DynamoDB["DynamoDB<br/>Distributed NoSQL"]
+    S3["S3<br/>Object Storage"]
+    SQS["SQS<br/>Message Queue"]
+    Kinesis["Kinesis<br/>Streaming"]
+    Lambda["Lambda<br/>Functions"]
+    CloudWatch["CloudWatch<br/>Monitoring"]
+    Route53["Route53<br/>DNS"]
+
+    Users -->|Request| Route53
+    Route53 -->|Route| CloudFront
+    CloudFront -->|Cache Hit/Miss| ALB
+    ALB -->|Distribute| ECS
+    ECS -->|Query| ElastiCache
+    ECS -->|Read| RDSRead
+    ECS -->|Write| RDS
+    ECS -->|NoSQL| DynamoDB
+    ECS -->|Store| S3
+    ECS -->|Queue| SQS
+    SQS -->|Trigger| Lambda
+    Lambda -->|Write| RDS
+    Lambda -->|Publish| Kinesis
+    Kinesis -->|Stream| Lambda
+    ECS -->|Metrics| CloudWatch
+    Lambda -->|Metrics| CloudWatch
+    RDS -->|Metrics| CloudWatch
+
+    style CloudFront fill:#FF9900
+    style ALB fill:#FF9900
+    style ECS fill:#FF9900
+    style RDS fill:#527FFF
+    style RDSRead fill:#527FFF
+    style ElastiCache fill:#E74C3C
+    style DynamoDB fill:#527FFF
+    style S3 fill:#92C83E
+    style SQS fill:#FF9900
+    style Kinesis fill:#FF9900
+    style Lambda fill:#FF9900
+    style CloudWatch fill:#759C3E
+    style Route53 fill:#FF9900
+```
+
+
+## Infrastructure as Code (Terraform)
+
+### Terraform Infrastructure as Code
+
+```hcl
+# Provider configuration
+terraform {{
+  required_providers {{
+    aws = {{
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }}
+  }}
+}}
+
+provider "aws" {{
+  region = var.aws_region
+
+  default_tags {{
+    tags = {{
+      Environment = var.environment
+      Project     = var.project_name
+      ManagedBy   = "Terraform"
+      CreatedAt   = timestamp()
+    }}
+  }}
+}}
+
+# VPC and Networking
+resource "aws_vpc" "main" {{
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  tags = {{
+    Name = "${{var.project_name}}-vpc"
+  }}
+}}
+
+resource "aws_subnet" "public" {{
+  count                   = length(var.availability_zones)
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.public_subnet_cidrs[count.index]
+  availability_zone       = var.availability_zones[count.index]
+  map_public_ip_on_launch = true
+
+  tags = {{
+    Name = "${{var.project_name}}-public-subnet-${{count.index + 1}}"
+  }}
+}}
+
+resource "aws_subnet" "private" {{
+  count             = length(var.availability_zones)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_subnet_cidrs[count.index]
+  availability_zone = var.availability_zones[count.index]
+
+  tags = {{
+    Name = "${{var.project_name}}-private-subnet-${{count.index + 1}}"
+  }}
+}}
+
+# Security Groups
+resource "aws_security_group" "alb" {{
+  name        = "${{var.project_name}}-alb-sg"
+  description = "Security group for ALB"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {{
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }}
+
+  ingress {{
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }}
+
+  egress {{
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }}
+}}
+
+resource "aws_security_group" "ecs" {{
+  name        = "${{var.project_name}}-ecs-sg"
+  description = "Security group for ECS tasks"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {{
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }}
+
+  egress {{
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }}
+}}
+
+# RDS Database
+resource "aws_db_subnet_group" "main" {{
+  name       = "${{var.project_name}}-db-subnet"
+  subnet_ids = aws_subnet.private[*].id
+
+  tags = {{
+    Name = "${{var.project_name}}-db-subnet-group"
+  }}
+}}
+
+resource "aws_rds_cluster" "main" {{
+  cluster_identifier      = "${{var.project_name}}-cluster"
+  engine                  = "aurora-postgresql"
+  engine_version          = "15.2"
+  database_name           = var.db_name
+  master_username         = var.db_username
+  master_password         = random_password.db_password.result
+  db_subnet_group_name    = aws_db_subnet_group.main.name
+  vpc_security_group_ids  = [aws_security_group.database.id]
+  backup_retention_period = 7
+  preferred_backup_window = "03:00-04:00"
+  skip_final_snapshot     = false
+  final_snapshot_identifier = "${{var.project_name}}-final-snapshot-${{formatdate("YYYY-MM-DD-hhmm", timestamp())}}"
+  enabled_cloudwatch_logs_exports = ["postgresql"]
+
+  tags = {{
+    Name = "${{var.project_name}}-rds"
+  }}
+}}
+
+resource "aws_rds_cluster_instance" "main" {{
+  count              = var.db_instance_count
+  cluster_identifier = aws_rds_cluster.main.id
+  instance_class     = var.db_instance_class
+  engine              = aws_rds_cluster.main.engine
+  engine_version      = aws_rds_cluster.main.engine_version
+  publicly_accessible = false
+
+  tags = {{
+    Name = "${{var.project_name}}-rds-instance-${{count.index + 1}}"
+  }}
+}}
+
+# ElastiCache Redis
+resource "aws_elasticache_subnet_group" "main" {{
+  name       = "${{var.project_name}}-cache-subnet"
+  subnet_ids = aws_subnet.private[*].id
+}}
+
+resource "aws_elasticache_cluster" "main" {{
+  cluster_id           = "${{var.project_name}}-cache"
+  engine               = "redis"
+  node_type            = var.cache_node_type
+  num_cache_nodes      = var.cache_node_count
+  parameter_group_name = aws_elasticache_parameter_group.main.name
+  engine_version       = "7.0"
+  port                 = 6379
+  subnet_group_name    = aws_elasticache_subnet_group.main.name
+  security_group_ids   = [aws_security_group.cache.id]
+  at_rest_encryption_enabled = true
+  transit_encryption_enabled = true
+  automatic_failover_enabled = true
+
+  tags = {{
+    Name = "${{var.project_name}}-redis"
+  }}
+}}
+
+# ECS Cluster and Service
+resource "aws_ecs_cluster" "main" {{
+  name = "${{var.project_name}}-cluster"
+
+  setting {{
+    name  = "containerInsights"
+    value = "enabled"
+  }}
+}}
+
+resource "aws_ecs_task_definition" "main" {{
+  family                   = var.project_name
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.task_cpu
+  memory                   = var.task_memory
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
+
+  container_definitions = jsonencode([{{
+    name      = var.project_name
+    image     = var.docker_image
+    essential = true
+    portMappings = [{{
+      containerPort = var.container_port
+      hostPort      = var.container_port
+      protocol      = "tcp"
+    }}]
+    environment = [
+      {{
+        name  = "DB_HOST"
+        value = aws_rds_cluster.main.endpoint
+      }},
+      {{
+        name  = "CACHE_HOST"
+        value = aws_elasticache_cluster.main.cache_nodes[0].address
+      }},
+      {{
+        name  = "ENVIRONMENT"
+        value = var.environment
+      }}
+    ]
+    secrets = [
+      {{
+        name      = "DB_PASSWORD"
+        valueFrom = aws_secretsmanager_secret_version.db_password.arn
+      }}
+    ]
+    logConfiguration = {{
+      logDriver = "awslogs"
+      options = {{
+        awslogs-group         = aws_cloudwatch_log_group.ecs.name
+        awslogs-region        = var.aws_region
+        awslogs-stream-prefix = "ecs"
+      }}
+    }}
+  }}])
+}}
+
+resource "aws_ecs_service" "main" {{
+  name            = "${{var.project_name}}-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.main.arn
+  desired_count   = var.desired_task_count
+  launch_type     = "FARGATE"
+  network_configuration {{
+    subnets          = aws_subnet.private[*].id
+    security_groups  = [aws_security_group.ecs.id]
+    assign_public_ip = false
+  }}
+  load_balancer {{
+    target_group_arn = aws_lb_target_group.main.arn
+    container_name   = var.project_name
+    container_port   = var.container_port
+  }}
+
+  depends_on = [
+    aws_lb_listener.main,
+    aws_iam_role_policy.ecs_task_execution_role_policy
+  ]
+
+  tags = {{
+    Name = "${{var.project_name}}-service"
+  }}
+}}
+
+# Application Load Balancer
+resource "aws_lb" "main" {{
+  name               = "${{var.project_name}}-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = aws_subnet.public[*].id
+
+  enable_deletion_protection = false
+
+  tags = {{
+    Name = "${{var.project_name}}-alb"
+  }}
+}}
+
+resource "aws_lb_target_group" "main" {{
+  name        = "${{var.project_name}}-tg"
+  port        = var.container_port
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+
+  health_check {{
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    interval            = 30
+    path                = "/"
+    matcher             = "200"
+  }}
+
+  tags = {{
+    Name = "${{var.project_name}}-tg"
+  }}
+}}
+
+resource "aws_lb_listener" "main" {{
+  load_balancer_arn = aws_lb.main.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {{
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.main.arn
+  }}
+}}
+
+# CloudWatch Monitoring
+resource "aws_cloudwatch_log_group" "ecs" {{
+  name              = "/ecs/${{var.project_name}}"
+  retention_in_days = 7
+
+  tags = {{
+    Name = "${{var.project_name}}-logs"
+  }}
+}}
+
+# Variables
+variable "aws_region" {{
+  default = "us-east-1"
+}}
+
+variable "project_name" {{
+  default = "my-app"
+}}
+
+variable "environment" {{
+  default = "production"
+}}
+
+variable "vpc_cidr" {{
+  default = "10.0.0.0/16"
+}}
+
+variable "availability_zones" {{
+  default = ["us-east-1a", "us-east-1b"]
+}}
+
+variable "docker_image" {{
+  default = "my-account.dkr.ecr.us-east-1.amazonaws.com/my-app:latest"
+}}
+
+variable "container_port" {{
+  default = 8080
+}}
+
+variable "db_name" {{
+  default = "myapp"
+}}
+
+variable "db_username" {{
+  default = "postgres"
+}}
+
+variable "db_instance_class" {{
+  default = "db.r6g.large"
+}}
+
+variable "db_instance_count" {{
+  default = 2
+}}
+
+variable "cache_node_type" {{
+  default = "cache.r6g.large"
+}}
+
+variable "cache_node_count" {{
+  default = 2
+}}
+
+variable "task_cpu" {{
+  default = "1024"
+}}
+
+variable "task_memory" {{
+  default = "2048"
+}}
+
+variable "desired_task_count" {{
+  default = 3
+}}
+
+# Outputs
+output "alb_dns_name" {{
+  value = aws_lb.main.dns_name
+}}
+
+output "rds_endpoint" {{
+  value = aws_rds_cluster.main.endpoint
+}}
+
+output "redis_endpoint" {{
+  value = aws_elasticache_cluster.main.cache_nodes[0].address
+}}
+```
+
 ## Product Requirements Document (PRD)
 
 ### Overview
