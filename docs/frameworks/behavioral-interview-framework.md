@@ -85,6 +85,22 @@ STAR:
 - Action: "Instead of defending, I asked them to explain the O(n) approach. Spent 2 hours understanding it. Asked them to mentor me on optimization problems. Presented the algorithm to the team."
 - Result: "Learned a valuable technique. Became better at algorithmic thinking. Senior engineer agreed to monthly mentoring sessions."
 
+**Q: "Tell me about a time you had to support a teammate who was struggling."**
+
+STAR:
+- Situation: "New team member was assigned a complex caching system but had never worked with Redis"
+- Task: "They were falling behind, morale was low, and we had a sprint deadline"
+- Action: "I offered to pair program 1 hour daily. We did Redis tutorials together, then worked on the actual code. I didn't just give solutions—I explained trade-offs (TTL strategies, cache invalidation patterns) and let them drive the implementation."
+- Result: "They shipped the caching system on time. Later told me this pairing boosted their confidence. They became the team's Redis expert and mentored the next person."
+
+**Q: "Tell me about a time you disagreed with your manager or leader."**
+
+STAR:
+- Situation: "My manager wanted to skip code review to hit a deadline (ship in 2 weeks instead of 3)"
+- Task: "I believed skipping reviews was risky but I'm not the decision-maker"
+- Action: "I asked to discuss in private. I said 'I understand the deadline pressure. But I'm concerned about quality. What if we do lighter reviews (30 min instead of 2 hours) plus extra testing?' I showed data: past bugs caught in review vs. production bugs."
+- Result: "Manager agreed to light reviews. We hit deadline, had zero production bugs. Manager started using my data in future planning discussions."
+
 ### 2. Problem-Solving & Initiative
 
 **Q: "Tell me about a time you solved a problem nobody asked you to solve."**
@@ -103,6 +119,22 @@ STAR:
 - Action: "Implementation took 3 months. We had bugs in ranking. I took responsibility and escalated early (month 2) instead of hoping to catch up."
 - Result: "We pivoted to library + customization, shipped in 4 months total. I learned: estimate 1.5x when building custom. Now always present 'build vs. buy' analysis upfront."
 
+**Q: "Tell me about a time you debugged a tricky issue."**
+
+STAR:
+- Situation: "Customers reported intermittent 500 errors in payment service (happened ~1% of transactions)"
+- Task: "Production issue, hard to reproduce locally, needed to fix urgently"
+- Action: "Instead of guessing, I added structured logging (request ID, timestamps, state). Reproduced in staging with 100K concurrent requests. Found race condition: payment status updated twice when concurrent requests arrived. Fixed with pessimistic lock. Added tests for this specific race."
+- Result: "Issue resolved, zero subsequent occurrences. Improved logging framework used across team. Became go-to for hard bugs."
+
+**Q: "Tell me about a time you had to learn something new quickly."**
+
+STAR:
+- Situation: "Got assigned to build a real-time notification system. Never used WebSockets. Deadline: 3 weeks"
+- Task: "Had to ramp up on async I/O, connection handling, scaling WebSockets"
+- Action: "First week: read documentation, built local prototype with Socket.io. Second week: integrated with production. Third week: load tested and optimized (connection pooling, message batching). Paired with infrastructure engineer on deployment."
+- Result: "Shipped on time with 10K concurrent connections. Mentored next team on WebSocket architecture."
+
 ### 3. Technical Depth & Contribution
 
 **Q: "Tell me about the most complex problem you solved."**
@@ -112,6 +144,22 @@ STAR:
 - Task: "Need to handle failures, ensure exactly-once semantics, prevent double-charging"
 - Action: "Designed idempotent transaction API with idempotency keys. Implemented saga pattern for payment + inventory + shipping. Added comprehensive testing for failure modes. Built monitoring and alerting."
 - Result: "Shipped with zero double-charges in 2 years. Became go-to person for payment system questions."
+
+**Q: "Tell me about a time you improved a system's performance or scalability."**
+
+STAR:
+- Situation: "Our data pipeline was hitting 12-hour SLA on daily ETL. At growth rate, would miss SLA in 3 months"
+- Task: "Needed to optimize without halting feature work"
+- Action: "Profiled pipeline: identified 3 bottlenecks (inefficient joins, unnecessary full scans, serial processing). Optimized joins with composite indexes. Parallelized independent stages. Results: 2-hour runtime."
+- Result: "Reduced run time by 80%. Bought 1 year before next scaling. Blueprint reused for 2 other pipelines."
+
+**Q: "Tell me about a time you made a significant architectural decision."**
+
+STAR:
+- Situation: "Team was building notification system. Debated: monolith with background workers vs. separate microservice"
+- Task: "Decision would affect team structure, deployment, and future scaling"
+- Action: "Created comparison matrix: scaling, team ownership, deployment complexity, failure isolation. Showed that monolith worked up to 100K notifications/min. Microservice was over-engineered for our scale (10K/min). Recommended monolith now, extract later if needed."
+- Result: "Team agreed. Shipped faster. Avoided operational complexity. 2 years later when we hit scale, extracted the service (easier with well-defined API)."
 
 ### 4. Learning & Growth
 
@@ -123,6 +171,22 @@ STAR:
 - Action: "Completed Kubernetes course on Udemy (15 hours over 1 week). Practiced locally. Paired with ops engineer (3 sessions). Built deployment manifests, tested rollouts, wrote runbooks."
 - Result: "Deployed on schedule. Became team's Kubernetes expert. Later mentored 3 new hires on K8s."
 
+**Q: "Tell me about a time you asked for help or mentorship."**
+
+STAR:
+- Situation: "Realized my system design skills lagged behind peers. Not prepared for senior engineer interviews"
+- Task: "Needed to close the gap in 3 months before interview cycle"
+- Action: "Asked senior architect for mentorship. We did weekly 1-on-1s (1 hour). They assigned design problems. I presented designs, got feedback. Also read papers on distributed systems. Implemented mini projects (distributed cache, sharded database)."
+- Result: "Aced system design round. Got promotion. Became mentor for junior engineers (paying it forward)."
+
+**Q: "Tell me about a time you had to unlearn something."**
+
+STAR:
+- Situation: "Was deeply experienced with synchronous microservices. Company pivoted to event-driven architecture"
+- Task: "My knowledge was partially wrong: timing assumptions, deployment patterns, debugging approaches changed"
+- Action: "Instead of resisting, I read about event-driven patterns. Built a prototype with Kafka. Discussed with team what was different from sync RPC. Presented comparison."
+- Result: "Successfully led migration of 2 services to event-driven. Discovered event-driven was better for our scale. Now skilled in both paradigms."
+
 ### 5. Leadership (Even as Individual Contributor)
 
 **Q: "Tell me about a time you influenced a decision without formal authority."**
@@ -132,6 +196,22 @@ STAR:
 - Task: "Needed to voice this without derailing the decision or sounding like I was against the team"
 - Action: "Instead of objecting in meeting, I researched migration paths. Showed 3 scenarios: stay, migrate, hybrid. Wrote 1-page summary with pros/cons. Presented to team: 'Here are scenarios and costs.'"
 - Result: "Team chose framework but planned migration path. My analysis was referenced during future tech decisions."
+
+**Q: "Tell me about a time you mentored or helped someone grow."**
+
+STAR:
+- Situation: "Junior engineer was assigned a complex feature (distributed transactions) but lacked experience"
+- Task: "They were stuck. I could have just fixed it, but better to help them learn"
+- Action: "I did weekly pairing sessions (1 hour). Started with fundamentals (ACID, consensus). Drew diagrams. Let them implement while I guided. For bugs, I asked 'What do you think is happening?' instead of fixing. Recommended papers."
+- Result: "They shipped the feature independently. Later became team's distributed systems expert. Manager told me this mentoring impressed them (showed leadership)."
+
+**Q: "Tell me about a time you advocated for a decision that wasn't popular."**
+
+STAR:
+- Situation: "Team wanted to use ORM for new project. I believed raw SQL was better for our use case"
+- Task: "Needed to raise concern without seeming dismissive of team's preference"
+- Action: "I asked: 'What are we optimizing for? Rapid development or query performance?' Showed benchmarks: ORM generated N+1 queries for our data access pattern. Raw SQL was 10x faster. Proposed hybrid: ORM for simple CRUD, raw SQL for complex queries."
+- Result: "Team agreed. Adopted hybrid approach. Code was fast and maintainable. Avoided 6-month performance regression later."
 
 ---
 

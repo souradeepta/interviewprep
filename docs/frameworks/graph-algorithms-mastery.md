@@ -10,7 +10,28 @@ Master graph algorithms from basic traversal to advanced path-finding and flow a
 Adjacency List: O(V+E) space, O(degree) per vertex
 Adjacency Matrix: O(V²) space, O(1) edge lookup
 
-For most interviews: Use adjacency list
+For most interviews: Use adjacency list (sparse graphs, easier to iterate)
+```
+
+### Graph Building Example
+
+```python
+# Build adjacency list for undirected graph
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D'],
+    'C': ['A', 'D'],
+    'D': ['B', 'C']
+}
+
+# Or from edge list
+edges = [('A','B'), ('A','C'), ('B','D'), ('C','D')]
+graph = {}
+for u, v in edges:
+    if u not in graph: graph[u] = []
+    if v not in graph: graph[v] = []
+    graph[u].append(v)
+    graph[v].append(u)  # Add reverse for undirected
 ```
 
 ---
@@ -19,52 +40,71 @@ For most interviews: Use adjacency list
 
 ### BFS (Breadth-First Search)
 
+**Real Example: Find Shortest Path**
+
 ```python
 from collections import deque
 
-def bfs(graph, start):
-    visited = set()
-    queue = deque([start])
-    visited.add(start)
+def bfs_shortest_path(graph, start, end):
+    visited = {start}
+    queue = deque([(start, [start])])  # (node, path)
     
     while queue:
-        node = queue.popleft()
-        print(node)
+        node, path = queue.popleft()
+        
+        if node == end:
+            return path
         
         for neighbor in graph[node]:
             if neighbor not in visited:
                 visited.add(neighbor)
-                queue.append(neighbor)
+                queue.append((neighbor, path + [neighbor]))
     
-    # Use: Shortest path in unweighted graph, level-order, bipartite check
-    # Time: O(V+E), Space: O(V)
+    return None  # No path found
+
+# Example: graph = {'A': ['B', 'C'], 'B': ['D'], 'C': ['D'], 'D': []}
+# bfs_shortest_path(graph, 'A', 'D') → ['A', 'B', 'D']
+# Time: O(V+E), Space: O(V)
 ```
+
+**Common Mistakes:**
+- ❌ Forgetting to mark visited BEFORE enqueueing (leads to duplicates)
+- ❌ Forgetting to handle disconnected graphs
+- ❌ Using regular list instead of deque (deque.popleft is O(1), list.pop(0) is O(n))
 
 ### DFS (Depth-First Search)
 
-```python
-def dfs_recursive(graph, node, visited):
-    visited.add(node)
-    print(node)
-    
-    for neighbor in graph[node]:
-        if neighbor not in visited:
-            dfs_recursive(graph, neighbor, visited)
+**Real Example: Detect Cycle in Undirected Graph**
 
-def dfs_iterative(graph, start):
-    visited = set()
-    stack = [start]
+```python
+def has_cycle_undirected(graph, n):
+    visited = [False] * n
     
-    while stack:
-        node = stack.pop()
-        if node not in visited:
-            visited.add(node)
-            print(node)
-            stack.extend(reversed(graph[node]))
+    def dfs(node, parent):
+        visited[node] = True
+        for neighbor in graph[node]:
+            if not visited[neighbor]:
+                if dfs(neighbor, node):
+                    return True
+            elif neighbor != parent:  # Not the edge we came from
+                return True  # Found a back edge = cycle
+        return False
     
-    # Use: Cycle detection, topological sort, connected components
-    # Time: O(V+E), Space: O(V)
+    for i in range(n):
+        if not visited[i]:
+            if dfs(i, -1):
+                return True
+    return False
+
+# Example: graph = [[1,2], [0,2], [0,1]]
+# Nodes 0-1-2 form a cycle
+# Time: O(V+E), Space: O(V) for recursion stack
 ```
+
+**Common Mistakes:**
+- ❌ Forgetting parent check in undirected (sees same edge twice)
+- ❌ Not handling disconnected components (multiple DFS calls needed)
+- ❌ Using recursive when stack depth is deep (use iterative)
 
 ---
 
@@ -351,33 +391,157 @@ class UnionFind:
 
 ---
 
-## Graph Problems Decision Tree
+## Interview Tips for Graph Problems
 
-| Problem | Algorithm | Time | Space |
-|---------|-----------|------|-------|
-| Shortest unweighted | BFS | O(V+E) | O(V) |
-| Shortest weighted | Dijkstra | O((V+E)logV) | O(V) |
-| Shortest with negatives | Bellman-Ford | O(V·E) | O(V) |
-| All pairs | Floyd-Warshall | O(V³) | O(V²) |
-| MST sparse | Kruskal | O(E log E) | O(V) |
-| MST dense | Prim | O((V+E)logV) | O(V) |
-| Topological sort | DFS or Kahn | O(V+E) | O(V) |
-| Bipartite check | 2-coloring BFS | O(V+E) | O(V) |
-| SCC | Kosaraju | O(V+E) | O(V) |
-| Connected components | Union-Find | O(α(n)) | O(V) |
+### Clarifying Questions (Phase 1)
+
+When you get a graph problem, ask:
+- "Is the graph directed or undirected?"
+- "Can there be cycles or is it acyclic?"
+- "Are there negative edge weights?"
+- "Is the graph guaranteed to be connected?"
+- "What should I return if no path exists?"
+- "Should I optimize for time or space?"
+
+### Common Interview Questions
+
+**Q: Find shortest path between two nodes**
+- Unweighted: BFS (simpler, O(V+E))
+- Weighted: Dijkstra (single source) or Floyd-Warshall (all pairs, if small)
+
+**Q: Detect cycle in graph**
+- Undirected: DFS with parent check OR Union-Find
+- Directed: DFS with recursion stack (visiting state), OR Kahn's algorithm
+
+**Q: Find connected components**
+- Union-Find (elegant, O(α(n)))
+- DFS/BFS with visited set
+
+**Q: Topological sort**
+- DFS (naturally produces reverse finish order)
+- Kahn's algorithm (simultaneously checks for cycles)
+
+### Edge Cases to Mention
+
+```python
+# Case 1: Empty graph
+graph = {}
+# Solution: handle gracefully, return empty result
+
+# Case 2: Single node (no edges)
+graph = {'A': []}
+# Solution: return [A] for paths/components
+
+# Case 3: Disconnected graph
+graph = {'A': ['B'], 'B': ['A'], 'C': []}
+# Solution: loop through all unvisited nodes
+
+# Case 4: Self-loop
+graph = {'A': ['A', 'B'], 'B': ['A']}
+# Solution: mark visited before exploring to avoid infinite loop
+
+# Case 5: Bidirectional vs unidirectional
+# Clarify: A->B, is B->A also an edge?
+```
 
 ---
 
+## Real Interview Examples
+
+### Example 1: Course Schedule (Detect Cycle via Topological Sort)
+
+**Problem:** Given n courses and prerequisites like [1,0] (course 1 requires 0), determine if all courses can be finished.
+
+**Solution:** If topological sort can order all n courses, answer is yes. Otherwise, cycle exists.
+
+```python
+def canFinish(numCourses, prerequisites):
+    graph = [[] for _ in range(numCourses)]
+    in_degree = [0] * numCourses
+    
+    for course, prereq in prerequisites:
+        graph[prereq].append(course)
+        in_degree[course] += 1
+    
+    queue = [i for i in range(numCourses) if in_degree[i] == 0]
+    count = 0
+    
+    while queue:
+        node = queue.pop(0)
+        count += 1
+        for neighbor in graph[node]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+    
+    return count == numCourses
+```
+
+### Example 2: Number of Islands (Connected Components)
+
+**Problem:** Count distinct islands in a grid (1 = land, 0 = water).
+
+**Solution:** DFS/BFS from each unvisited land cell, mark entire island as visited.
+
+```python
+def numIslands(grid):
+    if not grid:
+        return 0
+    
+    count = 0
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == '1':
+                dfs(grid, i, j)
+                count += 1
+    return count
+
+def dfs(grid, i, j):
+    if i < 0 or i >= len(grid) or j < 0 or j >= len(grid[0]) or grid[i][j] == '0':
+        return
+    grid[i][j] = '0'
+    dfs(grid, i+1, j)
+    dfs(grid, i-1, j)
+    dfs(grid, i, j+1)
+    dfs(grid, i, j-1)
+```
+
+### Example 3: Lowest Common Ancestor (Graph Traversal)
+
+**Problem:** Find LCA of two nodes in a DAG.
+
+**Solution:** Traverse from both nodes upward, mark visited ancestors, return first common.
+
+```python
+def lowestCommonAncestor(root, p, q):
+    ancestors = set()
+    
+    def traverse(node):
+        if not node:
+            return
+        ancestors.add(node)
+        traverse(node.parent)
+    
+    traverse(p)
+    
+    while q:
+        if q in ancestors:
+            return q
+        q = q.parent
+    
+    return None
+```
+
 ## Graph Checklist
 
-- ✓ Chose correct algorithm (weighted/unweighted, directed/undirected)
-- ✓ Used adjacency list for sparse graphs
-- ✓ BFS for shortest unweighted path
-- ✓ Dijkstra for shortest weighted path (non-negative)
-- ✓ Bellman-Ford for negative weights
-- ✓ DFS for cycle detection and topological sort
-- ✓ Union-Find for connectivity and cycle detection
-- ✓ Handled disconnected components
-- ✓ Verified start/end node exists
-- ✓ Tested on small examples before submitting
+- ✓ Clarified: directed/undirected, weighted/unweighted, connected/disconnected
+- ✓ Chose correct algorithm per decision tree
+- ✓ Used adjacency list (not matrix)
+- ✓ Handled disconnected components (loop over all nodes)
+- ✓ Handled edge cases: empty graph, single node, self-loops
+- ✓ Marked visited BEFORE enqueuing in BFS (avoid duplicates)
+- ✓ Handled parent check in undirected DFS (avoid revisiting edge source)
+- ✓ Tested on small hand-traced example
+- ✓ Discussed time/space complexity
+- ✓ Mentioned optimizations if time allows
 

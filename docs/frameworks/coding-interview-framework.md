@@ -6,42 +6,96 @@ A proven 5-step framework for solving algorithmic problems in 45-minute technica
 
 ## Phase 1: Clarify & Verify (5 minutes)
 
-**Goal:** Understand the problem completely before coding.
+**Goal:** Understand the problem completely before coding. This phase prevents you from solving the wrong problem.
 
-### Questions to Ask
+### Questions to Ask (In Order)
 
-**Input/Output:**
-- "What's the input format? (array, string, tree, graph)"
-- "What are the constraints on input size?"
-- "What should I return?"
+**Input/Output (Most Important):**
+- "What's the input format? (array, string, tree, graph, matrix, linked list)"
+- "What are the constraints on input size? (1 ≤ n ≤ 10^5?)"
+- "What should I return? (single value, list, count, boolean, path)"
+- "Can the input be empty/null? What should I return in that case?"
+- "Are there any restrictions on the values? (positive only, integers, floats)"
 
-**Edge Cases:**
-- "Should I handle empty input?"
-- "Are there negative numbers / duplicates?"
-- "What's the maximum value of n?"
+**Constraints & Properties:**
+- "Are there negative numbers?"
+- "Can there be duplicates?"
+- "What's the maximum value of n? (10^3, 10^5, 10^6)"
+- "Is the input sorted or unsorted?"
+- "Are there repeated elements?"
+- "Should I modify the input or keep it unchanged?"
 
-**Optimization Hints:**
-- "Is there a specific time or space target?"
-- "Would O(n log n) be acceptable?"
+**Performance Requirements:**
+- "Is there a specific time or space target? (under 1 second, under 100MB)"
+- "Would O(n log n) be acceptable or do I need O(n)?"
+- "Is O(n²) too slow? (depends on n)"
+- "Can I use extra space or must it be O(1)?"
+
+**Domain-Specific:**
+- For arrays: "Contiguous subarrays or subsequences? Order matter?"
+- For strings: "Case sensitive? Unicode characters?"
+- For trees/graphs: "Directed or undirected? Cyclic?"
+- For linked lists: "Singly or doubly linked?"
+
+### Real Example Walkthrough
+
+**Problem:** "Find the two sum in a sorted array that adds up to target"
+
+**Good Clarification Dialogue:**
+```
+You: "So I need to find two numbers that add to the target?"
+Interviewer: "Yes"
+You: "And the array is sorted?"
+Interviewer: "Yes"
+You: "Should I return the indices or the values?"
+Interviewer: "Indices, 0-indexed"
+You: "Are there guaranteed to be two numbers that sum to target?"
+Interviewer: "Yes, exactly one pair"
+You: "Can there be duplicates in the array?"
+Interviewer: "Yes"
+You: "And the array is sorted in ascending order?"
+Interviewer: "Yes"
+```
 
 ### Template to Fill Out
 
 ```
 Problem: [Name]
 
-Input: [Format and constraints]
-Output: [What to return]
+Input Format: [array of size n, string, etc]
+Output Format: [indices, count, modified array, etc]
 
 Constraints:
 - n: _____
-- Values: _____
-- Time: O(?)
-- Space: O(?)
+- Value range: _____
+- Duplicates: Yes/No
+- Sorted: Yes/No/Unknown
+- Can modify input: Yes/No
+- Target time: O(?)
+- Target space: O(?)
 
 Examples:
-Input: _____
-Output: _____
+Input: [values], target = X
+Output: [expected result]
+
+Input: [edge case], target = X
+Output: [expected result]
+
+Edge Cases:
+- Empty input: return ___
+- Single element: return ___
+- All duplicates: return ___
 ```
+
+### Critical Mistakes to Avoid in Phase 1
+
+| Mistake | Impact | Fix |
+|---------|--------|-----|
+| Assuming sorted when not stated | Wrong algorithm | Always ask |
+| Not asking about duplicates | Algorithm breaks | Always ask |
+| Forgetting to clarify return type | Wrong solution | Explicitly confirm |
+| Assuming single answer exists | Crashes on multiple answers | Ask about edge cases |
+| Not confirming constraints | O(n²) fails on n=10^5 | Ask max n |
 
 ---
 
@@ -63,12 +117,31 @@ Output: _____
 - "Can I use [data structure] to improve to O(n log n)?"
 - "What trade-off am I making (time vs. space)?"
 
+### Real Interview Dialogue Example
+
+**Problem:** "Find all unique pairs in an array that sum to a target"
+
+**Interviewer:** "You have 15 minutes for this problem."
+
+**You:** "Let me break this down. So I need to find all pairs [a, b] where a + b = target?"
+
+**Interviewer:** "Yes, and all pairs should be unique."
+
+**You:** "Got it. Let me think about the brute force first. I could check every pair - nested loops would be O(n²) time, O(1) space if I count pairs. That works but it's not great.
+
+But I notice with two pointers on a sorted array, I could do O(n log n + sort) with O(1) extra space. Or I could use a hash set: iterate through, and for each element x, check if target - x is in the set. That's O(n) time but O(n) space.
+
+Given the constraints, I'll go with the hash set approach since time is more important than space here. Let me code that up."
+
+**Interviewer:** "Good thinking. Let's see the code."
+
 ### Red Flags to Avoid
 
 - ❌ Silent coding with no explanation
 - ❌ Jumping to code without discussing approach
 - ❌ Implementing complex solution without verifying idea first
 - ❌ Over-optimizing prematurely
+- ❌ Proposing solution without understanding trade-offs
 
 **Green Flags to Show**
 
@@ -76,6 +149,7 @@ Output: _____
 - ✅ "My brute force is O(n²), let me optimize to..."
 - ✅ "I'll use [structure] because it gives me O(?) complexity"
 - ✅ "Let me trace through an example to verify"
+- ✅ "There are two approaches: X is faster but needs more space, Y is simpler..."
 
 ---
 
@@ -98,17 +172,30 @@ Output: _____
 **Naming:**
 - Use descriptive variable names (not `i`, `x`, `temp`)
 - Avoid single-letter vars except loop counters
+- Index variables: `left`/`right` (not `l`/`r`), `start`/`end`
 
 **Structure:**
 - Break into helper functions if >20 lines
 - Use comments for non-obvious steps only
 - Keep indentation consistent
+- Group related logic (e.g., validation before processing)
 
 **Avoid Common Mistakes:**
 - Off-by-one errors: use `i < n` not `i <= n` (verify bounds)
 - Null pointer checks: handle `None` / `null` cases
 - Integer overflow: use `//` for integer division, watch modulo
 - Mutable default arguments: `def func(arr=[])` is bad
+- Not returning the right type (int vs list vs boolean)
+
+### Common Mistakes During Coding
+
+| Mistake | Example | Fix |
+|---------|---------|-----|
+| Forgetting to skip duplicates | Finding pairs of (1,2) and (2,1) | Use set to track seen pairs |
+| Off-by-one in loop | `for i in range(len(arr)-1)` missing last element | Think: what happens at boundary? |
+| Modifying input implicitly | Sorting in-place when told not to | Check constraints first, copy if needed |
+| Wrong variable initialization | `result = None` then `.append()` | Initialize to correct type: `[]` or `set()` |
+| Not handling edge case | Empty array → IndexError | Validate input at start |
 
 ### Python Template
 
@@ -171,37 +258,61 @@ public class Solution {
 **Happy Path:**
 - Example given in problem statement
 - Trace through your code step-by-step
+- Include problem's exact inputs/outputs
 
 **Edge Cases:**
 - Empty input: `[]`, `""`, `None`
 - Single element: `[5]`
+- Two elements: `[1, 2]`
 - Duplicates: `[1, 1, 1]`
 - Negatives: `[-5, 0, 5]`
 - Boundary values: `[0, MAX_INT, MIN_INT]`
+- All same: `[5, 5, 5, 5]`
+- Already sorted: `[1, 2, 3]`
+- Reverse sorted: `[3, 2, 1]`
 
-### How to Trace
+### Real Testing Example
+
+**Problem:** Find all pairs summing to target, target = 5
 
 ```
-Input: [3, 1, 4, 1, 5]
-Target: 1
+Test 1 (Happy Path):
+Input: [2, 3, 1, 4], target = 5
+Expected: [(2,3), (1,4)] or similar
+Trace:
+  num=2: target-2=3, not seen. seen={2}
+  num=3: target-3=2, FOUND! (2,3). seen={2,3}
+  num=1: target-1=4, not seen. seen={2,3,1}
+  num=4: target-4=1, FOUND! (1,4). seen={2,3,1,4}
+Result: [(2,3), (1,4)] ✓
 
-Step 1: num=3, seen={}, add 3 → result=[3], seen={3}
-Step 2: num=1, seen={3}, add 1 → result=[3,1], seen={3,1}
-Step 3: num=4, seen={3,1}, add 4 → result=[3,1,4], seen={3,1,4}
-Step 4: num=1, seen={3,1,4}, skip (duplicate)
-Step 5: num=5, seen={3,1,4}, add 5 → result=[3,1,4,5], seen={3,1,4,5}
+Test 2 (Edge Case - Duplicates):
+Input: [2, 2, 3, 3], target = 5
+Should return: [(2,3)] (unique pairs only)
+Trace: First (2,3) added to set, second (2,3) skipped (already exists)
+Result: [(2,3)] ✓
 
-Output: [3,1,4,5] ✓
+Test 3 (Edge Case - No pairs):
+Input: [1, 2], target = 10
+Expected: []
+Result: [] ✓
+
+Test 4 (Edge Case - Empty):
+Input: [], target = 5
+Expected: []
+Result: [] ✓
 ```
 
 ### Verification Checklist
 
 - ✓ Code compiles/runs without syntax errors
 - ✓ Happy path example produces correct output
-- ✓ Edge cases handled (empty, single, negatives, max)
+- ✓ Edge cases handled (empty, single, negatives, max, duplicates)
 - ✓ No off-by-one errors in loops
 - ✓ Variable initializations are correct
 - ✓ Return statement is correct
+- ✓ Traced through at least one example by hand
+- ✓ No unhandled null/None cases
 
 ---
 
@@ -216,36 +327,70 @@ Output: [3,1,4,5] ✓
 - Count iterations: "I loop through n elements once: O(n)"
 - Count nested loops: "For each of n, I do log n binary search: O(n log n)"
 - Add asymptotics: "O(n) iteration + O(1) per element = O(n)"
+- Watch out for: hidden loops, recursive calls, data structure operations
 
 **Space Complexity:**
 - Hash set storing n elements: O(n)
 - Recursion depth d on call stack: O(d)
 - Output array of size m: O(m)
+- Don't count input in analysis (already provided)
 
-**Example:**
+**Example Explanation:**
 
 ```
-Problem: Remove duplicates from array
+Problem: Find pairs summing to target
 
-Time: O(n) - single pass through array
-Space: O(n) - hash set stores up to n elements in worst case (all unique)
+Time: O(n) - one pass through array, hash set operations are O(1)
+Space: O(n) - hash set stores up to n elements, pairs output is O(k) where k = num pairs
 
 Can we do better?
-- Time: Already optimal (need to look at each element once)
-- Space: Could sort in-place O(1) but that modifies input
-- Trade-off: O(n) space for O(n) time is good here
+- Time: Already optimal (must look at each element at least once)
+- Space: With sorted input + two pointers: O(1) but requires sorting (O(n log n))
+- Trade-off: My approach O(n) time + O(n) space is best for unsorted input
 ```
 
-### Follow-up Optimization
+### Common Complexity Mistakes
 
-**If you finished with time left:**
-- "Can I optimize space from O(n) to O(1)?"
-- "Can I solve this in O(n) instead of O(n²)?"
-- "What if the array was sorted? Could I use two pointers?"
+| Mistake | Example | Correct |
+|---------|---------|---------|
+| Forgetting sorting cost | "Two pointers O(n) space" | Don't forget O(n log n) sort if needed |
+| Confusing hash operations | "Hash set is O(1) per operation" | True on average, O(n) worst case with collisions |
+| Not counting output | "Remove duplicates is O(n) space" | Also count the output array |
+| Recursive calls | "DFS is O(n)" | Also count recursion stack O(h) height |
+| Nested data structures | "Store all pairs in set" | Sets have O(1) lookup but O(n) space for all pairs |
 
-**If you struggled with bugs:**
-- "Let me refactor this section to be clearer"
-- "Can I break this into helper functions?"
+### Follow-up Optimization Questions
+
+**If you finished with time left (best case):**
+```
+You: "I've verified correctness. Would you like me to optimize further?"
+
+Interviewer: "Sure, can you improve space complexity?"
+
+You: "With a sorted array, I could use two pointers:
+- Sort: O(n log n) time
+- Two pointers: O(n) time
+- Result: O(n log n) total, O(1) space (excluding output)
+
+Should I implement this version?"
+```
+
+**If you struggled with bugs (recovery):**
+```
+You: "I found a bug in the duplicate handling. Let me fix it."
+
+[Add a check to skip duplicate pairs]
+
+You: "There - now the set tracks seen pairs instead of seen numbers.
+Let me re-trace the duplicate example... Yes, this now returns one (2,3) instead of duplicates."
+```
+
+### When NOT to Optimize
+
+- ✗ Don't optimize prematurely (interviewer didn't ask)
+- ✗ Don't introduce complexity if time is running out
+- ✓ Wait for interviewer signal: "Can you improve?" or "Any follow-ups?"
+- ✓ Mention optimizations in discussion ("could use two pointers if sorted")
 
 ---
 

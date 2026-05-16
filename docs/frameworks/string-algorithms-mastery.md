@@ -8,6 +8,8 @@ Master string manipulation, pattern matching, and advanced string algorithms.
 
 ### KMP (Knuth-Morris-Pratt)
 
+**Real Example: Find All Pattern Occurrences**
+
 ```python
 def build_lps(pattern):
     m = len(pattern)
@@ -38,13 +40,19 @@ def kmp_search(text, pattern):
             j += 1
         if j == m:
             matches.append(i - m + 1)
-            j = lps[j - 1]
+            j = lps[j - 1]  # Continue searching for overlapping matches
     
     return matches
 
+# Example: text = "AABAAB", pattern = "AAB"
+# matches = [0, 3]  (AAB at position 0 and 3)
 # Time: O(n + m), Space: O(m)
-# Use: Pattern matching in text, find all occurrences
 ```
+
+**Why KMP over naive?**
+- Naive: O(n·m) worst case (checking every position)
+- KMP: O(n+m) linear (skip impossible positions)
+- Use when: pattern-heavy (long text, multiple searches)
 
 ### Boyer-Moore
 
@@ -113,6 +121,42 @@ def z_algorithm(s):
 # Time: O(n), Space: O(n)
 # Use: Pattern matching, finding all occurrences
 ```
+
+---
+
+## Interview Tips & Edge Cases
+
+### When to Use Each Algorithm
+
+**Pattern in text (once):** 
+- Use: strfind() (built-in, always safe)
+- If must code: KMP or Z-algorithm
+
+**Find all occurrences:**
+- Use: KMP or Z-algorithm (linear time)
+- Avoid: naive (too slow for large text)
+
+**Multiple patterns in text:**
+- Use: Aho-Corasick (find all k patterns in O(n+m+z))
+- Alternative: Rabin-Karp with multiple pattern hashes
+
+**Dictionary lookup / autocomplete:**
+- Use: Trie (O(m) per query)
+- Avoid: linear search through array
+
+**String similarity / spell check:**
+- Use: Edit distance (DP)
+- Use: Trie + edit distance (for dictionary suggestions)
+
+### Common Mistakes in String Problems
+
+| Mistake | Example | Fix |
+|---------|---------|-----|
+| Off-by-one in pattern match | Finding "AA" in "AAA" misses position 1 | Continue search after match (j = lps[j-1]) |
+| Forgetting edge case | Empty pattern, empty text | Check lengths first |
+| Case sensitivity | Pattern "A", text "a" | Normalize before matching (lower/upper) |
+| Trie stores only words | Trying to search prefix that's not a word | Check `is_end` flag, use separate `starts_with()` |
+| Palindrome expansion | Missing even-length palindromes | Expand around both (i, i) and (i, i+1) |
 
 ---
 
@@ -317,6 +361,71 @@ def lcs(s1, s2):
 
 ---
 
+## Real Interview Problems
+
+### Problem 1: Implement strStr() (Find First Occurrence)
+
+```python
+def strStr(haystack, needle):
+    if not needle:
+        return 0
+    if not haystack or len(haystack) < len(needle):
+        return -1
+    
+    # Built-in (always best in real interview)
+    return haystack.find(needle)
+    
+    # Or manual KMP:
+    # (implement as shown above, return matches[0] if matches else -1)
+```
+
+**Interview tips:**
+- Use built-in first (shows pragmatism)
+- If asked to implement: use KMP
+- If asked to optimize: rolling hash
+
+### Problem 2: Group Anagrams
+
+```python
+def groupAnagrams(words):
+    groups = {}
+    for word in words:
+        # Key: sorted characters (all anagrams have same key)
+        key = ''.join(sorted(word))
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(word)
+    return list(groups.values())
+
+# Example: ["eat", "tea", "ate", "bat"]
+# Output: [["eat", "tea", "ate"], ["bat"]]
+# Time: O(n·k log k) where k = avg word length
+```
+
+### Problem 3: Longest Substring Without Repeating Characters
+
+```python
+def lengthOfLongestSubstring(s):
+    char_index = {}
+    max_len = 0
+    start = 0
+    
+    for i, char in enumerate(s):
+        if char in char_index and char_index[char] >= start:
+            start = char_index[char] + 1
+        
+        char_index[char] = i
+        max_len = max(max_len, i - start + 1)
+    
+    return max_len
+
+# Example: "abcabcbb"
+# Longest substring: "abc" (length 3)
+# Time: O(n), Space: O(min(n, alphabet_size))
+```
+
+---
+
 ## Common String Problems
 
 | Problem | Algorithm | Time | Notes |
@@ -329,6 +438,8 @@ def lcs(s1, s2):
 | Longest palindrome | Expand around | O(n²) | Manacher = O(n) |
 | Edit distance | DP | O(m·n) | Sequence alignment |
 | LCS | DP | O(m·n) | Common subsequence |
+| Group anagrams | Sorting | O(n·k log k) | k = avg word length |
+| Longest substring no repeat | Sliding window | O(n) | Two-pointer technique |
 
 ---
 
@@ -339,8 +450,10 @@ def lcs(s1, s2):
 - ✓ Trie for prefix-based queries
 - ✓ Rolling hash for multiple patterns
 - ✓ DP for string transformation (edit distance, LCS)
-- ✓ Handle edge cases (empty strings, single char)
-- ✓ Palindrome check with expand-around technique
-- ✓ Anagram detection with character counts
+- ✓ Sliding window for substring problems
+- ✓ Handle edge cases (empty strings, single char, unicode)
+- ✓ Palindrome check with expand-around technique (both odd and even)
+- ✓ Anagram detection with sorted() or character counts
+- ✓ Know when to use built-in (strfind) vs. implement from scratch
 - ✓ Tested on small examples before submitting
 
