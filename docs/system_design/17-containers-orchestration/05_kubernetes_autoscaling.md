@@ -1006,3 +1006,22 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Cluster Capacity:**
+- Node: 16 cores, 64GB RAM
+- Per pod: 0.5 CPU request, 512MB
+- Max pods per node (CPU): 32; (RAM): 128 → CPU limits at 32
+- 100 nodes → 3200 pods max (real-world ~70% = 2200 schedulable)
+
+**API Server Load:**
+- 1000 pods × 2 watches = 2000 open connections
+- Heartbeat: 10s interval → 200 QPS steady state
+- kubectl list pods: scans etcd — expensive; use field selectors
+
+**Etcd Storage:**
+- 1 pod spec: ~2KB in etcd
+- 10K pods: 20MB — well within 8GB etcd limit
+- Snapshot interval: every 10K revisions → ~1 min compaction

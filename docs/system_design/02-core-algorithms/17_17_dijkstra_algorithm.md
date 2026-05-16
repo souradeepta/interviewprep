@@ -362,3 +362,86 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+import heapq
+from typing import Dict, List, Tuple
+
+def dijkstra(graph: Dict[int, List[Tuple[int,int]]], src: int) -> Dict[int, int]:
+    """Dijkstra's shortest path. graph[u] = [(v, weight), ...]. O((V+E) log V)."""
+    dist: Dict[int, int] = {src: 0}
+    heap: List[Tuple[int, int]] = [(0, src)]  # (cost, node)
+    while heap:
+        cost, u = heapq.heappop(heap)
+        if cost > dist.get(u, float("inf")):
+            continue    # stale entry
+        for v, w in graph.get(u, []):
+            new_cost = cost + w
+            if new_cost < dist.get(v, float("inf")):
+                dist[v] = new_cost
+                heapq.heappush(heap, (new_cost, v))
+    return dist
+
+# Example: 5-node weighted graph
+graph = {0: [(1,4),(2,1)], 1: [(3,1)], 2: [(1,2),(3,5)], 3: [(4,3)], 4: []}
+print(dijkstra(graph, 0))  # {0:0, 1:3, 2:1, 3:4, 4:7}
+```
+
+### Java
+```java
+import java.util.*;
+
+public class Dijkstra {
+    public static int[] dijkstra(List<int[]>[] graph, int src) {
+        int n = graph.length;
+        int[] dist = new int[n];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+        // PriorityQueue: [cost, node]
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0]));
+        pq.offer(new int[]{0, src});
+        while (!pq.isEmpty()) {
+            int[] curr = pq.poll();
+            int cost = curr[0], u = curr[1];
+            if (cost > dist[u]) continue;  // stale
+            for (int[] edge : graph[u]) {
+                int v = edge[0], w = edge[1];
+                if (dist[u] + w < dist[v]) {
+                    dist[v] = dist[u] + w;
+                    pq.offer(new int[]{dist[v], v});
+                }
+            }
+        }
+        return dist;
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

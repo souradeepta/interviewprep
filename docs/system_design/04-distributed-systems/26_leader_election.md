@@ -290,3 +290,139 @@ graph TB
 **Time to Master:** 3-4 weeks
 **Prerequisite Knowledge:** Distributed systems fundamentals, networking
 **Common in Interviews:** Yes - Hard problems requiring deep understanding
+
+
+## Code Implementation
+
+### Python
+```python
+import threading, time, random
+from enum import Enum
+
+class State(Enum):
+    FOLLOWER = "follower"
+    CANDIDATE = "candidate"
+    LEADER = "leader"
+
+class RaftNode:
+    """Simplified Raft node demonstrating leader election."""
+    def __init__(self, node_id: int, peers: list[int]):
+        self.id = node_id
+        self.peers = peers
+        self.state = State.FOLLOWER
+        self.current_term = 0
+        self.voted_for: int | None = None
+        self.last_heartbeat = time.time()
+        self.election_timeout = random.uniform(0.15, 0.3)  # 150-300ms
+
+    def check_election_timeout(self) -> bool:
+        """Returns True if leader is suspected dead."""
+        return time.time() - self.last_heartbeat > self.election_timeout
+
+    def request_vote(self, term: int, candidate_id: int) -> bool:
+        """Grant vote if term is newer and we haven't voted this term."""
+        if term > self.current_term:
+            self.current_term = term
+            self.voted_for = None
+            self.state = State.FOLLOWER
+        grant = term == self.current_term and (
+            self.voted_for is None or self.voted_for == candidate_id
+        )
+        if grant:
+            self.voted_for = candidate_id
+        return grant
+
+    def become_leader(self) -> None:
+        self.state = State.LEADER
+        print(f"Node {self.id} elected leader for term {self.current_term}")
+```
+
+### Java
+```java
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+public class RaftNode {
+    public enum State { FOLLOWER, CANDIDATE, LEADER }
+
+    private final int nodeId;
+    private final AtomicInteger currentTerm = new AtomicInteger(0);
+    private final AtomicReference<State> state = new AtomicReference<>(State.FOLLOWER);
+    private volatile Integer votedFor = null;
+    private volatile long lastHeartbeat = System.currentTimeMillis();
+    private final long electionTimeoutMs;
+
+    public RaftNode(int nodeId) {
+        this.nodeId = nodeId;
+        // randomized timeout 150-300ms to prevent split votes
+        this.electionTimeoutMs = 150 + (long)(Math.random() * 150);
+    }
+
+    public boolean isElectionTimeout() {
+        return System.currentTimeMillis() - lastHeartbeat > electionTimeoutMs;
+    }
+
+    public synchronized boolean requestVote(int term, int candidateId) {
+        if (term > currentTerm.get()) {
+            currentTerm.set(term);
+            votedFor = null;
+            state.set(State.FOLLOWER);
+        }
+        boolean grant = term == currentTerm.get()
+            && (votedFor == null || votedFor == candidateId);
+        if (grant) votedFor = candidateId;
+        return grant;
+    }
+
+    public void receiveHeartbeat(int term) {
+        if (term >= currentTerm.get()) {
+            currentTerm.set(term);
+            state.set(State.FOLLOWER);
+            lastHeartbeat = System.currentTimeMillis();
+        }
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**System Load Estimation:**
+- 1M daily active users × 10 requests/day = 10M requests/day
+- Peak QPS = 10M / 86400 × 3 (peak factor) ≈ 350 QPS
+- API server capacity: 1000 QPS/server → 1 server sufficient at peak
+- With 2x redundancy: 2 servers minimum
+
+**Storage Estimation:**
+- 1M users × 10KB average data = 10GB structured data
+- Annual growth: 10GB × 365 = 3.65TB/year
+- With 3x replication: 11TB/year
+- SSD cost ($0.10/GB): $1,100/year
+
+**Bandwidth:**
+- 350 QPS × 10KB response = 3.5MB/sec outbound
+- Monthly egress: 3.5MB × 86400 × 30 = 9TB/month
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

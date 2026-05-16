@@ -344,3 +344,148 @@ Total CI/CD cost: ~$10K/month
 - Security and compliance
 - Cost optimization and FinOps
 - Site reliability engineering (SRE)
+
+
+## Code Implementation
+
+### Python
+```python
+from kubernetes import client, config
+from typing import Optional
+
+def create_deployment(name: str, image: str, replicas: int = 3,
+                       namespace: str = "default") -> None:
+    """Create a Kubernetes Deployment programmatically."""
+    config.load_incluster_config()  # use in-cluster config when running in pod
+    apps_v1 = client.AppsV1Api()
+
+    container = client.V1Container(
+        name=name,
+        image=image,
+        resources=client.V1ResourceRequirements(
+            requests={"cpu": "100m", "memory": "128Mi"},
+            limits={"cpu": "500m", "memory": "512Mi"},
+        ),
+        liveness_probe=client.V1Probe(
+            http_get=client.V1HTTPGetAction(path="/health", port=8080),
+            initial_delay_seconds=10,
+            period_seconds=5,
+        ),
+    )
+
+    spec = client.V1DeploymentSpec(
+        replicas=replicas,
+        selector=client.V1LabelSelector(match_labels={"app": name}),
+        template=client.V1PodTemplateSpec(
+            metadata=client.V1ObjectMeta(labels={"app": name}),
+            spec=client.V1PodSpec(containers=[container]),
+        ),
+        strategy=client.V1DeploymentStrategy(
+            type="RollingUpdate",
+            rolling_update=client.V1RollingUpdateDeployment(
+                max_unavailable=0,     # zero downtime
+                max_surge=1,
+            ),
+        ),
+    )
+
+    deployment = client.V1Deployment(
+        metadata=client.V1ObjectMeta(name=name),
+        spec=spec,
+    )
+    apps_v1.create_namespaced_deployment(namespace, deployment)
+    print(f"Deployment {name} created with {replicas} replicas")
+
+def scale_deployment(name: str, replicas: int, namespace: str = "default") -> None:
+    config.load_incluster_config()
+    apps_v1 = client.AppsV1Api()
+    patch = {"spec": {"replicas": replicas}}
+    apps_v1.patch_namespaced_deployment_scale(name, namespace, patch)
+```
+
+### Java
+```java
+import io.kubernetes.client.openapi.ApiClient;
+import io.kubernetes.client.openapi.Configuration;
+import io.kubernetes.client.openapi.apis.AppsV1Api;
+import io.kubernetes.client.openapi.models.*;
+import io.kubernetes.client.util.Config;
+import java.util.*;
+
+public class KubernetesClient {
+
+    public static void createDeployment(String name, String image, int replicas) throws Exception {
+        ApiClient apiClient = Config.fromCluster(); // in-cluster config
+        Configuration.setDefaultApiClient(apiClient);
+        AppsV1Api appsApi = new AppsV1Api();
+
+        V1Container container = new V1Container()
+            .name(name)
+            .image(image)
+            .resources(new V1ResourceRequirements()
+                .putRequestsItem("cpu", new io.kubernetes.client.custom.Quantity("100m"))
+                .putRequestsItem("memory", new io.kubernetes.client.custom.Quantity("128Mi"))
+                .putLimitsItem("cpu", new io.kubernetes.client.custom.Quantity("500m"))
+                .putLimitsItem("memory", new io.kubernetes.client.custom.Quantity("512Mi")));
+
+        V1Deployment deployment = new V1Deployment()
+            .metadata(new V1ObjectMeta().name(name))
+            .spec(new V1DeploymentSpec()
+                .replicas(replicas)
+                .selector(new V1LabelSelector().matchLabels(Map.of("app", name)))
+                .template(new V1PodTemplateSpec()
+                    .metadata(new V1ObjectMeta().labels(Map.of("app", name)))
+                    .spec(new V1PodSpec().containers(List.of(container))))
+                .strategy(new V1DeploymentStrategy().type("RollingUpdate")
+                    .rollingUpdate(new V1RollingUpdateDeployment()
+                        .maxUnavailable(new IntOrString(0))
+                        .maxSurge(new IntOrString(1)))));
+
+        appsApi.createNamespacedDeployment("default", deployment, null, null, null, null);
+        System.out.println("Deployment " + name + " created");
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**Cluster Capacity:**
+- Node: 16 cores, 64GB RAM
+- Per pod: 0.5 CPU request, 512MB
+- Max pods per node (CPU): 32; (RAM): 128 → CPU limits at 32
+- 100 nodes → 3200 pods max (real-world ~70% = 2200 schedulable)
+
+**API Server Load:**
+- 1000 pods × 2 watches = 2000 open connections
+- Heartbeat: 10s interval → 200 QPS steady state
+- kubectl list pods: scans etcd — expensive; use field selectors
+
+**Etcd Storage:**
+- 1 pod spec: ~2KB in etcd
+- 10K pods: 20MB — well within 8GB etcd limit
+- Snapshot interval: every 10K revisions → ~1 min compaction
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

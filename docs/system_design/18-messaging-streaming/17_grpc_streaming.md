@@ -407,3 +407,145 @@ graph TB
 **Time to Master:** 2-4 weeks
 **Prerequisite Knowledge:** Distributed systems, message queues
 **Common in Interviews:** Yes - Medium to Hard
+
+
+## Code Implementation
+
+### Python
+```python
+import asyncio
+import aiohttp
+from typing import Optional
+import time
+
+class HTTPClient:
+    """Async HTTP client with retry, timeout, and connection pooling."""
+    def __init__(self, base_url: str, timeout: int = 5, max_retries: int = 3):
+        self.base_url = base_url
+        self.timeout = aiohttp.ClientTimeout(total=timeout)
+        self.max_retries = max_retries
+        self._session: Optional[aiohttp.ClientSession] = None
+
+    async def __aenter__(self):
+        connector = aiohttp.TCPConnector(limit=100, limit_per_host=30)
+        self._session = aiohttp.ClientSession(
+            base_url=self.base_url,
+            timeout=self.timeout,
+            connector=connector,
+        )
+        return self
+
+    async def __aexit__(self, *args):
+        await self._session.close()
+
+    async def get(self, path: str, **kwargs) -> dict:
+        for attempt in range(self.max_retries):
+            try:
+                async with self._session.get(path, **kwargs) as resp:
+                    resp.raise_for_status()
+                    return await resp.json()
+            except aiohttp.ClientError as e:
+                if attempt == self.max_retries - 1:
+                    raise
+                wait = 2 ** attempt        # exponential backoff
+                await asyncio.sleep(wait)
+
+async def main():
+    async with HTTPClient("https://api.example.com") as client:
+        data = await client.get("/users/123")
+        print(data)
+
+asyncio.run(main())
+```
+
+### Java
+```java
+import java.net.URI;
+import java.net.http.*;
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+
+public class HttpClientExample {
+    private static final HttpClient client = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(5))
+        .version(HttpClient.Version.HTTP_2)
+        .build();
+
+    /** Async GET with JSON parsing. */
+    public static CompletableFuture<String> getAsync(String url) {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .timeout(Duration.ofSeconds(10))
+            .header("Accept", "application/json")
+            .GET()
+            .build();
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .thenApply(HttpResponse::body);
+    }
+
+    /** POST JSON payload. */
+    public static HttpResponse<String> postJson(String url, String json) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(json))
+            .build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public static void main(String[] args) throws Exception {
+        // Async GET
+        getAsync("https://api.example.com/users/1")
+            .thenAccept(body -> System.out.println("Response: " + body))
+            .join();
+
+        // Sync POST
+        String payload = "{"name":"Alice","email":"alice@example.com"}";
+        HttpResponse<String> resp = postJson("https://api.example.com/users", payload);
+        System.out.println("Status: " + resp.statusCode());
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**Throughput:**
+- Kafka throughput per broker: 100MB/sec write
+- 1KB messages → 100K msgs/sec per broker
+- 10 brokers → 1M msgs/sec cluster throughput
+- At 500B messages/day: 500B / 86400 = ~5.8M msgs/sec peak
+
+**Storage:**
+- 1M msgs/sec × 1KB = 1GB/sec raw
+- 7-day retention: 7 × 86400 × 1GB = 604TB
+- With 3x replication: 1.8PB total
+- Compression (3:1): reduces to 600TB
+
+**Latency:**
+- Produce (acks=1): <5ms p99
+- End-to-end (produce → consume): 10-20ms typical
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

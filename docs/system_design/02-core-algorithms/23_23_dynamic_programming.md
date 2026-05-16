@@ -362,3 +362,95 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+# Classic DP examples
+
+def longest_common_subsequence(s1: str, s2: str) -> int:
+    """O(m*n) DP for LCS length."""
+    m, n = len(s1), len(s2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if s1[i-1] == s2[j-1]:
+                dp[i][j] = dp[i-1][j-1] + 1       # characters match
+            else:
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])  # skip one
+    return dp[m][n]
+
+def coin_change(coins: list[int], amount: int) -> int:
+    """Min coins to make amount. O(amount * len(coins))."""
+    dp = [float("inf")] * (amount + 1)
+    dp[0] = 0
+    for coin in coins:
+        for a in range(coin, amount + 1):
+            dp[a] = min(dp[a], dp[a - coin] + 1)
+    return dp[amount] if dp[amount] != float("inf") else -1
+
+print(longest_common_subsequence("abcde", "ace"))  # 3
+print(coin_change([1, 5, 11], 15))                 # 3 (5+5+5)
+```
+
+### Java
+```java
+public class DynamicProgramming {
+
+    // Longest Common Subsequence
+    public static int lcs(String s1, String s2) {
+        int m = s1.length(), n = s2.length();
+        int[][] dp = new int[m + 1][n + 1];
+        for (int i = 1; i <= m; i++)
+            for (int j = 1; j <= n; j++)
+                dp[i][j] = s1.charAt(i-1) == s2.charAt(j-1)
+                    ? dp[i-1][j-1] + 1
+                    : Math.max(dp[i-1][j], dp[i][j-1]);
+        return dp[m][n];
+    }
+
+    // Coin change — minimum coins to reach amount
+    public static int coinChange(int[] coins, int amount) {
+        int[] dp = new int[amount + 1];
+        java.util.Arrays.fill(dp, Integer.MAX_VALUE);
+        dp[0] = 0;
+        for (int coin : coins)
+            for (int a = coin; a <= amount; a++)
+                if (dp[a - coin] != Integer.MAX_VALUE)
+                    dp[a] = Math.min(dp[a], dp[a - coin] + 1);
+        return dp[amount] == Integer.MAX_VALUE ? -1 : dp[amount];
+    }
+
+    public static void main(String[] args) {
+        System.out.println(lcs("abcde", "ace"));        // 3
+        System.out.println(coinChange(new int[]{1,5,11}, 15)); // 3
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

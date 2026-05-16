@@ -846,3 +846,23 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Model Scale:**
+- Users: 100M, Items: 10M, Factors: 128
+- U matrix: 100M × 128 × 4 bytes = 51GB
+- V matrix: 10M × 128 × 4 bytes = 5.1GB
+- Training: 1B ratings × 20 epochs × 128 ops = 2.56T FLOPs → ~1h on A100
+
+**Serving Latency:**
+- ANN search (FAISS) 10M items: <10ms
+- Scoring top-1000 candidates: 1000 × 128 dot products = 128K FLOPs → <1ms
+- Total recommendation latency budget: 50ms
+  - Retrieval: 10ms, Scoring: 5ms, Post-processing: 5ms, Overhead: 30ms
+
+**Data Freshness:**
+- Real-time signals (clicks in last hour): <1min delay
+- Batch model retrain: daily
+- Feature store update: every 15min

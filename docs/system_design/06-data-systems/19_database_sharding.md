@@ -842,3 +842,18 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Index Impact:**
+- Table: 100M rows, 100 bytes each = 10GB
+- Full table scan: 10GB / 500MB/s = 20 seconds
+- B-tree index lookup: log₂(100M) ≈ 27 comparisons → <1ms
+- Index storage: 100M × 8 bytes (rowid) × 2 (overhead) = 1.6GB
+
+**Query Throughput:**
+- Single DB: 10K simple queries/sec
+- With connection pool (20 connections): ~5K TPS
+- Read replica: 3 replicas → 15K read TPS
+- Write throughput limited by leader: 2K TPS

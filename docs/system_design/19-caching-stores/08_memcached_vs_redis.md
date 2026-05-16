@@ -1219,3 +1219,19 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Cache Sizing:**
+- Working set: 10M active items × 1KB avg = 10GB
+- 80% hit target → cache needs to hold top 20% most popular = 2GB
+- With 10 cache nodes: 200MB per node (fits in RAM)
+- Hit ratio math: 80% from cache, 20% from DB
+- Effective latency: 0.8×1ms + 0.2×10ms = 2.8ms (vs 10ms without cache)
+
+**Throughput:**
+- Single Redis node: 100K ops/sec
+- 10-node cluster: 1M ops/sec
+- At 50% hit ratio a 1M QPS app issues 500K DB queries — unsustainable
+- At 90% hit ratio: 100K DB queries — manageable

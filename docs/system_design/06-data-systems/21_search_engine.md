@@ -845,3 +845,17 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Time vs Data Size:**
+- n=1,000: O(n log n) = ~10K ops → <1ms
+- n=1,000,000: O(n log n) = ~20M ops → ~20ms
+- n=1,000,000,000: O(n log n) = ~30B ops → ~30s
+- O(n²) at n=1M: 10¹² ops → hours — impractical
+
+**Memory:**
+- Merge sort: O(n) auxiliary = 8MB for 1M 64-bit ints
+- QuickSort: O(log n) stack = ~20 frames = negligible
+- Radix sort: O(n+k) where k=range — 4GB for 32-bit ints

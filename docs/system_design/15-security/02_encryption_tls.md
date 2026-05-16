@@ -775,3 +775,18 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Crypto Performance:**
+- AES-256-GCM: 3GB/sec throughput (hardware accelerated)
+- RSA-2048 sign: 5ms; verify: 0.3ms
+- bcrypt (cost=12): 250ms per hash — good for login, too slow for API
+- PBKDF2 (260K iterations): 100ms — balance of security and speed
+- JWT verify (HS256): <1ms — suitable for every request
+
+**Token Storage:**
+- 1M active sessions × 256 bytes = 256MB in Redis
+- 100K logins/day × 256 bytes = 25MB new tokens/day
+- TTL 1 hour → ~4% of tokens expire per minute → cleanup manageable

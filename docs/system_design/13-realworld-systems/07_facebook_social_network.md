@@ -2168,3 +2168,44 @@ graph TB
 **Difficulty:** Hard
 **Time to Design:** 45-60 minutes
 **Time to Implement:** 2-3 weeks
+
+
+## Back-of-the-Envelope Calculations
+
+**Latency Budget:**
+- Speed of light NYC→London (5570km): 18.5ms one-way
+- Realistic TCP latency: 70-100ms (routing overhead)
+- TLS handshake: +1 RTT = 100-200ms
+- With TLS session resumption: +0 RTT
+- CDN edge node (50ms away): 5-10ms vs 100ms origin
+
+**Throughput:**
+- TCP window size: 65KB default → 65KB / 100ms = 5Mbps
+- With window scaling (64MB): 64MB / 100ms = 5Gbps theoretical
+- HTTP/2 multiplexing: eliminates HOL blocking per-stream
+- HTTP/3 (QUIC): 0-RTT handshake, eliminates TCP HOL blocking
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

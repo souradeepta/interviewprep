@@ -536,3 +536,101 @@ Expected latency:
 6. **TTL Tuning Takes Time** - Start conservative, gradually increase based on staleness tolerance
 7. **Multi-Tier Caching Needed** - Single tier bottleneck; L1+L2+L3 provides best latency
 8. **Capacity Planning Essential** - Under-sized cache worse than no cache (thrashing)
+
+
+## Code Implementation
+
+### Python
+```python
+from collections import OrderedDict
+from typing import Optional
+
+class LRUCache:
+    """O(1) get/put using OrderedDict for ordering."""
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache: OrderedDict[int, int] = OrderedDict()
+
+    def get(self, key: int) -> int:
+        if key not in self.cache:
+            return -1
+        self.cache.move_to_end(key)   # mark as recently used
+        return self.cache[key]
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)  # evict least-recently-used
+
+# Usage
+cache = LRUCache(3)
+cache.put(1, 10); cache.put(2, 20); cache.put(3, 30)
+print(cache.get(1))   # 10, moves 1 to recent
+cache.put(4, 40)      # evicts key 2 (LRU)
+print(cache.get(2))   # -1 (evicted)
+```
+
+### Java
+```java
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class LRUCache {
+    private final int capacity;
+    // LinkedHashMap with accessOrder=true maintains LRU order
+    private final LinkedHashMap<Integer, Integer> cache;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.cache = new LinkedHashMap<>(capacity, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
+                return size() > capacity;  // evict when over capacity
+            }
+        };
+    }
+
+    public int get(int key) {
+        return cache.getOrDefault(key, -1);
+    }
+
+    public void put(int key, int value) {
+        cache.put(key, value);
+    }
+
+    public static void main(String[] args) {
+        LRUCache cache = new LRUCache(3);
+        cache.put(1, 10); cache.put(2, 20); cache.put(3, 30);
+        System.out.println(cache.get(1)); // 10
+        cache.put(4, 40);                 // evicts key 2
+        System.out.println(cache.get(2)); // -1
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

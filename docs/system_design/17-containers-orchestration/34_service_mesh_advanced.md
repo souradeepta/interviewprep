@@ -473,3 +473,128 @@ spec:
 6. **Cost Optimization Continuous** - Regularly audit resource usage; 30-40% savings achievable through optimization
 7. **Cluster Sizing Matters** - Clusters larger than 5K nodes require specialized configurations and monitoring
 8. **Documentation is Essential** - Internal playbooks for common failure scenarios reduce MTTR significantly
+
+
+## Code Implementation
+
+### Python
+```python
+import numpy as np
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class MatrixFactorization:
+    """Collaborative filtering via gradient descent ALS."""
+    n_users: int
+    n_items: int
+    n_factors: int = 50
+    learning_rate: float = 0.01
+    regularization: float = 0.02
+    n_epochs: int = 20
+
+    def __post_init__(self):
+        # Initialize latent factor matrices
+        self.U = np.random.normal(0, 0.1, (self.n_users, self.n_factors))
+        self.V = np.random.normal(0, 0.1, (self.n_items, self.n_factors))
+
+    def fit(self, ratings: list[tuple[int, int, float]]) -> "MatrixFactorization":
+        for epoch in range(self.n_epochs):
+            total_loss = 0.0
+            for user_id, item_id, rating in ratings:
+                pred = np.dot(self.U[user_id], self.V[item_id])
+                err = rating - pred
+                # Gradient step with L2 regularization
+                self.U[user_id] += self.learning_rate * (
+                    err * self.V[item_id] - self.regularization * self.U[user_id]
+                )
+                self.V[item_id] += self.learning_rate * (
+                    err * self.U[user_id] - self.regularization * self.V[item_id]
+                )
+                total_loss += err ** 2
+            if epoch % 5 == 0:
+                print(f"Epoch {epoch}: RMSE={np.sqrt(total_loss/len(ratings)):.4f}")
+        return self
+
+    def predict(self, user_id: int, item_id: int) -> float:
+        return float(np.dot(self.U[user_id], self.V[item_id]))
+
+    def recommend(self, user_id: int, top_k: int = 10) -> list[tuple[int, float]]:
+        scores = self.U[user_id] @ self.V.T          # dot product with all items
+        top_items = np.argsort(-scores)[:top_k]
+        return [(int(i), float(scores[i])) for i in top_items]
+
+# Demo
+ratings = [(0,0,5.0),(0,1,3.0),(1,0,4.0),(1,2,2.0),(2,1,5.0),(2,2,4.0)]
+model = MatrixFactorization(n_users=3, n_items=3, n_factors=10, n_epochs=10)
+model.fit(ratings)
+print(model.recommend(0, top_k=3))
+```
+
+### Java
+```java
+import java.util.*;
+
+public class CollaborativeFilter {
+    private final double[][] userFactors;  // U: users x factors
+    private final double[][] itemFactors;  // V: items x factors
+    private final int nFactors;
+    private final double lr, reg;
+
+    public CollaborativeFilter(int nUsers, int nItems, int nFactors) {
+        this.nFactors = nFactors; this.lr = 0.01; this.reg = 0.02;
+        Random rng = new Random(42);
+        userFactors = new double[nUsers][nFactors];
+        itemFactors = new double[nItems][nFactors];
+        // Random initialization
+        for (double[] row : userFactors) for (int j = 0; j < nFactors; j++) row[j] = rng.nextGaussian() * 0.1;
+        for (double[] row : itemFactors) for (int j = 0; j < nFactors; j++) row[j] = rng.nextGaussian() * 0.1;
+    }
+
+    public void train(int[][] userItem, double[] ratings) {
+        for (int epoch = 0; epoch < 20; epoch++) {
+            for (int k = 0; k < userItem.length; k++) {
+                int u = userItem[k][0], i = userItem[k][1];
+                double pred = dot(userFactors[u], itemFactors[i]);
+                double err = ratings[k] - pred;
+                for (int f = 0; f < nFactors; f++) {
+                    double uf = userFactors[u][f], vf = itemFactors[i][f];
+                    userFactors[u][f] += lr * (err * vf - reg * uf);
+                    itemFactors[i][f] += lr * (err * uf - reg * vf);
+                }
+            }
+        }
+    }
+
+    public double predict(int user, int item) { return dot(userFactors[user], itemFactors[item]); }
+
+    private double dot(double[] a, double[] b) {
+        double s = 0; for (int i = 0; i < a.length; i++) s += a[i] * b[i]; return s;
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

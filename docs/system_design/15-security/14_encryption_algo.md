@@ -311,3 +311,141 @@ Compression: 10x → 12.8 PB
 - Security compliance and standards
 - Secure software development
 - Cloud security and multi-tenancy
+
+
+## Code Implementation
+
+### Python
+```python
+import hashlib, hmac, secrets, time
+import jwt                        # pip install PyJWT
+from cryptography.fernet import Fernet
+from typing import Optional
+
+SECRET_KEY = secrets.token_bytes(32)
+
+# ── Password hashing ────────────────────────────────────────────────────────
+def hash_password(password: str) -> str:
+    """Argon2 / bcrypt preferable in production; PBKDF2 shown here."""
+    salt = secrets.token_bytes(16)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 260_000)
+    return f"{salt.hex()}:{dk.hex()}"
+
+def verify_password(stored: str, provided: str) -> bool:
+    salt_hex, dk_hex = stored.split(":")
+    salt = bytes.fromhex(salt_hex)
+    dk = hashlib.pbkdf2_hmac("sha256", provided.encode(), salt, 260_000)
+    return hmac.compare_digest(dk.hex(), dk_hex)  # constant-time comparison
+
+# ── JWT tokens ──────────────────────────────────────────────────────────────
+def create_token(user_id: int, roles: list[str], ttl_seconds: int = 3600) -> str:
+    payload = {
+        "sub": user_id,
+        "roles": roles,
+        "iat": time.time(),
+        "exp": time.time() + ttl_seconds,
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+def verify_token(token: str) -> Optional[dict]:
+    try:
+        return jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        return None
+
+# ── Symmetric encryption ────────────────────────────────────────────────────
+key = Fernet.generate_key()
+fernet = Fernet(key)
+encrypted = fernet.encrypt(b"sensitive data")
+print(fernet.decrypt(encrypted))   # b"sensitive data"
+```
+
+### Java
+```java
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.*;
+
+public class SecurityUtils {
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final SecretKey JWT_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+    // ── Password hashing ─────────────────────────────────────────────────
+    public static String hashPassword(String password) throws Exception {
+        byte[] salt = new byte[16];
+        RANDOM.nextBytes(salt);
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(salt);
+        byte[] hash = md.digest(password.getBytes());
+        return Base64.getEncoder().encodeToString(salt) + ":" +
+               Base64.getEncoder().encodeToString(hash);
+    }
+
+    public static boolean verifyPassword(String stored, String provided) throws Exception {
+        String[] parts = stored.split(":");
+        byte[] salt = Base64.getDecoder().decode(parts[0]);
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(salt);
+        byte[] expected = Base64.getDecoder().decode(parts[1]);
+        byte[] actual = md.digest(provided.getBytes());
+        return MessageDigest.isEqual(expected, actual); // constant-time
+    }
+
+    // ── JWT ──────────────────────────────────────────────────────────────
+    public static String createToken(long userId, List<String> roles) {
+        return Jwts.builder()
+            .subject(String.valueOf(userId))
+            .claim("roles", roles)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + 3_600_000)) // 1h
+            .signWith(JWT_KEY)
+            .compact();
+    }
+
+    public static Claims verifyToken(String token) {
+        return Jwts.parser().verifyWith(JWT_KEY).build()
+               .parseSignedClaims(token).getPayload();
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**Time vs Data Size:**
+- n=1,000: O(n log n) = ~10K ops → <1ms
+- n=1,000,000: O(n log n) = ~20M ops → ~20ms
+- n=1,000,000,000: O(n log n) = ~30B ops → ~30s
+- O(n²) at n=1M: 10¹² ops → hours — impractical
+
+**Memory:**
+- Merge sort: O(n) auxiliary = 8MB for 1M 64-bit ints
+- QuickSort: O(log n) stack = ~20 frames = negligible
+- Radix sort: O(n+k) where k=range — 4GB for 32-bit ints
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

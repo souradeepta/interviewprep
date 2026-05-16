@@ -861,3 +861,22 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Throughput:**
+- Kafka throughput per broker: 100MB/sec write
+- 1KB messages → 100K msgs/sec per broker
+- 10 brokers → 1M msgs/sec cluster throughput
+- At 500B messages/day: 500B / 86400 = ~5.8M msgs/sec peak
+
+**Storage:**
+- 1M msgs/sec × 1KB = 1GB/sec raw
+- 7-day retention: 7 × 86400 × 1GB = 604TB
+- With 3x replication: 1.8PB total
+- Compression (3:1): reduces to 600TB
+
+**Latency:**
+- Produce (acks=1): <5ms p99
+- End-to-end (produce → consume): 10-20ms typical

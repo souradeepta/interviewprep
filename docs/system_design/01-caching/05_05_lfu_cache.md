@@ -536,3 +536,118 @@ Expected latency:
 6. **TTL Tuning Takes Time** - Start conservative, gradually increase based on staleness tolerance
 7. **Multi-Tier Caching Needed** - Single tier bottleneck; L1+L2+L3 provides best latency
 8. **Capacity Planning Essential** - Under-sized cache worse than no cache (thrashing)
+
+
+## Code Implementation
+
+### Python
+```python
+import heapq
+from collections import defaultdict
+
+class LFUCache:
+    """O(1) LFU using frequency buckets and min-heap."""
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.key_val: dict[int, int] = {}
+        self.key_freq: dict[int, int] = defaultdict(int)
+        self.freq_keys: dict[int, set] = defaultdict(set)
+        self.min_freq = 0
+
+    def _touch(self, key: int):
+        freq = self.key_freq[key]
+        self.key_freq[key] += 1
+        self.freq_keys[freq].discard(key)
+        if not self.freq_keys[freq] and freq == self.min_freq:
+            self.min_freq += 1
+        self.freq_keys[freq + 1].add(key)
+
+    def get(self, key: int) -> int:
+        if key not in self.key_val:
+            return -1
+        self._touch(key)
+        return self.key_val[key]
+
+    def put(self, key: int, value: int):
+        if self.capacity == 0:
+            return
+        if key in self.key_val:
+            self.key_val[key] = value
+            self._touch(key)
+        else:
+            if len(self.key_val) >= self.capacity:
+                evict = next(iter(self.freq_keys[self.min_freq]))
+                self.freq_keys[self.min_freq].discard(evict)
+                del self.key_val[evict], self.key_freq[evict]
+            self.key_val[key] = value
+            self.key_freq[key] = 1
+            self.freq_keys[1].add(key)
+            self.min_freq = 1
+```
+
+### Java
+```java
+import java.util.*;
+
+public class LFUCache {
+    private final int capacity;
+    private int minFreq;
+    private final Map<Integer, Integer> keyVal = new HashMap<>();
+    private final Map<Integer, Integer> keyFreq = new HashMap<>();
+    private final Map<Integer, LinkedHashSet<Integer>> freqKeys = new HashMap<>();
+
+    public LFUCache(int capacity) { this.capacity = capacity; }
+
+    public int get(int key) {
+        if (!keyVal.containsKey(key)) return -1;
+        touch(key);
+        return keyVal.get(key);
+    }
+
+    public void put(int key, int value) {
+        if (capacity == 0) return;
+        if (keyVal.containsKey(key)) { keyVal.put(key, value); touch(key); return; }
+        if (keyVal.size() >= capacity) {
+            int evict = freqKeys.get(minFreq).iterator().next();
+            freqKeys.get(minFreq).remove(evict);
+            keyVal.remove(evict); keyFreq.remove(evict);
+        }
+        keyVal.put(key, value); keyFreq.put(key, 1);
+        freqKeys.computeIfAbsent(1, k -> new LinkedHashSet<>()).add(key);
+        minFreq = 1;
+    }
+
+    private void touch(int key) {
+        int f = keyFreq.get(key);
+        keyFreq.put(key, f + 1);
+        freqKeys.get(f).remove(key);
+        if (freqKeys.get(f).isEmpty() && f == minFreq) minFreq++;
+        freqKeys.computeIfAbsent(f + 1, k -> new LinkedHashSet<>()).add(key);
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

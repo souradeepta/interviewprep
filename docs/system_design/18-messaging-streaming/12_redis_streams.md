@@ -407,3 +407,139 @@ graph TB
 **Time to Master:** 2-4 weeks
 **Prerequisite Knowledge:** Distributed systems, message queues
 **Common in Interviews:** Yes - Medium to Hard
+
+
+## Code Implementation
+
+### Python
+```python
+import redis
+import json
+import time
+from functools import wraps
+from typing import Any, Callable, TypeVar
+
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+
+def cache(ttl: int = 300):
+    """Decorator: cache function results in Redis."""
+    def decorator(fn: Callable) -> Callable:
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            key = f"{fn.__name__}:{args}:{kwargs}"
+            cached = r.get(key)
+            if cached:
+                return json.loads(cached)
+            result = fn(*args, **kwargs)
+            r.setex(key, ttl, json.dumps(result))
+            return result
+        return wrapper
+    return decorator
+
+@cache(ttl=60)
+def get_user_profile(user_id: int) -> dict:
+    """Simulates DB fetch, result cached for 60s."""
+    return {"id": user_id, "name": "Alice", "ts": time.time()}
+
+# Rate limiting using Redis sliding window
+def is_rate_limited(user_id: str, limit: int = 100, window: int = 60) -> bool:
+    key = f"rate:{user_id}"
+    pipe = r.pipeline()
+    now = time.time()
+    pipe.zremrangebyscore(key, 0, now - window)  # remove old requests
+    pipe.zadd(key, {str(now): now})              # add current request
+    pipe.zcard(key)                              # count in window
+    pipe.expire(key, window)
+    _, _, count, _ = pipe.execute()
+    return count > limit
+```
+
+### Java
+```java
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Pipeline;
+import com.google.gson.Gson;
+
+public class RedisCache {
+    private final JedisPool pool;
+    private final Gson gson = new Gson();
+
+    public RedisCache(String host, int port) {
+        this.pool = new JedisPool(host, port);
+    }
+
+    /** Store object in Redis with TTL. */
+    public <T> void set(String key, T value, int ttlSeconds) {
+        try (Jedis jedis = pool.getResource()) {
+            jedis.setex(key, ttlSeconds, gson.toJson(value));
+        }
+    }
+
+    /** Retrieve typed object from Redis. */
+    public <T> T get(String key, Class<T> type) {
+        try (Jedis jedis = pool.getResource()) {
+            String json = jedis.get(key);
+            return json == null ? null : gson.fromJson(json, type);
+        }
+    }
+
+    /** Sliding window rate limit. Returns true if request should be blocked. */
+    public boolean isRateLimited(String userId, int limit, int windowSecs) {
+        try (Jedis jedis = pool.getResource()) {
+            String key = "rate:" + userId;
+            long now = System.currentTimeMillis();
+            Pipeline pipe = jedis.pipelined();
+            pipe.zremrangeByScore(key, 0, now - windowSecs * 1000L);
+            pipe.zadd(key, now, String.valueOf(now));
+            var countResp = pipe.zcard(key);
+            pipe.expire(key, windowSecs);
+            pipe.sync();
+            return countResp.get() > limit;
+        }
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**Throughput:**
+- Kafka throughput per broker: 100MB/sec write
+- 1KB messages → 100K msgs/sec per broker
+- 10 brokers → 1M msgs/sec cluster throughput
+- At 500B messages/day: 500B / 86400 = ~5.8M msgs/sec peak
+
+**Storage:**
+- 1M msgs/sec × 1KB = 1GB/sec raw
+- 7-day retention: 7 × 86400 × 1GB = 604TB
+- With 3x replication: 1.8PB total
+- Compression (3:1): reduces to 600TB
+
+**Latency:**
+- Produce (acks=1): <5ms p99
+- End-to-end (produce → consume): 10-20ms typical
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

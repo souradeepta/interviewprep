@@ -362,3 +362,113 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+class TrieNode:
+    def __init__(self):
+        self.children: dict[str, "TrieNode"] = {}
+        self.is_end = False
+
+class Trie:
+    """Prefix tree. O(m) insert/search where m = word length."""
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        node = self.root
+        for ch in word:
+            node = node.children.setdefault(ch, TrieNode())
+        node.is_end = True
+
+    def search(self, word: str) -> bool:
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                return False
+            node = node.children[ch]
+        return node.is_end
+
+    def starts_with(self, prefix: str) -> bool:
+        node = self.root
+        for ch in prefix:
+            if ch not in node.children:
+                return False
+            node = node.children[ch]
+        return True
+
+trie = Trie()
+for w in ["apple", "app", "application"]:
+    trie.insert(w)
+print(trie.search("app"))         # True
+print(trie.starts_with("appl"))   # True
+print(trie.search("apply"))       # False
+```
+
+### Java
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+public class Trie {
+    private static class Node {
+        Map<Character, Node> children = new HashMap<>();
+        boolean isEnd;
+    }
+
+    private final Node root = new Node();
+
+    public void insert(String word) {
+        Node cur = root;
+        for (char c : word.toCharArray())
+            cur = cur.children.computeIfAbsent(c, k -> new Node());
+        cur.isEnd = true;
+    }
+
+    public boolean search(String word) {
+        Node cur = root;
+        for (char c : word.toCharArray()) {
+            cur = cur.children.get(c);
+            if (cur == null) return false;
+        }
+        return cur.isEnd;
+    }
+
+    public boolean startsWith(String prefix) {
+        Node cur = root;
+        for (char c : prefix.toCharArray()) {
+            cur = cur.children.get(c);
+            if (cur == null) return false;
+        }
+        return true;
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

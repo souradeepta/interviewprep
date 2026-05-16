@@ -362,3 +362,88 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+from typing import TypeVar, List
+T = TypeVar("T")
+
+def merge_sort(arr: List[int]) -> List[int]:
+    """O(n log n) stable sort via divide-and-conquer."""
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left  = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    return merge(left, right)
+
+def merge(left: List[int], right: List[int]) -> List[int]:
+    result, i, j = [], 0, 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:   # stable: equal elements keep order
+            result.append(left[i]); i += 1
+        else:
+            result.append(right[j]); j += 1
+    return result + left[i:] + right[j:]
+
+arr = [38, 27, 43, 3, 9, 82, 10]
+print(merge_sort(arr))  # [3, 9, 10, 27, 38, 43, 82]
+```
+
+### Java
+```java
+import java.util.Arrays;
+
+public class MergeSort {
+    public static void mergeSort(int[] arr, int left, int right) {
+        if (left >= right) return;
+        int mid = left + (right - left) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+
+    private static void merge(int[] arr, int left, int mid, int right) {
+        int[] temp = Arrays.copyOfRange(arr, left, right + 1);
+        int i = 0, j = mid - left + 1, k = left;
+        while (i <= mid - left && j <= right - left)
+            arr[k++] = temp[i] <= temp[j] ? temp[i++] : temp[j++];
+        while (i <= mid - left) arr[k++] = temp[i++];
+        while (j <= right - left) arr[k++] = temp[j++];
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {38, 27, 43, 3, 9, 82, 10};
+        mergeSort(arr, 0, arr.length - 1);
+        System.out.println(Arrays.toString(arr)); // [3, 9, 10, 27, 38, 43, 82]
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

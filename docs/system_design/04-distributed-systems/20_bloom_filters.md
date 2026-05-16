@@ -290,3 +290,115 @@ graph TB
 **Time to Master:** 3-4 weeks
 **Prerequisite Knowledge:** Distributed systems fundamentals, networking
 **Common in Interviews:** Yes - Hard problems requiring deep understanding
+
+
+## Code Implementation
+
+### Python
+```python
+import mmh3, math
+from bitarray import bitarray
+
+class BloomFilter:
+    """Space-efficient probabilistic set membership."""
+    def __init__(self, n: int, fp_rate: float = 0.01):
+        self.m = int(-n * math.log(fp_rate) / (math.log(2) ** 2))
+        self.k = int(self.m / n * math.log(2))
+        self.bits = bitarray(self.m)
+        self.bits.setall(0)
+
+    def add(self, item: str) -> None:
+        for seed in range(self.k):
+            idx = mmh3.hash(item, seed) % self.m
+            self.bits[idx] = 1
+
+    def contains(self, item: str) -> bool:
+        """Returns True if item MIGHT be in set; False = definitely not."""
+        return all(self.bits[mmh3.hash(item, s) % self.m] for s in range(self.k))
+
+bf = BloomFilter(n=1_000_000, fp_rate=0.01)
+bf.add("user:abc123")
+print(bf.contains("user:abc123"))   # True (in set)
+print(bf.contains("user:xyz999"))   # False (not in set)
+```
+
+### Java
+```java
+import java.util.BitSet;
+
+public class BloomFilter {
+    private final BitSet bits;
+    private final int m, k;
+
+    public BloomFilter(int n, double fpRate) {
+        this.m = (int) (-n * Math.log(fpRate) / (Math.log(2) * Math.log(2)));
+        this.k = (int) (m / n * Math.log(2));
+        this.bits = new BitSet(m);
+    }
+
+    private int hash(String item, int seed) {
+        // MurmurHash simulation using Java hashCode
+        int h = item.hashCode() ^ (seed * 0x9e3779b9);
+        return Math.abs(h) % m;
+    }
+
+    public void add(String item) {
+        for (int i = 0; i < k; i++) bits.set(hash(item, i));
+    }
+
+    public boolean mightContain(String item) {
+        for (int i = 0; i < k; i++) if (!bits.get(hash(item, i))) return false;
+        return true;
+    }
+
+    public static void main(String[] args) {
+        BloomFilter bf = new BloomFilter(1_000_000, 0.01);
+        bf.add("user:abc123");
+        System.out.println(bf.mightContain("user:abc123")); // true
+        System.out.println(bf.mightContain("user:xyz999")); // false
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**System Load Estimation:**
+- 1M daily active users × 10 requests/day = 10M requests/day
+- Peak QPS = 10M / 86400 × 3 (peak factor) ≈ 350 QPS
+- API server capacity: 1000 QPS/server → 1 server sufficient at peak
+- With 2x redundancy: 2 servers minimum
+
+**Storage Estimation:**
+- 1M users × 10KB average data = 10GB structured data
+- Annual growth: 10GB × 365 = 3.65TB/year
+- With 3x replication: 11TB/year
+- SSD cost ($0.10/GB): $1,100/year
+
+**Bandwidth:**
+- 350 QPS × 10KB response = 3.5MB/sec outbound
+- Monthly egress: 3.5MB × 86400 × 30 = 9TB/month
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

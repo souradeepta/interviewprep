@@ -362,3 +362,100 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+from typing import List, Optional
+
+def binary_search(arr: List[int], target: int) -> int:
+    """O(log n) search on sorted array. Returns index or -1."""
+    lo, hi = 0, len(arr) - 1
+    while lo <= hi:
+        mid = lo + (hi - lo) // 2     # avoids integer overflow
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            lo = mid + 1              # target in right half
+        else:
+            hi = mid - 1             # target in left half
+    return -1
+
+def lower_bound(arr: List[int], target: int) -> int:
+    """First index where arr[i] >= target."""
+    lo, hi = 0, len(arr)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo
+
+nums = [1, 3, 5, 7, 9, 11, 13]
+print(binary_search(nums, 7))    # 3
+print(binary_search(nums, 6))    # -1
+print(lower_bound(nums, 6))      # 3 (first element >= 6)
+```
+
+### Java
+```java
+public class BinarySearch {
+    /** Returns index of target, or -1 if not found. O(log n). */
+    public static int search(int[] arr, int target) {
+        int lo = 0, hi = arr.length - 1;
+        while (lo <= hi) {
+            int mid = lo + (hi - lo) / 2;  // prevents overflow
+            if (arr[mid] == target) return mid;
+            else if (arr[mid] < target) lo = mid + 1;
+            else hi = mid - 1;
+        }
+        return -1;
+    }
+
+    /** First index where arr[i] >= target. */
+    public static int lowerBound(int[] arr, int target) {
+        int lo = 0, hi = arr.length;
+        while (lo < hi) {
+            int mid = (lo + hi) / 2;
+            if (arr[mid] < target) lo = mid + 1;
+            else hi = mid;
+        }
+        return lo;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 3, 5, 7, 9, 11, 13};
+        System.out.println(search(nums, 7));      // 3
+        System.out.println(search(nums, 6));      // -1
+        System.out.println(lowerBound(nums, 6));  // 3
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

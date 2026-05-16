@@ -551,3 +551,42 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Time vs Data Size:**
+- n=1,000: O(n log n) = ~10K ops → <1ms
+- n=1,000,000: O(n log n) = ~20M ops → ~20ms
+- n=1,000,000,000: O(n log n) = ~30B ops → ~30s
+- O(n²) at n=1M: 10¹² ops → hours — impractical
+
+**Memory:**
+- Merge sort: O(n) auxiliary = 8MB for 1M 64-bit ints
+- QuickSort: O(log n) stack = ~20 frames = negligible
+- Radix sort: O(n+k) where k=range — 4GB for 32-bit ints
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

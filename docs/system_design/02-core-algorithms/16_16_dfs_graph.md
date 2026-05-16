@@ -362,3 +362,96 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+from typing import Dict, List, Set
+
+def dfs_iterative(graph: Dict[int, List[int]], start: int) -> List[int]:
+    """Iterative DFS — avoids recursion limit on large graphs."""
+    visited, stack, order = set(), [start], []
+    while stack:
+        node = stack.pop()
+        if node in visited:
+            continue
+        visited.add(node)
+        order.append(node)
+        for nb in reversed(graph.get(node, [])):   # reversed to maintain left-first order
+            if nb not in visited:
+                stack.append(nb)
+    return order
+
+def has_cycle(graph: Dict[int, List[int]], n: int) -> bool:
+    """Detect cycle in directed graph using DFS coloring."""
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = [WHITE] * n
+
+    def dfs(u: int) -> bool:
+        color[u] = GRAY          # in current path
+        for v in graph.get(u, []):
+            if color[v] == GRAY: return True   # back edge = cycle
+            if color[v] == WHITE and dfs(v): return True
+        color[u] = BLACK         # fully explored
+        return False
+
+    return any(color[i] == WHITE and dfs(i) for i in range(n))
+
+g = {0: [1, 2], 1: [3], 2: [3], 3: []}
+print(dfs_iterative(g, 0))   # [0, 1, 3, 2]
+print(has_cycle(g, 4))       # False
+```
+
+### Java
+```java
+import java.util.*;
+
+public class DFS {
+    public static List<Integer> dfs(Map<Integer, List<Integer>> graph, int start) {
+        List<Integer> order = new ArrayList<>();
+        Set<Integer> visited = new HashSet<>();
+        Deque<Integer> stack = new ArrayDeque<>();
+        stack.push(start);
+        while (!stack.isEmpty()) {
+            int node = stack.pop();
+            if (!visited.add(node)) continue;
+            order.add(node);
+            List<Integer> neighbors = graph.getOrDefault(node, Collections.emptyList());
+            // push in reverse to process left-first
+            ListIterator<Integer> it = neighbors.listIterator(neighbors.size());
+            while (it.hasPrevious()) {
+                int nb = it.previous();
+                if (!visited.contains(nb)) stack.push(nb);
+            }
+        }
+        return order;
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

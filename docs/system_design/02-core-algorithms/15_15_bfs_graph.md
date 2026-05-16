@@ -362,3 +362,99 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+from collections import deque
+from typing import Optional, Dict, List
+
+def bfs(graph: Dict[int, List[int]], start: int) -> List[int]:
+    """BFS traversal — shortest path in unweighted graph."""
+    visited, queue, order = {start}, deque([start]), []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return order
+
+def shortest_path(graph: Dict[int, List[int]], src: int, dst: int) -> int:
+    """Returns minimum hops src → dst, -1 if unreachable."""
+    visited, queue = {src}, deque([(src, 0)])
+    while queue:
+        node, dist = queue.popleft()
+        if node == dst:
+            return dist
+        for nb in graph.get(node, []):
+            if nb not in visited:
+                visited.add(nb); queue.append((nb, dist + 1))
+    return -1
+
+g = {1: [2, 3], 2: [4, 5], 3: [6], 4: [], 5: [], 6: []}
+print(bfs(g, 1))                  # [1, 2, 3, 4, 5, 6]
+print(shortest_path(g, 1, 6))     # 2
+```
+
+### Java
+```java
+import java.util.*;
+
+public class BFS {
+    public static List<Integer> bfs(Map<Integer, List<Integer>> graph, int start) {
+        List<Integer> order = new ArrayList<>();
+        Set<Integer> visited = new HashSet<>();
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(start); visited.add(start);
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            order.add(node);
+            for (int nb : graph.getOrDefault(node, Collections.emptyList()))
+                if (visited.add(nb)) queue.add(nb);  // add returns false if already present
+        }
+        return order;
+    }
+
+    public static int shortestPath(Map<Integer, List<Integer>> graph, int src, int dst) {
+        Queue<int[]> queue = new LinkedList<>();  // [node, distance]
+        Set<Integer> visited = new HashSet<>();
+        queue.add(new int[]{src, 0}); visited.add(src);
+        while (!queue.isEmpty()) {
+            int[] curr = queue.poll();
+            if (curr[0] == dst) return curr[1];
+            for (int nb : graph.getOrDefault(curr[0], Collections.emptyList()))
+                if (visited.add(nb)) queue.add(new int[]{nb, curr[1] + 1});
+        }
+        return -1;
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

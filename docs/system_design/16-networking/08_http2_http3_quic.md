@@ -918,3 +918,19 @@ Cost per user: $5.68/month
 - Caching mechanisms and patterns
 - Monitoring and alerting systems
 - Security and compliance
+
+
+## Back-of-the-Envelope Calculations
+
+**Latency Budget:**
+- Speed of light NYC→London (5570km): 18.5ms one-way
+- Realistic TCP latency: 70-100ms (routing overhead)
+- TLS handshake: +1 RTT = 100-200ms
+- With TLS session resumption: +0 RTT
+- CDN edge node (50ms away): 5-10ms vs 100ms origin
+
+**Throughput:**
+- TCP window size: 65KB default → 65KB / 100ms = 5Mbps
+- With window scaling (64MB): 64MB / 100ms = 5Gbps theoretical
+- HTTP/2 multiplexing: eliminates HOL blocking per-stream
+- HTTP/3 (QUIC): 0-RTT handshake, eliminates TCP HOL blocking

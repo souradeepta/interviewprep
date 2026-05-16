@@ -329,3 +329,138 @@ Total peak: 14.45 GB/s ≈ 116 Tbps
 - User authentication and authorization
 - Rate limiting and throttling
 - Monitoring and alerting systems
+
+
+## Code Implementation
+
+### Python
+```python
+import redis
+import time
+from dataclasses import dataclass, field
+from typing import Optional
+
+r = redis.Redis(decode_responses=True)
+
+@dataclass
+class Post:
+    post_id: str
+    author_id: str
+    content: str
+    timestamp: float = field(default_factory=time.time)
+
+class FeedService:
+    """Hybrid push-pull feed: push for regular users, pull for celebrities."""
+    CELEBRITY_THRESHOLD = 1_000_000   # followers
+
+    def publish_post(self, post: Post, follower_count: int) -> None:
+        """Push post to follower feeds (fanout on write for small accounts)."""
+        post_data = f"{post.post_id}:{post.timestamp}"
+        # Store post metadata
+        r.hset(f"post:{post.post_id}", mapping={
+            "content": post.content,
+            "author": post.author_id,
+            "ts": post.timestamp,
+        })
+        if follower_count < self.CELEBRITY_THRESHOLD:
+            # Push to each follower's feed sorted set (score = timestamp)
+            followers = r.smembers(f"followers:{post.author_id}")
+            pipe = r.pipeline()
+            for follower_id in followers:
+                pipe.zadd(f"feed:{follower_id}", {post.post_id: post.timestamp})
+                pipe.zremrangebyrank(f"feed:{follower_id}", 0, -1001)  # cap at 1000
+            pipe.execute()
+
+    def get_feed(self, user_id: str, limit: int = 20) -> list[dict]:
+        """Get merged feed: own feed (pushed) + celebrity followings (pulled)."""
+        post_ids = r.zrevrange(f"feed:{user_id}", 0, limit - 1, withscores=False)
+        return [r.hgetall(f"post:{pid}") for pid in post_ids]
+```
+
+### Java
+```java
+import redis.clients.jedis.*;
+import java.util.*;
+
+public class FeedService {
+    private static final int CELEBRITY_THRESHOLD = 1_000_000;
+    private final JedisPool jedisPool;
+
+    public FeedService(JedisPool jedisPool) { this.jedisPool = jedisPool; }
+
+    public void publishPost(String postId, String authorId, String content,
+                             long followerCount) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            double timestamp = System.currentTimeMillis() / 1000.0;
+            // Store post metadata
+            jedis.hset("post:" + postId, Map.of(
+                "content", content, "author", authorId, "ts", String.valueOf(timestamp)
+            ));
+            if (followerCount < CELEBRITY_THRESHOLD) {
+                // Fanout on write — push to each follower's feed
+                Set<String> followers = jedis.smembers("followers:" + authorId);
+                Pipeline pipe = jedis.pipelined();
+                for (String followerId : followers) {
+                    pipe.zadd("feed:" + followerId, timestamp, postId);
+                    pipe.zremrangeByRank("feed:" + followerId, 0, -1001); // keep 1000
+                }
+                pipe.sync();
+            }
+        }
+    }
+
+    public List<Map<String, String>> getFeed(String userId, int limit) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            List<String> postIds = new ArrayList<>(
+                jedis.zrevrangeByScore("feed:" + userId, "+inf", "-inf",
+                                       0, limit));
+            List<Map<String, String>> posts = new ArrayList<>();
+            for (String pid : postIds) posts.add(jedis.hgetAll("post:" + pid));
+            return posts;
+        }
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**System Load Estimation:**
+- 1M daily active users × 10 requests/day = 10M requests/day
+- Peak QPS = 10M / 86400 × 3 (peak factor) ≈ 350 QPS
+- API server capacity: 1000 QPS/server → 1 server sufficient at peak
+- With 2x redundancy: 2 servers minimum
+
+**Storage Estimation:**
+- 1M users × 10KB average data = 10GB structured data
+- Annual growth: 10GB × 365 = 3.65TB/year
+- With 3x replication: 11TB/year
+- SSD cost ($0.10/GB): $1,100/year
+
+**Bandwidth:**
+- 350 QPS × 10KB response = 3.5MB/sec outbound
+- Monthly egress: 3.5MB × 86400 × 30 = 9TB/month
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

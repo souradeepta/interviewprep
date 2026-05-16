@@ -362,3 +362,100 @@ Choosing O(n log n) over O(n²) algorithm is difference between sub-second and h
 4. **Space-Time Tradeoff** - Memoization trades memory for time
 5. **Stability Matters** - Choose stable sort if element order matters for equal keys
 6. **Algorithm Choice is Context-Dependent** - No universal best algorithm
+
+
+## Code Implementation
+
+### Python
+```python
+import random
+from typing import List
+
+def quicksort(arr: List[int], lo: int = 0, hi: int = -1) -> None:
+    """In-place O(n log n) average, O(n²) worst. Random pivot avoids worst case."""
+    if hi == -1:
+        hi = len(arr) - 1
+    if lo >= hi:
+        return
+    pivot_idx = partition(arr, lo, hi)
+    quicksort(arr, lo, pivot_idx - 1)
+    quicksort(arr, pivot_idx + 1, hi)
+
+def partition(arr: List[int], lo: int, hi: int) -> int:
+    rand_idx = random.randint(lo, hi)      # random pivot → O(n log n) expected
+    arr[rand_idx], arr[hi] = arr[hi], arr[rand_idx]
+    pivot = arr[hi]
+    i = lo - 1
+    for j in range(lo, hi):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[hi] = arr[hi], arr[i + 1]
+    return i + 1
+
+arr = [10, 7, 8, 9, 1, 5]
+quicksort(arr)
+print(arr)  # [1, 5, 7, 8, 9, 10]
+```
+
+### Java
+```java
+import java.util.Arrays;
+import java.util.Random;
+
+public class QuickSort {
+    private static final Random rand = new Random();
+
+    public static void quickSort(int[] arr, int lo, int hi) {
+        if (lo >= hi) return;
+        int pivot = partition(arr, lo, hi);
+        quickSort(arr, lo, pivot - 1);
+        quickSort(arr, pivot + 1, hi);
+    }
+
+    private static int partition(int[] arr, int lo, int hi) {
+        int randIdx = lo + rand.nextInt(hi - lo + 1);
+        swap(arr, randIdx, hi);  // random pivot
+        int pivot = arr[hi], i = lo - 1;
+        for (int j = lo; j < hi; j++)
+            if (arr[j] <= pivot) swap(arr, ++i, j);
+        swap(arr, i + 1, hi);
+        return i + 1;
+    }
+
+    private static void swap(int[] arr, int a, int b) {
+        int t = arr[a]; arr[a] = arr[b]; arr[b] = t;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {10, 7, 8, 9, 1, 5};
+        quickSort(arr, 0, arr.length - 1);
+        System.out.println(Arrays.toString(arr)); // [1, 5, 7, 8, 9, 10]
+    }
+}
+```
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?

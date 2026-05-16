@@ -329,3 +329,144 @@ Total peak: 14.45 GB/s ≈ 116 Tbps
 - User authentication and authorization
 - Rate limiting and throttling
 - Monitoring and alerting systems
+
+
+## Code Implementation
+
+### Python
+```python
+from kafka import KafkaProducer, KafkaConsumer
+import json, time
+from typing import Any
+
+class EventProducer:
+    """Kafka producer with serialization and retry."""
+    def __init__(self, bootstrap_servers: str = "localhost:9092"):
+        self.producer = KafkaProducer(
+            bootstrap_servers=bootstrap_servers,
+            value_serializer=lambda v: json.dumps(v).encode(),
+            key_serializer=lambda k: k.encode() if k else None,
+            acks="all",                  # wait for all replicas
+            retries=3,
+            batch_size=16384,            # 16KB batch
+            linger_ms=5,                 # wait 5ms to batch
+        )
+
+    def send(self, topic: str, key: str, event: dict[str, Any]) -> None:
+        future = self.producer.send(topic, key=key, value=event)
+        record = future.get(timeout=10)  # block until acknowledged
+        print(f"Sent to {record.topic}:{record.partition}@{record.offset}")
+
+class EventConsumer:
+    """Kafka consumer with manual offset commit for reliability."""
+    def __init__(self, topics: list[str], group_id: str):
+        self.consumer = KafkaConsumer(
+            *topics,
+            bootstrap_servers="localhost:9092",
+            group_id=group_id,
+            auto_offset_reset="earliest",
+            enable_auto_commit=False,    # manual commit for at-least-once
+            value_deserializer=lambda m: json.loads(m.decode()),
+        )
+
+    def run(self) -> None:
+        for msg in self.consumer:
+            try:
+                self.process(msg.value)
+                self.consumer.commit()   # commit only after successful processing
+            except Exception as e:
+                print(f"Failed: {e}")   # dead-letter queue in production
+
+    def process(self, event: dict) -> None:
+        print(f"Processing: {event}")
+```
+
+### Java
+```java
+import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.consumer.*;
+import java.util.*;
+
+public class KafkaExample {
+
+    // ── Producer ────────────────────────────────────────────────────────────
+    public static KafkaProducer<String, String> createProducer() {
+        Properties props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                  "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                  "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.ACKS_CONFIG, "all");      // durability
+        props.put(ProducerConfig.RETRIES_CONFIG, 3);
+        return new KafkaProducer<>(props);
+    }
+
+    public static void sendEvent(KafkaProducer<String, String> producer,
+                                  String topic, String key, String value) {
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
+        producer.send(record, (metadata, ex) -> {
+            if (ex != null) ex.printStackTrace();
+            else System.out.printf("Sent %s:%d@%d%n",
+                    metadata.topic(), metadata.partition(), metadata.offset());
+        });
+    }
+
+    // ── Consumer ────────────────────────────────────────────────────────────
+    public static KafkaConsumer<String, String> createConsumer(String groupId) {
+        Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); // manual commit
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                  "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                  "org.apache.kafka.common.serialization.StringDeserializer");
+        return new KafkaConsumer<>(props);
+    }
+}
+```
+
+## Back-of-the-Envelope Calculations
+
+**System Load Estimation:**
+- 1M daily active users × 10 requests/day = 10M requests/day
+- Peak QPS = 10M / 86400 × 3 (peak factor) ≈ 350 QPS
+- API server capacity: 1000 QPS/server → 1 server sufficient at peak
+- With 2x redundancy: 2 servers minimum
+
+**Storage Estimation:**
+- 1M users × 10KB average data = 10GB structured data
+- Annual growth: 10GB × 365 = 3.65TB/year
+- With 3x replication: 11TB/year
+- SSD cost ($0.10/GB): $1,100/year
+
+**Bandwidth:**
+- 350 QPS × 10KB response = 3.5MB/sec outbound
+- Monthly egress: 3.5MB × 86400 × 30 = 9TB/month
+## Follow-up Questions
+
+1. **How would you handle this at 10x the scale described?**
+   - What breaks first? (typically: single DB, single cache node, single region)
+   - What architectural changes are required?
+
+2. **What are the consistency vs. availability trade-offs in your design?**
+   - Where did you accept eventual consistency?
+   - Which operations require strong consistency and why?
+
+3. **How would you debug a sudden latency spike in production?**
+   - What metrics would you look at first?
+   - What's your runbook for the top 3 likely causes?
+
+4. **How does your design handle partial failures?**
+   - What happens if one component is slow (not down)?
+   - How do you prevent cascading failures?
+
+5. **What would you change if you had to build this in one week vs. six months?**
+   - What corners can safely be cut initially?
+   - What must be right from day one?
+
+6. **How would you migrate from the current design to a better one without downtime?**
+   - What's the strangler-fig or blue-green strategy here?
+   - How do you validate correctness during migration?
