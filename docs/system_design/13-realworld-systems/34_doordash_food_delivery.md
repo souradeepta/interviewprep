@@ -484,6 +484,222 @@
 | **Tracing** | Jaeger/Zipkin | Distributed tracing, latency analysis |
 
 
+## Back-of-Envelope Calculations
+
+### Traffic Metrics
+
+**Daily Activity:**
+- DAU: 10M+
+- RPS (Peak): 200K+
+- Average RPS: 200K+ / 3 = 200K+ / 3
+
+**Data Volume (Daily):**
+- Baseline calculation using RPS:
+- Peak RPS: 200K+
+- Average RPS: Peak / 3
+- Requests/day: Average RPS × 86400 seconds
+- Data/request: varies by system type
+
+### Storage Calculation
+
+**Database Storage:**
+- Current data: Based on daily growth rates
+- Indexing overhead: +30% for indexes and metadata
+- Backup copies: 3 replicas + daily snapshots
+- Total: Current × replication factor
+
+**Cache Layer:**
+- Working set size: ~20% of total data
+- Hot data: ~1-2% of total data
+- Cache nodes needed: Working Set / (Node Capacity)
+
+**CDN/Static Content:**
+- Media distribution: Multi-tier caching
+- Edge cache: Regional distribution
+- Archive storage: Cold data tiered to S3
+
+### Bandwidth Calculation
+
+**Ingress:**
+- Peak upload bandwidth: Peak RPS × avg request size
+- Peak = 3× average
+- Network redundancy: 2+ diverse paths
+
+**Egress:**
+- Download bandwidth: Streaming/serving data
+- Peak surge: 5-10× during viral events
+- CDN reduces origin bandwidth by 80-90%
+
+### Cost Estimation
+
+**Compute:**
+- Load balanced instances: Peak RPS / 10K RPS per instance
+- Redundancy: 2x for failover
+- Reserved capacity: 20% headroom
+- Cost: $0.30-0.50 per instance per hour
+
+**Database:**
+- Instance cost: $0.50-2.00 per hour
+- Primary + replicas: 3-5 instances
+- Storage: $0.10 per GB per month
+
+**Networking:**
+- Egress: $0.12 per GB
+- CDN: $0.085 per GB
+- Peak egress bandwidth drives costs
+
+**Total Monthly Cost:**
+- Compute: 200K+ RPS → Cost scales with traffic
+- Database: Depends on data volume
+- Networking: Depends on CDN usage
+- Typical range: $1M - $10M+ per month
+
+### Latency Budget
+
+**Total P99 latency target: 100-500ms (varies by system)**
+
+Budget breakdown:
+- Network round trip: 10-50ms
+- API Gateway processing: 5-10ms
+- Service processing: 20-50ms
+- Database query: 10-50ms
+- Cache lookup: 1-5ms
+- Response serialization: 5-10ms
+- Network return: 10-50ms
+
+### Availability Targets
+
+**99.99% availability:**
+- Downtime per year: 52 minutes
+- Downtime per month: 4.38 minutes
+- Downtime per day: 8.64 seconds
+
+**Implies:**
+- No single point of failure
+- Multi-region redundancy
+- Automated failover < 2 minutes RTO
+- RPO < 1 minute for critical data
+
+## Product Requirements Document (PRD)
+
+### Overview
+
+Doordash Food Delivery is a mission-critical system serving 50M+ users globally.
+This PRD defines requirements for scaling, reliability, and performance at this unprecedented scale.
+
+### Functional Requirements
+
+- Restaurant and menu browsing
+- Real-time order placement
+- Live delivery tracking
+- Driver assignment and routing
+- Payment processing
+- Reviews and ratings
+- Promotions and discounts
+- Refunds and support
+- Accessibility features
+- Notification system
+
+### Non-Functional Requirements
+
+**Performance:**
+- Latency: P99 < 200ms for ordering
+- Throughput: 200K+ RPS peak
+- Concurrent users: 10M+ DAU, 200K+ RPS peak
+
+**Reliability:**
+- Availability: 99.99%
+- Data durability: 99.999999% (8 nines)
+- RTO (Recovery Time Objective): < 2 minutes
+- RPO (Recovery Point Objective): < 1 minute
+
+**Scalability:**
+- 1M+ daily orders
+- Horizontal scaling for all tiers
+- Auto-scaling based on metrics
+- Handle 10x load spikes gracefully
+
+**Consistency:**
+- Model: Strong for orders
+- Critical data: Strong ACID guarantees
+- Non-critical data: Eventual consistency acceptable
+
+### User Roles & Personas
+
+**End Users:**
+- Need: Fast, reliable access to services
+- Pain point: Downtime, slow response times
+- Success metric: P99 latency < target, 99.99% uptime
+
+**Business Stakeholders:**
+- Need: Revenue generation, market expansion
+- Pain point: Scale limitations, operational costs
+- Success metric: Supports 10x growth, cost per user decreases
+
+**Operations/SRE:**
+- Need: System visibility and control
+- Pain point: Complex failure modes, unclear blame
+- Success metric: MTTR < 5 minutes, clear root causes
+
+**Developers:**
+- Need: Simple APIs, good documentation
+- Pain point: Operational complexity, debugging
+- Success metric: Easy to understand, debug, and extend
+
+### Success Metrics
+
+**Technical Metrics:**
+- P50 latency: < 50ms
+- P99 latency: P99 < 200ms for ordering
+- P99.9 latency: < 1s
+- Availability: 99.99%
+- Error rate: < 0.1%
+- Cache hit ratio: > 95%
+- Database replication lag: < 1 second
+
+**Business Metrics:**
+- Daily active users: 10M+
+- Monthly active users: 50M+
+- Request success rate: > 99.9%
+- Customer satisfaction: > 4.5/5
+
+**Operational Metrics:**
+- Mean time to resolution: < 30 minutes
+- Deployment frequency: Daily
+- Change failure rate: < 5%
+- Incident response time: < 15 minutes
+
+### Constraints & Assumptions
+
+**Constraints:**
+- Global latency: Can't reduce network physics
+- Data center failover: 30-60s detection + 1-2min failover
+- Budget: Must optimize cost per request
+- Compliance: GDPR, SOC2, PCI-DSS requirements
+
+**Assumptions:**
+- Team has Kubernetes expertise
+- Access to managed database services
+- Multi-region deployment possible
+- Cloud budget is flexible for auto-scaling
+
+### Out of Scope (Phase 1)
+
+- Blockchain/crypto integration
+- Quantum-resistant encryption
+- Machine learning model training (covered separately)
+- Mobile app optimization (covered separately)
+
+### Success Criteria
+
+1. System operates at scale: 50M+ users
+2. Maintains SLOs: P99 < 200ms for ordering latency, 99.99% availability
+3. Cost per request: $0.0001 or lower
+4. Team can troubleshoot issues < 30 minutes
+5. Can scale 10x in < 1 week
+6. Zero data loss in any failure scenario
+
+
 ## Architecture & Flow Diagrams
 
 ### System Architecture
