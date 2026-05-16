@@ -235,26 +235,135 @@ def cache_warmup():
 
 ---
 
-## Cache Selection Guide
+## Real Interview Scenarios
 
-| Cache Type | Latency | Capacity | Use Case |
-|-----------|---------|----------|----------|
-| **Local** (in-process) | 1μs | Limited (RAM) | Single server |
-| **Redis** | 1ms | Large (distributed) | Shared across servers |
-| **Memcached** | 1ms | Large | Simple key-value |
-| **CDN** | 10-50ms | Unlimited (distributed) | Static content |
+### Scenario 1: User Profile Cache at Uber Scale
+
+```
+Requirements:
+- 1M active users, each user accessed 100x/day
+- Profile: name, rating, history (1KB each)
+- Updates: every hour on average
+- SLA: <10ms for reads
+
+Cache Strategy:
+1. Cache type: Redis (distributed, fast)
+2. Invalidation: TTL 1 hour + write-through
+   - TTL handles eventual updates
+   - Write-through for immediate profile changes
+3. Key: "user:{user_id}"
+4. Capacity: 1M × 1KB = 1GB (cheap, fits in memory)
+5. Eviction: LRU (least active users)
+6. Warmup: Pre-load top 100K users on startup
+
+Hit ratio target: 95% (100 requests/day per user)
+Expected: ~190 requests hit cache, 10 to DB
+```
+
+### Scenario 2: Social Feed with Caching
+
+```
+Requirements:
+- 10M users, 1M active daily
+- Feed: 100 posts per user (cached)
+- Writes: New post every 5 minutes (user average)
+- SLA: <100ms
+
+Cache Strategy:
+1. Cache type: Redis (supporting pub/sub for invalidation)
+2. Invalidation: Cache-aside + event-based invalidation
+   - Read: Check cache, if miss, query DB
+   - Write: Publish "feed_changed" event
+   - Subscribers: Invalidate affected user feeds
+3. Key: "feed:{user_id}:{page}"
+4. TTL: 12 hours (feeds eventually get old)
+5. Capacity: 1M users × 100 posts × 100 bytes = 10GB
+
+Problem: Feed changes every 5 minutes (new post from followed users)
+Solution: Use "push" model instead of "pull"
+- When user posts, push to all followers' feeds
+- Cache the pre-computed feed
+- TTL as safety net if push fails
+```
+
+### Scenario 3: Cache Hotspot (Celebrity on Instagram)
+
+```
+Problem:
+- Celebrity posts, 1M likes/minute
+- Each like increments view counter
+- Redis single key becoming bottleneck
+
+Solutions:
+1. Local counters (in-process)
+   - Each server maintains local count
+   - Periodic flush to Redis (e.g., every 10s)
+   - Tradeoff: Eventual consistency, ~10s lag
+   
+2. Counter sharding
+   - Split into multiple keys: "likes:{post_id}:{shard}"
+   - Each request hits random shard
+   - Reduces hotspot from 1M to 100K qps/shard
+   
+3. Probabilistic counting (HyperLogLog)
+   - Approximate count (good enough for display)
+   - O(1) space, accurate to 99%
+```
+
+---
+
+## Interview Decision Tree for Cache Design
+
+```
+Q1: What are you caching?
+├─ Static content (images, CSS) → CDN
+├─ User data (profile, settings) → Redis with TTL
+├─ Frequently computed (recommendations) → Redis with refresh-ahead
+└─ Hot data (trending posts) → Local cache + Redis
+
+Q2: How often does data change?
+├─ Never (static) → Long TTL (1 day)
+├─ Rarely (profile) → Medium TTL (1 hour) + write-through
+├─ Often (feed) → Short TTL (1 min) + event-based invalidation
+└─ Always (live counter) → Don't cache, or use approximate
+
+Q3: What's the read:write ratio?
+├─ 100:1 (read-heavy) → Aggressive caching, simple invalidation
+├─ 10:1 (mixed) → Cache-aside, event-based invalidation
+└─ 1:1 (write-heavy) → Light caching, cache-aside only
+
+Q4: How much data?
+├─ <100MB → Single Redis instance
+├─ 100MB-10GB → Redis cluster
+├─ >10GB → Distributed cache (sharding) + local cache (CDN)
+└─ Unbounded → CDN for static, light cache for hot
+
+Q5: Consistency requirements?
+├─ Strong (payment, balance) → Write-through or don't cache
+├─ Eventual (profile, feed) → TTL + write-through on explicit updates
+└─ Weak (views, recommendations) → Cache-aside, long TTL
+```
 
 ---
 
 ## Cache Design Checklist
 
-- ✓ Identified what to cache (frequently accessed, slow to compute)
-- ✓ Chose invalidation strategy (TTL, write-through, cache-aside)
-- ✓ Set appropriate TTL
-- ✓ Designed for cache miss (DB fallback, circuit breaker)
-- ✓ Planned for cache-stampede (locks or probability refresh)
-- ✓ Monitoring in place (hit ratio, eviction rate, latency)
-- ✓ Cache warming strategy if needed
-- ✓ Consistency plan for updates (invalidation, refresh)
-- ✓ Capacity planning (memory budget, eviction policy)
+**During Interview:**
+- ✓ Identified what to cache (hot data, frequent access, slow compute)
+- ✓ Calculated cache hit ratio target (80-95% typically)
+- ✓ Chose invalidation strategy with clear rationale
+- ✓ Set TTL appropriately (not too short, not too long)
+- ✓ Handled cache miss path (circuit breaker, fallback to DB)
+- ✓ Identified cache-stampede risk and mitigation
+- ✓ Planned for capacity (memory budget, growth)
+- ✓ Discussed eviction policy (LRU most common)
+- ✓ Explained monitoring (hit ratio, latency, memory)
+- ✓ Mentioned cache warming for large caches
+
+**Implementation Focus:**
+- ✓ Cache key design (namespace, expiring keys cleanup)
+- ✓ Error handling (cache failures shouldn't break system)
+- ✓ Consistency model (strong vs. eventual)
+- ✓ Scalability (single vs. distributed cache)
+- ✓ Monitoring metrics (hit ratio target, alerts)
 
