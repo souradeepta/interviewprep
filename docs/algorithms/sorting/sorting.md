@@ -149,6 +149,44 @@ flowchart TD
 
 **When to use:** Almost never in production. Useful in interviews to explain stability, adaptive behavior, and the early-exit optimization. Acceptable for n < 10.
 
+### Implementation
+
+**Python:**
+```python
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(n - 1 - i):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:
+            break
+    return arr
+```
+
+**Java:**
+```java
+public class BubbleSort {
+    public static void bubbleSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n; i++) {
+            boolean swapped = false;
+            for (int j = 0; j < n - 1 - i; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            if (!swapped) break;
+        }
+    }
+}
+```
+
 ---
 
 ## Selection Sort
@@ -231,6 +269,41 @@ flowchart TD
 **Key insight:** Selection sort makes the fewest writes of any simple O(n²) sort — at most n-1 swaps. This is valuable when write cost dominates (e.g., flash memory). The trade-off is that it is non-adaptive: it always does exactly n(n-1)/2 comparisons.
 
 **When to use:** When writes are expensive and n is small. Not adaptive, so never use on nearly-sorted data. Instructive for explaining the stability vs. swap-count trade-off.
+
+### Implementation
+
+**Python:**
+```python
+def selection_sort(arr):
+    n = len(arr)
+    for i in range(n - 1):
+        min_idx = i
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    return arr
+```
+
+**Java:**
+```java
+public class SelectionSort {
+    public static void selectionSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            int minIdx = i;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] < arr[minIdx]) {
+                    minIdx = j;
+                }
+            }
+            int temp = arr[i];
+            arr[i] = arr[minIdx];
+            arr[minIdx] = temp;
+        }
+    }
+}
+```
 
 ---
 
@@ -320,6 +393,38 @@ flowchart TD
 **Key insight:** The number of shifts equals the number of inversions in the input. A nearly-sorted array has very few inversions, giving O(n + inversions) ≈ O(n) performance. This makes it the algorithm of choice for small or nearly-sorted arrays — and is exactly why Tim Sort uses it for runs shorter than minrun.
 
 **When to use:** Arrays of n ≤ 16, nearly-sorted data, online sorting (stream elements arriving one at a time). Used internally by Tim Sort and introsort for small sub-arrays.
+
+### Implementation
+
+**Python:**
+```python
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
+```
+
+**Java:**
+```java
+public class InsertionSort {
+    public static void insertionSort(int[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+}
+```
 
 ---
 
@@ -421,6 +526,67 @@ flowchart TD
 
 **When to use:** When stability is required and O(n) extra memory is acceptable. Preferred for linked lists (no random access needed). The basis of external sorting (data larger than RAM). Never degrades: guaranteed O(n log n) worst case.
 
+### Implementation
+
+**Python:**
+```python
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:  # <= for stability
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+```
+
+**Java:**
+```java
+public class MergeSort {
+    public static void mergeSort(int[] arr, int left, int right) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+            mergeSort(arr, left, mid);
+            mergeSort(arr, mid + 1, right);
+            merge(arr, left, mid, right);
+        }
+    }
+    
+    private static void merge(int[] arr, int left, int mid, int right) {
+        int[] temp = new int[right - left + 1];
+        int i = left, j = mid + 1, k = 0;
+        
+        while (i <= mid && j <= right) {
+            if (arr[i] <= arr[j]) {
+                temp[k++] = arr[i++];
+            } else {
+                temp[k++] = arr[j++];
+            }
+        }
+        
+        while (i <= mid) temp[k++] = arr[i++];
+        while (j <= right) temp[k++] = arr[j++];
+        
+        System.arraycopy(temp, 0, arr, left, temp.length);
+    }
+}
+```
+
 ---
 
 ## Quick Sort
@@ -519,6 +685,69 @@ flowchart TD
 **Key insight:** 3-way partitioning creates a "fat pivot" region `arr[lt..gt]` where all elements equal the pivot are permanently placed. This makes the algorithm O(n) when all elements are equal (instead of O(n²) with a 2-way partition). Median-of-three pivot selection prevents O(n²) on sorted/reverse-sorted inputs.
 
 **When to use:** General-purpose sorting when memory is constrained (O(log n) stack vs. O(n) for merge sort) and stability is not required. Fastest in practice due to cache locality. Use merge sort instead when stability matters.
+
+### Implementation
+
+**Python:**
+```python
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    
+    pivot = median_of_three(arr)
+    left = [x for x in arr if x < pivot]
+    mid = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    
+    return quick_sort(left) + mid + quick_sort(right)
+
+def median_of_three(arr):
+    if len(arr) < 3:
+        return arr[0]
+    first, mid, last = arr[0], arr[len(arr)//2], arr[-1]
+    return sorted([first, mid, last])[1]
+```
+
+**Java (3-way partition in-place):**
+```java
+public class QuickSort {
+    public static void quickSort(int[] arr) {
+        if (arr.length == 0) return;
+        quickSort(arr, 0, arr.length - 1);
+    }
+    
+    private static void quickSort(int[] arr, int left, int right) {
+        if (left < right) {
+            int[] p = partition3Way(arr, left, right);
+            quickSort(arr, left, p[0] - 1);
+            quickSort(arr, p[1] + 1, right);
+        }
+    }
+    
+    private static int[] partition3Way(int[] arr, int left, int right) {
+        int pivot = arr[right];
+        int lt = left, gt = right - 1, i = left;
+        
+        while (i <= gt) {
+            if (arr[i] < pivot) {
+                swap(arr, i++, lt++);
+            } else if (arr[i] > pivot) {
+                swap(arr, i, gt--);
+            } else {
+                i++;
+            }
+        }
+        swap(arr, i, right);
+        return new int[]{lt, i};
+    }
+    
+    private static void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+}
+```
 
 ---
 
@@ -630,6 +859,74 @@ flowchart TD
 
 **When to use:** When guaranteed O(n log n) worst case AND O(1) extra space are both required. Used as the fallback in C++ introsort when quick sort recursion depth exceeds 2 log n. Not suitable when stability is needed.
 
+### Implementation
+
+**Python:**
+```python
+def heap_sort(arr):
+    n = len(arr)
+    
+    # Build max heap
+    for i in range(n // 2 - 1, -1, -1):
+        sift_down(arr, i, n)
+    
+    # Extract elements
+    for i in range(n - 1, 0, -1):
+        arr[0], arr[i] = arr[i], arr[0]
+        sift_down(arr, 0, i)
+    
+    return arr
+
+def sift_down(arr, i, n):
+    while 2 * i + 1 < n:
+        left = 2 * i + 1
+        right = 2 * i + 2 if 2 * i + 2 < n else left
+        largest = left if arr[left] > arr[right] else right
+        
+        if arr[i] < arr[largest]:
+            arr[i], arr[largest] = arr[largest], arr[i]
+            i = largest
+        else:
+            break
+```
+
+**Java:**
+```java
+public class HeapSort {
+    public static void heapSort(int[] arr) {
+        int n = arr.length;
+        
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            siftDown(arr, i, n);
+        }
+        
+        for (int i = n - 1; i > 0; i--) {
+            int temp = arr[0];
+            arr[0] = arr[i];
+            arr[i] = temp;
+            siftDown(arr, 0, i);
+        }
+    }
+    
+    private static void siftDown(int[] arr, int i, int n) {
+        while (2 * i + 1 < n) {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2 < n ? 2 * i + 2 : left;
+            int largest = arr[left] > arr[right] ? left : right;
+            
+            if (arr[i] < arr[largest]) {
+                int temp = arr[i];
+                arr[i] = arr[largest];
+                arr[largest] = temp;
+                i = largest;
+            } else {
+                break;
+            }
+        }
+    }
+}
+```
+
 ---
 
 ## Counting Sort
@@ -701,6 +998,55 @@ flowchart TD
 **Key insight:** Counting sort sidesteps the Omega(n log n) comparison-based lower bound by exploiting the integer domain of the values. It is only practical when k (the maximum value) is O(n); if k >> n, the count array becomes wastefully large. The reverse-iteration trick in the placement step is what makes it stable.
 
 **When to use:** Sorting non-negative integers when the value range k is small relative to n (e.g., sorting exam scores 0–100, or sorting characters). Used as the stable sub-routine inside Radix Sort.
+
+### Implementation
+
+**Python:**
+```python
+def counting_sort(arr, max_val=None):
+    if not arr:
+        return arr
+    max_val = max_val or max(arr)
+    count = [0] * (max_val + 1)
+    
+    for num in arr:
+        count[num] += 1
+    
+    for i in range(1, len(count)):
+        count[i] += count[i - 1]
+    
+    output = [0] * len(arr)
+    for num in reversed(arr):
+        output[count[num] - 1] = num
+        count[num] -= 1
+    
+    return output
+```
+
+**Java:**
+```java
+public class CountingSort {
+    public static void countingSort(int[] arr, int maxVal) {
+        int[] count = new int[maxVal + 1];
+        
+        for (int num : arr) {
+            count[num]++;
+        }
+        
+        for (int i = 1; i <= maxVal; i++) {
+            count[i] += count[i - 1];
+        }
+        
+        int[] output = new int[arr.length];
+        for (int i = arr.length - 1; i >= 0; i--) {
+            output[count[arr[i]] - 1] = arr[i];
+            count[arr[i]]--;
+        }
+        
+        System.arraycopy(output, 0, arr, 0, arr.length);
+    }
+}
+```
 
 ---
 
@@ -783,6 +1129,82 @@ flowchart TD
 **Key insight:** Stability at each digit pass is essential — without it, a correctly placed digit from pass k would be disrupted in pass k+1. Because each pass is O(n + k) with k=10 (decimal base), and d passes are made, total time is O(d(n+10)) = O(dn). For 32-bit integers d ≤ 10, making this effectively linear.
 
 **When to use:** Fixed-length integers (phone numbers, ZIP codes, IP addresses) or fixed-length strings where d << log(n). Not comparison-based so not bounded by Omega(n log n). Impractical when d is large (e.g., arbitrary-precision numbers).
+
+### Implementation
+
+**Python:**
+```python
+def radix_sort(arr):
+    if not arr:
+        return arr
+    
+    max_val = max(arr)
+    exp = 1
+    
+    while max_val // exp > 0:
+        arr = counting_sort_by_digit(arr, exp)
+        exp *= 10
+    
+    return arr
+
+def counting_sort_by_digit(arr, exp):
+    count = [0] * 10
+    for num in arr:
+        count[(num // exp) % 10] += 1
+    
+    for i in range(1, 10):
+        count[i] += count[i - 1]
+    
+    output = [0] * len(arr)
+    for num in reversed(arr):
+        idx = (num // exp) % 10
+        output[count[idx] - 1] = num
+        count[idx] -= 1
+    
+    return output
+```
+
+**Java:**
+```java
+public class RadixSort {
+    public static void radixSort(int[] arr) {
+        int maxVal = findMax(arr);
+        
+        for (int exp = 1; maxVal / exp > 0; exp *= 10) {
+            countingSortByDigit(arr, exp);
+        }
+    }
+    
+    private static int findMax(int[] arr) {
+        int max = arr[0];
+        for (int num : arr) {
+            if (num > max) max = num;
+        }
+        return max;
+    }
+    
+    private static void countingSortByDigit(int[] arr, int exp) {
+        int[] count = new int[10];
+        
+        for (int num : arr) {
+            count[(num / exp) % 10]++;
+        }
+        
+        for (int i = 1; i < 10; i++) {
+            count[i] += count[i - 1];
+        }
+        
+        int[] output = new int[arr.length];
+        for (int i = arr.length - 1; i >= 0; i--) {
+            int digit = (arr[i] / exp) % 10;
+            output[count[digit] - 1] = arr[i];
+            count[digit]--;
+        }
+        
+        System.arraycopy(output, 0, arr, 0, arr.length);
+    }
+}
+```
 
 ---
 

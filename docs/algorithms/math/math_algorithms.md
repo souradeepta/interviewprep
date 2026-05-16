@@ -53,6 +53,56 @@ Verify: 48 * (-1) + 18 * 3 = -48 + 54 = 6  ✓
 | lcm(a, b)        | O(log min(a, b))      | O(1)                  |
 | extended_gcd     | O(log min(a, b))      | O(log min(a, b))      |
 
+### Implementation
+
+**Python:**
+```python
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+def lcm(a, b):
+    return a // gcd(a, b) * b
+
+def extended_gcd(a, b):
+    if b == 0:
+        return a, 1, 0
+    gcd_val, x1, y1 = extended_gcd(b, a % b)
+    x = y1
+    y = x1 - (a // b) * y1
+    return gcd_val, x, y
+```
+
+**Java:**
+```java
+public class GCD {
+    public static int gcd(int a, int b) {
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+    
+    public static long lcm(int a, int b) {
+        return (long)a / gcd(a, b) * b;
+    }
+    
+    public static int[] extendedGcd(int a, int b) {
+        if (b == 0) {
+            return new int[]{a, 1, 0};
+        }
+        int[] result = extendedGcd(b, a % b);
+        int gcd = result[0], x1 = result[1], y1 = result[2];
+        int x = y1;
+        int y = x1 - (a / b) * y1;
+        return new int[]{gcd, x, y};
+    }
+}
+```
+
 ---
 
 ## 2. Sieve of Eratosthenes
@@ -87,6 +137,43 @@ Remaining primes: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 |-----------|----------------|-------|
 | Sieve(n)  | O(n log log n) | O(n)  |
 
+### Implementation
+
+**Python:**
+```python
+def sieve_of_eratosthenes(n):
+    is_prime = [True] * (n + 1)
+    is_prime[0] = is_prime[1] = False
+    
+    for i in range(2, int(n**0.5) + 1):
+        if is_prime[i]:
+            for j in range(i*i, n + 1, i):
+                is_prime[j] = False
+    
+    return [i for i in range(n + 1) if is_prime[i]]
+```
+
+**Java:**
+```java
+public class Sieve {
+    public static boolean[] sieveOfEratosthenes(int n) {
+        boolean[] isPrime = new boolean[n + 1];
+        for (int i = 2; i <= n; i++) {
+            isPrime[i] = true;
+        }
+        
+        for (int i = 2; i * i <= n; i++) {
+            if (isPrime[i]) {
+                for (int j = i * i; j <= n; j += i) {
+                    isPrime[j] = false;
+                }
+            }
+        }
+        return isPrime;
+    }
+}
+```
+
 ---
 
 ## 3. Fast (Binary) Exponentiation
@@ -118,6 +205,57 @@ Iterative:
 |------------------------|------------|----------------|
 | fast_pow (recursive)   | O(log exp) | O(log exp)     |
 | fast_pow (iterative)   | O(log exp) | O(1)           |
+
+### Implementation
+
+**Python:**
+```python
+def fast_pow(base, exp, mod=None):
+    result = 1
+    base = base % mod if mod else base
+    
+    while exp > 0:
+        if exp % 2 == 1:
+            result *= base
+            if mod:
+                result %= mod
+        exp //= 2
+        base *= base
+        if mod:
+            base %= mod
+    
+    return result
+```
+
+**Java:**
+```java
+public class FastPow {
+    public static long fastPow(long base, long exp) {
+        long result = 1;
+        while (exp > 0) {
+            if (exp % 2 == 1) {
+                result *= base;
+            }
+            exp /= 2;
+            base *= base;
+        }
+        return result;
+    }
+    
+    public static long fastPow(long base, long exp, long mod) {
+        long result = 1;
+        base %= mod;
+        while (exp > 0) {
+            if (exp % 2 == 1) {
+                result = (result * base) % mod;
+            }
+            exp /= 2;
+            base = (base * base) % mod;
+        }
+        return result;
+    }
+}
+```
 
 ---
 
@@ -158,6 +296,47 @@ Method 2 — Extended GCD:
 |---------------------|-----------------|-----------------|
 | Fermat (mod prime)  | O(log p)        | O(1) iterative  |
 | Extended GCD        | O(log min(a,m)) | O(log min(a,m)) |
+
+### Implementation
+
+**Python:**
+```python
+def mod_inverse_fermat(a, mod):
+    # When mod is prime: a^(-1) = a^(p-2) mod p
+    return fast_pow(a, mod - 2, mod)
+
+def mod_inverse_extended_gcd(a, m):
+    gcd_val, x, y = extended_gcd(a, m)
+    if gcd_val != 1:
+        return None  # Inverse doesn't exist
+    return (x % m + m) % m
+```
+
+**Java:**
+```java
+public class ModularInverse {
+    public static long modInverseFermat(long a, long mod) {
+        return fastPow(a, mod - 2, mod);
+    }
+    
+    public static long modInverseExtGcd(long a, long m) {
+        long[] result = extendedGcd(a, m);
+        if (result[0] != 1) return -1;  // Inverse doesn't exist
+        return ((result[1] % m) + m) % m;
+    }
+    
+    private static long[] extendedGcd(long a, long b) {
+        if (b == 0) {
+            return new long[]{a, 1, 0};
+        }
+        long[] result = extendedGcd(b, a % b);
+        long gcd = result[0], x1 = result[1], y1 = result[2];
+        long x = y1;
+        long y = x1 - (a / b) * y1;
+        return new long[]{gcd, x, y};
+    }
+}
+```
 
 ---
 
@@ -203,6 +382,122 @@ x=2, y=2
 | Pollard's rho      | O(n^(1/4)) exp. | O(log n) |
 | Miller-Rabin test  | O(log^2 n)      | O(1)     |
 
+### Implementation
+
+**Python:**
+```python
+def prime_factorization(n):
+    factors = []
+    
+    while n % 2 == 0:
+        factors.append(2)
+        n //= 2
+    
+    d = 3
+    while d * d <= n:
+        while n % d == 0:
+            factors.append(d)
+            n //= d
+        d += 2
+    
+    if n > 1:
+        factors.append(n)
+    
+    return factors
+
+def is_prime_miller_rabin(n, k=5):
+    if n < 2: return False
+    if n == 2 or n == 3: return True
+    if n % 2 == 0: return False
+    
+    r, d = 0, n - 1
+    while d % 2 == 0:
+        r += 1
+        d //= 2
+    
+    for _ in range(k):
+        a = 2 + (n - 4) % (n - 3) if n > 4 else 1
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(r - 1):
+            x = pow(x, 2, n)
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+```
+
+**Java:**
+```java
+import java.util.*;
+
+public class Factorization {
+    public static List<Integer> primeFactorization(long n) {
+        List<Integer> factors = new ArrayList<>();
+        
+        while (n % 2 == 0) {
+            factors.add(2);
+            n /= 2;
+        }
+        
+        for (long d = 3; d * d <= n; d += 2) {
+            while (n % d == 0) {
+                factors.add((int)d);
+                n /= d;
+            }
+        }
+        
+        if (n > 1) {
+            factors.add((int)n);
+        }
+        
+        return factors;
+    }
+    
+    public static boolean isMillerRabin(long n, int k) {
+        if (n < 2) return false;
+        if (n == 2 || n == 3) return true;
+        if (n % 2 == 0) return false;
+        
+        long d = n - 1;
+        int r = 0;
+        while (d % 2 == 0) {
+            r++;
+            d /= 2;
+        }
+        
+        for (int i = 0; i < k; i++) {
+            long x = modPow(2 + (n - 4) % (n - 3), d, n);
+            if (x == 1 || x == n - 1) continue;
+            
+            boolean composite = true;
+            for (int j = 0; j < r - 1; j++) {
+                x = modPow(x, 2, n);
+                if (x == n - 1) {
+                    composite = false;
+                    break;
+                }
+            }
+            if (composite) return false;
+        }
+        return true;
+    }
+    
+    private static long modPow(long base, long exp, long mod) {
+        long result = 1;
+        base %= mod;
+        while (exp > 0) {
+            if (exp % 2 == 1) result = (result * base) % mod;
+            exp /= 2;
+            base = (base * base) % mod;
+        }
+        return result;
+    }
+}
+```
+
 ---
 
 ## 6. Combinations and Permutations
@@ -244,6 +539,85 @@ C(10,3) mod (10^9+7) = 120
 | nCr mod prime (query)      | O(1)          | —       |
 | nPr                        | O(r)          | O(1)    |
 
+### Implementation
+
+**Python:**
+```python
+def ncr(n, r):
+    if r > n or r < 0: return 0
+    if r == 0 or r == n: return 1
+    
+    pascal = [[0] * (r + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        pascal[i][0] = 1
+        for j in range(1, min(i + 1, r + 1)):
+            pascal[i][j] = pascal[i-1][j-1] + pascal[i-1][j]
+    return pascal[n][r]
+
+def ncr_mod_prime(n, r, mod):
+    fact = [1] * (n + 1)
+    for i in range(1, n + 1):
+        fact[i] = (fact[i-1] * i) % mod
+    
+    inv_fact = [1] * (n + 1)
+    inv_fact[n] = pow(fact[n], mod - 2, mod)
+    for i in range(n - 1, -1, -1):
+        inv_fact[i] = (inv_fact[i+1] * (i+1)) % mod
+    
+    if r > n: return 0
+    return (fact[n] * inv_fact[r] % mod) * inv_fact[n-r] % mod
+
+def npr(n, r):
+    result = 1
+    for i in range(n, n - r, -1):
+        result *= i
+    return result
+```
+
+**Java:**
+```java
+public class Combinations {
+    public static long ncr(int n, int r) {
+        if (r > n || r < 0) return 0;
+        if (r == 0 || r == n) return 1;
+        
+        long[][] pascal = new long[n + 1][r + 1];
+        for (int i = 0; i <= n; i++) {
+            pascal[i][0] = 1;
+            for (int j = 1; j <= Math.min(i, r); j++) {
+                pascal[i][j] = pascal[i-1][j-1] + pascal[i-1][j];
+            }
+        }
+        return pascal[n][r];
+    }
+    
+    public static long ncrModPrime(int n, int r, long mod) {
+        long[] fact = new long[n + 1];
+        fact[0] = 1;
+        for (int i = 1; i <= n; i++) {
+            fact[i] = (fact[i-1] * i) % mod;
+        }
+        
+        long[] invFact = new long[n + 1];
+        invFact[n] = modPow(fact[n], mod - 2, mod);
+        for (int i = n - 1; i >= 0; i--) {
+            invFact[i] = (invFact[i+1] * (i+1)) % mod;
+        }
+        
+        if (r > n) return 0;
+        return (fact[n] * invFact[r] % mod) * invFact[n-r] % mod;
+    }
+    
+    public static long npr(int n, int r) {
+        long result = 1;
+        for (int i = n; i > n - r; i--) {
+            result *= i;
+        }
+        return result;
+    }
+}
+```
+
 ---
 
 ## 7. Catalan Numbers
@@ -278,6 +652,59 @@ Values: C(0)=1, C(1)=1, C(2)=2, C(3)=5, C(4)=14, C(5)=42, ...
 | Operation  | Time   | Space |
 |------------|--------|-------|
 | catalan(n) | O(n^2) | O(n)  |
+
+### Implementation
+
+**Python:**
+```python
+def catalan(n):
+    dp = [0] * (n + 1)
+    dp[0] = dp[1] = 1
+    
+    for i in range(2, n + 1):
+        for j in range(i):
+            dp[i] += dp[j] * dp[i-1-j]
+    
+    return dp[n]
+
+def catalan_formula(n):
+    # C(n) = C(2n, n) / (n+1)
+    return ncr(2*n, n) // (n + 1)
+```
+
+**Java:**
+```java
+public class Catalan {
+    public static long catalan(int n) {
+        long[] dp = new long[n + 1];
+        dp[0] = dp[1] = 1;
+        
+        for (int i = 2; i <= n; i++) {
+            for (int j = 0; j < i; j++) {
+                dp[i] += dp[j] * dp[i - 1 - j];
+            }
+        }
+        return dp[n];
+    }
+    
+    public static long catalanFormula(int n) {
+        return ncr(2*n, n) / (n + 1);
+    }
+    
+    public static long ncr(int n, int r) {
+        if (r > n || r < 0) return 0;
+        if (r == 0 || r == n) return 1;
+        long[][] pascal = new long[n + 1][r + 1];
+        for (int i = 0; i <= n; i++) {
+            pascal[i][0] = 1;
+            for (int j = 1; j <= Math.min(i, r); j++) {
+                pascal[i][j] = pascal[i-1][j-1] + pascal[i-1][j];
+            }
+        }
+        return pascal[n][r];
+    }
+}
+```
 
 ---
 
@@ -330,6 +757,90 @@ F(6) = M^6[0][1] = 8  ✓  (Fibonacci: 0,1,1,2,3,5,8,...)
 | mat_pow(M, n)          | O(k^3 log n)   | O(k^2)  |
 | fib_matrix(n)          | O(log n)       | O(1)    |
 | linear_recurrence(k,n) | O(k^3 log n)   | O(k^2)  |
+
+### Implementation
+
+**Python:**
+```python
+def matrix_mul(A, B):
+    n = len(A)
+    C = [[0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            for k in range(n):
+                C[i][j] += A[i][k] * B[k][j]
+    return C
+
+def matrix_pow(M, n):
+    size = len(M)
+    result = [[1 if i == j else 0 for j in range(size)] for i in range(size)]
+    base = [row[:] for row in M]
+    
+    while n > 0:
+        if n % 2 == 1:
+            result = matrix_mul(result, base)
+        base = matrix_mul(base, base)
+        n //= 2
+    
+    return result
+
+def fibonacci_matrix(n):
+    if n == 0: return 0
+    if n == 1: return 1
+    
+    M = [[1, 1], [1, 0]]
+    result = matrix_pow(M, n)
+    return result[0][1]
+```
+
+**Java:**
+```java
+public class MatrixExponentiation {
+    public static int[][] matrixMul(int[][] A, int[][] B) {
+        int n = A.length;
+        int[][] C = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                    C[i][j] += A[i][k] * B[k][j];
+                }
+            }
+        }
+        return C;
+    }
+    
+    public static int[][] matrixPow(int[][] M, long n) {
+        int size = M.length;
+        int[][] result = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            result[i][i] = 1;
+        }
+        
+        int[][] base = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(M[i], 0, base[i], 0, size);
+        }
+        
+        while (n > 0) {
+            if (n % 2 == 1) {
+                result = matrixMul(result, base);
+            }
+            base = matrixMul(base, base);
+            n /= 2;
+        }
+        return result;
+    }
+    
+    public static long fibonacciMatrix(int n) {
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        
+        int[][] M = {{1, 1}, {1, 0}};
+        int[][] result = matrixPow(M, n);
+        return result[0][1];
+    }
+}
+```
 
 ---
 
