@@ -32,8 +32,9 @@ A **comprehensive, production-ready** repository for software engineering interv
 | **Curated Problems** | 200+ organized by domain and difficulty | ✅ Complete |
 | **Learning Paths** | 9 different structured paths | ✅ Ready |
 | **Mock Interviews** | 2 AI agents for live practice | ✅ Ready |
-| **Code Examples** | Python + Java implementations + 189 passing tests | ✅ Complete |
-| **Test Suite** | pytest — basic DS, sorting/searching, DP/graphs, patterns | ✅ 189 tests |
+| **Code Examples** | Python + Java implementations + 218 passing tests | ✅ Complete |
+| **Test Suite** | pytest — 50+ DS/algorithms + 40+ interview patterns | ✅ 218 tests |
+| **Interview Patterns** | 5 pattern modules (2-pointer, sliding window, binary search, monotonic stack, prefix sum) | ✅ 40 problems |
 
 ---
 
