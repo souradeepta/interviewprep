@@ -32,7 +32,8 @@ A **comprehensive, production-ready** repository for software engineering interv
 | **Curated Problems** | 200+ organized by domain and difficulty | ✅ Complete |
 | **Learning Paths** | 9 different structured paths | ✅ Ready |
 | **Mock Interviews** | 2 AI agents for live practice | ✅ Ready |
-| **Code Examples** | Python + Java implementations | ✅ Complete |
+| **Code Examples** | Python + Java implementations + 189 passing tests | ✅ Complete |
+| **Test Suite** | pytest — basic DS, sorting/searching, DP/graphs, patterns | ✅ 189 tests |
 
 ---
 
