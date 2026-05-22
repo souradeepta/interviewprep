@@ -48,11 +48,6 @@ class SimpleCoffee(Coffee):
 class CoffeeDecorator(Coffee):
     """Base decorator for coffee"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, coffee: Coffee):
         self.coffee = coffee
 

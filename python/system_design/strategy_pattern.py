@@ -19,11 +19,6 @@ class PaymentStrategy(ABC):
 class CreditCardPayment(PaymentStrategy):
     """Credit card payment strategy"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, card_number: str, cvv: str):
         self.card_number = card_number
         self.cvv = cvv
@@ -42,11 +37,6 @@ class CreditCardPayment(PaymentStrategy):
 class PayPalPayment(PaymentStrategy):
     """PayPal payment strategy"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, email: str):
         self.email = email
 
@@ -64,11 +54,6 @@ class PayPalPayment(PaymentStrategy):
 class BitcoinPayment(PaymentStrategy):
     """Bitcoin payment strategy"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, address: str):
         self.address = address
 
@@ -86,11 +71,6 @@ class BitcoinPayment(PaymentStrategy):
 class ShoppingCart:
     """Context that uses payment strategy"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self):
         self.items = []
         self.payment_strategy = None

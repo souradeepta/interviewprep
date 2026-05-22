@@ -8,11 +8,6 @@ import random
 class Server:
     """Backend server"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, server_id: int, ip: str, port: int):
         self.server_id = server_id
         self.ip = ip
@@ -50,11 +45,6 @@ class BalancingStrategy(ABC):
 class RoundRobinStrategy(BalancingStrategy):
     """Round robin - rotate through servers"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self):
         self.current_index = 0
 
@@ -105,11 +95,6 @@ class RandomStrategy(BalancingStrategy):
 class LoadBalancer:
     """Load balancer"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, strategy: BalancingStrategy):
         self.strategy = strategy
         self.servers = []

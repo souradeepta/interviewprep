@@ -15,11 +15,6 @@ class Observer:
 class Subject:
     """Observable subject"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self):
         self._observers = []
 
@@ -42,11 +37,6 @@ class Subject:
 class Button(Subject):
     """Concrete subject - Button"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self):
         super().__init__()
         self._is_pressed = False
@@ -74,11 +64,6 @@ class Button(Subject):
 class LogObserver(Observer):
     """Concrete observer - Log events"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, name: str):
         self.name = name
 
@@ -94,11 +79,6 @@ class LogObserver(Observer):
 class DisplayObserver(Observer):
     """Concrete observer - Display status"""
 
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self):
         self.status = "released"
 
