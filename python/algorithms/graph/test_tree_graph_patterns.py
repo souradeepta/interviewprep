@@ -1,9 +1,8 @@
-import sys
-sys.path.insert(0, '/home/sbisw/github/interviewprep/python/algorithms/graph')
-
-from graph_algorithms import TreeNode, lca, path_sum, all_paths_sum, tree_diameter, \
-    rob_tree, build_tree_preorder_inorder, serialize_tree, deserialize_tree, \
+from python.algorithms.graph.graph_algorithms import (
+    TreeNode, lca, path_sum, all_paths_sum, tree_diameter,
+    rob_tree, build_tree_preorder_inorder, serialize_tree, deserialize_tree,
     count_islands, is_bipartite, has_cycle_directed, has_cycle_undirected
+)
 
 def test_lca():
     """Test Lowest Common Ancestor."""
