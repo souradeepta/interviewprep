@@ -31,45 +31,12 @@ from python.system_design.url_shortener import URLShortener
 
 class TestURLShortener:
     def test_shorten_and_expand(self):
-    """
-    [Brief description of what this function does]
-
-    Args:
-        [param]: description
-
-    Returns:
-        [description of return value]
-
-    Time: O([complexity])
-    Space: O([complexity])
-    """
         shortener = URLShortener()
         long_url = "https://example.com/very/long/path"
         short_code = shortener.shorten(long_url)
         assert shortener.expand(short_code) == long_url
 
     def test_unique_short_codes(self):
-
-    """
-
-    [Brief description of what this function does]
-
-
-    Args:
-
-        [param]: description
-
-
-    Returns:
-
-        [description of return value]
-
-
-    Time: O([complexity])
-
-    Space: O([complexity])
-
-    """
         shortener = URLShortener()
         urls = [
             "https://example.com/url1",
@@ -83,27 +50,6 @@ class TestURLShortener:
         assert len(short_codes) == 3
 
     def test_deduplication(self):
-
-    """
-
-    [Brief description of what this function does]
-
-
-    Args:
-
-        [param]: description
-
-
-    Returns:
-
-        [description of return value]
-
-
-    Time: O([complexity])
-
-    Space: O([complexity])
-
-    """
         shortener = URLShortener()
         url = "https://example.com/url"
         code1 = shortener.shorten(url)
@@ -115,27 +61,6 @@ class TestURLShortener:
         assert shortener.expand("xyz123") is None
 
     def test_base62_encoding(self):
-
-    """
-
-    [Brief description of what this function does]
-
-
-    Args:
-
-        [param]: description
-
-
-    Returns:
-
-        [description of return value]
-
-
-    Time: O([complexity])
-
-    Space: O([complexity])
-
-    """
         shortener = URLShortener()
         code1 = shortener.shorten("https://example.com/1")
         code2 = shortener.shorten("https://example.com/2")

@@ -5,12 +5,6 @@ from collections import defaultdict, OrderedDict
 
 class LFUCache:
     """O(1) LFU Cache using frequency map + doubly linked list"""
-
-        """__init__ implementation.
-
-        Time: O(n)
-        Space: O(1)
-        """
     def __init__(self, capacity: int):
         self.capacity = capacity
         self.cache = {}  # key -> value

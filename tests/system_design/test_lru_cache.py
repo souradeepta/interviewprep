@@ -36,27 +36,6 @@ class TestLRUCache:
         assert cache.get(1) == 1
 
     def test_eviction(self):
-
-    """
-
-    [Brief description of what this function does]
-
-
-    Args:
-
-        [param]: description
-
-
-    Returns:
-
-        [description of return value]
-
-
-    Time: O([complexity])
-
-    Space: O([complexity])
-
-    """
         cache = LRUCache(2)
         cache.put(1, 1)
         cache.put(2, 2)
@@ -71,27 +50,6 @@ class TestLRUCache:
         assert cache.get(1) == 10
 
     def test_get_updates_recency(self):
-
-    """
-
-    [Brief description of what this function does]
-
-
-    Args:
-
-        [param]: description
-
-
-    Returns:
-
-        [description of return value]
-
-
-    Time: O([complexity])
-
-    Space: O([complexity])
-
-    """
         cache = LRUCache(3)
         cache.put(1, 1)
         cache.put(2, 2)
@@ -102,27 +60,6 @@ class TestLRUCache:
         assert cache.get(1) == 1
 
     def test_capacity_one(self):
-
-    """
-
-    [Brief description of what this function does]
-
-
-    Args:
-
-        [param]: description
-
-
-    Returns:
-
-        [description of return value]
-
-
-    Time: O([complexity])
-
-    Space: O([complexity])
-
-    """
         cache = LRUCache(1)
         cache.put(1, 1)
         assert cache.get(1) == 1
