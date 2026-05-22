@@ -76,7 +76,7 @@ Based on your answers above, here are curated resources for your learning journe
 - 🧪 **Run Tests:** `pytest tests/patterns/ -v` to verify all solutions
 - 🤖 **Mock Interviews:** [AGENTS.md](AGENTS.md) — live practice with Claude interviewer
 
-**Next Step:** [Start Week 1 →](#) or [Jump to Mock Interviews](AGENTS.md)
+**Next Step:** [Jump to Mock Interviews →](AGENTS.md)
 
 ---
 
