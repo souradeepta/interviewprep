@@ -1,22 +1,34 @@
 # 📚 InterviewPrep — Complete SDE Interview Preparation
 
-A **comprehensive, production-ready** repository for software engineering interview preparation covering **algorithms, system design, AI/ML/LLMs, behavioral interviews, and more**. Master with **100+ interview framework guides, 200+ curated problems, 9 learning paths, and 2 mock interview agents**.
+A **comprehensive, tested** repository for software engineering interview preparation. Master **algorithms, system design, and interview frameworks** with **218 passing tests, 40+ interview patterns, and 2 mock interview agents**. Choose your learning path: **2 weeks, 4 weeks, or 8 weeks**.
 
 ---
 
-## 🚀 Quick Start (Choose Your Path)
+## 🎯 Why This Repo Stands Out
 
-### **🏃 In a Hurry? (5 minutes)**
-→ [docs/STRUCTURE.md](docs/STRUCTURE.md) — Navigate the full repo with visual maps
+✅ **Tested code, not just docs** — 218 passing tests across data structures, algorithms, and interview patterns. Run locally, see it work.
 
-### **⏱️ Have 2-8 Weeks?**
-→ [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md) — Choose by timeline, interview stage, or learning style
+✅ **Pattern-focused learning** — Master 5 interview-winning patterns (two-pointer, sliding window, binary search, monotonic stack, prefix sum) with 40+ problems + complete solutions.
 
-### **🤖 Want to Practice?**
-→ [AGENTS.md](AGENTS.md) — Mock interviewer and candidate agents for practice
+✅ **Multiple learning paths** — Choose by timeline (2/4/8 weeks), interview stage (phone screen, technical, system design), or learning style (step-by-step, dive deep, learn by doing).
 
-### **🎯 Know exactly what you want?**
-→ [docs/STRUCTURE.md](docs/STRUCTURE.md) — Jump to your topic
+✅ **Mock interview agents** — Practice live with AI interviewer & candidate agents via Claude ([AGENTS.md](AGENTS.md)). Real-time feedback and coaching.
+
+---
+
+## 🚀 Quick Start
+
+### 🆕 **New Here?** (2 minutes)
+→ **[GETTING_STARTED.md](GETTING_STARTED.md)** — Answer 3 questions, get your personalized learning path
+
+### 💻 **Ready to Code?**
+→ **[python/patterns/](python/patterns/)** — 40+ problems, fully tested. Pick a pattern and start solving.
+
+### 🤖 **Want to Practice Interviews?**
+→ **[AGENTS.md](AGENTS.md)** — Schedule a mock interview with Claude
+
+### 🗺️ **Exploring the Full Repo?**
+→ **[docs/STRUCTURE.md](docs/STRUCTURE.md)** — Complete navigation guide with visual maps
 
 ---
 
@@ -25,34 +37,50 @@ A **comprehensive, production-ready** repository for software engineering interv
 | Component | Coverage | Status |
 |-----------|----------|--------|
 | **Interview Frameworks** | 42 comprehensive guides (coding, system design, behavioral) | ✅ Complete |
-| **Algorithms** | 11 mastery guides + patterns (DP, graph, string, etc.) | ✅ Complete |
-| **Data Structures** | 17 structures with implementations | ✅ Complete |
-| **System Design** | 39+ real-world systems with architecture | ✅ Complete |
-| **AI/ML/LLMs** | Fundamentals, LLM engineering, system design | 🚀 Expanding |
-| **Curated Problems** | 200+ organized by domain and difficulty | ✅ Complete |
-| **Learning Paths** | 9 different structured paths | ✅ Ready |
-| **Mock Interviews** | 2 AI agents for live practice | ✅ Ready |
-| **Code Examples** | Python + Java implementations + 218 passing tests | ✅ Complete |
-| **Test Suite** | pytest — 50+ DS/algorithms + 40+ interview patterns | ✅ 218 tests |
-| **Interview Patterns** | 5 pattern modules (2-pointer, sliding window, binary search, monotonic stack, prefix sum) | ✅ 40 problems |
+| **Algorithms** | 11 mastery guides + 5 pattern modules (40+ problems) | ✅ Complete |
+| **Data Structures** | 17 core structures with implementations | ✅ Complete |
+| **System Design** | 39+ real-world case studies with architecture | ✅ Complete |
+| **Code Examples** | Python + Java implementations, fully tested | ✅ Complete |
+| **Test Suite** | 218 tests passing (patterns, DS, algorithms) | ✅ 218 passing |
+| **Learning Paths** | 9 structured paths by timeline & style | ✅ Ready |
+| **Mock Interviews** | 2 AI agents (interviewer, candidate) | ✅ Ready |
 
 ---
 
-## 🎯 Learning Paths (Pick Your Style)
+## 📚 Learning Paths
 
-### **Time-Based Paths**
-- [2-Week Intensive Sprint](learning-paths/sequential-tracks/2-week-sprint.md) — 30 hours focused
-- [4-Week Balanced Path](learning-paths/sequential-tracks/4-week-focused.md) — 24-28 hours ← **Recommended**
-- [8-Week Comprehensive](learning-paths/sequential-tracks/8-week-comprehensive.md) — 32-40 hours deep
+### By Timeline
+- **[2-Week Intensive Sprint](learning-paths/sequential-tracks/2-week-sprint.md)** — 20 focused hours, phone screen prep
+- **[4-Week Balanced Path](learning-paths/sequential-tracks/4-week-focused.md)** — 24-28 hours, technical round ← **Recommended**
+- **[8-Week Comprehensive](learning-paths/sequential-tracks/8-week-comprehensive.md)** — 32-40 hours, system design deep dive
 
-### **Interview-Stage Paths**
-- [Phone Screen](learning-paths/interview-playbooks/phone-screen.md) — 30-45 min interviews
-- [Technical Round](learning-paths/interview-playbooks/technical-round.md) — 45-60 min coding
-- [System Design](learning-paths/interview-playbooks/system-design-round.md) — 45-60 min architecture
+### By Interview Stage
+- **[Phone Screen](learning-paths/interview-playbooks/phone-screen.md)** — Quick coding challenges
+- **[Technical Round](learning-paths/interview-playbooks/technical-round.md)** — Medium-hard problems
+- **[System Design](learning-paths/interview-playbooks/system-design-round.md)** — Architecture & trade-offs
 
-### **Learning Style Paths**
-- [Depth-First](learning-paths/skill-trees/depth-first.md) — Master each domain completely
-- [Breadth-First](learning-paths/skill-trees/breadth-first.md) — Sample all domains, then specialize
+### By Learning Style
+- **[Depth-First](learning-paths/skill-trees/depth-first.md)** — Master each domain completely
+- **[Breadth-First](learning-paths/skill-trees/breadth-first.md)** — Sample all domains, then specialize
+- **[Learn by Doing](learning-paths/learn-by-doing.md)** — Code + tests guide you
+
+---
+
+## 🎯 Interview Patterns (40+ Problems)
+
+Master these patterns and solve 80% of interview questions:
+
+- **[Two-Pointer](python/patterns/two_pointer.py)** — 10 problems (arrays, linked lists, strings)
+- **[Sliding Window](python/patterns/sliding_window.py)** — 9 problems (substrings, subarrays)
+- **[Binary Search](python/patterns/binary_search.py)** — 8 problems (rotated arrays, boundaries)
+- **[Monotonic Stack](python/patterns/monotonic_stack.py)** — 6 problems (next/previous element, histograms)
+- **[Prefix Sum](python/patterns/prefix_sum.py)** — 6 problems (range queries, subarrays)
+
+Each pattern includes:
+- 📖 Concept explanation
+- 💻 Multiple solution approaches
+- 🧪 Test cases (run `pytest tests/patterns/ -v`)
+- 🎯 LeetCode-style problems with difficulty
 
 ---
 
@@ -60,217 +88,136 @@ A **comprehensive, production-ready** repository for software engineering interv
 
 ```
 interviewprep/
-├── 📖 docs/                     # Complete documentation & guides
-│   ├── STRUCTURE.md             # 🗺️ Full navigation guide (READ THIS FIRST!)
-│   ├── 00-resources/            # Utilities and helper materials
-│   ├── 01-interview-frameworks/ # 42 comprehensive interview guides
-│   │   ├── coding-interview-framework.md
-│   │   ├── behavioral-interview-framework.md
-│   │   ├── system-design-interview-guide.md
-│   │   └── [38 mastery & pattern guides]
-│   ├── 02-algorithms/           # Algorithm patterns & data structures
-│   │   ├── *-mastery.md         # Deep dives (binary-search, DP, graph, etc.)
-│   │   ├── *-patterns.md        # Pattern guides (sliding-window, two-pointer, etc.)
-│   │   └── [subdirs: geometry, graph, math, searching, sorting, string, dp/]
-│   ├── 03-system-design/        # System design with real architecture
-│   │   ├── system-design-case-studies.md
-│   │   ├── 01-caching/          # Cache design, invalidation, patterns
-│   │   ├── 02-core-algorithms/  # Load balancing, consensus, sharding
-│   │   ├── 03-design-patterns/  # MVC, microservices, saga
-│   │   └── [06-data-systems, 07-social, 08-infrastructure, etc.]
-│   ├── 04-ai-ml-llms/           # 🤖 NEW! AI/ML/LLM systems (expanding)
-│   │   ├── fundamentals/        # ML concepts, neural networks
-│   │   ├── llm-engineering/     # Prompts, RAG, fine-tuning, agents
-│   │   └── system-design/       # ML platforms, serving, MLOps
+├── GETTING_STARTED.md           # 👈 START HERE (new visitors)
+├── AGENTS.md                    # Mock interview agents
+├── README.md                    # This file
+├── conftest.py                  # pytest configuration
+│
+├── 💻 python/                   # Python implementations
+│   ├── patterns/                # 40+ interview pattern problems
+│   │   ├── two_pointer.py       # 10 problems
+│   │   ├── sliding_window.py    # 9 problems
+│   │   ├── binary_search.py     # 8 problems
+│   │   ├── monotonic_stack.py   # 6 problems
+│   │   └── prefix_sum.py        # 6 problems
+│   ├── basic/                   # Data structures (linked list, stack, queue, hashmap)
+│   ├── algorithms/              # Sorting, searching, DP, graph algorithms
+│   └── system_design/           # LRU cache, URL shortener, parking lot
+│
+├── 📖 docs/                     # Complete documentation
+│   ├── _NAVIGATION.md           # Quick "where is X?" glossary
+│   ├── STRUCTURE.md             # Full repo navigation (visual maps)
+│   ├── 01-interview-frameworks/ # 42 interview guides
+│   ├── 02-algorithms/           # Algorithm mastery & patterns
+│   ├── 03-system-design/        # Real-world system designs
+│   ├── 04-ai-ml-llms/           # AI/ML fundamentals (expanding)
 │   └── 05-learning-paths/       # Structured learning tracks
-│       ├── sequential-tracks/   # Time-based (2/4/8 weeks)
-│       ├── interview-playbooks/ # Stage-specific paths
-│       ├── domains/             # 13 deep-dive specializations
-│       └── skill-trees/         # Learning style options
 │
-├── 💻 code/                     # Language implementations
-│   ├── python/                  # Python implementations
-│   │   ├── algorithms/
-│   │   ├── data-structures/
-│   │   └── system-design/
-│   ├── java/                    # Java implementations
-│   │   ├── algorithms/
-│   │   ├── data-structures/
-│   │   └── system-design/
-│   └── README.md
+├── 🧪 tests/                    # 218 passing tests
+│   ├── patterns/                # Tests for 40+ pattern problems
+│   ├── basic/                   # Tests for data structures
+│   ├── algorithms/              # Tests for algorithms
+│   └── system_design/           # Tests for system design
 │
-├── 🎓 learning-paths/           # Interactive learning paths
-│   ├── index.md
-│   ├── sequential-tracks/
-│   ├── interview-playbooks/
-│   ├── domains/
-│   └── skill-trees/
+├── 📚 learning-paths/           # Structured learning journeys
+│   ├── sequential-tracks/       # 2-week, 4-week, 8-week paths
+│   ├── interview-playbooks/     # Stage-specific (phone, technical, SD)
+│   └── skill-trees/             # Learning style options
 │
-├── 🛠️ scripts/                  # Automation & utility scripts
-│   └── [enhancement & generation scripts]
-│
-├── 🧪 tests/                    # Test suites
-│   └── system_design/
-│
-├── .claude/                     # 🔧 Internal Claude Code config
-│   ├── agents/                  # Mock interview agents
-│   ├── scripts/                 # Internal utility scripts
-│   └── memory/                  # Project memory and context
-│
-├── 🚀 QUICK_START.md            # Get started in 2 minutes
-├── 🎯 LEARNING_PATHS_QUICK_START.md
-├── 🤖 AGENTS.md                 # How to use mock interviewers
-├── 📑 INDEX.md                  # Complete index of all content
-└── 📄 README.md                 # This file
+└── 🎯 java/                     # Java implementations (same topics)
 ```
 
 ---
 
-## 📊 Coverage
+## 🧪 Run Tests Locally
 
-### Interview Frameworks (42 guides)
-✅ Coding interview framework (5-phase approach)
-✅ System design interview guide (4-phase approach)
-✅ Behavioral interview framework (STAR method + 20+ examples)
-✅ 39 algorithm & system design mastery guides with edge cases, mistakes, real examples
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/interviewprep.git
+cd interviewprep
 
-### Algorithms & Data Structures
-✅ 11 algorithm mastery guides (DP, graphs, strings, sorting, binary search, etc.)
-✅ 15+ pattern guides (sliding window, two pointers, greedy, recursion, bit manipulation)
-✅ 17 data structures with implementations
-✅ Complexity analysis and trade-off discussions
+# Run all tests (218 passing)
+pytest -v
 
-### System Design
-✅ 39+ real-world system designs with architecture
-✅ Complete case studies (URL shortener, video streaming, chat, payments, recommendations)
-✅ Scaling strategies and bottleneck analysis
-✅ Interview follow-up questions & answers
+# Run just the interview patterns (40+ problems)
+pytest tests/patterns/ -v
 
-### AI/ML/LLMs
-✅ Foundation guides (expanding with LLM engineering, RAG, system design)
-✅ Real coding examples
-✅ Interview scenarios and design problems
+# Run a specific pattern
+pytest tests/patterns/test_two_pointer.py -v
+```
 
-### Learning & Practice
-✅ 200+ curated problems by domain
-✅ 9 learning paths (time-based, stage-based, style-based)
-✅ 2 mock interview agents (interviewer & candidate)
-✅ 4 interview playbooks (phone screen, technical, system design, behavioral)  
+**All tests should pass** ✅ — that's how you know the solutions are correct.
 
 ---
 
-## 🎓 How to Use This Repo
+## 🤖 Mock Interview Agents
 
-### **Interview in 2 Weeks?**
-1. Go to [docs/STRUCTURE.md](docs/STRUCTURE.md) and find your interview type
-2. Read the relevant framework (e.g., `coding-interview-framework.md`)
-3. Study 3-5 algorithm patterns from `docs/02-algorithms/`
-4. Practice with mock interviews: `AGENTS.md`
+Practice with two AI-powered agents:
+- **Interviewer Agent** — Asks you questions, provides feedback
+- **Candidate Agent** — You ask it questions, it codes
 
-### **Want Comprehensive Prep?**
-1. Start: [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md)
-2. Choose: Path from [learning-paths/](learning-paths/)
-3. Study: Follow weekly structure with frameworks & algorithms
-4. Practice: 1-2 mock interviews per week
-5. Refine: Review weak areas with deep-dive guides
-
-### **Need Quick Reference?**
-- **Algorithm pattern?** → [docs/02-algorithms/](docs/02-algorithms/) 
-- **System design concept?** → [docs/03-system-design/](docs/03-system-design/)
-- **Interview framework?** → [docs/01-interview-frameworks/](docs/01-interview-frameworks/)
-- **AI/ML question?** → [docs/04-ai-ml-llms/](docs/04-ai-ml-llms/)
-
-### **For Teaching/Learning**
-- Use interview frameworks as curriculum
-- Reference algorithm guides with complexity analysis
-- Practice with mock interview agents
+See [AGENTS.md](AGENTS.md) for setup and usage.
 
 ---
 
-## 🚀 Features
+## 🎓 For Students & Juniors
 
-### Learning Paths
-- **9 different paths** → everyone finds their fit
-- **200+ problems** → extensive practice
-- **Time estimates** → know what you're committing
-- **Weekly milestones** → track progress
-- **Clear patterns** → recognize problem types instantly
-
-### Mock Interviews
-- **Live practice** → practice thinking aloud
-- **Realistic scenarios** → actual interview simulation
-- **Feedback** → learn from mistakes
-- **2 agents** → practice both sides
-
-### Complete Documentation
-- **Step-by-step guides** → understand every concept
-- **Multiple languages** → Python & Java solutions
-- **Complexity analysis** → know your trade-offs
-- **Visual diagrams** → understand visually
+This repo is **built for you**:
+- ✅ Pathways for every timeline (2, 4, or 8 weeks)
+- ✅ Frameworks that demystify interviews
+- ✅ 40+ pattern problems with solutions
+- ✅ Test cases show you the "right" answer
+- ✅ Mock agents for live practice
+- ✅ No paywalls, no upsells — completely free
 
 ---
 
-## 📚 Key Resources
+## ❓ FAQ
 
-| Resource | Purpose | Link |
-|----------|---------|------|
-| **🗺️ Repo Navigation** | Understand the full structure | [docs/STRUCTURE.md](docs/STRUCTURE.md) |
-| **🚀 Quick Start** | Get going in 2 min | [QUICK_START.md](QUICK_START.md) |
-| **📖 Learning Paths** | Pick by timeline/style/goal | [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md) |
-| **📋 Interview Frameworks** | 42 comprehensive guides | [docs/01-interview-frameworks/](docs/01-interview-frameworks/) |
-| **🧮 Algorithm Mastery** | Deep dives with examples | [docs/02-algorithms/](docs/02-algorithms/) |
-| **🏗️ System Design** | Real-world architectures | [docs/03-system-design/](docs/03-system-design/) |
-| **🤖 AI/ML/LLMs** | NEW expanding section | [docs/04-ai-ml-llms/](docs/04-ai-ml-llms/) |
-| **🤖 Mock Interviews** | Practice with AI agents | [AGENTS.md](AGENTS.md) |
+**Q: Where do I start?**  
+A: Go to [GETTING_STARTED.md](GETTING_STARTED.md) and answer 3 quick questions. Takes 2 minutes.
 
----
+**Q: How long does this take?**  
+A: Pick your timeline: 2 weeks (intensive), 4 weeks (balanced), or 8 weeks (deep).
 
-## 📈 Statistics
+**Q: Can I just code without reading docs?**  
+A: Absolutely. Start with [python/patterns/](python/patterns/) and run the tests. Learning happens by doing.
 
-- **42** comprehensive interview framework guides
-- **11** algorithm mastery guides (with 3-5x expanded content)
-- **15+** algorithm pattern guides
-- **17** data structures
-- **39+** system design problems
-- **200+** curated interview problems
-- **9** learning paths
-- **2** mock interview agents
-- **13** problem domains
-- **Python + Java** code examples throughout
-- **100+** total guides and resources
+**Q: Are these real interview problems?**  
+A: Yes — all problems are from LeetCode, real company interviews, or common patterns. 40+ problems, fully tested.
+
+**Q: Can I contribute?**  
+A: Yes! See [CONTRIBUTING.md](CONTRIBUTING.md) (link TBD).
 
 ---
 
-## 🎯 Who This Is For
+## 📊 Stats
 
-✅ **SDE Interview Candidates** — Structured prep for FAANG & startups  
-✅ **New Software Engineers** — Learn CS fundamentals solidly  
-✅ **Coding Bootcamp Grads** — Fill gaps in computer science knowledge  
-✅ **Interview Prep Coaches** — Reference material and teaching examples  
-✅ **Competitive Programmers** — Algorithm and data structure reference  
+- **218 passing tests** across all modules
+- **40+ interview pattern problems** with full solutions
+- **42 interview frameworks** covering coding, system design, behavioral
+- **9 learning paths** for different timelines and goals
+- **39+ system design case studies** with real architecture
+- **Python + Java** implementations for every topic
 
 ---
 
-## 🤝 Contributing
+## 🚀 Next Steps
 
-This is a **comprehensive but living** resource. Have a problem type we should add? Want to contribute a new explanation? See [CONTRIBUTING.md](docs/CONTRIBUTING.md) (coming soon).
+1. **Go to [GETTING_STARTED.md](GETTING_STARTED.md)** — Find your learning path (2 min)
+2. **Pick a pattern** — Start with [two-pointer](python/patterns/two_pointer.py) or [sliding window](python/patterns/sliding_window.py)
+3. **Run tests** — `pytest tests/patterns/test_two_pointer.py -v` (verify solutions work)
+4. **Solve problems** — Implement each one, compare with tests
+5. **Practice interviews** — [AGENTS.md](AGENTS.md) (live mock rounds)
 
 ---
 
 ## 📄 License
 
-All content, implementations, and problem solutions are provided for educational purposes. See [LICENSE](LICENSE) for details.
+Open source. Free to use, modify, share.
 
 ---
 
-## 🚀 Get Started Now
+**Questions?** Check [docs/STRUCTURE.md](docs/STRUCTURE.md) for detailed navigation or open an issue.
 
-**First time here?** → [docs/STRUCTURE.md](docs/STRUCTURE.md) (5 min navigation guide)  
-**Have limited time?** → [QUICK_START.md](QUICK_START.md) (2 minutes)  
-**Planning long prep?** → [LEARNING_PATHS_QUICK_START.md](LEARNING_PATHS_QUICK_START.md)  
-**Want to practice now?** → [AGENTS.md](AGENTS.md)  
-**Need specific topic?** → Use [docs/STRUCTURE.md](docs/STRUCTURE.md) to find it  
-
----
-
-**Made for SDE interview prep — covering algorithms, system design, AI/ML/LLMs, and behavioral interviews. Good luck! 🎓**
+**Ready?** [Get started →](GETTING_STARTED.md)
