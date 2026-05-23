@@ -10,6 +10,7 @@ A comprehensive guide to navigating this repository's documentation.
 docs/
 ├── 00-resources/          Resources, utilities, and helper materials
 ├── 01-interview-frameworks/  Interview preparation frameworks & guides
+├── 02-databases/          Database systems (SQL, NoSQL, graphs, etc.)
 ├── 02-algorithms/         Algorithm patterns, data structures, problems
 ├── 03-system-design/      System design problems and patterns
 ├── 04-ai-ml-llms/         AI/ML/LLM systems and techniques
@@ -37,6 +38,21 @@ docs/
 - API design, database design, caching, load balancing
 - Microservices, distributed systems, messaging queues
 - Security, monitoring, performance optimization
+
+### 🗄️ Database Systems
+**Start here:** `docs/02-databases/README.md`
+
+**Database types:**
+- SQL (PostgreSQL, MySQL): Relational, ACID, normalization
+- NoSQL (MongoDB, DynamoDB): Document, key-value, sharding
+- Graphs (Neo4j): Relationships, patterns, traversals
+- Columnar (Snowflake, BigQuery): Analytics, OLAP, compression
+- Time-Series (Prometheus, InfluxDB): Metrics, monitoring, downsampling
+- Search (Elasticsearch): Full-text, ranking, aggregations
+- Caching (Redis): Sessions, real-time, in-memory
+- Vectors (Pinecone): Embeddings, RAG, similarity search
+- APIs (GraphQL): Query language, resolvers, schema design
+- Warehousing: ETL/ELT, lakehouses, medallion architecture
 
 ### 🤖 AI/ML/LLMs
 **Start here:** `docs/04-ai-ml-llms/` (will expand with comprehensive guides)

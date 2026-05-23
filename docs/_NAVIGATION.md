@@ -77,11 +77,79 @@ Looking for **graph algorithms**?
 
 ---
 
+## By AI/ML Topic
+
+**Want to learn ML fundamentals?**  
+→ [docs/04-ai-ml-llms/01-ml-fundamentals.md](04-ai-ml-llms/01-ml-fundamentals.md)  
+→ Core concepts, algorithms, metrics
+
+**Want to understand transformers?**  
+→ [docs/04-ai-ml-llms/04-llm-architecture.md](04-ai-ml-llms/04-llm-architecture.md)  
+→ Attention, scaling laws, how LLMs work
+
+**Want to learn prompt engineering?**  
+→ [docs/04-ai-ml-llms/05-prompt-engineering.md](04-ai-ml-llms/05-prompt-engineering.md)  
+→ Techniques, patterns, optimization
+
+**Want to build RAG systems?**  
+→ [docs/04-ai-ml-llms/06-rag-systems.md](04-ai-ml-llms/06-rag-systems.md)  
+→ Retrieval-augmented generation, vector DBs
+
+**Want to fine-tune models?**  
+→ [docs/04-ai-ml-llms/07-fine-tuning-training.md](04-ai-ml-llms/07-fine-tuning-training.md)  
+→ LoRA, instruction tuning, RLHF
+
+---
+
+## By Database Type
+
+**Want to learn SQL?**  
+→ [docs/02-databases/01-sql-advanced.md](02-databases/01-sql-advanced.md)  
+→ Window functions, CTEs, optimization, transactions
+
+**Want to learn NoSQL?**  
+→ [docs/02-databases/02-nosql-advanced.md](02-databases/02-nosql-advanced.md)  
+→ MongoDB, DynamoDB, sharding, consistency
+
+**Want to understand graphs?**  
+→ [docs/02-databases/03-graph-databases.md](02-databases/03-graph-databases.md)  
+→ Neo4j, Cypher, relationship queries
+
+**Want to learn analytics?**  
+→ [docs/02-databases/04-columnar-databases.md](02-databases/04-columnar-databases.md)  
+→ Snowflake, BigQuery, compression, OLAP
+
+**Want to understand time-series?**  
+→ [docs/02-databases/05-timeseries-databases.md](02-databases/05-timeseries-databases.md)  
+→ Prometheus, InfluxDB, metrics, monitoring
+
+**Want to build search systems?**  
+→ [docs/02-databases/06-search-engines.md](02-databases/06-search-engines.md)  
+→ Elasticsearch, full-text search, ranking
+
+**Want to learn caching?**  
+→ [docs/02-databases/07-caching-stores.md](02-databases/07-caching-stores.md)  
+→ Redis, Memcached, in-memory data structures
+
+**Want to build semantic search?**  
+→ [docs/02-databases/08-vector-databases.md](02-databases/08-vector-databases.md)  
+→ Embeddings, RAG, similarity search
+
+**Want to learn APIs?**  
+→ [docs/02-databases/09-graphql.md](02-databases/09-graphql.md)  
+→ GraphQL schema, resolvers, N+1 problems
+
+**Want to understand data warehousing?**  
+→ [docs/02-databases/10-warehousing-lakehouses.md](02-databases/10-warehousing-lakehouses.md)  
+→ Medallion architecture, ETL/ELT, modern data stack
+
+---
+
 ## By Learning Style
 
 **Want to read frameworks first?**  
 → [docs/01-interview-frameworks/](01-interview-frameworks/)  
-→ Includes: coding, system design, behavioral frameworks
+→ Includes: coding, system design, behavioral, databases, networking
 
 **Want to code immediately?**  
 → [python/patterns/](../python/patterns/)  
@@ -90,6 +158,14 @@ Looking for **graph algorithms**?
 **Want to understand system design?**  
 → [docs/03-system-design/](03-system-design/)  
 → Real-world case studies, architecture patterns
+
+**Want to understand databases?**  
+→ [docs/01-interview-frameworks/database-fundamentals.md](01-interview-frameworks/database-fundamentals.md)  
+→ SQL, NoSQL, indexing, optimization
+
+**Want to understand networking?**  
+→ [docs/01-interview-frameworks/networking-fundamentals.md](01-interview-frameworks/networking-fundamentals.md)  
+→ HTTP, TCP/IP, DNS, network optimization
 
 **Want to practice interviews?**  
 → [AGENTS.md](../AGENTS.md)  

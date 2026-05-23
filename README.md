@@ -36,13 +36,14 @@ A **comprehensive, tested** repository for software engineering interview prepar
 
 | Component | Coverage | Status |
 |-----------|----------|--------|
-| **Interview Frameworks** | 42 comprehensive guides (coding, system design, behavioral) | ✅ Complete |
+| **Interview Frameworks** | 44 comprehensive guides (coding, system design, behavioral, databases, networking) | ✅ Complete |
 | **Algorithms** | 11 mastery guides + 5 pattern modules (40+ problems) | ✅ Complete |
 | **Data Structures** | 17 core structures with implementations | ✅ Complete |
 | **System Design** | 39+ real-world case studies with architecture | ✅ Complete |
+| **AI/ML/LLMs** | 9 guides (ML fundamentals, transformers, prompt engineering, RAG, fine-tuning) | ✅ Complete |
 | **Code Examples** | Python + Java implementations, fully tested | ✅ Complete |
 | **Test Suite** | 218 tests passing (patterns, DS, algorithms) | ✅ 218 passing |
-| **Learning Paths** | 9 structured paths by timeline & style | ✅ Ready |
+| **Learning Paths** | 13 structured paths (timeline, stage, company-specific, style) | ✅ Ready |
 | **Mock Interviews** | 2 AI agents (interviewer, candidate) | ✅ Ready |
 
 ---
@@ -64,6 +65,12 @@ A **comprehensive, tested** repository for software engineering interview prepar
 - **[Breadth-First](learning-paths/skill-trees/breadth-first.md)** — Sample all domains, then specialize
 - **[Learn by Doing](learning-paths/learn-by-doing.md)** — Code + tests guide you
 
+### By Company
+- **[Google](learning-paths/company-specific/google-interview-prep.md)** — Focus on graph algorithms, optimization, system design
+- **[Meta](learning-paths/company-specific/meta-interview-prep.md)** — Speed & optimization, array/string focus
+- **[Amazon](learning-paths/company-specific/amazon-interview-prep.md)** — Leadership principles, balanced coverage
+- **[Microsoft & Apple](learning-paths/company-specific/microsoft-and-apple.md)** — Fundamentals & efficiency
+
 ---
 
 ## 🎯 Interview Patterns (40+ Problems)
@@ -84,7 +91,40 @@ Each pattern includes:
 
 ---
 
-## 📂 Repository Structure
+## 🤖 AI/ML/LLMs Learning Path
+
+Master modern AI systems:
+
+- **[ML Fundamentals](docs/04-ai-ml-llms/01-ml-fundamentals.md)** — Core concepts, algorithms, metrics
+- **[Neural Networks](docs/04-ai-ml-llms/02-neural-networks-basics.md)** — Perceptrons, backpropagation, optimization
+- **[Deep Learning](docs/04-ai-ml-llms/03-deep-learning-essentials.md)** — CNNs, RNNs, LSTMs, attention
+- **[LLM Architecture](docs/04-ai-ml-llms/04-llm-architecture.md)** — Transformers, attention mechanisms, scaling laws
+- **[Prompt Engineering](docs/04-ai-ml-llms/05-prompt-engineering.md)** — Techniques, chain-of-thought, few-shot learning
+- **[RAG Systems](docs/04-ai-ml-llms/06-rag-systems.md)** — Retrieval-augmented generation, vector databases
+- **[Fine-tuning](docs/04-ai-ml-llms/07-fine-tuning-training.md)** — LoRA, instruction tuning, RLHF
+- **[Model Serving](docs/04-ai-ml-llms/08-model-serving-inference.md)** — Quantization, batching, inference optimization
+- **[ML Systems Design](docs/04-ai-ml-llms/10-ml-systems-design.md)** — End-to-end pipelines, monitoring, retraining
+
+Each guide includes:
+- 📖 Detailed explanations with examples
+- 💡 Interview-style Q&A
+- 🎯 Real-world applications
+- ✅ Checklists for verification
+
+---
+
+## 📊 Fundamentals Coverage
+
+Beyond algorithms and data structures:
+
+- **[Database Fundamentals](docs/01-interview-frameworks/database-fundamentals.md)** — SQL, NoSQL, indexing, optimization, ACID
+- **[Networking Fundamentals](docs/01-interview-frameworks/networking-fundamentals.md)** — HTTP, TCP/IP, DNS, latency, bandwidth
+
+---
+
+## 📂 Repository Structure (Reorganized)
+
+**Topics on the outside, code implementations inside** ✨
 
 ```
 interviewprep/
@@ -93,39 +133,88 @@ interviewprep/
 ├── README.md                    # This file
 ├── conftest.py                  # pytest configuration
 │
-├── 💻 python/                   # Python implementations
-│   ├── patterns/                # 40+ interview pattern problems
-│   │   ├── two_pointer.py       # 10 problems
-│   │   ├── sliding_window.py    # 9 problems
-│   │   ├── binary_search.py     # 8 problems
-│   │   ├── monotonic_stack.py   # 6 problems
-│   │   └── prefix_sum.py        # 6 problems
-│   ├── basic/                   # Data structures (linked list, stack, queue, hashmap)
-│   ├── algorithms/              # Sorting, searching, DP, graph algorithms
-│   └── system_design/           # LRU cache, URL shortener, parking lot
+├── 📖 docs/                     # Complete documentation & code
+│   ├── 00-resources/            # Utilities and helper materials
+│   ├── 01-interview-frameworks/ # 42 interview guides (unchanged)
+│   ├── 02-databases/            # Database systems (unchanged)
+│   ├── 03-system-design/        # System design patterns (unchanged)
+│   ├── 04-ai-ml-llms/           # AI/ML/LLM guides (unchanged)
+│   │
+│   ├── 05-algorithms/ 🆕        # Algorithms organized by type
+│   │   ├── README.md            # Algorithm overview
+│   │   ├── sorting/
+│   │   │   ├── README.md        # Sorting guide
+│   │   │   └── code/
+│   │   │       ├── python/      # Python implementations & tests
+│   │   │       └── java/        # Java implementations & tests
+│   │   ├── searching/
+│   │   ├── dp/
+│   │   ├── graphs/
+│   │   ├── string-algorithms/
+│   │   ├── greedy/
+│   │   ├── math/
+│   │   ├── bit-manipulation/
+│   │   └── geometry/
+│   │
+│   ├── 06-data-structures/ 🆕  # Data structures by type
+│   │   ├── README.md            # DS overview
+│   │   ├── arrays/
+│   │   │   ├── README.md        # Arrays guide
+│   │   │   └── code/
+│   │   │       ├── python/      # Implementations & tests
+│   │   │       └── java/
+│   │   ├── linked-lists/
+│   │   ├── stacks/
+│   │   ├── queues/
+│   │   ├── trees/
+│   │   ├── heaps/
+│   │   ├── hash-tables/
+│   │   ├── tries/
+│   │   ├── graphs/
+│   │   └── dsu/
+│   │
+│   ├── 07-patterns/ 🆕          # Interview patterns (40+ problems)
+│   │   ├── README.md            # Patterns overview
+│   │   ├── two-pointer/
+│   │   │   ├── README.md        # Two-pointer guide
+│   │   │   ├── code/
+│   │   │   │   ├── python/      # Implementations & tests
+│   │   │   │   └── java/
+│   │   │   └── problems.md      # LeetCode problems
+│   │   ├── sliding-window/
+│   │   ├── binary-search/
+│   │   ├── monotonic-stack/
+│   │   └── prefix-sum/
+│   │
+│   ├── 08-learning-paths/       # Structured learning journeys
+│   ├── _NAVIGATION.md           # Quick navigation guide
+│   ├── STRUCTURE.md             # Full documentation map
+│   └── REORGANIZATION_GUIDE.md  # Migration guide (what changed)
 │
-├── 📖 docs/                     # Complete documentation
-│   ├── _NAVIGATION.md           # Quick "where is X?" glossary
-│   ├── STRUCTURE.md             # Full repo navigation (visual maps)
-│   ├── 01-interview-frameworks/ # 42 interview guides
-│   ├── 02-algorithms/           # Algorithm mastery & patterns
-│   ├── 03-system-design/        # Real-world system designs
-│   ├── 04-ai-ml-llms/           # AI/ML fundamentals (expanding)
-│   └── 05-learning-paths/       # Structured learning tracks
-│
-├── 🧪 tests/                    # 218 passing tests
-│   ├── patterns/                # Tests for 40+ pattern problems
-│   ├── basic/                   # Tests for data structures
+├── 🧪 tests/                    # 218+ passing tests
 │   ├── algorithms/              # Tests for algorithms
+│   ├── data-structures/         # Tests for data structures
+│   ├── patterns/                # Tests for patterns
 │   └── system_design/           # Tests for system design
 │
-├── 📚 learning-paths/           # Structured learning journeys
-│   ├── sequential-tracks/       # 2-week, 4-week, 8-week paths
-│   ├── interview-playbooks/     # Stage-specific (phone, technical, SD)
-│   └── skill-trees/             # Learning style options
+├── 📚 learning-paths/           # Learning tracks (also in docs/08-learning-paths/)
 │
-└── 🎯 java/                     # Java implementations (same topics)
+├── 💻 python/ (deprecated)      # Old location (use docs/*/code/python/ instead)
+├── 🎯 java/ (deprecated)        # Old location (use docs/*/code/java/ instead)
+└── ...
 ```
+
+---
+
+### **Key Benefits of New Structure**
+
+✅ **Topics Centered** — All info about one topic in one place  
+✅ **Code with Docs** — Guide, implementation, and tests together  
+✅ **Easy Navigation** — Documentation first, code second  
+✅ **Self-Contained** — Learn → code → practice in one directory  
+✅ **Multi-Language** — Python and Java side-by-side  
+
+See [REORGANIZATION_GUIDE.md](docs/REORGANIZATION_GUIDE.md) for details.
 
 ---
 

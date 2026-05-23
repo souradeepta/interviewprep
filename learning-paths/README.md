@@ -18,6 +18,12 @@ Welcome! This directory contains curated learning paths for SDE interview prepar
 
 **Preparing for system design?** → [System Design Playbook](interview-playbooks/system-design-round.md)
 
+**Preparing for a specific company?** → See [Company-Specific Paths](company-specific/)
+- **Google:** [Google Interview Prep](company-specific/google-interview-prep.md)
+- **Meta (Facebook):** [Meta Interview Prep](company-specific/meta-interview-prep.md)
+- **Amazon:** [Amazon Interview Prep](company-specific/amazon-interview-prep.md)
+- **Microsoft & Apple:** [Microsoft & Apple Interview Prep](company-specific/microsoft-and-apple.md)
+
 ## 📖 How to Use These Paths
 
 ### Sequential Tracks
