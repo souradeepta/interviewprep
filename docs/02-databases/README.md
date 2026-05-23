@@ -4,95 +4,153 @@ Comprehensive guide to modern database systems for interviews and production.
 
 ---
 
-## 📚 Database Categories
+## 📚 Database Categories (30 Guides Total)
 
-### 🗄️ **Relational Databases (SQL)**
-- PostgreSQL, MySQL, Oracle, SQL Server
-- ACID guarantees, normalization, joins
-- Best for: Structured data, transactions, relationships
+### Core Database Systems (10 Original Guides)
 
-**[SQL Deep Dive](01-sql-advanced.md)** — Advanced queries, optimization, transactions
+**1. 🗄️ Relational Databases (SQL)**
+- **[SQL Deep Dive](01-sql-advanced.md)** — Advanced queries, optimization, transactions
+- Window functions, CTEs, EXPLAIN plans, indexes, ACID
 
----
+**2. 📄 Document Databases (NoSQL)**
+- **[NoSQL Comprehensive Guide](02-nosql-advanced.md)** — Data modeling, consistency models, scaling
+- MongoDB, DynamoDB, schema design, sharding
 
-### 📄 **Document Databases (NoSQL)**
-- MongoDB, Firebase, CouchDB, DynamoDB
-- Flexible schema, horizontal scaling
-- Best for: JSON documents, rapid iteration, scale-out
+**3. 🔗 Graph Databases**
+- **[Graph Databases](03-graph-databases.md)** — Graph queries, ACID on graphs, traversals
+- Neo4j, Cypher, recommendations, fraud detection
 
-**[NoSQL Comprehensive Guide](02-nosql-advanced.md)** — Data modeling, consistency models, scaling
+**4. 📊 Columnar Databases**
+- **[Columnar Databases](04-columnar-databases.md)** — Column families, compression, analytics
+- Snowflake, BigQuery, OLAP, medallion architecture
 
----
+**5. ⏱️ Time-Series Databases**
+- **[Time-Series Databases](05-timeseries-databases.md)** — Bucketing, retention, downsampling
+- Prometheus, InfluxDB, cardinality management
 
-### 🔗 **Graph Databases**
-- Neo4j, ArangoDB, JanusGraph
-- Relationship queries fast (not joins)
-- Best for: Social graphs, recommendations, knowledge graphs
+**6. 🔍 Search Engines**
+- **[Search Engines & Full-Text Search](06-search-engines.md)** — Inverted indexes, ranking, aggregations
+- Elasticsearch, BM25, autocomplete, faceting
 
-**[Graph Databases](03-graph-databases.md)** — Graph queries, ACID on graphs, traversals
+**7. 💾 Cache Databases**
+- **[Caching & In-Memory Stores](07-caching-stores.md)** — Eviction, persistence, clustering
+- Redis, Memcached, cache patterns, leaderboards
 
----
+**8. 🎯 Vector Databases**
+- **[Vector Databases](08-vector-databases.md)** — Embedding search, indexing, distance metrics
+- Pinecone, Weaviate, RAG, similarity search
 
-### 📊 **Columnar Databases**
-- ClickHouse, Snowflake, BigQuery, Redshift
-- Compress similar data, fast aggregations
-- Best for: Analytics, data warehousing, OLAP
+**9. 🔀 GraphQL**
+- **[GraphQL Fundamentals](09-graphql.md)** — Schema design, resolvers, N+1 problems
+- Query optimization, caching strategies
 
-**[Columnar Databases](04-columnar-databases.md)** — Column families, compression, analytics
-
----
-
-### ⏱️ **Time-Series Databases**
-- InfluxDB, Prometheus, TimescaleDB, VictoriaMetrics
-- Optimized for time-indexed data
-- Best for: Metrics, monitoring, IoT, financial data
-
-**[Time-Series Databases](05-timeseries-databases.md)** — Bucketing, retention, downsampling
-
----
-
-### 🔍 **Search Engines**
-- Elasticsearch, Solr, Meilisearch, Algolia
-- Full-text search, ranking, faceted search
-- Best for: Search, logging, real-time analytics
-
-**[Search Engines & Full-Text Search](06-search-engines.md)** — Inverted indexes, ranking, aggregations
+**10. 🏛️ Data Warehousing & Lakehouses**
+- **[Data Warehousing & Lakehouses](10-warehousing-lakehouses.md)** — Architecture, ETL, optimization
+- Medallion architecture, Delta Lake, table formats
 
 ---
 
-### 📤 **Cache Databases**
-- Redis, Memcached, Dragonfly
-- In-memory, blazingly fast
-- Best for: Caching, sessions, real-time data
+### Advanced Concepts (20 New Guides)
 
-**[Caching & In-Memory Stores](07-caching-stores.md)** — Eviction, persistence, clustering
+**11. 📨 Message Queues & Event Streaming**
+- **[Message Queues & Event Streaming](11-message-queues-streams.md)** — Kafka, RabbitMQ, event sourcing
+- Pub/Sub patterns, ordering guarantees, replay capability
+- Exercises: Order processing, analytics streams, fault handling
 
----
+**12. 🔄 Distributed Transactions**
+- **[Distributed Transactions](12-distributed-transactions.md)** — 2PC, Sagas, consistency
+- Trade-offs between blocking and eventual consistency
+- Exercises: Order processing with compensations
 
-### 🎯 **Vector Databases**
-- Pinecone, Weaviate, Milvus, Qdrant
-- Similarity search, embeddings
-- Best for: RAG, semantic search, recommendations
+**13. 🤝 Consensus Algorithms**
+- **[Consensus Algorithms](13-consensus-algorithms.md)** — Raft, Paxos, Byzantine Fault Tolerance
+- Leader election, log replication, failure recovery
+- Exercises: Implement Raft node with consensus
 
-**[Vector Databases](08-vector-databases.md)** — Embedding search, indexing, distance metrics
+**14. ⚖️ Load Balancing & Routing**
+- **[Load Balancing & Routing](14-load-balancing-and-routing.md)** — Consistent hashing, routing strategies
+- Round-robin, least-connections, geographic routing
+- Exercises: Implement consistent hash ring
 
----
+**15. 🔁 Database Replication & Failover**
+- **[Database Replication & Failover](15-database-replication.md)** — Master-replica, multi-region
+- Synchronous vs. asynchronous replication
+- Exercises: Failover detection and promotion
 
-### 🔀 **Query Language: GraphQL**
-- API query language, multiple sources
-- Strongly typed, composable
-- Best for: APIs, flexibility, client-driven queries
+**16. 💾 Backup & Recovery**
+- **[Database Backup & Recovery](16-backup-recovery.md)** — RTO, RPO, incremental backups
+- Point-in-time recovery, cross-region backup
+- Exercises: Design backup strategy for scale
 
-**[GraphQL Fundamentals](09-graphql.md)** — Schema design, resolvers, N+1 problems
+**17. 📋 Query Planning & Optimization**
+- **[Query Planning & Optimization](17-query-planning.md)** — Cost-based optimization, statistics
+- Join ordering, cardinality estimation
+- Exercises: Optimize complex queries
 
----
+**18. 🔑 Indexing Deep Dive**
+- **[Indexing Deep Dive](18-indexing-deep-dive.md)** — B-trees, LSM trees, hash indexes
+- Bitmap indexes, covering indexes
+- Exercises: Choose optimal index structure
 
-### 🏛️ **Data Warehousing & Lakehouses**
-- Snowflake, Redshift, Delta Lake, Iceberg
-- OLAP, analytics, big data
-- Best for: Data analytics, business intelligence
+**19. 📍 Sharding Strategies Deep Dive**
+- **[Sharding Strategies Deep Dive](19-sharding-advanced.md)** — Range, hash, directory-based
+- Consistent hashing, rebalancing, hotspot detection
+- Exercises: Design sharding for scale-out
 
-**[Data Warehousing & Lakehouses](10-warehousing-lakehouses.md)** — Architecture, ETL, optimization
+**20. 📤 Change Data Capture (CDC)**
+- **[Change Data Capture](20-change-data-capture.md)** — Log-based, query-based CDC
+- Streaming changes to downstream systems
+- Exercises: Implement CDC pipeline
+
+**21. 🔄 Eventual Consistency Patterns**
+- **[Eventual Consistency Patterns](21-eventual-consistency.md)** — Read-your-write, monotonic reads
+- Handling stale reads, conflict resolution
+- Exercises: Design eventual consistency system
+
+**22. 🔍 Distributed Tracing & Observability**
+- **[Distributed Tracing](22-distributed-tracing.md)** — Span tracking, latency analysis
+- Sampling, correlation IDs, flame graphs
+- Exercises: Trace production incident
+
+**23. 📑 API Pagination & Filtering**
+- **[API Pagination & Filtering](23-api-pagination.md)** — Cursor-based, offset-based pagination
+- Filter syntax, sorting strategies
+- Exercises: Implement efficient pagination
+
+**24. 📊 Database Monitoring & Alerting**
+- **[Database Monitoring & Alerting](24-database-monitoring.md)** — Key metrics, anomaly detection
+- Query latency, connection pools, disk usage
+- Exercises: Design monitoring dashboard
+
+**25. 🔌 Connection Pooling**
+- **[Connection Pooling](25-connection-pooling.md)** — Pool sizing, idle timeout, queue management
+- Connection lifecycle, resource limits
+- Exercises: Implement connection pool
+
+**26. 🔀 Database Migration Strategies**
+- **[Database Migration Strategies](26-migration-strategies.md)** — Zero-downtime migration, dual writes
+- Shadow traffic, feature flags, rollback
+- Exercises: Plan major schema migration
+
+**27. 👥 Multi-tenancy Patterns**
+- **[Multi-tenancy Patterns](27-multi-tenancy.md)** — Shared database, schema-per-tenant, database-per-tenant
+- Row-level security, data isolation
+- Exercises: Design multi-tenant architecture
+
+**28. 🔒 Database Security & Encryption**
+- **[Database Security](28-database-security.md)** — Encryption at rest, in-transit, TDE
+- Access control, audit logging, compliance
+- Exercises: Implement encryption strategy
+
+**29. ⚡ Time-Series Optimization Deep Dive**
+- **[Time-Series Optimization](29-time-series-optimization.md)** — Specialized compression, retention
+- Downsampling, aggregate tables, tiered storage
+- Exercises: Optimize for 1B metrics/day
+
+**30. 🌊 Stream Processing & Complex Event Processing**
+- **[Stream Processing](30-stream-processing.md)** — Kafka Streams, Flink, window operations
+- Stateful processing, joins, aggregations
+- Exercises: Implement real-time analytics
 
 ---
 
