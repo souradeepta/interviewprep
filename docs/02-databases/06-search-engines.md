@@ -558,6 +558,416 @@ Performance Tuning:
 
 ---
 
+## 🧪 Practical Exercises & Solutions
+
+### Exercise 1: Build Product Search Index (Easy)
+
+**Problem:**
+Index 10M products and implement:
+1. Full-text search
+2. Faceted filtering
+3. Sorting by relevance
+
+**Solution:**
+
+```json
+// Create index mapping
+PUT /products
+{
+  "mappings": {
+    "properties": {
+      "id": {"type": "keyword"},
+      "name": {
+        "type": "text",
+        "analyzer": "standard",
+        "fields": {
+          "keyword": {"type": "keyword"}
+        }
+      },
+      "description": {"type": "text"},
+      "brand": {"type": "keyword"},
+      "category": {"type": "keyword"},
+      "price": {"type": "float"},
+      "rating": {"type": "float"},
+      "in_stock": {"type": "boolean"},
+      "popularity_score": {"type": "integer"},
+      "tags": {"type": "keyword"}
+    }
+  }
+}
+
+// Index sample products
+POST /products/_bulk
+{"index": {"_id": "1"}}
+{"id": "1", "name": "Apple MacBook Pro 14 inch", "description": "High-performance laptop with M3 chip", "brand": "Apple", "category": "Laptops", "price": 1999, "rating": 4.8, "in_stock": true, "popularity_score": 9500, "tags": ["laptop", "apple", "m3"]}
+
+{"index": {"_id": "2"}}
+{"id": "2", "name": "Dell XPS 13 Plus", "description": "Ultra-portable laptop with Intel i7", "brand": "Dell", "category": "Laptops", "price": 1299, "rating": 4.6, "in_stock": true, "popularity_score": 8200, "tags": ["laptop", "intel", "ultrabook"]}
+
+{"index": {"_id": "3"}}
+{"id": "3", "name": "Logitech MX Master 3S Mouse", "description": "Premium wireless mouse for professionals", "brand": "Logitech", "category": "Accessories", "price": 99, "rating": 4.7, "in_stock": true, "popularity_score": 5600, "tags": ["mouse", "wireless", "gaming"]}
+```
+
+```json
+// QUERY 1: Full-text search
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "multi_match": {
+            "query": "laptop m3",
+            "fields": ["name^2", "description"]
+          }
+        }
+      ]
+    }
+  }
+}
+
+// Result: MacBook Pro matches "laptop" and "m3"
+// Score: High due to name matching and boost
+
+// QUERY 2: Search with facets
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "must": [{"match": {"name": "laptop"}}],
+      "filter": [
+        {"range": {"price": {"gte": 1000, "lte": 2000}}},
+        {"term": {"in_stock": true}}
+      ]
+    }
+  },
+  "aggs": {
+    "brands": {
+      "terms": {"field": "brand.keyword", "size": 10}
+    },
+    "price_ranges": {
+      "range": {
+        "field": "price",
+        "ranges": [
+          {"to": 1000},
+          {"from": 1000, "to": 2000},
+          {"from": 2000}
+        ]
+      }
+    },
+    "categories": {
+      "terms": {"field": "category.keyword", "size": 10}
+    }
+  },
+  "size": 20
+}
+
+// Result:
+// {
+//   "hits": {"MacBook Pro", "Dell XPS 13"},
+//   "aggregations": {
+//     "brands": [
+//       {"key": "Apple", "doc_count": 1},
+//       {"key": "Dell", "doc_count": 1}
+//     ],
+//     "price_ranges": [
+//       {"key": "1000-2000", "doc_count": 2}
+//     ]
+//   }
+// }
+
+// QUERY 3: Sort by relevance and popularity
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"name": "laptop"}}
+      ]
+    }
+  },
+  "sort": [
+    {"_score": {"order": "desc"}},    // BM25 score
+    {"popularity_score": {"order": "desc"}}  // Popularity tiebreaker
+  ],
+  "size": 10
+}
+
+// Result: Sorted by relevance first, then popularity
+```
+
+---
+
+### Exercise 2: Implement Autocomplete (Medium)
+
+**Problem:**
+Implement search autocomplete suggesting product names as user types
+
+**Solution:**
+
+```json
+// Create completion index
+PUT /product_suggestions
+{
+  "mappings": {
+    "properties": {
+      "product_id": {"type": "keyword"},
+      "name": {
+        "type": "completion",
+        "analyzer": "simple"
+      },
+      "popularity": {"type": "integer"}
+    }
+  }
+}
+
+// Index suggestions with popularity weighting
+POST /product_suggestions/_bulk
+{"index": {"_id": "1"}}
+{"product_id": "1", "name": {"input": ["MacBook Pro", "MacBook", "Apple MacBook"], "weight": 9500}, "popularity": 9500}
+
+{"index": {"_id": "2"}}
+{"product_id": "2", "name": {"input": ["Dell XPS 13", "XPS", "Dell"], "weight": 8200}, "popularity": 8200}
+
+{"index": {"_id": "3"}}
+{"product_id": "3", "name": {"input": ["Logitech MX Master", "MX Master", "Logitech"], "weight": 5600}, "popularity": 5600}
+
+// QUERY: Autocomplete as user types
+GET /product_suggestions/_search
+{
+  "suggest": {
+    "product_suggestions": {
+      "prefix": "mac",
+      "completion": {
+        "field": "name",
+        "size": 5,
+        "skip_duplicates": true
+      }
+    }
+  }
+}
+
+// Result:
+// {
+//   "suggest": {
+//     "product_suggestions": [{
+//       "options": [
+//         {"text": "MacBook Pro", "score": 9500},
+//         {"text": "MacBook", "score": 9500},
+//         {"text": "Apple MacBook", "score": 9500}
+//       ]
+//     }]
+//   }
+// }
+
+// QUERY: Autocomplete with fuzzy matching (typo tolerance)
+GET /product_suggestions/_search
+{
+  "suggest": {
+    "product_suggestions": {
+      "prefix": "macboo",  // Missing 'k'
+      "completion": {
+        "field": "name",
+        "size": 5,
+        "fuzzy": {
+          "fuzziness": "AUTO"
+        }
+      }
+    }
+  }
+}
+
+// Result: Still suggests "MacBook Pro" (matches despite typo)
+```
+
+---
+
+### Exercise 3: Ranking and Boosting (Hard)
+
+**Problem:**
+Improve search results ranking:
+- Recent products ranked higher
+- Popular products ranked higher
+- Exact matches scored higher
+
+**Solution:**
+
+```json
+// QUERY: Complex ranking with multiple factors
+GET /products/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "name": {
+              "query": "laptop",
+              "boost": 2.0  // Boost exact match
+            }
+          }
+        }
+      ]
+    }
+  },
+  "rescore": {
+    "window_size": 50,  // Re-rank top 50 results
+    "query": {
+      "rescore_query": {
+        "bool": {
+          "should": [
+            {
+              "term": {
+                "name.keyword": {
+                  "value": "laptop",
+                  "boost": 3.0  // Exact match boost
+                }
+              }
+            },
+            {
+              "range": {
+                "popularity_score": {
+                  "gte": 5000,
+                  "boost": 1.5  // Popular products
+                }
+              }
+            },
+            {
+              "range": {
+                "rating": {
+                  "gte": 4.5,
+                  "boost": 1.2  // High rating
+                }
+              }
+            }
+          ]
+        }
+      },
+      "query_weight": 0.7,
+      "rescore_query_weight": 1.2
+    }
+  },
+  "size": 10
+}
+
+// Alternative: Function Score Query (more flexible)
+GET /products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match": {"name": "laptop"}
+      },
+      "functions": [
+        {
+          "field_value_factor": {
+            "field": "popularity_score",
+            "modifier": "log1p",
+            "factor": 1.2
+          }
+        },
+        {
+          "field_value_factor": {
+            "field": "rating",
+            "modifier": "sqrt",
+            "factor": 0.5
+          }
+        },
+        {
+          "gauss": {
+            "price": {
+              "origin": 1500,
+              "scale": 500,
+              "decay": 0.5
+            }
+          }
+        }
+      ],
+      "boost_mode": "multiply",
+      "score_mode": "sum"
+    }
+  }
+}
+
+// Score calculation:
+// base_score (BM25) * popularity_factor * rating_factor * price_decay
+// = BM25 * log(popularity) * sqrt(rating) * price_decay
+
+// Results:
+// 1. MacBook Pro (high score + high popularity)
+// 2. Dell XPS 13 (medium score + medium popularity)
+// 3. Other laptops (lower scores)
+```
+
+---
+
+### Exercise 4: Handle Relevance Decay Over Time (Hard)
+
+**Problem:**
+Rank recent products higher, decay old products
+
+**Solution:**
+
+```json
+// Add publication_date to index
+PUT /products
+{
+  "mappings": {
+    "properties": {
+      "name": {"type": "text"},
+      "published_date": {"type": "date"},
+      "popularity_score": {"type": "integer"}
+    }
+  }
+}
+
+// QUERY: Decay score based on age
+GET /products/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match": {"name": "laptop"}
+      },
+      "functions": [
+        {
+          "gauss": {
+            "published_date": {
+              "origin": "now",
+              "scale": "30d",    // Half decay at 30 days
+              "offset": "7d",    // No decay for first 7 days
+              "decay": 0.5
+            }
+          }
+        },
+        {
+          "field_value_factor": {
+            "field": "popularity_score",
+            "modifier": "log1p"
+          }
+        }
+      ],
+      "boost_mode": "multiply"
+    }
+  }
+}
+
+// Decay calculation:
+// - Product published today: 100% score
+// - Product published 7 days ago: 100% score (offset)
+// - Product published 30 days ago: 50% score
+// - Product published 60 days ago: 25% score
+// - Product published 90 days ago: 12% score
+
+// Score = BM25 * decay_factor * popularity_factor
+
+// Example scores:
+// MacBook Pro (new, popular): 2.5 * 1.0 * 1.3 = 3.25
+// Old laptop (old, popular): 2.0 * 0.1 * 1.3 = 0.26
+```
+
+---
+
 ## 💡 Interview Tips
 
 **What interviewer is really asking:**

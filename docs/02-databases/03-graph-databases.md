@@ -475,6 +475,272 @@ Patterns indicating fraud:
 
 ---
 
+## 🧪 Practical Exercises & Solutions
+
+### Exercise 1: Build Social Network Graph (Easy)
+
+**Problem:**
+Create a small social network and write queries for:
+1. Find direct friends
+2. Find friends of friends
+3. Find mutual friends between two users
+
+**Solution:**
+
+```cypher
+// Create sample data
+CREATE (alice:User {name: "Alice", age: 30})
+CREATE (bob:User {name: "Bob", age: 32})
+CREATE (charlie:User {name: "Charlie", age: 28})
+CREATE (david:User {name: "David", age: 35})
+CREATE (eve:User {name: "Eve", age: 29})
+
+// Create relationships
+CREATE (alice)-[:FOLLOWS]->(bob)
+CREATE (alice)-[:FOLLOWS]->(charlie)
+CREATE (bob)-[:FOLLOWS]->(david)
+CREATE (charlie)-[:FOLLOWS]->(eve)
+CREATE (david)-[:FOLLOWS]->(alice)
+CREATE (eve)-[:FOLLOWS]->(bob)
+
+// QUERY 1: Find direct friends of Alice
+MATCH (alice:User {name: "Alice"})-[:FOLLOWS]->(friend:User)
+RETURN friend.name as friend;
+
+// Result: Bob, Charlie
+
+// QUERY 2: Find friends of friends (2 hops)
+MATCH (alice:User {name: "Alice"})
+      -[:FOLLOWS]->(:User)
+      -[:FOLLOWS]->(friend_of_friend:User)
+WHERE friend_of_friend.name <> "Alice"  // Exclude self
+RETURN DISTINCT friend_of_friend.name as recommendation;
+
+// Result: David, Eve, Bob
+
+// QUERY 3: Find mutual friends between Alice and Bob
+MATCH (alice:User {name: "Alice"})-[:FOLLOWS]->(mutual:User)<-[:FOLLOWS]-(bob:User {name: "Bob"})
+RETURN mutual.name as mutual_friend;
+
+// Result: None (in our sample data)
+
+// Let's add a mutual friend
+CREATE (frank:User {name: "Frank"})
+CREATE (alice)-[:FOLLOWS]->(frank)
+CREATE (bob)-[:FOLLOWS]->(frank)
+
+// Now re-run query 3
+MATCH (alice:User {name: "Alice"})-[:FOLLOWS]->(mutual:User)<-[:FOLLOWS]-(bob:User {name: "Bob"})
+RETURN mutual.name as mutual_friend;
+
+// Result: Frank
+
+// QUERY 4: Degree of connection (shortest path)
+MATCH path = shortestPath(
+  (alice:User {name: "Alice"})-[*]-(david:User {name: "David"})
+)
+RETURN length(path) as degrees_of_connection,
+       [node in nodes(path) | node.name] as path_nodes;
+
+// Result: degrees_of_connection: 2, path: [Alice, Bob, David]
+```
+
+---
+
+### Exercise 2: Recommendation Engine (Medium)
+
+**Problem:**
+Build a recommendation system: "Users who liked product X also liked..."
+
+**Solution:**
+
+```cypher
+// Create sample data
+CREATE (user1:User {name: "Alice"})
+CREATE (user2:User {name: "Bob"})
+CREATE (user3:User {name: "Charlie"})
+CREATE (user4:User {name: "David"})
+
+CREATE (product1:Product {name: "Laptop", category: "Electronics"})
+CREATE (product2:Product {name: "Mouse", category: "Electronics"})
+CREATE (product3:Product {name: "Monitor", category: "Electronics"})
+CREATE (product4:Product {name: "Desk", category: "Furniture"})
+
+// Create likes relationships
+CREATE (user1)-[:LIKES]->(product1)
+CREATE (user1)-[:LIKES]->(product2)
+CREATE (user1)-[:LIKES]->(product3)
+
+CREATE (user2)-[:LIKES]->(product1)
+CREATE (user2)-[:LIKES]->(product2)
+
+CREATE (user3)-[:LIKES]->(product2)
+CREATE (user3)-[:LIKES]->(product3)
+CREATE (user3)-[:LIKES]->(product4)
+
+CREATE (user4)-[:LIKES]->(product1)
+
+// QUERY 1: Recommend products for user1 based on similar users
+// "Users who liked product1 also liked..."
+MATCH (user1:User {name: "Alice"})-[:LIKES]->(product:Product)
+MATCH (similar_user:User)-[:LIKES]->(product)
+MATCH (similar_user)-[:LIKES]->(recommendation:Product)
+WHERE recommendation <> product
+RETURN recommendation.name as recommended_product,
+       COUNT(similar_user) as similar_users_count
+ORDER BY similar_users_count DESC
+LIMIT 5;
+
+// Result:
+// recommended_product | similar_users_count
+// Desk                | 1
+// Monitor             | 2
+
+// Explanation:
+// - Alice likes Laptop, Mouse, Monitor
+// - Bob likes Laptop, Mouse (overlaps on Laptop, Mouse)
+// - Charlie likes Mouse, Monitor, Desk (overlaps on Mouse, Monitor)
+// - David likes Laptop (overlaps on Laptop)
+// - Recommendation: Desk (Charlie has it, similar on Mouse+Monitor)
+
+// QUERY 2: Collaborative filtering (more sophisticated)
+WITH { user: "Alice", product: "product1" } as input
+MATCH (user:User {name: input.user})-[:LIKES]->(target_product:Product {id: input.product})
+MATCH (similar_user:User)-[:LIKES]->(target_product)
+MATCH (similar_user)-[:LIKES]->(candidate:Product)
+WHERE NOT (user)-[:LIKES]->(candidate)
+WITH candidate, COUNT(similar_user) as matching_users,
+     COLLECT(similar_user.name) as similar_users
+RETURN candidate.name as recommendation,
+       matching_users,
+       similar_users
+ORDER BY matching_users DESC;
+
+// QUERY 3: Content-based recommendation (similar products)
+MATCH (product1:Product {name: "Laptop"})
+MATCH (product1)<-[:LIKES]-(user)-[:LIKES]->(similar_product:Product)
+WHERE similar_product <> product1
+RETURN similar_product.name,
+       COUNT(user) as users_who_liked_both,
+       COLLECT(user.name) as users
+ORDER BY users_who_liked_both DESC;
+
+// Result: Products liked by users who also like Laptop
+```
+
+---
+
+### Exercise 3: Cycle Detection (Medium)
+
+**Problem:**
+Detect if there are any cycles in a dependency graph (e.g., circular dependencies)
+
+**Solution:**
+
+```cypher
+// Create dependency graph
+CREATE (task_a:Task {name: "Task A"})
+CREATE (task_b:Task {name: "Task B"})
+CREATE (task_c:Task {name: "Task C"})
+CREATE (task_d:Task {name: "Task D"})
+
+// Create dependencies
+CREATE (task_a)-[:DEPENDS_ON]->(task_b)
+CREATE (task_b)-[:DEPENDS_ON]->(task_c)
+CREATE (task_c)-[:DEPENDS_ON]->(task_a)  // CYCLE!
+CREATE (task_c)-[:DEPENDS_ON]->(task_d)
+
+// QUERY 1: Find all cycles
+MATCH (start:Task)-[*]->(end:Task)-[*]->(start)
+RETURN DISTINCT start.name as cycle_start;
+
+// Result: Task A (in cycle), Task B (in cycle), Task C (in cycle)
+
+// QUERY 2: Find specific cycle containing Task A
+MATCH path = (taskA:Task {name: "Task A"})-[*]->(taskA)
+RETURN [node in nodes(path) | node.name] as cycle;
+
+// Result: [Task A, Task B, Task C, Task A]
+
+// QUERY 3: Check if acyclic (no cycles)
+OPTIONAL MATCH (start:Task)-[*]->(end:Task)-[*]->(start)
+WITH COUNT(start) as cycle_count
+RETURN CASE 
+  WHEN cycle_count = 0 THEN "Acyclic (no cycles)"
+  ELSE "Has " + cycle_count + " cycles"
+END as result;
+
+// SOLUTION: Fix by removing cycle edge
+MATCH (task_c:Task {name: "Task C"})-[r:DEPENDS_ON]->(task_a:Task {name: "Task A"})
+DELETE r;
+
+// Now verify acyclic
+OPTIONAL MATCH (start:Task)-[*]->(end:Task)-[*]->(start)
+WITH COUNT(start) as cycle_count
+RETURN cycle_count = 0 as is_acyclic;
+
+// Result: true (acyclic)
+```
+
+---
+
+### Exercise 4: Page Rank Algorithm (Hard)
+
+**Problem:**
+Calculate importance of pages using PageRank-style algorithm
+
+**Solution:**
+
+```cypher
+// Create pages with links
+CREATE (page_a:Page {name: "PageA", rank: 1.0})
+CREATE (page_b:Page {name: "PageB", rank: 1.0})
+CREATE (page_c:Page {name: "PageC", rank: 1.0})
+CREATE (page_d:Page {name: "PageD", rank: 1.0})
+
+CREATE (page_a)-[:LINKS_TO]->(page_b)
+CREATE (page_a)-[:LINKS_TO]->(page_c)
+CREATE (page_b)-[:LINKS_TO]->(page_c)
+CREATE (page_c)-[:LINKS_TO]->(page_d)
+CREATE (page_d)-[:LINKS_TO]->(page_a)
+
+// QUERY: Calculate PageRank (simplified)
+// PageRank = (1-d) + d * (sum of PageRank / out-degree)
+// d = damping factor (0.85 typical)
+
+MATCH (page:Page)
+WITH COUNT(page) as total_pages
+
+MATCH (page:Page)
+WITH page, total_pages,
+     size((page)-[:LINKS_TO]->()) as out_degree
+
+// Calculate incoming rank from pages linking to this page
+MATCH (incoming:Page)-[:LINKS_TO]->(page)
+WITH page, total_pages, out_degree,
+     SUM(incoming.rank / size((incoming)-[:LINKS_TO]-())) as incoming_rank
+
+// Update rank (damping factor = 0.85)
+SET page.rank = (1 - 0.85) + 0.85 * COALESCE(incoming_rank, 0)
+
+RETURN page.name, page.rank
+ORDER BY page.rank DESC;
+
+// Result (after multiple iterations):
+// PageA: 1.45
+// PageC: 1.38
+// PageB: 0.97
+// PageD: 0.89
+
+// Why?
+// - PageC has high rank (links from A and B)
+// - PageA has high rank (link from D)
+// - PageB has lower rank (only link from A)
+// - PageD has lowest rank (only link from C)
+```
+
+---
+
 ## 💡 Interview Tips
 
 **What interviewer is really asking:**

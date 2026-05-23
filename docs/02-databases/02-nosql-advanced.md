@@ -609,6 +609,473 @@ Decision tree:
 
 ---
 
+## 🧪 Practical Exercises & Solutions
+
+### Exercise 1: MongoDB Schema Design (Easy)
+
+**Problem:**
+Design a MongoDB schema for a blog platform with:
+- Users
+- Posts (with comments, likes)
+- Tags
+
+**Task:** Choose between embedding and referencing
+
+**Solution:**
+
+```javascript
+// APPROACH 1: Embedding (if comments < 1000 per post)
+db.posts.insertOne({
+  _id: ObjectId("..."),
+  title: "MongoDB Tips",
+  content: "...",
+  author_id: ObjectId("user_123"),
+  author_name: "Alice",  // Denormalized for easy access
+  created_at: ISODate("2024-05-22"),
+  tags: ["mongodb", "database"],
+  comments: [
+    {
+      _id: ObjectId("comment_1"),
+      author_id: ObjectId("user_456"),
+      author_name: "Bob",
+      content: "Great post!",
+      created_at: ISODate("2024-05-22T10:30:00"),
+      likes: 5
+    },
+    {
+      _id: ObjectId("comment_2"),
+      author_id: ObjectId("user_789"),
+      author_name: "Charlie",
+      content: "Thanks!",
+      created_at: ISODate("2024-05-22T11:00:00"),
+      likes: 2
+    }
+  ],
+  like_count: 42,
+  comment_count: 2
+});
+
+// Queries with embedded approach:
+
+// Get post with all comments
+db.posts.findOne({ _id: ObjectId("...") });
+
+// Get recent comments on post
+db.posts.findOne(
+  { _id: ObjectId("...") },
+  { comments: { $slice: -10 } }  // Last 10 comments
+);
+
+// Add comment to post
+db.posts.updateOne(
+  { _id: ObjectId("...") },
+  {
+    $push: {
+      comments: {
+        _id: ObjectId("..."),
+        author_id: ObjectId("user_999"),
+        author_name: "David",
+        content: "Excellent!",
+        created_at: new Date(),
+        likes: 0
+      }
+    },
+    $inc: { comment_count: 1 }
+  }
+);
+
+// APPROACH 2: Referencing (if comments > 10000 per post)
+// Posts collection
+db.posts.insertOne({
+  _id: ObjectId("post_123"),
+  title: "MongoDB Tips",
+  content: "...",
+  author_id: ObjectId("user_123"),
+  created_at: ISODate("2024-05-22"),
+  tags: ["mongodb", "database"],
+  comment_ids: [
+    ObjectId("comment_1"),
+    ObjectId("comment_2"),
+    ObjectId("comment_3")
+  ],
+  comment_count: 3,
+  like_count: 42
+});
+
+// Comments collection
+db.comments.insertMany([
+  {
+    _id: ObjectId("comment_1"),
+    post_id: ObjectId("post_123"),
+    author_id: ObjectId("user_456"),
+    content: "Great post!",
+    created_at: ISODate("2024-05-22T10:30:00"),
+    likes: 5
+  },
+  {
+    _id: ObjectId("comment_2"),
+    post_id: ObjectId("post_123"),
+    author_id: ObjectId("user_789"),
+    content: "Thanks!",
+    created_at: ISODate("2024-05-22T11:00:00"),
+    likes: 2
+  }
+]);
+
+// Queries with referenced approach:
+
+// Get post
+db.posts.findOne({ _id: ObjectId("post_123") });
+
+// Get comments for post (separate query)
+db.comments.find({ post_id: ObjectId("post_123") })
+  .sort({ created_at: -1 })
+  .limit(10);
+
+// Add comment (update both collections)
+db.comments.insertOne({
+  _id: ObjectId("comment_4"),
+  post_id: ObjectId("post_123"),
+  author_id: ObjectId("user_999"),
+  content: "Excellent!",
+  created_at: new Date(),
+  likes: 0
+});
+
+db.posts.updateOne(
+  { _id: ObjectId("post_123") },
+  {
+    $push: { comment_ids: ObjectId("comment_4") },
+    $inc: { comment_count: 1 }
+  }
+);
+
+// RECOMMENDATION:
+// Embedding: Comments < 1000, access together frequently
+// Referencing: Comments > 10000, independent access, evolving data
+// Hybrid: Summary in post (comment count, last 5), details in separate collection
+```
+
+---
+
+### Exercise 2: DynamoDB Access Patterns (Medium)
+
+**Problem:**
+Design DynamoDB table for user orders with queries:
+1. Get all orders for user (most common)
+2. Get order by order_id
+3. Get orders by date range
+4. Get orders by status
+
+**Solution:**
+
+```javascript
+// Main Table: Orders
+const OrdersTable = {
+  TableName: 'Orders',
+  
+  // Primary Key Design
+  KeySchema: [
+    {
+      AttributeName: 'user_id',
+      KeyType: 'HASH'  // Partition key
+    },
+    {
+      AttributeName: 'order_date#order_id',
+      KeyType: 'RANGE'  // Sort key
+    }
+  ],
+  
+  // Attributes
+  AttributeDefinitions: [
+    { AttributeName: 'user_id', AttributeType: 'S' },
+    { AttributeName: 'order_date#order_id', AttributeType: 'S' },
+    { AttributeName: 'order_id', AttributeType: 'S' },
+    { AttributeName: 'order_status', AttributeType: 'S' },
+    { AttributeName: 'order_date', AttributeType: 'S' }
+  ],
+  
+  // Global Secondary Indexes for alternate queries
+  GlobalSecondaryIndexes: [
+    {
+      // Query 2: Get order by order_id
+      IndexName: 'OrderIdIndex',
+      KeySchema: [
+        { AttributeName: 'order_id', KeyType: 'HASH' },
+        { AttributeName: 'order_date', KeyType: 'RANGE' }
+      ],
+      Projection: { ProjectionType: 'ALL' }
+    },
+    {
+      // Query 4: Get orders by status
+      IndexName: 'StatusDateIndex',
+      KeySchema: [
+        { AttributeName: 'order_status', KeyType: 'HASH' },
+        { AttributeName: 'order_date', KeyType: 'RANGE' }
+      ],
+      Projection: { ProjectionType: 'ALL' }
+    }
+  ]
+};
+
+// Sample Item
+const sampleOrder = {
+  user_id: 'user_123',  // Partition key
+  order_date: '2024-05-22',  // Sort key prefix
+  order_id: 'ORD_789',  // Used in GSI
+  order_date_time: '2024-05-22T14:30:45Z',
+  order_status: 'COMPLETED',  // Used in GSI
+  items: [
+    { product_id: 'PROD_1', quantity: 2, price: 29.99 },
+    { product_id: 'PROD_2', quantity: 1, price: 49.99 }
+  ],
+  total: 109.97,
+  shipping_address: { ... },
+  payment_method: { ... }
+};
+
+// QUERY 1: Get all orders for user (most common - uses main key)
+// O(log n) + O(k) where k = number of orders
+const getOrdersForUser = async (userId) => {
+  return await dynamodb.query({
+    TableName: 'Orders',
+    KeyConditionExpression: 'user_id = :uid',
+    ExpressionAttributeValues: {
+      ':uid': userId
+    },
+    ScanIndexForward: false  // Newest first
+  }).promise();
+};
+
+// QUERY 2: Get order by order_id (uses GSI)
+// O(log n) + O(1) since order_id is unique
+const getOrderById = async (orderId) => {
+  return await dynamodb.query({
+    TableName: 'Orders',
+    IndexName: 'OrderIdIndex',
+    KeyConditionExpression: 'order_id = :oid',
+    ExpressionAttributeValues: {
+      ':oid': orderId
+    }
+  }).promise();
+};
+
+// QUERY 3: Get orders by date range (uses main key with range)
+// O(log n) + O(k) where k = orders in range
+const getOrdersByDateRange = async (userId, startDate, endDate) => {
+  return await dynamodb.query({
+    TableName: 'Orders',
+    KeyConditionExpression: 
+      'user_id = :uid AND order_date BETWEEN :start AND :end',
+    ExpressionAttributeValues: {
+      ':uid': userId,
+      ':start': startDate,
+      ':end': endDate
+    }
+  }).promise();
+};
+
+// QUERY 4: Get orders by status (uses GSI)
+// O(log n) + O(k) where k = orders with status
+const getOrdersByStatus = async (status) => {
+  return await dynamodb.query({
+    TableName: 'Orders',
+    IndexName: 'StatusDateIndex',
+    KeyConditionExpression: 'order_status = :status',
+    ExpressionAttributeValues: {
+      ':status': status
+    }
+  }).promise();
+};
+
+// Trade-offs:
+// - Main key optimized for Query 1 (most common)
+// - 2 GSIs for alternate access patterns
+// - Projection: ALL (uses more storage, faster queries)
+// - Sort key includes order_id for uniqueness
+```
+
+---
+
+### Exercise 3: Handle Concurrent Writes (Hard)
+
+**Problem:**
+Implement a counter (like/view counter) that handles concurrent increments
+
+**Solution:**
+
+```javascript
+// Problem: Race condition with concurrent updates
+// Initial: likes = 100
+// Thread 1 reads: 100, increments: 101, writes: 101
+// Thread 2 reads: 100, increments: 101, writes: 101
+// Result: 101 (should be 102!)
+
+// SOLUTION 1: Atomic Operation (Best)
+// MongoDB atomic increment
+db.posts.updateOne(
+  { _id: ObjectId("...") },
+  { $inc: { likes: 1 } }  // Atomic!
+);
+
+// DynamoDB atomic operation
+await dynamodb.updateItem({
+  TableName: 'Posts',
+  Key: { post_id: 'POST_123' },
+  UpdateExpression: 'ADD likes :inc',  // Atomic!
+  ExpressionAttributeValues: {
+    ':inc': 1
+  }
+}).promise();
+
+// SOLUTION 2: Distributed Counter (High Scale)
+// Problem: Hot partition for popular posts
+// Solution: Distribute counter across multiple items
+
+// Store counter in multiple shards
+for (let i = 0; i < 10; i++) {
+  db.post_counters.insertOne({
+    post_id: 'POST_123',
+    shard_id: i,
+    likes: 0
+  });
+}
+
+// On increment: pick random shard
+db.post_counters.updateOne(
+  {
+    post_id: 'POST_123',
+    shard_id: Math.floor(Math.random() * 10)
+  },
+  { $inc: { likes: 1 } }
+);
+
+// To read total: sum all shards
+const result = await db.post_counters.aggregate([
+  { $match: { post_id: 'POST_123' } },
+  { $group: { _id: null, total_likes: { $sum: '$likes' } } }
+]).toArray();
+
+// Trade-off:
+// - More storage (multiple counters)
+// - No hot partition (distributed load)
+// - Small lag in reading total
+// - Eventual consistency for count
+
+// SOLUTION 3: Event Sourcing
+// Instead of storing counter, store events
+db.like_events.insertOne({
+  post_id: 'POST_123',
+  user_id: 'USER_456',
+  action: 'LIKE',
+  timestamp: new Date()
+});
+
+// To get count: count events
+const count = await db.like_events.countDocuments({
+  post_id: 'POST_123',
+  action: 'LIKE'
+});
+
+// Trade-off:
+// - No lost writes
+// - Can replay history
+// - Slow count calculation (O(n))
+// - More storage for history
+
+// RECOMMENDATION:
+// - Atomic operation: Simple, works for most cases
+// - Distributed counter: If > 1M increments/sec
+// - Event sourcing: If need audit trail
+```
+
+---
+
+### Exercise 4: Multi-Document Transaction (Hard)
+
+**Problem:**
+Transfer money between accounts atomically
+
+**Solution:**
+
+```javascript
+// Problem: What if transfer fails halfway?
+// Account A: deduct 100 ✓
+// Network fails
+// Account B: add 100 ✗
+// Result: Money lost!
+
+// SOLUTION: Multi-document transaction (MongoDB 4.0+)
+
+const session = db.getMongo().startSession();
+
+try {
+  session.startTransaction();
+  
+  // Deduct from account A
+  db.accounts.updateOne(
+    { account_id: 'ACC_A' },
+    { $inc: { balance: -100 } },
+    { session }
+  );
+  
+  // Add to account B
+  db.accounts.updateOne(
+    { account_id: 'ACC_B' },
+    { $inc: { balance: 100 } },
+    { session }
+  );
+  
+  // Record transaction
+  db.transactions.insertOne(
+    {
+      from_account: 'ACC_A',
+      to_account: 'ACC_B',
+      amount: 100,
+      timestamp: new Date(),
+      status: 'COMPLETED'
+    },
+    { session }
+  );
+  
+  // All operations succeed together
+  session.commitTransaction();
+  
+} catch (error) {
+  // All operations rollback together
+  session.abortTransaction();
+  console.error('Transaction failed:', error);
+  throw error;
+  
+} finally {
+  session.endSession();
+}
+
+// ALTERNATIVE: Saga Pattern (for systems without multi-doc transactions)
+// Step 1: Try to deduct
+try {
+  await deductFromAccount('ACC_A', 100);
+} catch (e) {
+  console.error('Step 1 failed, aborting');
+  throw e;
+}
+
+// Step 2: Try to add
+try {
+  await addToAccount('ACC_B', 100);
+} catch (e) {
+  // Compensating transaction: Undo step 1
+  console.error('Step 2 failed, compensating');
+  await addToAccount('ACC_A', 100);  // Refund!
+  throw e;
+}
+
+// Both succeeded!
+await recordTransaction('ACC_A', 'ACC_B', 100);
+```
+
+---
+
 ## 💡 Interview Tips
 
 **What interviewer is really asking:**

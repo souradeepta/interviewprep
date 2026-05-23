@@ -497,6 +497,464 @@ CREATE TABLE orders_2024_q1 PARTITION OF orders
 
 ---
 
+## 🧪 Practical Exercises & Solutions
+
+### Exercise 1: Optimize Slow Query (Easy)
+
+**Problem:**
+```sql
+-- This query is slow (~10 seconds on 1M rows)
+SELECT u.id, u.name, COUNT(o.id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.country = 'US'
+  AND o.created_at >= '2024-01-01'
+GROUP BY u.id, u.name;
+```
+
+**Task:** 
+1. Show what the execution plan might look like
+2. Identify the bottleneck
+3. Propose indexes
+4. Estimate improvement
+
+**Solution:**
+
+```sql
+-- Step 1: Check execution plan
+EXPLAIN ANALYZE
+SELECT u.id, u.name, COUNT(o.id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.country = 'US'
+  AND o.created_at >= '2024-01-01'
+GROUP BY u.id, u.name;
+
+-- Output might show:
+-- Seq Scan on users (full table scan = SLOW)
+-- Hash Join (medium cost)
+-- Total rows: 100K, Actual: 50K
+-- Time: 9500ms
+
+-- Step 2: Add indexes
+CREATE INDEX idx_users_country ON users(country);
+CREATE INDEX idx_orders_user_date ON orders(user_id, created_at);
+
+-- Step 3: Optimized query (same logic, better indexes)
+SELECT u.id, u.name, COUNT(o.id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.country = 'US'
+  AND o.created_at >= '2024-01-01'
+GROUP BY u.id, u.name;
+
+-- New execution plan:
+-- Index Scan on idx_users_country (fast lookup)
+-- Index Seek on idx_orders_user_date (fast range scan)
+-- Hash Join (same cost)
+-- Time: 500ms (20x improvement!)
+
+-- Step 4: Further optimization (if needed)
+-- Pre-compute aggregates
+CREATE MATERIALIZED VIEW user_order_stats AS
+SELECT 
+  u.id, 
+  u.name,
+  COUNT(o.id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.country = 'US'
+  AND o.created_at >= '2024-01-01'
+GROUP BY u.id, u.name;
+
+-- Now query is instant (100ms)
+SELECT * FROM user_order_stats;
+```
+
+**Key Concepts:**
+- Index on filtered column (country)
+- Composite index on join + filter (user_id, created_at)
+- Materialized view for pre-computation
+- Expected improvement: 20x to 100x
+
+---
+
+### Exercise 2: Design Schema for Events (Medium)
+
+**Problem:**
+Design a schema for an event tracking system:
+- 100M events/day
+- 10 event types
+- Need to query: events by user, by type, by time range
+- 1-year retention
+- Support aggregations (count, sum, average)
+
+**Task:**
+1. Design normalized schema
+2. Propose indexes
+3. Suggest partitioning
+4. Write sample queries
+
+**Solution:**
+
+```sql
+-- Schema Design
+CREATE TABLE events (
+  event_id BIGINT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  event_type VARCHAR(50) NOT NULL,
+  event_timestamp TIMESTAMP NOT NULL,
+  properties JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE event_types (
+  event_type_id INT PRIMARY KEY,
+  event_type_name VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Indexes (critical for performance)
+CREATE INDEX idx_events_user_timestamp 
+  ON events(user_id, event_timestamp DESC);
+
+CREATE INDEX idx_events_type_timestamp 
+  ON events(event_type, event_timestamp DESC);
+
+CREATE INDEX idx_events_timestamp 
+  ON events(event_timestamp DESC);
+
+-- Partitioning by date (for 100M events/day)
+CREATE TABLE events (...)
+  PARTITION BY RANGE (DATE(event_timestamp)) (
+    PARTITION p_2024_01 VALUES LESS THAN ('2024-02-01'),
+    PARTITION p_2024_02 VALUES LESS THAN ('2024-03-01'),
+    ...
+    PARTITION p_future VALUES LESS THAN (MAXVALUE)
+  );
+
+-- Sample Queries
+
+-- Query 1: Get user's events in time range
+SELECT user_id, event_type, event_timestamp, properties
+FROM events
+WHERE user_id = 12345
+  AND event_timestamp >= '2024-05-01'
+  AND event_timestamp < '2024-05-02'
+ORDER BY event_timestamp DESC;
+-- Uses: idx_events_user_timestamp
+-- Time: <100ms
+
+-- Query 2: Aggregate events by type
+SELECT 
+  event_type,
+  COUNT(*) as event_count,
+  COUNT(DISTINCT user_id) as unique_users
+FROM events
+WHERE event_timestamp >= '2024-05-01'
+  AND event_timestamp < '2024-05-02'
+GROUP BY event_type;
+-- Uses: idx_events_type_timestamp + partitioning
+-- Time: ~1 second
+
+-- Query 3: Recent events (last 100)
+SELECT *
+FROM events
+WHERE event_timestamp >= NOW() - INTERVAL '1 hour'
+ORDER BY event_timestamp DESC
+LIMIT 100;
+-- Uses: idx_events_timestamp
+-- Time: <50ms
+
+-- Query 4: Event funnel (users who did A then B)
+WITH step_a AS (
+  SELECT DISTINCT user_id
+  FROM events
+  WHERE event_type = 'page_view'
+    AND event_timestamp >= '2024-05-01'
+),
+step_b AS (
+  SELECT DISTINCT user_id
+  FROM events
+  WHERE event_type = 'click'
+    AND event_timestamp >= '2024-05-01'
+)
+SELECT 
+  (SELECT COUNT(*) FROM step_a) as step_a_users,
+  (SELECT COUNT(*) FROM step_b) as step_b_users,
+  (SELECT COUNT(*) FROM step_a WHERE user_id IN (SELECT user_id FROM step_b)) as funnel_users;
+
+-- Query 5: Top events today
+SELECT 
+  event_type,
+  COUNT(*) as count
+FROM events
+WHERE DATE(event_timestamp) = CURRENT_DATE
+GROUP BY event_type
+ORDER BY count DESC
+LIMIT 10;
+```
+
+**Trade-offs:**
+- Partitioning: Fast queries on recent data, slower on old data
+- JSONB: Flexible properties, slower aggregations on properties
+- Indexes: Speed up queries, slow down inserts
+
+---
+
+### Exercise 3: Handle Duplicate Orders (Medium)
+
+**Problem:**
+You have orders table with duplicate rows. How to:
+1. Identify duplicates
+2. Remove duplicates
+3. Prevent future duplicates
+
+**Solution:**
+
+```sql
+-- Table with duplicates
+CREATE TABLE orders (
+  order_id INT,
+  user_id INT,
+  amount DECIMAL,
+  created_at TIMESTAMP
+);
+
+-- Insert sample data with duplicates
+INSERT INTO orders VALUES
+(1, 101, 100, '2024-05-01 10:00:00'),
+(1, 101, 100, '2024-05-01 10:00:00'),  -- Duplicate!
+(2, 102, 200, '2024-05-01 11:00:00'),
+(2, 102, 200, '2024-05-01 11:00:00'),  -- Duplicate!
+(3, 103, 300, '2024-05-01 12:00:00');
+
+-- Identify duplicates
+SELECT order_id, COUNT(*) as duplicate_count
+FROM orders
+GROUP BY order_id
+HAVING COUNT(*) > 1;
+
+-- Remove duplicates (keep first occurrence)
+DELETE FROM orders
+WHERE ctid NOT IN (
+  SELECT MIN(ctid)
+  FROM orders
+  GROUP BY order_id, user_id, amount
+);
+
+-- Or using ROW_NUMBER (more portable)
+DELETE FROM orders
+WHERE ctid IN (
+  SELECT ctid
+  FROM (
+    SELECT 
+      ctid,
+      ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY created_at) as rn
+    FROM orders
+  ) t
+  WHERE rn > 1
+);
+
+-- Prevent future duplicates: Add unique constraint
+ALTER TABLE orders
+ADD CONSTRAINT uk_order_id UNIQUE (order_id);
+
+-- Or: Idempotent insert
+INSERT INTO orders (order_id, user_id, amount, created_at)
+VALUES (1, 101, 100, '2024-05-01 10:00:00')
+ON CONFLICT (order_id) DO NOTHING;
+
+-- Or: Handle with merge
+INSERT INTO orders (order_id, user_id, amount, created_at)
+VALUES (1, 101, 100, '2024-05-01 10:00:00')
+ON CONFLICT (order_id) DO UPDATE SET
+  amount = EXCLUDED.amount,
+  created_at = EXCLUDED.created_at;
+```
+
+---
+
+### Exercise 4: Complex Window Function (Hard)
+
+**Problem:**
+Calculate:
+1. Running total of sales per day
+2. Month-over-month growth
+3. Moving average (7-day)
+
+**Solution:**
+
+```sql
+-- Sample data
+CREATE TABLE daily_sales (
+  date DATE,
+  region VARCHAR(50),
+  sales DECIMAL
+);
+
+INSERT INTO daily_sales VALUES
+('2024-04-01', 'North', 1000),
+('2024-04-02', 'North', 1100),
+('2024-04-03', 'North', 950),
+-- ... more data
+
+-- Exercise Solution
+WITH daily_totals AS (
+  SELECT 
+    date,
+    region,
+    sales,
+    -- 1. Running total (cumulative)
+    SUM(sales) OVER (
+      PARTITION BY region
+      ORDER BY date
+      ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) as running_total,
+    
+    -- 2. Day-over-day growth
+    LAG(sales) OVER (
+      PARTITION BY region
+      ORDER BY date
+    ) as prev_day_sales,
+    
+    -- 3. 7-day moving average
+    AVG(sales) OVER (
+      PARTITION BY region
+      ORDER BY date
+      ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) as moving_avg_7d,
+    
+    -- 4. Month-over-month comparison
+    LAG(sales, 30) OVER (
+      PARTITION BY region
+      ORDER BY date
+    ) as sales_30_days_ago
+  FROM daily_sales
+),
+with_calculations AS (
+  SELECT 
+    date,
+    region,
+    sales,
+    running_total,
+    prev_day_sales,
+    ROUND(((sales - prev_day_sales) / prev_day_sales * 100)::NUMERIC, 2) as pct_change_day,
+    moving_avg_7d,
+    sales_30_days_ago,
+    ROUND(((sales - sales_30_days_ago) / sales_30_days_ago * 100)::NUMERIC, 2) as pct_change_month
+  FROM daily_totals
+)
+SELECT *
+FROM with_calculations
+WHERE date >= '2024-04-20'
+ORDER BY region, date;
+
+-- Expected output:
+-- date       | region | sales | running_total | pct_change_day | moving_avg_7d | pct_change_month
+-- 2024-04-20 | North  | 1050  | 31500         | 5.00           | 1028.57       | 2.50
+-- 2024-04-21 | North  | 1120  | 32620         | 6.67           | 1042.86       | 3.10
+```
+
+---
+
+### Exercise 5: Recursive CTE for Hierarchy (Hard)
+
+**Problem:**
+Find all employees under a manager (multi-level hierarchy)
+
+**Solution:**
+
+```sql
+-- Employees with manager hierarchy
+CREATE TABLE employees (
+  employee_id INT PRIMARY KEY,
+  name VARCHAR(100),
+  manager_id INT,
+  salary DECIMAL,
+  FOREIGN KEY (manager_id) REFERENCES employees(employee_id)
+);
+
+INSERT INTO employees VALUES
+(1, 'CEO', NULL, 500000),
+(2, 'VP Engineering', 1, 300000),
+(3, 'VP Sales', 1, 280000),
+(4, 'Engineering Lead', 2, 200000),
+(5, 'Senior Engineer', 4, 150000),
+(6, 'Junior Engineer', 4, 100000),
+(7, 'Sales Manager', 3, 120000),
+(8, 'Sales Rep', 7, 80000);
+
+-- Find all employees under VP Engineering (recursive)
+WITH RECURSIVE org_hierarchy AS (
+  -- Base case: Start with target manager
+  SELECT 
+    employee_id,
+    name,
+    manager_id,
+    salary,
+    1 as level
+  FROM employees
+  WHERE employee_id = 2  -- VP Engineering
+  
+  UNION ALL
+  
+  -- Recursive case: Find direct reports
+  SELECT 
+    e.employee_id,
+    e.name,
+    e.manager_id,
+    e.salary,
+    oh.level + 1
+  FROM employees e
+  INNER JOIN org_hierarchy oh ON e.manager_id = oh.employee_id
+)
+SELECT *
+FROM org_hierarchy
+ORDER BY level, name;
+
+-- Output:
+-- employee_id | name               | manager_id | salary | level
+-- 2           | VP Engineering     | 1          | 300000 | 1
+-- 4           | Engineering Lead   | 2          | 200000 | 2
+-- 5           | Senior Engineer    | 4          | 150000 | 3
+-- 6           | Junior Engineer    | 4          | 100000 | 3
+
+-- Calculate total team size and salary budget
+WITH RECURSIVE org_hierarchy AS (
+  SELECT 
+    employee_id,
+    name,
+    manager_id,
+    salary,
+    1 as level
+  FROM employees
+  WHERE employee_id = 2
+  
+  UNION ALL
+  
+  SELECT 
+    e.employee_id,
+    e.name,
+    e.manager_id,
+    e.salary,
+    oh.level + 1
+  FROM employees e
+  INNER JOIN org_hierarchy oh ON e.manager_id = oh.employee_id
+)
+SELECT 
+  COUNT(*) as team_size,
+  SUM(salary) as total_salary_budget,
+  AVG(salary) as avg_salary,
+  MAX(level) as max_depth
+FROM org_hierarchy;
+
+-- Output:
+-- team_size | total_salary_budget | avg_salary | max_depth
+-- 4         | 650000              | 162500     | 3
+```
+
+---
+
 ## 💡 Interview Tips
 
 **What the interviewer is really asking:**
