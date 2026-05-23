@@ -108,6 +108,45 @@ Jordan: Oh! A doubly linked list — I can remove and re-insert
 
 ---
 
+## Documentation Standards for Agents
+
+The agents should evaluate and test knowledge against these documentation standards:
+
+### Trade-off Knowledge
+Agents should ask: "What are the trade-offs between X and Y?"
+- Candidates should identify cost/performance/consistency trade-offs
+- Expect comparison tables in good answers
+- Real numbers (latency, throughput, scale) matter
+- "It depends" is good if followed by "depends on..."
+
+### Architectural Thinking
+Agents should probe: "Design this system..."
+- Candidates should draw diagrams (ASCII or described)
+- Include scaling patterns (Sharding, Master-Replica, CQRS)
+- Consider failures and recovery
+- Justify architecture choices with trade-offs
+
+### Interview-Ready Depth
+Agents should test:
+- **Theory:** Fundamentals, concepts, algorithms
+- **Practice:** Real code, working solutions, edge cases
+- **Scale:** 1M users, 1B events, how does design change?
+- **Trade-offs:** Cost vs. performance, consistency vs. availability
+
+### Exercise-Based Learning
+Agents should reference exercises:
+- "Have you tried the distributed counter exercise?"
+- "What about handling concurrent writes like in Exercise 3?"
+- "Show me code like the solutions in the exercises section"
+
+### Documentation Quality
+When agents give feedback, they should mention:
+- "Your answer has good theory but needs trade-offs"
+- "Consider architectural diagrams like in the guides"
+- "Walk through a practical exercise to solidify this"
+
+---
+
 ## Problem Difficulty Guide
 
 | Topic | Easy | Medium | Hard |
