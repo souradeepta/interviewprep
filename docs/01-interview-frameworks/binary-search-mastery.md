@@ -379,3 +379,19 @@ def test_binary_search():
 - ✓ Tested on small examples and edge cases
 - ✓ Verified sorted property before implementing binary search
 
+---
+
+## 🏃 Run the Code
+
+Working Python implementation and test suite:
+
+```bash
+# Run the test suite (from repo root)
+pytest tests/patterns/test_binary_search.py -v
+```
+
+**Implementation:** [`python/patterns/binary_search.py`](../../python/patterns/binary_search.py)
+**Tests:** [`tests/patterns/test_binary_search.py`](../../tests/patterns/test_binary_search.py)
+
+> All 5 pattern modules have 218 passing tests total. Run `pytest tests/patterns/ -v` to run all.
+

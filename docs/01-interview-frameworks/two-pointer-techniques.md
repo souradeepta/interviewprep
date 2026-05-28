@@ -286,3 +286,19 @@ def threeSum(nums):
 - ✓ Time complexity O(n), Space O(1)
 - ✓ Verified solution doesn't modify input (if not allowed)
 
+---
+
+## 🏃 Run the Code
+
+Working Python implementation and test suite:
+
+```bash
+# Run the test suite (from repo root)
+pytest tests/patterns/test_two_pointer.py -v
+```
+
+**Implementation:** [`python/patterns/two_pointer.py`](../../python/patterns/two_pointer.py)
+**Tests:** [`tests/patterns/test_two_pointer.py`](../../tests/patterns/test_two_pointer.py)
+
+> All 5 pattern modules have 218 passing tests total. Run `pytest tests/patterns/ -v` to run all.
+

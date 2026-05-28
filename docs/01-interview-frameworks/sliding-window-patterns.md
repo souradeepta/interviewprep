@@ -384,3 +384,19 @@ def sliding_window_template(arr, target_property):
 - ✓ Handled edge cases (empty, k > n)
 - ✓ Traced through one full example by hand
 
+---
+
+## 🏃 Run the Code
+
+Working Python implementation and test suite:
+
+```bash
+# Run the test suite (from repo root)
+pytest tests/patterns/test_sliding_window.py -v
+```
+
+**Implementation:** [`python/patterns/sliding_window.py`](../../python/patterns/sliding_window.py)
+**Tests:** [`tests/patterns/test_sliding_window.py`](../../tests/patterns/test_sliding_window.py)
+
+> All 5 pattern modules have 218 passing tests total. Run `pytest tests/patterns/ -v` to run all.
+
