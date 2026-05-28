@@ -193,5 +193,5 @@ Sharding strategy:
 ## Resources
 
 - [System Design Fundamentals](../domains/system-design-fundamentals.md)
-- [Full System Design Guide](../../docs/system_design/)
+- [Full System Design Guide](../../docs/03-system-design/README.md)
 - [Design Patterns](../domains/design-patterns.md)

@@ -168,4 +168,4 @@ This track gives you a solid foundation in data structures, algorithms, and syst
 - [All Domains](../domains/) — Deep dives
 - [Interview Playbooks](../interview-playbooks/) — Stage-specific prep
 - [Mock Interviewers](../../AGENTS.md) — Practice with AI
-- [System Design](../../docs/system_design/) — Full system design guide
+- [System Design](../../docs/03-system-design/README.md) — Full system design guide

@@ -73,9 +73,9 @@ Bookmark this README and check back as you progress!
 
 ## 🔗 Links to Core Resources
 
-- [Data Structures Documentation](../docs/basic/) — Detailed explanations
-- [Design Patterns Guide](../docs/patterns/) — Gang of Four patterns
-- [System Design](../docs/system_design/) — Comprehensive system design problems
+- [TODO: Data Structures Documentation] — Detailed explanations (content not yet built under docs/06-data-structures/)
+- [Design Patterns Guide](../docs/07-patterns/README.md) — Gang of Four patterns
+- [System Design](../docs/03-system-design/README.md) — Comprehensive system design problems
 - [Mock Interviewers](../AGENTS.md) — Practice with AI agents
 
 ---

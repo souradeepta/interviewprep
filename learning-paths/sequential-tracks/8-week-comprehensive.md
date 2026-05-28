@@ -136,5 +136,5 @@ You'll be ready for:
 - [All Domains](../domains/)
 - [Interview Playbooks](../interview-playbooks/)
 - [Mock Interviewers](../../AGENTS.md)
-- [System Design](../../docs/system_design/)
-- [Design Patterns](../../docs/patterns/)
+- [System Design](../../docs/03-system-design/README.md)
+- [Design Patterns](../../docs/07-patterns/README.md)
