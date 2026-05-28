@@ -1,5 +1,8 @@
 # Eventual Consistency Patterns
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Design systems where data eventually synchronizes across replicas while maintaining availability and handling concurrent writes.
 
 ---

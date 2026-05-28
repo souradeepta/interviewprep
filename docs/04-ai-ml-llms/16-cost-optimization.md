@@ -1,5 +1,8 @@
 # Cost Optimization for ML — Reducing Spend Without Sacrificing Quality
 
+**Level:** L5-L5+
+**Time to read:** ~20 min
+
 Practical strategies for 10-100× cost reduction: model compression, inference optimization, caching, and infrastructure right-sizing.
 
 ---

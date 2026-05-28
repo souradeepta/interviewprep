@@ -1,5 +1,8 @@
 # Recursion & Backtracking Mastery: Decision Trees and Exploration
 
+**Level:** L3-L4
+**Time to read:** ~20 min
+
 Master recursive problem solving and backtracking patterns for combinatorial problems.
 
 ---

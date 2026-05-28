@@ -1,5 +1,8 @@
 # Rate Limiting & Throttling: Protecting Systems from Overload
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master rate limiting strategies to protect backends from abuse and overload.
 
 ---

@@ -1,5 +1,8 @@
 # Common System Design Follow-ups
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 Likely interviewer questions for each system design in this repo. Study these patterns.
 
 ---

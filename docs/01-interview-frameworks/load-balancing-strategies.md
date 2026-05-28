@@ -1,5 +1,8 @@
 # Load Balancing Strategies: Distributing Traffic Efficiently
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master load balancing algorithms and distribution strategies.
 
 ---

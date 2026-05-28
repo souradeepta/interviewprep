@@ -1,5 +1,8 @@
 # Real-Time Systems: Building Low-Latency Interactive Applications
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master real-time communication patterns for live updates and streaming.
 
 ---

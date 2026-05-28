@@ -1,5 +1,8 @@
 # Container Orchestration Basics: Kubernetes Fundamentals
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Understand containerization and orchestration for modern deployment.
 
 ---

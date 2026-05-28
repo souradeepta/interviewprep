@@ -1,5 +1,8 @@
 # Caching & In-Memory Stores — Redis, Memcached, and Beyond
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Fast data access with intelligent eviction and persistence strategies.
 
 ---

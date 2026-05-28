@@ -1,5 +1,8 @@
 # Coding Interview Framework: 45-Minute Problem Solving
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 A proven 5-step framework for solving algorithmic problems in 45-minute technical interviews.
 
 ---

@@ -1,5 +1,8 @@
 # System Design Case Studies: Deep Dives into Real Problems
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master system design through detailed case studies of common interview problems.
 
 ---

@@ -1,5 +1,8 @@
 # Two Pointer Techniques: Converging and Diverging Strategies
 
+**Level:** L3-L4
+**Time to read:** ~20 min
+
 Master two pointer patterns for efficient array and string manipulation.
 
 **When to Use Two Pointers:**

@@ -1,5 +1,8 @@
 # Rate Limiting & Throttling — Protecting Systems from Overload
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Controlling request flow to prevent abuse and overload.
 
 ---

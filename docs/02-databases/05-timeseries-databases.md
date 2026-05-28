@@ -1,5 +1,8 @@
 # Time-Series Databases — Metrics and Monitoring at Scale
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Optimized for time-indexed data with fast aggregations and retention policies.
 
 ---

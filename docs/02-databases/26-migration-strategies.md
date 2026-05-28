@@ -1,5 +1,8 @@
 # Database Migration Strategies
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Execute major schema changes and data migrations safely with zero downtime, full rollback capability, and consistent validation at every phase.
 
 ---

@@ -1,5 +1,8 @@
 # Model Serving & Inference Optimization — Getting Models to Production
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 How to deploy models efficiently at scale.
 
 ---

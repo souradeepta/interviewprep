@@ -1,5 +1,8 @@
 # ML Systems Design — Building End-to-End Pipelines
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Designing complete machine learning systems for production.
 
 ---

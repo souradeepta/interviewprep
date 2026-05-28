@@ -1,5 +1,8 @@
 # Sorting Algorithms Mastery: Time and Space Trade-offs
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Master sorting algorithms and when to use each one.
 
 ---

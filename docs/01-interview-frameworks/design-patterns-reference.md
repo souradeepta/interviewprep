@@ -1,5 +1,8 @@
 # Design Patterns Reference: Gang of Four in System Design
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 The 23 Gang of Four design patterns and where they appear in real system designs.
 
 ---

@@ -1,5 +1,8 @@
 # Connection Pooling
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Manage database connections efficiently to reduce overhead, prevent connection exhaustion, and maximize throughput under high concurrency.
 
 ---

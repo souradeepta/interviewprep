@@ -1,5 +1,8 @@
 # API Pagination & Filtering
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Design efficient, consistent pagination for APIs serving millions of records without degrading database performance.
 
 ---

@@ -1,5 +1,8 @@
 # Multimodal Models — Vision + Language + Audio
 
+**Level:** L5-L5+
+**Time to read:** ~30 min
+
 Systems that understand and generate across multiple data modalities. Powers GPT-4V, Gemini, DALL-E, Whisper, and next-gen AI assistants.
 
 ---

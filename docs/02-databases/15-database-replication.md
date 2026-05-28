@@ -1,5 +1,8 @@
 # Database Replication & Failover
 
+**Level:** L5
+**Time to read:** ~45 min
+
 Keep data synchronized across multiple database instances and automatically promote replicas when primary fails.
 
 ---

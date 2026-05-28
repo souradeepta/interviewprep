@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Strings
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Character manipulation, pattern matching, palindromes

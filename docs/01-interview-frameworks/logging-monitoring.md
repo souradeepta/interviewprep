@@ -1,5 +1,8 @@
 # Logging & Monitoring — Observability in Production
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Seeing what's happening in your systems.
 
 ---

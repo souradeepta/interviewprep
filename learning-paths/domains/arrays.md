@@ -10,6 +10,9 @@ key_concepts: [two-pointers, sliding-window, binary-search, prefix-sums]
 
 # Arrays
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Arrays are the most fundamental data structure in interviews. Master them first — concepts from arrays unlock trees, graphs, and advanced algorithms. This domain covers manipulation, searching, and fundamental patterns.

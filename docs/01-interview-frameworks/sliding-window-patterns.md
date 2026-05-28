@@ -1,5 +1,8 @@
 # Sliding Window Patterns: Efficient Subarray/Substring Solutions
 
+**Level:** L3-L4
+**Time to read:** ~20 min
+
 Master the sliding window technique for solving array and string problems efficiently.
 
 ---

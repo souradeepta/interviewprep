@@ -1,5 +1,8 @@
 # Indexing Deep Dive
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Master index data structures and design optimal indexes for fast lookups, range queries, and analytics.
 
 ---

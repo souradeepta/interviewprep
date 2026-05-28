@@ -1,5 +1,8 @@
 # Deep Learning Essentials — CNNs, RNNs, and Advanced Architectures
 
+**Level:** L4
+**Time to read:** ~20 min
+
 Building blocks for modern deep learning systems.
 
 ---

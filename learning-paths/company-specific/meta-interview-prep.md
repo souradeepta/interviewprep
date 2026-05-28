@@ -1,5 +1,8 @@
 # Meta (Facebook) Interview Preparation Path
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Complete guide for Meta SDE interviews (E3-E5).
 
 ---

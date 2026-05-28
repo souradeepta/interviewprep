@@ -1,5 +1,8 @@
 # Scaling LLMs — From Millions to Billions of Parameters
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Practical strategies for training and deploying large language models: scaling laws, parallelism strategies, memory optimization, and compute budgeting.
 
 ---

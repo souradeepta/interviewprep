@@ -1,5 +1,8 @@
 # Cache Design Patterns: Strategies and Trade-offs
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Master caching strategies for building fast, scalable systems.
 
 ---

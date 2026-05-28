@@ -1,5 +1,8 @@
 # Query Planning & Optimization
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Understand how databases execute queries and optimize slow queries through better plans, indexes, and statistics.
 
 ---

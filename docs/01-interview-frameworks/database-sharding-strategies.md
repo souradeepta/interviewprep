@@ -1,5 +1,8 @@
 # Database Sharding Strategies: Horizontal Scaling of Data
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Master sharding approaches for distributing data across multiple database servers.
 
 ---

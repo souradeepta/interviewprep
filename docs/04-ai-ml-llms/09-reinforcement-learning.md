@@ -1,5 +1,8 @@
 # Reinforcement Learning — Learning from Rewards
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 RL agents learn optimal behavior through trial-and-error interaction with environments. Core to robotics, game AI, recommendation systems, and LLM alignment (RLHF).
 
 ---

@@ -1,5 +1,8 @@
 # LLMOps — Operational Excellence for LLM Systems
 
+**Level:** L5-L5+
+**Time to read:** ~30 min
+
 Production lifecycle management for LLM-powered applications: deployment, monitoring, cost control, and reliability at scale.
 
 ---

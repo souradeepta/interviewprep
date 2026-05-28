@@ -1,5 +1,8 @@
 # Behavioral Interview Framework: STAR Method & Beyond
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Master behavioral interviews (also called "culture fit" or "competency-based" rounds) with the STAR framework and preparation strategies.
 
 ---

@@ -1,5 +1,8 @@
 # Google Interview Preparation Path
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Complete preparation guide for Google SDE interviews (L3-L5).
 
 ---

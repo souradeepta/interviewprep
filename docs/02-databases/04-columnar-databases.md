@@ -1,5 +1,8 @@
 # Columnar Databases — Analytics at Scale
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Optimized for OLAP queries and data warehousing.
 
 ---

@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Graphs
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 DFS/BFS, topological sort, shortest paths, connectivity

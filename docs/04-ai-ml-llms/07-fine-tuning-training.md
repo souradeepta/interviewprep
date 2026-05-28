@@ -1,5 +1,8 @@
 # Fine-tuning & Training Strategies — Adapting LLMs Efficiently
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 How to adapt pre-trained models for specific tasks without retraining from scratch.
 
 ---

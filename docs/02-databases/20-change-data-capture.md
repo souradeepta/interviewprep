@@ -1,5 +1,8 @@
 # Change Data Capture (CDC)
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Stream database changes to downstream systems in real-time for replication, analytics, and event-driven architectures.
 
 ---

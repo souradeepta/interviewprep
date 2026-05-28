@@ -1,5 +1,8 @@
 # Estimation Techniques: Capacity Planning & Scalability Math
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Master the art of estimating system capacity, scaling requirements, and identifying bottlenecks.
 
 ---

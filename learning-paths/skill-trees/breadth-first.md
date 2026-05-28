@@ -7,6 +7,9 @@ duration: "6-8 weeks"
 
 # Breadth-First Skill Tree
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Philosophy:** Get exposure to all domains first, then specialize.
 
 This path is ideal if you want **balanced coverage** and the ability to recognize problem types across all domains.

@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Bit Manipulation
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Bitwise ops, power of 2, bit counting

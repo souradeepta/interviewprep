@@ -1,5 +1,8 @@
 # API Design Framework: REST, GraphQL, & RPC
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Comprehensive guide to designing APIs that scale, are maintainable, and follow industry standards.
 
 ---

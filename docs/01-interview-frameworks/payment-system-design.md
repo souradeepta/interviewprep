@@ -1,5 +1,8 @@
 # Payment System Design: Building Safe Financial Transactions
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master payment system architecture for handling money safely and reliably.
 
 ---

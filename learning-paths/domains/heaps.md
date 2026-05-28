@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Heaps
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Priority queues, heap operations, top-K problems

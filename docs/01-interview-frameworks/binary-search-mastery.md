@@ -1,5 +1,8 @@
 # Binary Search Mastery: Searching, Boundaries, and Variants
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Master binary search patterns for efficient searching and finding boundaries.
 
 ---

@@ -1,5 +1,8 @@
 # Model Evaluation & Benchmarking — Measuring What Matters
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Comprehensive evaluation covering automatic metrics, benchmarks, human evaluation, and production monitoring for LLM and ML systems.
 
 ---

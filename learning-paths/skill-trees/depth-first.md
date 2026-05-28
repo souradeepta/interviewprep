@@ -7,6 +7,9 @@ duration: "8-10 weeks"
 
 # Depth-First Skill Tree
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Philosophy:** Become an expert in one domain before moving to the next.
 
 This path is ideal if you want to truly **master** each topic and build deep technical knowledge.

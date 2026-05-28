@@ -1,5 +1,8 @@
 # NoSQL Comprehensive Guide — MongoDB, DynamoDB, and Beyond
 
+**Level:** L3-L4
+**Time to read:** ~45 min
+
 Building scalable document and key-value systems.
 
 ---

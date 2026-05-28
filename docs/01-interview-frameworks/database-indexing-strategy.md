@@ -1,5 +1,8 @@
 # Database Indexing Strategy: Optimizing Query Performance
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master indexing strategies for fast database queries.
 
 ---

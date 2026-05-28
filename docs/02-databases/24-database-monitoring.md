@@ -1,5 +1,8 @@
 # Database Monitoring & Alerting
 
+**Level:** L4-L5+
+**Time to read:** ~30 min
+
 Detect problems before users do by tracking the right metrics, setting meaningful thresholds, and building runbooks for every alert.
 
 ---

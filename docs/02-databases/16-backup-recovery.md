@@ -1,5 +1,8 @@
 # Database Backup & Recovery
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Protect data with automated backups and enable point-in-time recovery with minimal RTO/RPO.
 
 ---

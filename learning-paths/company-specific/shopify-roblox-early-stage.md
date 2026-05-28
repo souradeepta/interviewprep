@@ -1,5 +1,8 @@
 # Shopify, Roblox, & Early-Stage Startups Interview Prep
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 ---
 
 ## 🛍️ Shopify Interview Prep

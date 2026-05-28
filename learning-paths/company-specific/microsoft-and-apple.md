@@ -1,5 +1,8 @@
 # Microsoft & Apple Interview Prep
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Quick guides for Microsoft and Apple technical interviews.
 
 ---

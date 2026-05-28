@@ -1,5 +1,8 @@
 # CI/CD & DevOps: Automating Deployment and Testing
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master continuous integration and deployment practices.
 
 ---

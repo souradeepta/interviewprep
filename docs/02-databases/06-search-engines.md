@@ -1,5 +1,8 @@
 # Search Engines & Full-Text Search
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Building fast, ranked search systems for documents, products, and content.
 
 ---

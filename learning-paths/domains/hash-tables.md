@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Hash Tables
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Deduplication, frequency counting, lookups

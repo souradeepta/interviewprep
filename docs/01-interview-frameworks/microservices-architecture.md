@@ -1,5 +1,8 @@
 # Microservices Architecture: Design and Implementation Patterns
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Master microservices design for scalable, maintainable systems.
 
 ---

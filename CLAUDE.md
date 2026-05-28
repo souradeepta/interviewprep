@@ -16,6 +16,36 @@ This file documents how to work with Claude on the datastructures repository.
 - `docs/07-patterns/` — 40+ interview pattern problems
 - `docs/08-learning-paths/` — Structured learning journeys
 
+## Guide Frontmatter Convention
+
+Every guide must include these lines immediately after the H1 title, with a blank line before the next content:
+
+```
+# Guide Title
+
+**Level:** L4-L5
+**Time to read:** ~20 min
+**Prerequisites:** [Name](relative/path.md), ...  ← optional, omit if none
+**Related:** [Name](relative/path.md), ...  ← optional
+```
+
+**Level definitions:**
+- `L3` — intern / new grad (fundamentals)
+- `L4` — mid-level (1-3 yrs, patterns + basic design)
+- `L5` — senior (4-7 yrs, deep design, scale, trade-offs)
+- `L5+` — staff (8+ yrs, cross-team, capacity planning, failure budgets)
+- `L6+` — principal (multi-org, technical vision, strategy)
+
+Use a range (e.g. `L3-L5`) when a guide spans multiple levels.
+
+**Time to read estimates:**
+- Short guides (<200 lines) → ~10 min
+- Medium guides (200-500 lines) → ~20 min
+- Long guides (500-1000 lines) → ~30 min
+- Very long guides (1000+ lines) → ~45 min
+
+**Prerequisites and Related:** Omit both lines unless the connection is obvious (e.g. `cap-theorem.md` as prerequisite for `distributed-databases.md`).
+
 ## Documentation Best Practices (Learned)
 
 ### Structure for Technical Guides

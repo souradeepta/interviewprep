@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # System Design Fundamentals
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Caching, databases, scalability, load balancing

@@ -8,6 +8,9 @@ focus: "Scalability, Trade-offs, Design Patterns"
 
 # System Design Interview Playbook
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Duration:** 45-60 minutes  
 **Expected Problem:** 1 open-ended system design (e.g., "Design Instagram")  
 **Goal:** Propose reasonable architecture, justify design choices, discuss trade-offs

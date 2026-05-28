@@ -1,5 +1,8 @@
 # Neural Networks Basics — From Perceptron to Backpropagation
 
+**Level:** L4
+**Time to read:** ~20 min
+
 Understanding how neural networks learn.
 
 ---

@@ -1,5 +1,8 @@
 # Prompt Engineering & Design — Techniques & Patterns
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 How to get the best results from LLMs without retraining.
 
 ---

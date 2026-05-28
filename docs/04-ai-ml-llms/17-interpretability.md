@@ -1,5 +1,8 @@
 # Interpretability & Explainability — Understanding Model Decisions
 
+**Level:** L5-L5+
+**Time to read:** ~20 min
+
 Make AI models transparent: explain individual predictions, audit internal representations, detect shortcuts, and satisfy regulatory requirements.
 
 ---

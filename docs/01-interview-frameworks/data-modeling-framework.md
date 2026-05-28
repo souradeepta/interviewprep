@@ -1,5 +1,8 @@
 # Data Modeling Framework: Database Design & Schema
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Comprehensive guide to designing database schemas that scale, are normalized, and handle real-world requirements.
 
 ---

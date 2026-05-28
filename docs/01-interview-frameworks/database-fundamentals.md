@@ -1,5 +1,8 @@
 # Database Fundamentals — RDBMS, NoSQL, and Query Optimization
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Core database concepts every engineer should know.
 
 ---

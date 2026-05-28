@@ -1,5 +1,8 @@
 # ML Fundamentals — Core Concepts & Algorithms
 
+**Level:** L4
+**Time to read:** ~20 min
+
 Essential machine learning concepts for interview preparation.
 
 ---

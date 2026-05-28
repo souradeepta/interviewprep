@@ -1,5 +1,8 @@
 # GraphQL — Modern API Query Language
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Strongly typed, flexible API query language with client-driven data fetching.
 
 ---

@@ -1,5 +1,8 @@
 # Message Queue Patterns: Async Communication and Event Streaming
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master message queue patterns for decoupling services and handling async workloads.
 
 ---

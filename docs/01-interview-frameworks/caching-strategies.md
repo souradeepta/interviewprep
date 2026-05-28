@@ -1,5 +1,8 @@
 # Caching Strategies — Making Systems Fast
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Where, when, and how to cache.
 
 ---

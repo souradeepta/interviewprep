@@ -1,5 +1,8 @@
 # Stream Processing & Complex Event Processing
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Process continuous event streams in real-time for fraud detection, aggregations, event-driven workflows, and stateful computations at scale.
 
 ---

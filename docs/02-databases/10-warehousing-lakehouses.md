@@ -1,5 +1,8 @@
 # Data Warehousing & Lakehouses — Analytics Infrastructure
 
+**Level:** L4-L5+
+**Time to read:** ~30 min
+
 Building scalable, cost-effective analytics systems with governance and performance.
 
 ---

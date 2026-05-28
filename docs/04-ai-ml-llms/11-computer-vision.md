@@ -1,5 +1,8 @@
 # Computer Vision — Image Recognition, Detection, Segmentation
 
+**Level:** L5
+**Time to read:** ~20 min
+
 CV systems extract semantic understanding from images and video. Core concepts for ML engineering and system design interviews.
 
 ---

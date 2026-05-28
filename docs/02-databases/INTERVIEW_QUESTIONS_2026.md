@@ -1,5 +1,8 @@
 # 30+ Database Interview Questions from 2026
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Real database interview questions from DataCamp, FAANG, and major tech companies (2026).
 
 ---

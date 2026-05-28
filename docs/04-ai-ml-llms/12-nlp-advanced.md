@@ -1,5 +1,8 @@
 # NLP Advanced — Transformers, BERT, GPT, and Modern Architectures
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Beyond bag-of-words: transformer-based NLP covering architecture deep-dives, fine-tuning strategies, and production deployment trade-offs.
 
 ---

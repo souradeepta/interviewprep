@@ -1,5 +1,8 @@
 # Graph Algorithms Mastery: Traversal, Shortest Path, and Advanced Techniques
 
+**Level:** L3-L5
+**Time to read:** ~30 min
+
 Master graph algorithms from basic traversal to advanced path-finding and flow algorithms.
 
 ---

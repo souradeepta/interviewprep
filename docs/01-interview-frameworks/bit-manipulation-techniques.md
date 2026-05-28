@@ -1,5 +1,8 @@
 # Bit Manipulation Techniques: Working with Binary Representations
 
+**Level:** L3-L4
+**Time to read:** ~20 min
+
 Master bit operations for efficient algorithms and clever solutions.
 
 ---

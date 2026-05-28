@@ -1,5 +1,8 @@
 # Math & Number Theory: Essential Interview Techniques
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 Master mathematical concepts for algorithm and system design problems.
 
 ---

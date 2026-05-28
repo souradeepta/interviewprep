@@ -1,5 +1,8 @@
 # SQL Deep Dive — Advanced Queries and Optimization
 
+**Level:** L3-L5
+**Time to read:** ~30 min
+
 Master SQL for interviews and production systems.
 
 ---

@@ -1,5 +1,8 @@
 # DevOps Basics — Infrastructure as Code and Deployment
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Essential DevOps concepts for all engineers.
 
 ---

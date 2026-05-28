@@ -1,5 +1,8 @@
 # Uber, Stripe, & Airbnb Interview Prep
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 Specialized guides for ride-sharing, payments, and travel platforms.
 
 ---

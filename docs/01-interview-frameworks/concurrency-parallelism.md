@@ -1,5 +1,8 @@
 # Concurrency & Parallelism — Handling Multiple Tasks
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Critical for building responsive, performant systems.
 
 ---

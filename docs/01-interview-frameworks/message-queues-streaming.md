@@ -1,5 +1,8 @@
 # Message Queues & Event Streaming — Asynchronous Communication at Scale
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Building decoupled, resilient systems.
 
 ---

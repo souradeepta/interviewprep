@@ -1,5 +1,8 @@
 # Vector Databases — Semantic Search and Embeddings
 
+**Level:** L4-L5+
+**Time to read:** ~20 min
+
 Finding similar items using vector similarity and approximate nearest neighbor search.
 
 ---

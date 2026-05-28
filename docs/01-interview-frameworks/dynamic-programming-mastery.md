@@ -1,5 +1,8 @@
 # Dynamic Programming Mastery: From Theory to Optimization
 
+**Level:** L3-L5
+**Time to read:** ~30 min
+
 Master dynamic programming patterns, state representation, and optimization techniques.
 
 ---

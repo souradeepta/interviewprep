@@ -1,5 +1,8 @@
 # Greedy Algorithms: Making Optimal Local Choices
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 Master greedy patterns for problems where local optimization leads to global optimality.
 
 ---

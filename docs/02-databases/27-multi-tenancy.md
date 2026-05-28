@@ -1,5 +1,8 @@
 # Multi-Tenancy Patterns
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Design databases to serve multiple independent customers (tenants) with strong data isolation, fair resource allocation, and efficient operations at scale.
 
 ---

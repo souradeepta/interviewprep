@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Sorting Searching
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Merge sort, quicksort, binary search variants

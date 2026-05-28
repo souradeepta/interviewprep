@@ -1,5 +1,8 @@
 # Recommendation System Design: Building Personalized Experiences
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Master recommendation algorithms and system architecture.
 
 ---

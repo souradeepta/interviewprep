@@ -8,6 +8,9 @@ best_for: "Urgent interviews, tight timelines"
 
 # 2-Week Intensive Interview Sprint
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Total Time:** ~30 hours  
 **Pace:** 15 hours/week  
 **Target:** Quick coverage of must-know problems

@@ -1,5 +1,8 @@
 # Networking Fundamentals — HTTP, TCP/IP, DNS, and Beyond
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Essential networking concepts for system design and backend interviews.
 
 ---

@@ -1,5 +1,8 @@
 # Message Queues & Event Streaming — Kafka, RabbitMQ, and Beyond
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Asynchronous communication for distributed systems with message ordering and durability.
 
 ---

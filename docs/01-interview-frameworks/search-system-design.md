@@ -1,5 +1,8 @@
 # Search System Design: Building Fast, Relevant Search
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master search system architecture from indexing to ranking.
 
 ---

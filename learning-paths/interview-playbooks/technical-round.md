@@ -8,6 +8,9 @@ focus: "All Data Structures, Algorithms, Problem-Solving"
 
 # Technical Interview Playbook
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Duration:** 45-60 minutes  
 **Expected Problems:** 1-2 problems (1 medium + 1 hard, OR 2 medium)  
 **Goal:** Solve correctly, optimize, handle edge cases

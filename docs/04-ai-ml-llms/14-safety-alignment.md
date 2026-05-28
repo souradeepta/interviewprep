@@ -1,5 +1,8 @@
 # Safety & Alignment — Building Trustworthy AI
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Ensuring AI systems behave safely, honestly, and in accordance with human values. Covers Constitutional AI, RLHF, red-teaming, and production safety guardrails.
 
 ---

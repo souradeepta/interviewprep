@@ -1,5 +1,8 @@
 # Interview Grading Rubric: What Interviewers Look For
 
+**Level:** L3-L5
+**Time to read:** ~30 min
+
 Understanding how technical interviews are graded helps you understand what matters during the interview.
 
 ---

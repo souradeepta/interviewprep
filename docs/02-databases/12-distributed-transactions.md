@@ -1,5 +1,8 @@
 # Distributed Transactions — 2PC, Sagas, and Consistency
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Ensuring atomicity across multiple databases and services.
 
 ---

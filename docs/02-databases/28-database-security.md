@@ -1,5 +1,8 @@
 # Database Security & Encryption
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Protect sensitive data at rest, in transit, and at the column level. Implement access control, audit logging, and secrets management for compliance-ready systems.
 
 ---

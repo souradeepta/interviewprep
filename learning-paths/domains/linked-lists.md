@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Linked Lists
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Pointer manipulation, reversal, cycle detection

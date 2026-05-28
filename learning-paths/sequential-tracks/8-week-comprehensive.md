@@ -8,6 +8,9 @@ best_for: "Thorough preparation, mastery, multiple interviews"
 
 # 8-Week Comprehensive Interview Mastery
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Total Time:** ~32-40 hours  
 **Pace:** 4-5 hours/week  
 **Target:** Master every domain and advanced topics

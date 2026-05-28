@@ -1,5 +1,8 @@
 # Monitoring & Observability: Metrics, Logging, and Tracing
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Build visibility into systems with comprehensive monitoring and observability.
 
 ---

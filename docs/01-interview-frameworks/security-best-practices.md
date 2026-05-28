@@ -1,5 +1,8 @@
 # Security Best Practices: Protecting Systems and Data
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master security fundamentals for building secure systems.
 
 ---

@@ -1,5 +1,8 @@
 # Distributed Systems Patterns: Building Reliable Systems at Scale
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Essential patterns and techniques for building resilient, scalable distributed systems.
 
 ---

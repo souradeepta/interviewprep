@@ -1,5 +1,8 @@
 # Distributed Tracing & Observability
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Track requests across microservices and databases to diagnose latency issues, identify bottlenecks, and understand system behavior at scale.
 
 ---

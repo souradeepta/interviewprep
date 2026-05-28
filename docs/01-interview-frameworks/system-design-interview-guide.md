@@ -1,5 +1,8 @@
 # System Design Interview: 4-Phase Framework
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 A proven framework for designing systems during 45-60 minute technical interviews.
 
 ## Phase 1: Requirements & Clarification (5-10 minutes)

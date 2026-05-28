@@ -1,5 +1,8 @@
 # Palantir, Databricks, & Discord Interview Prep
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 ---
 
 ## 🔮 Palantir Interview Prep

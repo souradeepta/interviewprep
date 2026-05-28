@@ -1,5 +1,8 @@
 # Sharding Strategies Deep Dive
 
+**Level:** L5
+**Time to read:** ~30 min
+
 Scale databases horizontally by partitioning data across multiple instances while maintaining consistency.
 
 ---

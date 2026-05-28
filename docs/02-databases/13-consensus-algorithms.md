@@ -1,5 +1,8 @@
 # Consensus Algorithms — Raft, Paxos, and Byzantine Fault Tolerance
 
+**Level:** L5
+**Time to read:** ~10 min
+
 Achieving agreement in distributed systems despite failures.
 
 ---

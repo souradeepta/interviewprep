@@ -1,5 +1,8 @@
 # RAG Systems — Retrieval-Augmented Generation
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Combining LLMs with knowledge bases for better answers.
 
 ---

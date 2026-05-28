@@ -1,5 +1,8 @@
 # Graph Databases — Neo4j and Relationship Queries
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Building systems optimized for relationships.
 
 ---

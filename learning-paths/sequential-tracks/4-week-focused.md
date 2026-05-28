@@ -8,6 +8,9 @@ best_for: "Balanced preparation for all interview types"
 
 # 4-Week Focused Interview Prep
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Total Time:** ~24-28 hours  
 **Pace:** 6-7 hours/week  
 **Target:** Solid coverage of core data structures and algorithms

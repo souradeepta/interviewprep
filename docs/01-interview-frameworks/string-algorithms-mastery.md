@@ -1,5 +1,8 @@
 # String Algorithms Mastery: Pattern Matching and Advanced Techniques
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Master string manipulation, pattern matching, and advanced string algorithms.
 
 ---

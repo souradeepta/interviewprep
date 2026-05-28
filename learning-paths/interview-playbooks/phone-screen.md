@@ -8,6 +8,9 @@ focus: "Arrays, Strings, Basic Problem-Solving"
 
 # Phone Screen Interview Playbook
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 **Duration:** 30-45 minutes  
 **Expected Problems:** 1 easy problem + 1 quick follow-up  
 **Goal:** Solve quickly, communicate clearly, verify edge cases

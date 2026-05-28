@@ -1,5 +1,8 @@
 # Testing Strategies: Unit, Integration, and E2E
 
+**Level:** L4-L5
+**Time to read:** ~20 min
+
 Master testing approaches for building reliable systems.
 
 ---

@@ -1,5 +1,8 @@
 # LLM Architecture & Transformers — From Attention to Scale
 
+**Level:** L4
+**Time to read:** ~20 min
+
 Understanding how large language models work.
 
 ---

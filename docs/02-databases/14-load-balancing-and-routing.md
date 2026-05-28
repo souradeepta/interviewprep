@@ -1,5 +1,8 @@
 # Load Balancing & Routing
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Distribute traffic across database replicas and servers while maintaining consistency and minimizing latency.
 
 ---

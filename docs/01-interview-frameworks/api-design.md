@@ -1,5 +1,8 @@
 # API Design & REST Principles — Building Scalable Interfaces
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Designing APIs that are intuitive, scalable, and maintainable.
 
 ---

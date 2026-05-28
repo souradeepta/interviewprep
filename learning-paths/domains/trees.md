@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Trees
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 DFS/BFS, tree traversal, BST properties, reconstruction

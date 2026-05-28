@@ -1,5 +1,8 @@
 # Time Series Database Design: Storing and Querying Temporal Data
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Master time series database patterns for metrics, logs, and events.
 
 ---

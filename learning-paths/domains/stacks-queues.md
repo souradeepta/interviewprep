@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Stacks Queues
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 LIFO/FIFO, monotonic stacks, queue applications

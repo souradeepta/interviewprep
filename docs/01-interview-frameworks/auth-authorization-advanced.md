@@ -1,5 +1,8 @@
 # Authentication & Authorization — Advanced Patterns
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Building secure identity systems.
 
 ---

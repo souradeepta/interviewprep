@@ -1,5 +1,8 @@
 # Amazon Interview Preparation Path
 
+**Level:** L3-L5
+**Time to read:** ~20 min
+
 Complete guide for Amazon SDE interviews (SDE1-SDE3).
 
 ---

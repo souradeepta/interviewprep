@@ -1,5 +1,8 @@
 # Security Fundamentals — Building Secure Systems
 
+**Level:** L4-L5
+**Time to read:** ~10 min
+
 Essential security concepts for all engineers.
 
 ---

@@ -10,6 +10,9 @@ key_concepts: [TBD]
 
 # Dynamic Programming
 
+**Level:** L3-L4
+**Time to read:** ~10 min
+
 ## Overview
 
 Memoization, tabulation, state transitions

@@ -1,5 +1,8 @@
 # Time-Series Optimization Deep Dive
 
+**Level:** L4-L5
+**Time to read:** ~30 min
+
 Optimize databases for fast ingestion and querying of massive time-series datasets: metrics, events, sensor data, financial ticks, and IoT streams.
 
 ---

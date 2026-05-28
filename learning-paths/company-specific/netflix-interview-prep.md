@@ -1,5 +1,8 @@
 # Netflix Interview Preparation
 
+**Level:** L3-L5
+**Time to read:** ~10 min
+
 Specialized guide for Netflix SDE interviews.
 
 ---

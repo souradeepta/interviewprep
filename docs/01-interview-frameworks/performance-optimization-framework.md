@@ -1,5 +1,8 @@
 # Performance Optimization Framework: Profiling to Tuning
 
+**Level:** L5
+**Time to read:** ~20 min
+
 Systematic approach to identifying bottlenecks, measuring performance, and optimizing systems.
 
 ---
