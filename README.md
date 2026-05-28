@@ -30,6 +30,9 @@ A **comprehensive, tested** repository for software engineering interview prepar
 ### 🗺️ **Exploring the Full Repo?**
 → **[docs/STRUCTURE.md](docs/STRUCTURE.md)** — Complete navigation guide with visual maps
 
+### 📚 **Find Any Guide by Level, Topic, or Time?**
+→ **[docs/INDEX.md](docs/INDEX.md)** — Master index: find any guide by level, topic, or time-to-read
+
 ---
 
 ## 📦 What's Included
