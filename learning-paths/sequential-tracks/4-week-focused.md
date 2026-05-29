@@ -52,6 +52,25 @@ This track gives you a solid foundation in data structures, algorithms, and syst
 - [ ] Write solutions in both Python and Java
 - [ ] Review two-pointer and sliding-window patterns
 
+### Week 1 Mastery Checkpoint
+
+Before moving to Week 2, verify you can:
+
+- [ ] Solve any two-pointer Easy problem in under 5 minutes
+- [ ] Explain sliding window (fixed vs variable) with a concrete example
+- [ ] Implement binary search correctly on the first try (no off-by-one)
+- [ ] Name 3 ways to handle hash table collisions
+- [ ] Recognize when to use a frequency map vs a sorted array for a lookup problem
+
+**If any boxes are unchecked:** Re-study before proceeding.
+
+| Weak area | Guide to revisit |
+|-----------|-----------------|
+| Two-pointer | [Two-Pointer Pattern](../../docs/07-patterns/two-pointer/README.md) |
+| Sliding window | [Sliding Window Pattern](../../docs/07-patterns/sliding-window/README.md) |
+| Binary search | [Binary Search Pattern](../../docs/07-patterns/binary-search/README.md) |
+| Hash tables | [Hash Tables](../../docs/06-data-structures/hash-tables/README.md) |
+
 ---
 
 ## Week 2: Data Structures (Trees & Graphs)
@@ -76,6 +95,26 @@ This track gives you a solid foundation in data structures, algorithms, and syst
 - [ ] Complete easy graph problems
 - [ ] Write solutions in both Python and Java
 - [ ] Understand BFS vs DFS trade-offs
+
+### Week 2 Mastery Checkpoint
+
+Before moving to Week 3, verify you can:
+
+- [ ] Traverse a binary tree iteratively (using a stack, not recursion) in all 3 orders
+- [ ] Implement BST insert and search from scratch without notes
+- [ ] Write BFS on a graph (adjacency list) and identify when BFS beats DFS
+- [ ] Implement Union-Find with path compression
+- [ ] Explain when to use a heap vs a BST for priority-based access
+
+**If any boxes are unchecked:** Re-study before proceeding.
+
+| Weak area | Guide to revisit |
+|-----------|-----------------|
+| Trees & traversals | [Trees](../../docs/06-data-structures/trees/README.md) |
+| Binary search trees | [BST](../../docs/06-data-structures/trees/bst/README.md) |
+| Graphs | [Graphs](../../docs/06-data-structures/graphs/README.md) |
+| Union-Find | [DSU](../../docs/06-data-structures/dsu/README.md) |
+| Heaps | [Heaps](../../docs/06-data-structures/heaps/README.md) |
 
 ---
 
@@ -102,6 +141,25 @@ This track gives you a solid foundation in data structures, algorithms, and syst
 - [ ] Write solutions in both Python and Java
 - [ ] Review memoization approach
 
+### Week 3 Mastery Checkpoint
+
+Before moving to Week 4, verify you can:
+
+- [ ] Solve 0/1 Knapsack with correct DP recurrence and bottom-up table
+- [ ] Implement merge sort from scratch and derive its T(n) = 2T(n/2) + O(n) recurrence
+- [ ] Explain memoization vs tabulation trade-offs (when to use each)
+- [ ] Implement topological sort using DFS and identify when it applies
+- [ ] Write binary search on a rotated sorted array without referencing the template
+
+**If any boxes are unchecked:** Re-study before proceeding.
+
+| Weak area | Guide to revisit |
+|-----------|-----------------|
+| Dynamic programming | [DP Algorithms](../../docs/05-algorithms/dp/README.md) |
+| Sorting algorithms | [Sorting](../../docs/05-algorithms/sorting/README.md) |
+| Graph algorithms | [Graph Algorithms](../../docs/05-algorithms/graphs/README.md) |
+| Binary search | [Binary Search Pattern](../../docs/07-patterns/binary-search/README.md) |
+
 ---
 
 ## Week 4: System Design & Review
@@ -125,6 +183,25 @@ This track gives you a solid foundation in data structures, algorithms, and syst
 - [ ] Re-solve 2-3 hardest technical problems from weeks 1-3
 - [ ] Write a summary of key patterns learned
 - [ ] Do a mock interview (using [mock interviewer](../../AGENTS.md))
+
+### Week 4 Mastery Checkpoint
+
+Before calling yourself interview-ready, verify you can:
+
+- [ ] Design a rate limiter with back-of-envelope math and data model in 20 minutes
+- [ ] Explain CAP theorem in one sentence and give a real system example for both CP and AP
+- [ ] Describe 3 cache invalidation strategies and when each is appropriate
+- [ ] Complete a timed mock coding round (35 min) with a medium problem without hints
+- [ ] Complete a timed mock system design round (45 min) without stopping
+
+**If any boxes are unchecked:** Re-study before your interview.
+
+| Weak area | Guide to revisit |
+|-----------|-----------------|
+| Rate limiter / system design | [Rate Limiter](../../docs/03-system-design/02-core-algorithms/rate-limiter.md) |
+| Caching strategies | [LRU Cache](../../docs/03-system-design/01-caching/lru-cache.md) |
+| Distributed systems | [Circuit Breaker](../../docs/03-system-design/08-infrastructure/circuit-breaker.md) |
+| Mock interview | [Coding Good](../../docs/01-interview-frameworks/mock-transcripts/01-coding-good.md) |
 
 ---
 

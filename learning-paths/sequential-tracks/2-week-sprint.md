@@ -46,6 +46,24 @@ Intensive 2-week prep focused on highest-impact problems. Best for urgent interv
 - [ ] 3 string problems solved
 - [ ] 3 tree problems solved
 
+### Week 1 Mastery Checkpoint
+
+Before moving to Week 2, verify you can:
+
+- [ ] Solve Two Sum II and Move Zeroes using two-pointer in under 8 minutes each
+- [ ] Explain the difference between fixed and variable sliding windows with an example
+- [ ] Implement binary search with correct boundary conditions without referencing notes
+- [ ] Calculate Big-O for any nested loop pattern without external help
+- [ ] Traverse a binary tree in all three DFS orders (pre/in/post) from memory
+
+**If any boxes are unchecked:** Re-study before proceeding.
+
+| Weak area | Guide to revisit |
+|-----------|-----------------|
+| Two-pointer / sliding window | [Two-Pointer Pattern](../../docs/07-patterns/two-pointer/README.md) |
+| Binary search | [Binary Search Pattern](../../docs/07-patterns/binary-search/README.md) |
+| Tree traversals | [Trees](../../docs/06-data-structures/trees/README.md) |
+
 ---
 
 ## Week 2: Algorithms & Design (15 hours)
@@ -69,6 +87,26 @@ Intensive 2-week prep focused on highest-impact problems. Best for urgent interv
 - [ ] 2 DP problems solved
 - [ ] 1 sorting problem solved
 - [ ] 1 complete mock interview
+
+### Week 2 Mastery Checkpoint
+
+Before your interview, verify you can:
+
+- [ ] Sketch a URL shortener architecture (back-of-envelope → data model → API) in 20 minutes from memory
+- [ ] Explain LRU cache implementation and why it needs both a hashmap and doubly-linked list
+- [ ] Compare SQL vs NoSQL trade-offs without notes (name 3 criteria for each)
+- [ ] Name 3 failure modes in a distributed system and their mitigations
+- [ ] Solve a DP coin-change variant without looking up the recurrence
+
+**If any boxes are unchecked:** Re-study before your interview.
+
+| Weak area | Guide to revisit |
+|-----------|-----------------|
+| System design fundamentals | [URL Shortener](../../docs/03-system-design/02-core-algorithms/url-shortener.md) |
+| LRU cache | [LRU Cache](../../docs/03-system-design/01-caching/lru-cache.md) |
+| SQL vs NoSQL | [SQL Advanced](../../docs/02-databases/01-sql-advanced.md) |
+| Distributed systems | [Circuit Breaker](../../docs/03-system-design/08-infrastructure/circuit-breaker.md) |
+| DP patterns | [Dynamic Programming](../../docs/05-algorithms/dp/README.md) |
 
 ---
 

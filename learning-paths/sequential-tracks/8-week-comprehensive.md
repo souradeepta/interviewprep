@@ -38,11 +38,15 @@ Comprehensive 8-week path for deep mastery. By the end, you'll have seen and sol
 - Complete: EASY + MEDIUM
 - Patterns: Two pointers, sliding window, binary search, prefix sums
 
+> **Week 1 Checkpoint:** Solve any two-pointer Easy in ≤5 min, Medium in ≤10 min. Implement binary search correctly on first try. Re-study: [Two-Pointer](../../docs/07-patterns/two-pointer/README.md), [Sliding Window](../../docs/07-patterns/sliding-window/README.md)
+
 **Week 2: Strings & Hash Tables (4-5 hours)**
 - [Strings Domain](../domains/strings.md)
 - [Hash Tables Domain](../domains/hash-tables.md)
 - Complete: EASY + MEDIUM
 - Patterns: Character manipulation, deduplication, frequency counting
+
+> **Week 2 Checkpoint:** Solve anagram/palindrome problems in under 10 min. Explain open addressing vs chaining for collision resolution. Re-study: [Hash Tables](../../docs/06-data-structures/hash-tables/README.md)
 
 ### Week 3-4: Basic Data Structures
 
@@ -51,9 +55,13 @@ Comprehensive 8-week path for deep mastery. By the end, you'll have seen and sol
 - [Stacks/Queues Domain](../domains/stacks-queues.md)
 - Focus: Pointer manipulation, stack/queue patterns
 
+> **Week 3 Checkpoint:** Reverse a singly linked list iteratively without notes. Detect a cycle using Floyd's algorithm. Implement a stack using two queues. Re-study: [Linked Lists](../../docs/06-data-structures/linked-lists/README.md), [Stacks](../../docs/06-data-structures/stacks/README.md)
+
 **Week 4: Heaps (4-5 hours)**
 - [Heaps Domain](../domains/heaps.md)
 - Patterns: Priority queues, top-K problems
+
+> **Week 4 Checkpoint:** Implement min-heap push and pop from scratch. Solve a top-K elements problem using a heap in O(n log k). Explain when a heap beats a sorted array. Re-study: [Heaps](../../docs/06-data-structures/heaps/README.md)
 
 ### Week 5-6: Advanced Data Structures
 
@@ -62,10 +70,14 @@ Comprehensive 8-week path for deep mastery. By the end, you'll have seen and sol
 - Complete: EASY + MEDIUM + selected HARD
 - Patterns: DFS, BFS, tree reconstruction, LCA
 
+> **Week 5 Checkpoint:** Traverse a binary tree iteratively in all 4 orders (pre/in/post/level). Find LCA of two nodes in a BST and a general binary tree. Validate a BST iteratively. Re-study: [Trees](../../docs/06-data-structures/trees/README.md), [BST](../../docs/06-data-structures/trees/bst/README.md)
+
 **Week 6: Graphs (4-5 hours)**
 - [Graphs Domain](../domains/graphs.md)
 - Complete: EASY + MEDIUM + selected HARD
 - Patterns: Graph traversal, topological sort
+
+> **Week 6 Checkpoint:** Implement Dijkstra with a priority queue and explain why it fails on negative edges. Detect a cycle in a directed graph using DFS. Implement topological sort. Re-study: [Graphs](../../docs/06-data-structures/graphs/README.md), [Graph Algorithms](../../docs/05-algorithms/graphs/README.md), [Advanced Graphs](../../docs/05-algorithms/graphs/advanced/README.md)
 
 ### Week 7: Algorithms & Problem-Solving
 
@@ -74,6 +86,8 @@ Comprehensive 8-week path for deep mastery. By the end, you'll have seen and sol
 - [Sorting & Searching Domain](../domains/sorting-searching.md)
 - [Bit Manipulation Domain](../domains/bit-manipulation.md)
 - Focus: Mix of MEDIUM and HARD
+
+> **Week 7 Checkpoint:** Solve 0/1 Knapsack and LCS with correct DP table bottom-up. Write KMP failure function from the pattern description. Explain greedy correctness using an exchange argument. Re-study: [DP](../../docs/05-algorithms/dp/README.md), [String Algorithms](../../docs/05-algorithms/string-algorithms/README.md), [Greedy](../../docs/05-algorithms/greedy/README.md)
 
 ### Week 8: Design & System Design
 
@@ -87,6 +101,24 @@ Comprehensive 8-week path for deep mastery. By the end, you'll have seen and sol
 - [ ] Do 2-3 full mock interviews
 - [ ] Write summary of key patterns
 - [ ] Create personal cheat sheet
+
+### Week 8 Mastery Checkpoint
+
+Before calling yourself interview-ready, verify you can:
+
+- [ ] Complete a timed mock coding round (35 min) on a medium-hard problem without hints
+- [ ] Complete a timed mock system design round (45 min) with back-of-envelope and dual-tier depth
+- [ ] Complete a timed behavioral round (30 min) with 2 STAR stories for "disagree with manager" and "most impactful project"
+- [ ] Score yourself using the annotated transcripts — identify gaps
+
+**If any boxes are unchecked:** Re-study the relevant mock before your real interview.
+
+| Weak area | Guide to revisit |
+|-----------|-----------------|
+| Coding round signals | [Coding: Strong Candidate](../../docs/01-interview-frameworks/mock-transcripts/01-coding-good.md) |
+| System design L5 depth | [System Design L5](../../docs/01-interview-frameworks/mock-transcripts/03-system-design-l5.md) |
+| Behavioral STAR quality | [Behavioral: Strong Candidate](../../docs/01-interview-frameworks/mock-transcripts/05-behavioral-good.md) |
+| Common rejection reasons | [Red Flags Guide](../../docs/01-interview-frameworks/red-flags-and-rejection-reasons.md) |
 
 ---
 
