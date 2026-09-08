@@ -1,5 +1,15 @@
 # TCP vs UDP
 
+Status: draft
+
+Audience: Backend and infrastructure engineers preparing for transport-protocol and latency trade-off interviews.
+
+Prerequisites: Reliability, congestion control, sockets, MTU, retransmission, and application protocols.
+
+Sequence: Define delivery semantics → choose transport → bound loss and latency → instrument retransmissions and queues.
+
+Terra gate: Before coding, state whether ordering and retransmission are required and which layer owns backpressure.
+
 ## Problem Statement
 
 Compare TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) — understand when to use each and how TCP achieves reliable delivery.
@@ -744,13 +754,9 @@ public class SystemHandler {
 
 **Calculations:**
 ```
-Total daily requests = 100M users × 50 requests = 5 billion requests/day
-Average RPS = 5B requests / 86400 seconds ≈ 57,870 RPS
-Peak hour RPS = (5B / 86400) × (100 / 10) ≈ 578,700 RPS
-Peak minute RPS = 578,700 / 60 ≈ 9,645 RPS
-
-Read operations = 57,870 × 0.7 ≈ 40,509 RPS (average)
-Write operations = 57,870 × 0.3 ≈ 17,361 RPS (average)
+Assume 100,000 realtime flows sending 20 packets/s, with 1% packet loss on the busiest path.
+That is 2 million packets/s; TCP retransmits and preserves order, while UDP avoids transport-level retransmission but requires the application to decide whether to drop, repair, or reorder packets.
+Measure loss, jitter, queue depth, and effective goodput rather than selecting UDP solely because its header is smaller.
 ```
 
 ### Storage Requirements
@@ -780,7 +786,7 @@ Backup storage (weekly snapshots): 8.25 PB × 52 weeks = 429 PB
 Inbound bandwidth = 57,870 RPS × 2 KB = 115.74 MB/s
 Outbound bandwidth = 57,870 RPS × 5 KB = 289.35 MB/s
 Replication bandwidth = 17,361 RPS × 2 KB × 2 = 69.44 MB/s
-Total peak bandwidth ≈ 474 MB/s ≈ 3.8 Tbps (peak hour)
+At 1,200-byte packets, 2 million packets/s produce about 2.4 GB/s of payload traffic before headers, retransmissions, and encryption overhead.
 ```
 
 ### Compute Requirements
