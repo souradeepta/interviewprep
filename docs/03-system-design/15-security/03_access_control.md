@@ -1,5 +1,15 @@
 # Access Control & RBAC
 
+Status: draft
+
+Audience: Backend and security engineers preparing for authorization and policy-evaluation interviews.
+
+Prerequisites: Identity, RBAC/ABAC, policy caching, tenancy, and audit logging.
+
+Sequence: Authenticate principal → load policy context → evaluate least-privilege rules → audit the decision.
+
+Terra gate: Before coding, state the tenant boundary, deny-by-default behavior, and how policy changes become effective.
+
 ## Problem Statement
 
 Role-based access control, attribute-based, permission management, audit trails.
@@ -579,13 +589,9 @@ public class SystemHandler {
 
 **Calculations:**
 ```
-Total daily requests = 100M users × 50 requests = 5 billion requests/day
-Average RPS = 5B requests / 86400 seconds ≈ 57,870 RPS
-Peak hour RPS = (5B / 86400) × (100 / 10) ≈ 578,700 RPS
-Peak minute RPS = 578,700 / 60 ≈ 9,645 RPS
-
-Read operations = 57,870 × 0.7 ≈ 40,509 RPS (average)
-Write operations = 57,870 × 0.3 ≈ 17,361 RPS (average)
+Assume 250,000 authorization checks/s, with 99% evaluated from a local policy cache and 1% requiring a centralized policy lookup.
+Cache keys must include tenant and policy version; invalidate or version them on policy change so revocation does not wait for an unbounded TTL.
+Record subject, resource, action, policy version, and decision for audits, while avoiding sensitive payloads in the audit stream.
 ```
 
 ### Storage Requirements
@@ -615,7 +621,7 @@ Backup storage (weekly snapshots): 8.25 PB × 52 weeks = 429 PB
 Inbound bandwidth = 57,870 RPS × 2 KB = 115.74 MB/s
 Outbound bandwidth = 57,870 RPS × 5 KB = 289.35 MB/s
 Replication bandwidth = 17,361 RPS × 2 KB × 2 = 69.44 MB/s
-Total peak bandwidth ≈ 474 MB/s ≈ 3.8 Tbps (peak hour)
+At 1 KB per centralized policy request, the 1% miss path produces about 2.5 MB/s of policy traffic; authorization decision logs may be larger than policy lookups.
 ```
 
 ### Compute Requirements
