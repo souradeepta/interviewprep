@@ -1,5 +1,15 @@
 # Reverse Proxy
 
+Status: draft
+
+Audience: Backend and infrastructure engineers preparing for gateway, routing, and resilience interviews.
+
+Prerequisites: HTTP, TLS termination, load balancing, health checks, rate limiting, and circuit breakers.
+
+Sequence: Accept connection → authenticate and route → enforce policy → proxy upstream → record outcome and latency.
+
+Terra gate: Before coding, state which limits are per client versus global and how the proxy behaves when all upstreams are unhealthy.
+
 ## Problem Statement
 
 Design a reverse proxy that sits in front of backend servers to provide SSL termination, caching, compression, rate limiting, and content routing.
@@ -690,13 +700,9 @@ public class SystemHandler {
 
 **Calculations:**
 ```
-Total daily requests = 100M users × 50 requests = 5 billion requests/day
-Average RPS = 5B requests / 86400 seconds ≈ 57,870 RPS
-Peak hour RPS = (5B / 86400) × (100 / 10) ≈ 578,700 RPS
-Peak minute RPS = 578,700 / 60 ≈ 9,645 RPS
-
-Read operations = 57,870 × 0.7 ≈ 40,509 RPS (average)
-Write operations = 57,870 × 0.3 ≈ 17,361 RPS (average)
+Assume 1 million requests/s across 20 proxy instances, with 10 upstream services and 5% of requests requiring retries.
+Each instance handles about 50,000 requests/s before headroom; bounded connection pools and retry budgets are essential so upstream failures do not amplify into a retry storm.
+Use consistent routing only when session affinity is required, and expose per-route saturation, queue time, upstream latency, and rejection counts.
 ```
 
 ### Storage Requirements
@@ -726,7 +732,7 @@ Backup storage (weekly snapshots): 8.25 PB × 52 weeks = 429 PB
 Inbound bandwidth = 57,870 RPS × 2 KB = 115.74 MB/s
 Outbound bandwidth = 57,870 RPS × 5 KB = 289.35 MB/s
 Replication bandwidth = 17,361 RPS × 2 KB × 2 = 69.44 MB/s
-Total peak bandwidth ≈ 474 MB/s ≈ 3.8 Tbps (peak hour)
+At 8 KB average request-plus-response payload, 1 million requests/s creates about 8 GB/s of proxy traffic before TLS framing and compression effects.
 ```
 
 ### Compute Requirements

@@ -1,5 +1,15 @@
 # Content Delivery Network (CDN)
 
+Status: draft
+
+Audience: Backend and infrastructure engineers preparing for CDN, caching, and global traffic interviews.
+
+Prerequisites: HTTP caching, DNS/anycast, origin shielding, invalidation, and edge observability.
+
+Sequence: Route to edge → check cache → shield the origin on misses → invalidate or revalidate content safely.
+
+Terra gate: Before coding, state the cache key, stale-content policy, and how a purge propagates during an origin failure.
+
 ## Problem Statement
 
 Design a CDN that serves static and dynamic content from geographically distributed edge servers to reduce latency and origin load.
@@ -743,13 +753,9 @@ public class SystemHandler {
 
 **Calculations:**
 ```
-Total daily requests = 100M users × 50 requests = 5 billion requests/day
-Average RPS = 5B requests / 86400 seconds ≈ 57,870 RPS
-Peak hour RPS = (5B / 86400) × (100 / 10) ≈ 578,700 RPS
-Peak minute RPS = 578,700 / 60 ≈ 9,645 RPS
-
-Read operations = 57,870 × 0.7 ≈ 40,509 RPS (average)
-Write operations = 57,870 × 0.3 ≈ 17,361 RPS (average)
+Assume 10 million edge requests/s with a 95% cache hit rate and 500,000 origin requests/s on misses.
+Origin shielding and request coalescing prevent a popular object from creating one origin fetch per edge; capacity-plan edge egress separately from origin egress.
+If a purge must converge within 60 seconds, publish versioned invalidation messages and measure propagation lag by region rather than assuming a synchronous global purge.
 ```
 
 ### Storage Requirements
@@ -779,7 +785,7 @@ Backup storage (weekly snapshots): 8.25 PB × 52 weeks = 429 PB
 Inbound bandwidth = 57,870 RPS × 2 KB = 115.74 MB/s
 Outbound bandwidth = 57,870 RPS × 5 KB = 289.35 MB/s
 Replication bandwidth = 17,361 RPS × 2 KB × 2 = 69.44 MB/s
-Total peak bandwidth ≈ 474 MB/s ≈ 3.8 Tbps (peak hour)
+At an average 100 KB response, 10 million edge requests/s represent about 1 TB/s of delivery traffic; a 95% hit rate reduces origin payload traffic to roughly 50 GB/s.
 ```
 
 ### Compute Requirements
